@@ -1,0 +1,29 @@
+{
+  "Index": {
+    "title": "Welcome to PEN-PAL",
+    "description": "A federally funded healthcare research study platform."
+  },
+  "Control": {
+    "title": "PEN-PAL Study Information",
+    "about": "Learn about pencillin allergies and our study."
+  },
+  "Intervention": {
+    "welcome": "Welcome to the interactive module.",
+    "start": "Start Questionnaire",
+    "next": "Next",
+    "back": "Back",
+    "submit": "Submit",
+    "reportTitle": "Health Report Summary",
+    "downloadReport": "Download Report",
+    "proceedToSurvey": "Proceed to Survey",
+    "dateGenerated": "Date Generated",
+    "primaryAllergy": "Primary Allergy",
+    "reportedSymptoms": "Reported Symptoms",
+    "editAnswers": "Edit Assessment"
+  },
+  "Common": {
+    "loading": "Loading...",
+    "error": "An error occurred.",
+    "invalidToken": "Invalid or expired access token."
+  }
+}

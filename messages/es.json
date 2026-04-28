@@ -1,0 +1,29 @@
+{
+  "Index": {
+    "title": "Bienvenido a PEN-PAL",
+    "description": "Una plataforma de estudio de investigación en salud."
+  },
+  "Control": {
+    "title": "Información del estudio PEN-PAL",
+    "about": "Aprenda sobre las alergias a la penicilina y nuestro estudio."
+  },
+  "Intervention": {
+    "welcome": "Bienvenido al módulo interactivo.",
+    "start": "Comenzar el Cuestionario",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "submit": "Enviar",
+    "reportTitle": "Resumen del Informe de Salud",
+    "downloadReport": "Descargar Informe",
+    "proceedToSurvey": "Proceder a la Encuesta",
+    "dateGenerated": "Fecha Generada",
+    "primaryAllergy": "Alergia Primaria",
+    "reportedSymptoms": "Síntomas Reportados",
+    "editAnswers": "Editar Evaluación"
+  },
+  "Common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error.",
+    "invalidToken": "Token de acceso inválido o caducado."
+  }
+}

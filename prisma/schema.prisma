@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // hashed
+  role      String   @default("RESEARCHER") // e.g., ADMIN, RESEARCHER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Participant {
+  id        String   @id @default(cuid())
+  externalId String?  @unique // User-provided ID for self-service token generation
+  groupId   String   // e.g., "INTERVENTION", "CONTROL"
+  status    String   @default("ACTIVE") // ACTIVE, COMPLETED, WITHDRAWN
+  
+  tokens    ParticipantToken[]
+  sessions  Session[]
+  responses QuestionnaireResponse[]
+  surveys   SurveyResponse[]
+  events    EventLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ParticipantToken {
+  id             String      @id @default(cuid())
+  token          String      @unique
+  participantId  String
+  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  status         String      @default("VALID") // VALID, EXPIRED, COMPLETED, REVOKED
+  expiresAt      DateTime?
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([token])
+}
+
+model Session {
+  id             String      @id @default(cuid())
+  participantId  String
+  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  
+  startTime      DateTime    @default(now())
+  endTime        DateTime?
+  durationSeconds Int?
+  status         String      @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, ABANDONED
+
+  events         EventLog[]
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model QuestionnaireResponse {
+  id             String      @id @default(cuid())
+  participantId  String
+  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  
+  questionId     String
+  answerValue    String
+  // Storing additional context in JSON if needed
+  metadata       String?     // Stored as JSON string to support flexibility
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@unique([participantId, questionId])
+}
+
+model SurveyResponse {
+  id             String      @id @default(cuid())
+  participantId  String
+  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  
+  surveyType     String      // e.g., "SUS", "EVAL_1"
+  answers        String      // Stored as JSON string
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model EventLog {
+  id             String      @id @default(cuid())
+  participantId  String?
+  participant    Participant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
+  
+  sessionId      String?
+  session        Session?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  
+  eventType      String      // PAGE_VIEW, BUTTON_CLICK, AUDIO_PLAY, MODAL_OPEN, etc.
+  eventData      String?     // Stored as JSON string
+  path           String?
+  
+  timestamp      DateTime    @default(now())
+  
+  @@index([participantId])
+  @@index([eventType])
+}
