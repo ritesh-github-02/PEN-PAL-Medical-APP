@@ -210,15 +210,15 @@ export default async function AdminPage({ searchParams }: PageProps) {
               <div key={index} className="flex items-center p-2 bg-teal-50/50 rounded hover:bg-teal-100/50 transition-colors">
                 <div className="w-3 h-3 bg-teal-400 rounded-full mr-3"></div>
                 <div className="flex-1">
-                  {item.type === 'summary' ? (
-                    <>
-                      <p className="text-xs font-medium text-teal-600">{item.title}</p>
-                      <p className="text-xs text-teal-400">{item.value}</p>
-                    </>
-                  ) : (
+                  {'login' in item ? (
                     <>
                       <p className="text-xs font-medium text-teal-600">{item.login.participant?.externalId || 'Unknown User'}</p>
                       <p className="text-xs text-teal-400">{new Date(item.login.createdAt).toLocaleTimeString()} • {new Date(item.login.createdAt).toLocaleDateString()}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs font-medium text-teal-600">{item.title}</p>
+                      <p className="text-xs text-teal-400">{item.value}</p>
                     </>
                   )}
                 </div>
