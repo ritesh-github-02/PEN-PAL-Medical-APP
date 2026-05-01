@@ -1,1 +1,137 @@
 @import "tailwindcss";
+
+/* Print Styles */
+@media print {
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* Scale down if content is too tall */
+  @media (max-height: 297mm) {
+    .print-container {
+      transform: scale(0.95);
+      transform-origin: top left;
+      width: 105%;
+    }
+  }
+
+  @media (max-height: 420mm) {
+    .print-container {
+      transform: scale(0.9);
+      transform-origin: top left;
+      width: 111%;
+    }
+  }
+
+  /* Prevent page breaks inside important sections */
+  .print-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-page {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  /* Summary screen specific print layout */
+  .print-report {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .print-report h2 {
+    font-size: 14pt !important;
+    margin-bottom: 8pt !important;
+    color: #000 !important;
+  }
+
+  .print-report p {
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+    margin-bottom: 6pt !important;
+  }
+
+  .print-report .section-label {
+    font-size: 9pt !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: #008080 !important;
+    margin-bottom: 2pt !important;
+  }
+
+  .print-report .section-value {
+    font-size: 11pt !important;
+    font-weight: 500 !important;
+    margin-bottom: 10pt !important;
+  }
+
+  /* Hide floating voiceover widget */
+  .fixed.bottom-6.right-6 {
+    display: none !important;
+  }
+
+  /* Ensure white background */
+  .bg-white {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Reduce margins for compact layout */
+  .p-8 {
+    padding: 1rem !important;
+  }
+
+  .p-12 {
+    padding: 1.5rem !important;
+  }
+
+  .mb-8 {
+    margin-bottom: 1rem !important;
+  }
+
+  .mb-10 {
+    margin-bottom: 1.25rem !important;
+  }
+
+  .mb-12 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .mt-8 {
+    margin-top: 1rem !important;
+  }
+
+  /* Smaller buttons container */
+  .flex.gap-4 {
+    gap: 0.5rem !important;
+  }
+
+  /* Adjust grid for print */
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Remove shadows for cleaner print */
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+
+  /* Ensure portrait orientation */
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+}

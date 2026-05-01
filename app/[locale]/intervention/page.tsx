@@ -39,7 +39,7 @@ export default function InterventionEntryPage() {
         setLoading(false);
       } else if (result?.success) {
         if (result.isCompleted) {
-          router.push('/intervention/report');
+          router.push('/intervention/flow?report=true');
         } else {
           router.push('/intervention/flow');
         }
@@ -75,14 +75,14 @@ export default function InterventionEntryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-zinc-900">
-        <div className="max-w-md w-full p-12 bg-white border border-zinc-200 text-center">
-          <div className="w-16 h-16 border border-zinc-200 flex items-center justify-center mx-auto mb-8 text-2xl font-light text-zinc-900">!</div>
-          <h2 className="text-3xl font-light text-zinc-900 mb-4 tracking-tight">System Message</h2>
-          <p className="text-zinc-500 mb-10 leading-relaxed font-light">{error}</p>
+      <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex items-center justify-center p-4 font-sans text-gray-900">
+        <div className="max-w-md w-full p-12 bg-white rounded-2xl shadow-lg text-center">
+          <div className="w-16 h-16 bg-red-100 flex items-center justify-center mx-auto mb-8 rounded-lg text-2xl font-light text-red-600">!</div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Alert</h2>
+          <p className="text-gray-600 mb-10 leading-relaxed">{error}</p>
           <button 
             onClick={() => { setError(null); setRequestStatus(null); }}
-            className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest border-t border-zinc-100 pt-6 hover:text-zinc-500 transition-colors"
+            className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition"
           >
             Go Back
           </button>
@@ -93,27 +93,27 @@ export default function InterventionEntryPage() {
 
   if (requestStatus) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-zinc-900">
-        <div className="max-w-md w-full p-12 bg-white border border-zinc-200 text-center">
-          <div className="w-16 h-16 bg-zinc-900 flex items-center justify-center mx-auto mb-8 text-2xl font-light text-white">✓</div>
-          <h2 className="text-3xl font-light text-zinc-900 mb-2 tracking-tight">Token Ready</h2>
-          <p className="text-zinc-500 mb-6 leading-relaxed font-light">{requestStatus.message}</p>
+      <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex items-center justify-center p-4 font-sans text-gray-900">
+        <div className="max-w-md w-full p-12 bg-white rounded-2xl shadow-lg text-center">
+          <div className="w-16 h-16 bg-green-100 flex items-center justify-center mx-auto mb-8 text-2xl rounded-lg">✓</div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Token Ready</h2>
+          <p className="text-gray-600 mb-6 leading-relaxed">{requestStatus.message}</p>
           
-          <div className="p-6 bg-zinc-50 border border-zinc-100 mb-8 select-all cursor-pointer group">
-             <p className="text-2xl font-mono tracking-widest text-zinc-900 group-hover:text-zinc-600 transition-colors">{requestStatus.token}</p>
-             <p className="text-[9px] uppercase tracking-tighter text-zinc-400 mt-2 italic">Click to select and copy</p>
+          <div className="p-6 bg-yellow-50 border-2 border-yellow-200 mb-8 select-all cursor-pointer rounded-lg">
+             <p className="text-2xl font-mono tracking-widest text-teal-700">{requestStatus.token}</p>
+             <p className="text-xs uppercase tracking-tighter text-gray-500 mt-2">Click to select and copy</p>
           </div>
 
           <button 
             onClick={() => handleValidation(requestStatus.token)}
-            className="w-full py-5 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-widest transition-colors flex justify-center items-center mb-4"
+            className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-lg mb-4 transition"
           >
-            Use Token & Start →
+            Use Token & Start
           </button>
           
           <button 
             onClick={() => setRequestStatus(null)}
-            className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest hover:text-zinc-900 transition-colors"
+            className="text-sm font-semibold text-gray-500 hover:text-gray-800 transition"
           >
             Cancel
           </button>
@@ -124,18 +124,19 @@ export default function InterventionEntryPage() {
 
   // If no token, show a manual entry input
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-zinc-900">
-      <div className="max-w-md mx-auto w-full space-y-12">
+    <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-900">
+      <div className="max-w-md mx-auto w-full space-y-8">
         <div className="space-y-4 text-center">
-          <h2 className="text-5xl font-light text-zinc-900 tracking-tight">
-            PEN-PAL <span className="font-medium">Study</span>
+          <h2 className="text-5xl font-bold text-teal-700">
+            PEN-PAL
           </h2>
-          <p className="text-lg text-zinc-500 font-light leading-relaxed">
+          <p className="text-gray-700 font-semibold">Parents Engaged in Penicillin Allergies</p>
+          <p className="text-lg text-gray-600 leading-relaxed">
             Please enter your secure access token.
           </p>
         </div>
 
-        <div className="bg-white border border-zinc-200">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="p-10 sm:p-12">
             <form onSubmit={(e) => {
               e.preventDefault();
@@ -145,45 +146,45 @@ export default function InterventionEntryPage() {
               <input 
                 name="token" 
                 type="text" 
-                placeholder="TOKEN" 
+                placeholder="ENTER TOKEN" 
                 required
-                className="w-full px-6 py-5 border border-zinc-200 focus:outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 mb-8 font-mono text-center tracking-widest text-zinc-900 bg-white placeholder-zinc-300 transition-colors"
+                className="w-full px-6 py-4 border-2 border-gray-300 focus:outline-none focus:border-teal-600 mb-6 font-mono text-center tracking-wider text-gray-900 bg-white placeholder-gray-400 rounded-lg transition"
               />
               <button 
                 type="submit" 
-                className="w-full py-5 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-widest transition-colors flex justify-center items-center"
+                className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg transition flex justify-center items-center"
               >
-                Enter Study →
+                Enter Study
               </button>
             </form>
           </div>
         </div>
 
         {/* REQUEST TOKEN SECTION */}
-        <div className="pt-8 border-t border-zinc-200">
-          <div className="text-center mb-8">
-             <h3 className="text-sm font-medium text-zinc-900 uppercase tracking-widest">Need a token?</h3>
-             <p className="text-xs text-zinc-500 mt-2 font-light">Generate one using your research ID.</p>
+        <div className="pt-8 border-t-2 border-teal-200">
+          <div className="text-center mb-6">
+             <h3 className="text-sm font-bold text-gray-900">Need a token?</h3>
+             <p className="text-xs text-gray-600 mt-2">Generate one using your research ID.</p>
           </div>
           
-          <div className="bg-white/50 border border-zinc-200 p-8">
+          <div className="bg-white rounded-2xl shadow-lg p-8">
             <form onSubmit={handleRequestToken} className="space-y-4">
               <input 
                 name="userId" 
                 type="text" 
-                placeholder="YOUR RESEARCH ID" 
+                placeholder="RESEARCH ID" 
                 required
-                className="w-full px-4 py-3 border border-zinc-200 focus:outline-none focus:border-zinc-900 bg-white/80 text-xs tracking-wider"
+                className="w-full px-4 py-3 border-2 border-gray-300 focus:outline-none focus:border-teal-600 bg-white text-sm font-semibold rounded-lg"
               />
               <button 
                 type="submit" 
-                className="w-full py-3 border border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all"
+                className="w-full py-3 border-2 border-teal-600 text-teal-700 hover:bg-teal-50 font-bold text-sm rounded-lg transition"
               >
                 Request Access Token
               </button>
             </form>
-            <p className="text-[9px] text-zinc-400 mt-4 text-center leading-tight">
-              Security Notice: Only one token is permitted per ID. Your IP and ID will be logged for audit purposes.
+            <p className="text-xs text-gray-500 mt-4 text-center leading-tight">
+              Security: Only one token per ID. Your IP and ID will be logged.
             </p>
           </div>
         </div>

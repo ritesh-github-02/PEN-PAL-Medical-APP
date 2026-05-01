@@ -20,9 +20,9 @@ export function ExportButton({ type }: { type: 'responses' | 'events' }) {
     <button
       onClick={handleExport}
       disabled={loading}
-      className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all text-sm uppercase tracking-wide disabled:opacity-50 disabled:shadow-none"
+      className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium shadow shadow-teal-200 transition-all text-xs uppercase tracking-wider disabled:opacity-50 disabled:shadow-none"
     >
-      <Download className="w-4 h-4" />
+      <Download className="w-3 h-3" />
       {loading ? 'Exporting...' : 'Export CSV'}
     </button>
   );

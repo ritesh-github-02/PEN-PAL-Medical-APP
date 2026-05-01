@@ -44,7 +44,7 @@ CREATE TABLE "Session" (
     "status" TEXT NOT NULL DEFAULT 'IN_PROGRESS',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-
+    
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
 );
 
