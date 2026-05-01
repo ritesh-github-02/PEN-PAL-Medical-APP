@@ -8,6 +8,10 @@ interface PageProps {
   searchParams: Promise<{ q?: string }>;
 }
 
+type OverviewItem = 
+  | { type: 'summary'; title: string; value: string }
+  | { type: 'login'; login: any };
+
 export default async function AdminPage({ searchParams }: PageProps) {
   const { q } = await searchParams;
   let participantCount = 0;
@@ -122,7 +126,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
   }
 
   // Create combined items for the participant overview grid
-  const overviewItems = [];
+  const overviewItems: OverviewItem[] = [];
   // Add total participants summary as first item
   overviewItems.push({
     type: 'summary',
