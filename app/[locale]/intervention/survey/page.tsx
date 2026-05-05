@@ -50,13 +50,17 @@ export default function SurveyPage() {
     const loadSurveyData = async () => {
       try {
         const result = await getSurveyResponse();
-        if (result.data) {
+        if (result.error) {
+          console.error('Survey load error:', result.error);
+          setGlobalError(result.error);
+        } else if (result.data) {
           setAnswers(result.data.answers);
           setIsEditMode(true);
           setLastUpdated(new Date(result.data.updatedAt));
         }
       } catch (error) {
         console.error('Error loading survey:', error);
+        setGlobalError('Failed to load survey data');
       } finally {
         setLoading(false);
       }
@@ -143,6 +147,9 @@ export default function SurveyPage() {
       </div>
     );
   }
+
+  // Allow survey to be shown even without session (for demo/preview mode)
+  // The globalError will show if there's an authentication issue
 
   if (submitted) {
     return (
