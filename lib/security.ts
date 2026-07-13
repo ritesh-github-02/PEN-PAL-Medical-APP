@@ -104,41 +104,69 @@ export function ipOctetPrefix(ip: string): string {
 // ── Token types ─────────────────────────────────────────────────────────────
 
 export interface ParsedToken {
-  raw: string;      // exactly as issued: "PEN-{payload}-{hmac}"
-  participantId: string; // embedded participant CUID: "cuid-nnnn:PEN2E7XY"
-  randomB32: string;  // the 8 Base32 chars
-  hmac: string;     // 64-char lowercase hex
+  raw: string;      // exactly as issued: "PEN-{payload}" or legacy format
+  participantId: string; // embedded participant CUID (legacy only)
+  randomB32: string;  // the random segment
+  hmac: string;     // HMAC signature (legacy only)
+}
+
+// ── Low-level helper for generating random Base32 string ─────────────────────
+function generateRandomBase32(length: number): string {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let result = '';
+  const randomBytes = crypto.randomBytes(length);
+  for (let i = 0; i < length; i++) {
+    result += alphabet[randomBytes[i] % 32];
+  }
+  return result;
 }
 
 // ── Parse ─────────────────────────────────────────────────────────────────
 
 /**
  * Parse and structurally validate a raw token string.
+ * Supports both new short format (PEN-XXXXXX) and legacy format.
  * @throws TokenTamperingError on any structural anomaly.
- *
- * Token format: `PEN-{participantId}:{8Base32}-{64HexHMAC}`
  */
 export function parseToken(raw: string): ParsedToken {
   const trimmed = typeof raw === 'string' ? raw.trim() : '';
-  // Regex: PEN-{anything-not-dash}:{8Base32}-{64hex}
-  const match = /^PEN-(\w+[\w\-]*):([A-Z2-7]{8})-([0-9a-f]{64})$/i.exec(trimmed);
-  if (!match) {
-    throw new TokenTamperingError(
-      `Malformed token — expected PEN-{participantId}:{8base32}-{hmac} but received "${trimmed.slice(0, 32)}${trimmed.length > 32 ? '…' : ''}"`,
-    );
+
+  // 1. New short token format: PEN-{4to6Base32} (total 8 to 10 chars)
+  const newFormatMatch = /^PEN-([A-Z2-7]{4,6})$/i.exec(trimmed);
+  if (newFormatMatch) {
+    const [, randomB32] = newFormatMatch;
+    return {
+      raw: trimmed,
+      participantId: '',
+      randomB32: randomB32.toUpperCase(),
+      hmac: '',
+    };
   }
-  const [, participantId, randomB32, hmac] = match;
-  return { raw: trimmed, participantId, randomB32: randomB32.toUpperCase(), hmac: hmac.toLowerCase() };
+
+  // 2. Legacy token format: PEN-{participantId}:{8Base32}-{64HexHMAC}
+  const legacyFormatMatch = /^PEN-(\w+[\w\-]*):([A-Z2-7]{8})-([0-9a-f]{64})$/i.exec(trimmed);
+  if (legacyFormatMatch) {
+    const [, participantId, randomB32, hmac] = legacyFormatMatch;
+    return {
+      raw: trimmed,
+      participantId,
+      randomB32: randomB32.toUpperCase(),
+      hmac: hmac.toLowerCase(),
+    };
+  }
+
+  throw new TokenTamperingError(
+    `Malformed token — expected PEN-{randomCode} but received "${trimmed.slice(0, 32)}${trimmed.length > 32 ? '…' : ''}"`,
+  );
 }
 
 // ── Crypto-only verification ─ ─────────────────────────────────────────────────
 
 /**
- * Verify the HMAC of a raw token against `ADMIN_SECRET` without touching DB.
- * Covers `{augmentId}:{participantId}:{randomB32}` — knowing `ADMIN_SECRET`
- * is required to forge or modify any segment.
+ * Verify the HMAC of a raw token against `ADMIN_SECRET` without touching DB (legacy only).
+ * Short tokens do not use HMAC and are verified directly via DB lookup.
  *
- * @returns true if the token is structurally valid AND the HMAC matches.
+ * @returns true if the token is structurally valid (and signature matches if legacy).
  */
 export function verifyTokenCrypto(rawInput: string, secret: string): boolean {
   let parsed: ParsedToken;
@@ -147,6 +175,9 @@ export function verifyTokenCrypto(rawInput: string, secret: string): boolean {
   } catch {
     return false;
   }
+  if (!parsed.hmac) {
+    return true; // Short token structural validity is verified
+  }
   const expected = hmacSha256Hex(secret, signingMessage(AUGMENT_ID, parsed.participantId, parsed.randomB32));
   return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(parsed.hmac));
 }
@@ -154,18 +185,10 @@ export function verifyTokenCrypto(rawInput: string, secret: string): boolean {
 // ── Token generation ─ ────────────────────────────────────────────────────────
 
 /**
- * Generate a new cryptographically secure access token bound to `participantId`.
+ * Generate a new cryptographically secure access token of 8 to 10 characters.
+ * Suffix is 6 random Base32 characters, prefix is 'PEN-', total length = 10 characters.
  *
- * Wire format: `PEN-{participantId}:{base32(5 random bytes)}-{HMAC_SHA256}`
- *
- * What each piece protects:
- *   ① participantId embedded in payload — token is explicitly tied to one user
- *   ② randomB32  (5 random bytes = 40 bits) — unguessable, unpredictable
- *   ③ hmac       HMAC-SHA-256 over `augmentId:participantId:randomB32` — any
- *                 change to any segment produces a completely different tag;
- *                 forgery requires `ADMIN_SECRET`
- *   ④ sha         SHA-256 of the full raw token — stored as `tokenHash` in the DB;
- *                 the raw token is NEVER persisted in plaintext.
+ * Wire format: `PEN-{base32(6 random characters)}`
  *
  * @param secret         Server-side secret (ADMIN_SECRET from env)
  * @param participantId  CUID of the participant this token is bound to
@@ -176,10 +199,10 @@ export function generateSecureToken(
   participantId: string,
   expiresAt?: Date | null,
 ): { raw: string; sha: string; payload: string; randomB32: string; hmac: string } {
-  const randomB32 = base32Encode(crypto.randomBytes(RANDOM_BYTE_LENGTH));
-  const payload = `${participantId}:${randomB32}`;
-  const hmac = hmacSha256Hex(secret, signingMessage(AUGMENT_ID, participantId, randomB32));
-  const raw = [TOKEN_PREFIX, payload, hmac].join('-');
+  const randomB32 = generateRandomBase32(6); // exactly 6 Base32 chars
+  const payload = randomB32; // payload is the random code
+  const hmac = ''; // no HMAC tag needed
+  const raw = `${TOKEN_PREFIX}-${randomB32}`; // "PEN-XXXXXX"
   const sha = sha256Hex(raw);
   return { raw, sha, payload, randomB32, hmac };
 }

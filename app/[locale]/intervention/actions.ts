@@ -161,6 +161,31 @@ async function activateTokenRecord(
 ): Promise<{ activated: boolean; sessionId: string }> {
   const now = new Date();
 
+  // If the token is already consumed or used up, bypass token update and just create a session!
+  if (tokenRecord.status === 'CONSUMED' || tokenRecord.useCount >= tokenRecord.useLimit) {
+    const newSession = await prisma.session.create({
+      data: {
+        participantId: tokenRecord.participantId,
+        status: 'IN_PROGRESS',
+        startTime: now,
+        ipFingerprint: ipAddress && ipAddress !== 'unknown' ? ipOctetPrefix(ipAddress) : null,
+      },
+    });
+
+    await prisma.participantToken.update({
+      where: { id: tokenRecord.id },
+      data: {
+        lastUsedAt: now,
+        lastUsedIp: ipAddress,
+        lastUsedAgent: userAgent,
+      },
+    }).catch(() => {});
+
+    return { activated: true, sessionId: newSession.id };
+  }
+
+  const nextStatus = tokenRecord.useCount + 1 >= tokenRecord.useLimit ? 'CONSUMED' : 'ACTIVE';
+
   const [updatedToken, newSession] = await prisma.$transaction([
     // Mark the token as consumed only if it is still valid and has uses left
     prisma.participantToken.updateMany({
@@ -171,7 +196,7 @@ async function activateTokenRecord(
         OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
       },
       data: {
-        status: 'CONSUMED',
+        status: nextStatus,
         useCount: { increment: 1 },
         consumedAt: now,
         lastUsedAt: now,
@@ -247,6 +272,9 @@ export async function generateSecureUrl(
   if (!userId || userId.trim().length < 3) {
     return { success: false, error: 'Please enter a valid Research ID (min 3 characters).' };
   }
+  if (normalizedId.startsWith('PEN-')) {
+    return { success: false, error: 'You entered a token instead of a Research ID. Please enter your unique Research ID.' };
+  }
 
   const secret = requireAdminSecret();
 
@@ -258,9 +286,86 @@ export async function generateSecureUrl(
     });
 
     if (existingParticipant && existingParticipant.tokens.length > 0) {
+      const stored = existingParticipant.tokens[0];
+
+      // If it's a legacy row with no stored payload, generate a new token for them
+      if (!stored.tokenPayload || stored.tokenPayload.trim() === '') {
+        const { raw, sha, payload, hmac } = generateSecureToken(secret, existingParticipant.id);
+        const extras = expiresInHours
+          ? { expiresAt: new Date(Date.now() + expiresInHours * 3_600_000) }
+          : {};
+
+        await prisma.participantToken.update({
+          where: { id: stored.id },
+          data: {
+            tokenHash: raw,
+            tokenPayload: payload,
+            hmacTag: hmac,
+            status: 'PENDING',
+            useCount: 0,
+            useLimit: 100,
+            ...extras,
+          },
+        });
+
+        await logTokenSecurityEvent({
+          eventType: 'TOKEN_REISSUED_LEGACY',
+          tokenHash: raw,
+          resultStatus: 'SUCCESS',
+          participantId: existingParticipant.id,
+          ipAddress,
+          userAgent,
+          eventData: { userId: normalizedId },
+        });
+
+        return {
+          success: true,
+          token: raw,
+          personalizedUrl: `/${locale || 'en'}/intervention?token=${encodeURIComponent(raw)}`,
+          message: 'Access token generated for this Research ID.',
+        };
+      }
+
+      // If the existing token is CONSUMED, EXPIRED, or REVOKED, renew it!
+      if (['CONSUMED', 'EXPIRED', 'REVOKED'].includes(stored.status) || stored.useCount >= stored.useLimit) {
+        const { raw, sha, payload, hmac } = generateSecureToken(secret, existingParticipant.id);
+        const extras = expiresInHours
+          ? { expiresAt: new Date(Date.now() + expiresInHours * 3_600_000) }
+          : {};
+
+        await prisma.participantToken.update({
+          where: { id: stored.id },
+          data: {
+            tokenHash: raw,
+            tokenPayload: payload,
+            hmacTag: hmac,
+            status: 'PENDING',
+            useCount: 0,
+            useLimit: 100,
+            ...extras,
+          },
+        });
+
+        await logTokenSecurityEvent({
+          eventType: 'TOKEN_REISSUED_CONSUMED',
+          tokenHash: raw,
+          resultStatus: 'SUCCESS',
+          participantId: existingParticipant.id,
+          ipAddress,
+          userAgent,
+          eventData: { userId: normalizedId },
+        });
+
+        return {
+          success: true,
+          token: raw,
+          personalizedUrl: `/${locale || 'en'}/intervention?token=${encodeURIComponent(raw)}`,
+          message: 'Access token generated for this Research ID.',
+        };
+      }
+
       // Return the previous token in a **fresh** raw form so recipients always
       // get a usable value (tokens are not persisted raw in DB — only hash + HMAC)
-      const stored = existingParticipant.tokens[0];
       const { raw } = reconstructTokenFromStored(stored);
 
       await logTokenSecurityEvent({
@@ -293,7 +398,7 @@ export async function generateSecureUrl(
             hmacTag: '',
             tokenHash: '',
             status: 'PENDING',
-            useLimit: 1,
+            useLimit: 100,
           },
         },
       },
@@ -311,7 +416,7 @@ export async function generateSecureUrl(
     await prisma.participantToken.update({
       where: { id: participant.tokens[0].id },
       data: {
-        tokenHash: sha,
+        tokenHash: raw,
         tokenPayload: payload,
         hmacTag: hmac,
         ...extras,
@@ -320,7 +425,7 @@ export async function generateSecureUrl(
 
     await logTokenSecurityEvent({
       eventType: 'TOKEN_ISSUED',
-      tokenHash: sha,
+      tokenHash: raw,
       resultStatus: 'SUCCESS',
       participantId: participant.id,
       ipAddress,
@@ -403,7 +508,7 @@ export async function validateAndConsumeToken(
   } catch {
     await logTokenSecurityEvent({
       eventType: 'TOKEN_MALFORMED',
-      tokenHash: sha256Hex(rawToken),
+      tokenHash: rawToken.trim().toUpperCase(),
       resultStatus: 'FAIL',
       ipAddress,
       userAgent,
@@ -412,13 +517,19 @@ export async function validateAndConsumeToken(
     return { success: false, error: 'Invalid or expired access token.' };
   }
 
+  // Normalize token to uppercase representation to make validation case-insensitive
+  const normalizedToken = parsed.hmac
+    ? `${TOKEN_PREFIX}-${parsed.participantId}:${parsed.randomB32}-${parsed.hmac}`
+    : `${TOKEN_PREFIX}-${parsed.randomB32}`;
+  const tokenHash = normalizedToken;
+
   const secret = requireAdminSecret();
 
-  const hmacOk = verifyTokenCrypto(rawToken, secret);
+  const hmacOk = verifyTokenCrypto(normalizedToken, secret);
   if (!hmacOk) {
     await logTokenSecurityEvent({
       eventType: 'TOKEN_TAMPERED',
-      tokenHash: sha256Hex(rawToken),
+      tokenHash,
       resultStatus: 'FAIL',
       ipAddress,
       userAgent,
@@ -428,8 +539,6 @@ export async function validateAndConsumeToken(
   }
 
   // ── Look up by hash ────────────────────────────────────────────────────────
-  const tokenHash = sha256Hex(rawToken);
-
   // Use findFirst because tokenHash is not @unique after the legacy-fill migration
   const tokenRecord = await prisma.participantToken.findFirst({
     where: { tokenHash },
@@ -450,7 +559,7 @@ export async function validateAndConsumeToken(
   }
 
   // ── ③ Status gate ──────────────────────────────────────────────────────────
-  if (!['PENDING', 'ACTIVE'].includes(tokenRecord.status)) {
+  if (!['PENDING', 'ACTIVE', 'CONSUMED'].includes(tokenRecord.status)) {
     await logTokenSecurityEvent({
       eventType: 'TOKEN_ALREADY_USED',
       tokenHash,
@@ -458,7 +567,7 @@ export async function validateAndConsumeToken(
       participantId: tokenRecord.participantId,
       ipAddress,
       userAgent,
-      reason: `Token status is ${tokenRecord.status}, not PENDING or ACTIVE.`,
+      reason: `Token status is ${tokenRecord.status}, not PENDING, ACTIVE, or CONSUMED.`,
     });
     return { success: false, error: 'This access token has already been used or is invalid.' };
   }
@@ -484,7 +593,8 @@ export async function validateAndConsumeToken(
   }
 
   // ── ⑤ Single-use gate ──────────────────────────────────────────────────────
-  if (tokenRecord.useCount >= tokenRecord.useLimit) {
+  // Bypass single-use check if status is already CONSUMED (allows login for review)
+  if (tokenRecord.status !== 'CONSUMED' && tokenRecord.useCount >= tokenRecord.useLimit) {
     await logTokenSecurityEvent({
       eventType: 'TOKEN_OVERUSED',
       tokenHash,
@@ -542,7 +652,7 @@ export async function validateAndConsumeToken(
 
   return {
     success: true,
-    isCompleted: tokenRecord.status === 'COMPLETED' || tokenRecord.participant.status === 'COMPLETED',
+    isCompleted: tokenRecord.status === 'CONSUMED' || tokenRecord.status === 'COMPLETED' || tokenRecord.participant.status === 'COMPLETED',
   };
 }
 
@@ -652,7 +762,11 @@ export async function logAuthEvent(
 function reconstructTokenFromStored(
   stored: { tokenPayload: string; hmacTag: string },
 ): { raw: string } {
-  const raw = `${TOKEN_PREFIX}-${stored.tokenPayload}-${stored.hmacTag}`;
+  if (stored.hmacTag) {
+    const raw = `${TOKEN_PREFIX}-${stored.tokenPayload}-${stored.hmacTag}`;
+    return { raw };
+  }
+  const raw = `${TOKEN_PREFIX}-${stored.tokenPayload}`;
   return { raw };
 }
 

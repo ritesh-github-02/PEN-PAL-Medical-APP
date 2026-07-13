@@ -134,7 +134,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
     // Filter by search query if present
     if (q) {
-      allParticipants = baseParticipants.filter(p =>
+      allParticipants = baseParticipants.filter((p: any) =>
         p.externalId?.toLowerCase().includes(q.toLowerCase()) ||
         p.id.toLowerCase().includes(q.toLowerCase())
       );

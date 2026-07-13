@@ -21,6 +21,7 @@ export default function InterventionEntryPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [requestStatus, setRequestStatus] = useState<{ message: string; token: string } | null>(null);
+  const [mode, setMode] = useState<'login' | 'register'>('login');
 
   const handleValidation = useCallback(async (tokenToValidate: string) => {
     setLoading(true);
@@ -128,7 +129,7 @@ export default function InterventionEntryPage() {
             </button>
             
             <button 
-              onClick={() => setRequestStatus(null)}
+              onClick={() => { setRequestStatus(null); setMode('login'); }}
               className="block w-full text-center text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors cursor-pointer"
             >
               Cancel
@@ -146,7 +147,7 @@ export default function InterventionEntryPage() {
       <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-500/5 rounded-full filter blur-[120px] pointer-events-none"></div>
       <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-500/5 rounded-full filter blur-[120px] pointer-events-none"></div>
 
-      <div className="max-w-4xl mx-auto w-full space-y-8 relative z-10 flex flex-col items-center">
+      <div className="max-w-md w-full space-y-8 relative z-10 flex flex-col items-center">
         {/* App Branding Header */}
         <div className="space-y-3 text-center">
           <h2 className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-teal-700 via-teal-600 to-indigo-800 bg-clip-text text-transparent tracking-tight">
@@ -157,24 +158,23 @@ export default function InterventionEntryPage() {
               Parents Engaged in Penicillin Allergies
             </span>
           </div>
-          <p className="text-sm text-slate-500 leading-relaxed max-w-md mx-auto pt-1 font-light">
-            Access the clinical assessment suite securely. Enter your existing research token or generate a new one below.
+          <p className="text-sm text-slate-500 leading-relaxed max-w-sm mx-auto pt-1 font-light">
+            Access the clinical assessment suite securely.
           </p>
         </div>
 
-        {/* Compact Two-Column Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch w-full">
-          
-          {/* ACCESS CARD */}
-          <div className="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-xl">
+        {/* Single Form Card */}
+        <div className="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-xl p-6 sm:p-8 w-full transition-all duration-300 hover:shadow-2xl">
+          {mode === 'login' ? (
+            /* ACCESS FORM */
             <div className="space-y-6">
               <div className="text-center">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-teal-600 bg-teal-50 border border-teal-100 px-2.5 py-1 rounded-md inline-block">
                   Secure Access
                 </span>
                 <h3 className="text-lg font-bold text-slate-800 mt-3">Enter Study Token</h3>
-                <p className="text-xs text-slate-500 mt-1.5 font-light leading-relaxed">
-                  Provide your 64-character research token to continue where you left off or start.
+                <p className="text-xs text-slate-505 mt-1.5 font-light leading-relaxed">
+                  Provide your 10-character research token to continue.
                 </p>
               </div>
 
@@ -186,7 +186,7 @@ export default function InterventionEntryPage() {
                 <input 
                   name="token" 
                   type="text" 
-                  placeholder="PEN-cmpebbxnt..." 
+                  placeholder="PEN-ABCDEF" 
                   required
                   className="h-12 w-full px-4 border border-slate-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl transition-all text-xs"
                 />
@@ -197,15 +197,19 @@ export default function InterventionEntryPage() {
                   Enter Study →
                 </button>
               </form>
-            </div>
-            
-            <p className="text-[10px] text-slate-400 text-center leading-relaxed mt-6 pt-4 border-t border-slate-100 font-light">
-              Security Notice: Session access tokens are private and cryptographically linked to your secure clinical assessment record.
-            </p>
-          </div>
 
-          {/* REQUEST REGISTRATION CARD */}
-          <div className="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-xl">
+              <div className="text-center pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setMode('register')}
+                  className="text-xs font-bold text-teal-650 hover:text-teal-800 hover:underline transition-all cursor-pointer uppercase tracking-wider"
+                >
+                  Create token if you are new
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* REGISTRATION / GENERATE TOKEN FORM */
             <div className="space-y-6">
               <div className="text-center">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-md inline-block">
@@ -232,14 +236,23 @@ export default function InterventionEntryPage() {
                   Request Access Token
                 </button>
               </form>
+
+              <div className="text-center pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setMode('login')}
+                  className="text-xs font-bold text-indigo-650 hover:text-indigo-850 hover:underline transition-all cursor-pointer uppercase tracking-wider"
+                >
+                  Already have a token? Log in
+                </button>
+              </div>
             </div>
-
-            <p className="text-[10px] text-slate-400 text-center leading-relaxed mt-6 pt-4 border-t border-slate-100 font-light">
-              Security Notice: Only one token is issued per unique Research ID. Your session, IP fingerprint, and access attempts are cryptographically secured.
-            </p>
-          </div>
-
+          )}
         </div>
+
+        <p className="text-[10px] text-slate-400 text-center leading-relaxed font-light max-w-xs">
+          Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.
+        </p>
       </div>
     </div>
   );
