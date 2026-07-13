@@ -35,35 +35,68 @@ model Participant {
   updatedAt DateTime @updatedAt
 }
 
-model ParticipantToken {
-  id             String      @id @default(cuid())
-  token          String      @unique
-  participantId  String
-  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  status         String      @default("VALID") // VALID, EXPIRED, COMPLETED, REVOKED
-  expiresAt      DateTime?
+  model ParticipantToken {
+    id             String      @id @default(cuid())
+    tokenHash  String     // SHA-256 hex of the full token; empty string for legacy rows (no hash stored)
+    hmacTag        String      @default("")        // HMAC tag; empty = legacy row
+    tokenPayload   String      @default("")        // Base32 random payload; empty = legacy row
+    participantId  String
+    participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+    status         String      @default("PENDING") // PENDING | ACTIVE | CONSUMED | EXPIRED | REVOKED
+    expiresAt      DateTime?               // Optional absolute expiry (null = never expires)
+    useLimit       Int         @default(1)  // Max allowed successful consumptions (>=1)
+    useCount       Int         @default(0)  // Successful consumptions so far
+    consumedAt     DateTime?               // Set to now() on first CONSUMED transition
+    lastUsedAt     DateTime?               // Last time token was validated (for audit trail)
+    lastUsedIp     String?                 // IP that consumed this token
+    lastUsedAgent  String?                 // User-agent at consumption
 
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+    ipFingerprint  String?                 // First 3 octets of IP at token generation (optional wire-up)
+    createdAt      DateTime    @default(now())
+    updatedAt      DateTime    @updatedAt
 
-  @@index([token])
-}
+    @@index([tokenHash])
+    @@index([participantId])
+    @@index([status])
+    @@index([expiresAt])
+    @@index([lastUsedAt])
+  }
 
-model Session {
-  id             String      @id @default(cuid())
-  participantId  String
-  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  
-  startTime      DateTime    @default(now())
-  endTime        DateTime?
-  durationSeconds Int?
-  status         String      @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, ABANDONED
+  model TokenSecurityEvent {
+    id             String   @id @default(cuid())
+    eventType      String                 // TOKEN_ISSUED | TOKEN_VALIDATED | TOKEN_CONSUMED | TOKEN_EXPIRED | TOKEN_ALREADY_USED | TOKEN_TAMPERED | TOKEN_INVALID | TOKEN_REVOKED
+    tokenHash      String?                // Hash of the token involved (null if tampered/not parseable)
+    resultStatus   String                 // SUCCESS | FAIL | ERROR
+    participantId  String?
+    sessionId      String?
+    ipAddress      String?
+    userAgent      String?
+    reason         String?                // Human-readable failure reason
+    eventData      String?                // JSON-serialized extra context
+    createdAt      DateTime  @default(now())
 
-  events         EventLog[]
+    @@index([tokenHash])
+    @@index([eventType])
+    @@index([createdAt])
+    @@index([ipAddress])
+  }
 
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-}
+  model Session {
+    id             String      @id @default(cuid())
+    participantId  String
+    participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+    startTime      DateTime    @default(now())
+    endTime        DateTime?
+    durationSeconds Int?
+    status         String      @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, ABANDONED
+    ipFingerprint  String?               // first 3 octets of client IP at session creation (device/environment binding)
+
+    events         EventLog[]
+
+    createdAt      DateTime    @default(now())
+    updatedAt      DateTime    @updatedAt
+  }
 
 model QuestionnaireResponse {
   id             String      @id @default(cuid())
@@ -93,20 +126,23 @@ model SurveyResponse {
   updatedAt      DateTime    @updatedAt
 }
 
-model EventLog {
-  id             String      @id @default(cuid())
-  participantId  String?
-  participant    Participant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
-  
-  sessionId      String?
-  session        Session?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
-  
-  eventType      String      // PAGE_VIEW, BUTTON_CLICK, AUDIO_PLAY, MODAL_OPEN, etc.
-  eventData      String?     // Stored as JSON string
-  path           String?
-  
-  timestamp      DateTime    @default(now())
-  
-  @@index([participantId])
-  @@index([eventType])
-}
+ model EventLog {
+   id             String      @id @default(cuid())
+   participantId  String?
+   participant    Participant? @relation(fields: [participantId], references: [id], onDelete: SetNull)
+
+   sessionId      String?
+   session        Session?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+   eventType      String      // TOKEN_VALIDATED, TOKEN_INVALID, SESSION_START, QUESTION_VIEW, QUESTION_ANSWER, AUDIO_PLAY, etc.
+   eventData      String?     // Stored as JSON string
+   path           String?
+   ipAddress      String?     // Capture IP for security
+   userAgent      String?     // Capture browser/device info
+   timestamp      DateTime    @default(now())
+
+   @@index([participantId])
+   @@index([eventType])
+   @@index([timestamp])
+   @@index([ipAddress])
+ }

@@ -13,18 +13,25 @@ export default function QuestionnaireEngine() {
   const t = useTranslations('Intervention');
   const params = useParams();
   const locale = (params.locale as string) || 'en';
-  
+
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
   const [initialized, setInitialized] = useState(false);
-  
+  const [bindingError, setBindingError] = useState<string | null>(null);
+
   const currentStep = questionnaireConfig[currentStepIndex];
 
   useEffect(() => {
     async function init() {
       let progress = await loadQuestionnaireProgress();
-      
+
+      if (progress.bindingError) {
+        setBindingError(progress.bindingError);
+        setInitialized(true);
+        return;
+      }
+
       // Fallback for preview environment via localStorage
       let localAnswers = false;
       if (!progress.lastStepId) {
@@ -168,6 +175,26 @@ export default function QuestionnaireEngine() {
       <Loader />
     </div>
   );
+
+  if (bindingError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-12 bg-white rounded-2xl shadow-lg text-center">
+          <div className="w-16 h-16 bg-teal-100 flex items-center justify-center mx-auto mb-8 rounded-lg text-3xl font-light text-teal-600">⚑</div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Session Unavailable</h2>
+          <p className="text-gray-600 mb-10 leading-relaxed">
+            This session is linked to a different device or network. Please request a new access token.
+          </p>
+          <button
+            onClick={() => { window.location.href = `/${locale}/intervention`; }}
+            className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition"
+          >
+            Request New Token
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const currentAnswer = answers[currentStep.id];
   const isNextDisabled = currentStep.required && (currentAnswer === undefined || currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0));

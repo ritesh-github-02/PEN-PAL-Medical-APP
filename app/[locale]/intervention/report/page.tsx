@@ -12,12 +12,21 @@ export default function ReportPage() {
   const params = useParams();
   const locale = (params.locale as string) || 'en';
   
-  const [data, setData] = useState<{ answers: Record<string, any> } | null>(null);
+  const [data, setData] = useState<{ answers: Record<string, any>; bindingError?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      const progress = await loadQuestionnaireProgress(); 
+      const progress = await loadQuestionnaireProgress();
+
+      if (progress.bindingError) {
+        // IP fingerprint mismatch — the session is tied to a different device/network.
+        // Show a re-auth prompt rather than rendering stale/incorrect data.
+        setData({ answers: {}, bindingError: progress.bindingError });
+        setLoading(false);
+        return;
+      }
+
       setData(progress);
       setLoading(false);
     }
@@ -30,6 +39,28 @@ export default function ReportPage() {
 
   if (loading) {
     return <Loader fullScreen />;
+  }
+
+  // IP-fingerprint mismatch on report page — cannot display stale/incorrect data
+  if (data?.bindingError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-12 bg-white rounded-2xl shadow-lg text-center">
+          <div className="w-16 h-16 bg-teal-100 flex items-center justify-center mx-auto mb-8 rounded-lg text-3xl font-light text-teal-600">⚑</div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Session Unavailable</h2>
+          <p className="text-gray-600 mb-10 leading-relaxed">
+            This session is linked to a different device or network and can no longer be used here.
+            Please request a new access token to continue.
+          </p>
+          <button
+            onClick={() => { window.location.href = `/${locale}/intervention`; }}
+            className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition"
+          >
+            Request New Token
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const answers = data?.answers || {};

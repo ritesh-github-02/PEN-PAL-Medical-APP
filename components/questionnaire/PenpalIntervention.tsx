@@ -38,6 +38,7 @@ export default function PenpalIntervention() {
   const [initialized, setInitialized] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [navigating, setNavigating] = useState(false);
+  const [bindingError, setBindingError] = useState<string | null>(null);
 
   const currentStep = questionnaireConfig[currentStepIndex];
 
@@ -45,6 +46,16 @@ export default function PenpalIntervention() {
     async function init() {
       let progress = await loadQuestionnaireProgress();
       let localAnswers = false;
+
+      // ── IP-fingerprint binding failure ────────────────────────────────────────
+      // The session's IP fingerprint (captured at first token validation) does
+      // not match the current request.  Treat this as a hard auth failure — the
+      // link may have been forwarded to an unauthorised device.
+      if (progress.bindingError) {
+        setBindingError(progress.bindingError);
+        setInitialized(true);
+        return;
+      }
 
       if (!progress.lastStepId) {
         try {
@@ -235,6 +246,28 @@ export default function PenpalIntervention() {
     return <Loader fullScreen />;
   }
 
+  // IP-fingerprint mismatch — failed device/environment binding check
+  if (bindingError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-12 bg-white rounded-2xl shadow-lg text-center">
+          <div className="w-16 h-16 bg-teal-100 flex items-center justify-center mx-auto mb-8 rounded-lg text-3xl font-light text-teal-600">⚑</div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Session Unavailable</h2>
+          <p className="text-gray-600 mb-10 leading-relaxed">
+            This session is linked to a different device or network and can no longer be used here.
+            Please request a new access token to continue.
+          </p>
+          <button
+            onClick={() => { window.location.href = `/${locale}/intervention`; }}
+            className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition"
+          >
+            Request New Token
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const content = locale === "es" ? currentStep.contentEs : currentStep.contentEn;
   const title = locale === "es" ? currentStep.titleEs : currentStep.titleEn;
   const description = locale === "es" ? currentStep.descriptionEs : currentStep.descriptionEn;
@@ -252,15 +285,20 @@ export default function PenpalIntervention() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex flex-col items-center justify-center py-8 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
+      {/* Decorative ambient background glows */}
+      <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse"></div>
+      <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse"></div>
+      
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-4xl relative z-10">
         {showSummary ? (
           <SummaryReportScreen
             answers={answers}
             onEditAssessment={() => {
               setShowSummary(false);
+              setCurrentStepIndex(0);
               router.push(`/${locale}/intervention/flow?edit=true`);
             }}
             onProceedToSurvey={async () => {
@@ -339,10 +377,10 @@ export default function PenpalIntervention() {
 
 function NavigationFooter({ onBack, onNext, loading, isFirstStep, t }: Omit<BaseScreenProps, 'title' | 'content' | 'description' | 'locale'>) {
   return (
-    <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center pt-8 mt-8 border-t border-zinc-100 gap-4 sm:gap-0">
+    <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center pt-8 mt-8 border-t border-slate-100 gap-4 sm:gap-0">
       <button
         type="button"
-        className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-900 disabled:opacity-0 transition-colors no-print"
+        className="px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-700 disabled:opacity-0 transition-colors duration-250 no-print cursor-pointer"
         disabled={isFirstStep || loading}
         onClick={onBack}
       >
@@ -352,7 +390,7 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t }: Omit<Base
         type="button"
         onClick={() => onNext()}
         disabled={loading}
-        className="px-12 py-4 text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center bg-zinc-900 text-white border border-zinc-900 hover:bg-zinc-800 no-print"
+        className="px-12 py-3.5 text-xs font-bold uppercase tracking-widest transition-all duration-250 flex items-center justify-center bg-slate-900 text-white border border-slate-900 hover:bg-slate-800 rounded-xl hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-md no-print"
       >
         {loading ? "..." : t("next")}
       </button>
@@ -364,15 +402,17 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t }: Omit<Base
 
 function IntroScreen({ title, description, content, onNext, onAnswer, loading, t }: BaseScreenProps & { onAnswer: (val: string) => void }) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl sm:text-5xl font-bold text-teal-700 mb-2">{title}</h1>
-        <p className="text-lg text-gray-700">{description}</p>
-      </div>
-      <div className="flex flex-col sm:flex-row gap-8 items-center justify-between mb-8">
-        <div className="flex-1">
-          <p className="text-lg text-gray-800 leading-relaxed whitespace-pre-line">{content}</p>
-          <div className="flex gap-4 mt-8">
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
+        <div className="flex-1 space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-teal-700 to-indigo-850 bg-clip-text text-transparent font-display tracking-tight leading-tight">{title}</h1>
+            <p className="text-base text-slate-500 font-light leading-relaxed">{description}</p>
+          </div>
+          <div className="text-slate-700 leading-relaxed font-light whitespace-pre-line bg-slate-50/50 p-6 rounded-2xl border border-slate-100/50 text-sm sm:text-base">
+            {content}
+          </div>
+          <div className="flex gap-4 pt-2">
             <button
               type="button"
               onClick={() => {
@@ -380,17 +420,21 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
                 onNext("yes");
               }}
               disabled={loading}
-              className="px-8 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition disabled:opacity-50 no-print"
+              className="px-8 py-3.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-lg hover:shadow-teal-600/15 active:scale-[0.98] no-print cursor-pointer"
             >
-              {loading ? "Loading..." : t("yes")}
+              {loading ? "..." : t("yes")}
             </button>
-            <button type="button" disabled={loading} className="px-8 py-3 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400 transition disabled:opacity-50 no-print">
+            <button 
+              type="button" 
+              disabled={loading} 
+              className="px-8 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl font-bold text-xs uppercase tracking-widest transition active:scale-[0.98] no-print cursor-pointer"
+            >
               {t("no")}
             </button>
           </div>
         </div>
-        <div className="flex-shrink-0 w-32 h-32 bg-teal-100 rounded-lg flex items-center justify-center">
-          <span className="text-5xl">👩‍⚕️</span>
+        <div className="flex-shrink-0 w-32 h-32 bg-teal-50 border border-teal-100 rounded-3xl flex items-center justify-center text-6xl shadow-inner shadow-teal-500/5 select-none">
+          👩‍⚕️
         </div>
       </div>
     </div>
@@ -413,11 +457,11 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
   }, [value]);
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 text-center">{title}</h2>
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+      <h2 className="text-3xl font-bold text-slate-800 font-display mb-8 text-center tracking-tight">{title}</h2>
       <div className="mb-12 text-center">
-        <p className="text-lg text-gray-700 mb-8">{content}</p>
-        <div className="grid grid-cols-10 sm:grid-cols-20 gap-1 sm:gap-2 mb-6 justify-center mx-auto max-w-4xl">
+        <p className="text-base text-slate-600 leading-relaxed font-light mb-8 max-w-2xl mx-auto">{content}</p>
+        <div className="grid grid-cols-10 sm:grid-cols-20 gap-1.5 sm:gap-2.5 mb-8 justify-center mx-auto max-w-4xl bg-slate-50/50 p-6 rounded-2xl border border-slate-100/50 shadow-inner">
           {Array(totalKids).fill(0).map((_, i) => {
             const isAllergic = i >= totalKids - allergicCount;
             const isGirl = i % 2 === 0;
@@ -426,7 +470,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
                 type="button"
                 key={i}
                 onClick={() => handleSelect(totalKids - i)}
-                className="focus:outline-none transition-transform hover:scale-110 flex items-center justify-center"
+                className="focus:outline-none transition-transform hover:scale-120 flex items-center justify-center cursor-pointer"
                 aria-label={`Select ${totalKids - i} kids`}
               >
                 <KidIcon isAllergic={isAllergic} isGirl={isGirl} />
@@ -434,7 +478,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
             );
           })}
         </div>
-        <p className="text-lg font-semibold text-gray-700">
+        <p className="text-lg font-bold text-slate-800 font-display">
           {allergicCount > 10 ? t("allergyMany", { count: allergicCount }) : t("allergyFew", { count: allergicCount })}
         </p>
       </div>
@@ -444,7 +488,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
 }
 
 const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: boolean; isGirl: boolean }) {
-  const color = isAllergic ? "#E86638" : "#558C8C";
+  const color = isAllergic ? "#e88d67" : "#0d5c63";
   return (
     <svg viewBox="0 0 24 24" className="w-6 h-6 sm:w-8 sm:h-8" fill={color}>
       {isGirl ? (
@@ -465,14 +509,14 @@ const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: bool
 
 function EducationScreen(props: BaseScreenProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <div className="flex flex-col sm:flex-row gap-8">
-        <div className="flex-1">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">{props.title}</h2>
-          <div className="text-gray-800 leading-relaxed space-y-4 whitespace-pre-line">{props.content}</div>
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-8 items-start">
+        <div className="flex-1 space-y-4">
+          <h2 className="text-3xl font-bold text-slate-800 font-display tracking-tight">{props.title}</h2>
+          <div className="text-slate-650 leading-relaxed space-y-4 whitespace-pre-line text-sm sm:text-base font-light bg-slate-50/50 p-6 rounded-2xl border border-slate-100/50">{props.content}</div>
         </div>
-        <div className="flex-shrink-0 w-32 h-32 bg-teal-100 rounded-lg flex items-center justify-center">
-          <span className="text-5xl">👩‍⚕️</span>
+        <div className="flex-shrink-0 w-24 h-24 bg-teal-50 border border-teal-100 rounded-2xl flex items-center justify-center text-4xl shadow-inner md:sticky md:top-4 select-none">
+          👩‍⚕️
         </div>
       </div>
       <NavigationFooter {...props} />
@@ -482,14 +526,14 @@ function EducationScreen(props: BaseScreenProps) {
 
 function TestingScreen(props: BaseScreenProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <div className="flex flex-col sm:flex-row gap-8">
-        <div className="flex-1">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">{props.title}</h2>
-          <div className="text-gray-800 leading-relaxed space-y-3 whitespace-pre-line text-sm">{props.content}</div>
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-8 items-start">
+        <div className="flex-1 space-y-4">
+          <h2 className="text-3xl font-bold text-slate-800 font-display tracking-tight">{props.title}</h2>
+          <div className="text-slate-650 leading-relaxed space-y-4 whitespace-pre-line text-sm font-light bg-slate-50/50 p-6 rounded-2xl border border-slate-100/50">{props.content}</div>
         </div>
-        <div className="flex-shrink-0 w-32 h-32 bg-teal-100 rounded-lg flex items-center justify-center">
-          <span className="text-5xl">👩‍⚕️</span>
+        <div className="flex-shrink-0 w-24 h-24 bg-teal-50 border border-teal-100 rounded-2xl flex items-center justify-center text-4xl shadow-inner md:sticky md:top-4 select-none">
+          👩‍⚕️
         </div>
       </div>
       <NavigationFooter {...props} />
@@ -499,14 +543,14 @@ function TestingScreen(props: BaseScreenProps) {
 
 function TestimonialScreen(props: BaseScreenProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <div className="flex flex-col sm:flex-row gap-8">
-        <div className="flex-1">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">{props.title}</h2>
-          <div className="text-gray-800 leading-relaxed space-y-3 whitespace-pre-line">{props.content}</div>
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-8 items-start">
+        <div className="flex-1 space-y-4">
+          <h2 className="text-3xl font-bold text-slate-800 font-display tracking-tight">{props.title}</h2>
+          <div className="text-slate-650 leading-relaxed space-y-4 whitespace-pre-line text-sm sm:text-base font-light bg-slate-50/50 p-6 rounded-2xl border border-slate-100/50 italic">{props.content}</div>
         </div>
-        <div className="flex-shrink-0 w-32 h-32 bg-teal-100 rounded-lg flex items-center justify-center">
-          <span className="text-5xl">👨‍👩‍👧</span>
+        <div className="flex-shrink-0 w-24 h-24 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-center text-4xl shadow-inner md:sticky md:top-4 select-none">
+          👨‍👩‍👧
         </div>
       </div>
       <NavigationFooter {...props} />
@@ -523,19 +567,43 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-8">{title}</h2>
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full filter blur-2xl pointer-events-none"></div>
+      
+      <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-8 font-display tracking-tight leading-snug">{title}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        {options.map((opt: any) => (
-          <button
-            type="button"
-            key={opt.value}
-            onClick={() => handleToggle(opt.value)}
-            className={`p-4 rounded-lg font-semibold border-2 transition ${selected?.includes(opt.value) ? "bg-teal-100 border-teal-600 text-teal-700" : "bg-gray-50 border-gray-300 text-gray-700 hover:border-teal-400"}`}
-          >
-            {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
-          </button>
-        ))}
+        {options.map((opt: any) => {
+          const isSelected = selected?.includes(opt.value);
+          return (
+            <button
+              type="button"
+              key={opt.value}
+              onClick={() => handleToggle(opt.value)}
+              className={`flex items-center gap-4 p-5 rounded-2xl font-semibold border text-left transition-all duration-250 hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
+                isSelected
+                  ? "bg-teal-55/80 border-teal-500 text-teal-900 ring-4 ring-teal-500/10"
+                  : "bg-slate-50/50 border-slate-200/60 text-slate-700 hover:bg-slate-50 hover:border-teal-300"
+              }`}
+            >
+              <div
+                className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 shrink-0 ${
+                  isSelected
+                    ? "bg-teal-600 border-teal-600 text-white"
+                    : "border-slate-300 bg-white"
+                }`}
+              >
+                {isSelected && (
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <span className="text-sm sm:text-base leading-snug">
+                {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
+              </span>
+            </button>
+          );
+        })}
       </div>
       <NavigationFooter {...navProps} />
     </div>
@@ -544,19 +612,41 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 
 function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string; onSelect: (val: string) => void }) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-8">{title}</h2>
-      <div className="space-y-3 mb-8">
-        {options.map((opt: any) => (
-          <button
-            type="button"
-            key={opt.value}
-            onClick={() => onSelect(opt.value)}
-            className={`w-full p-4 rounded-lg font-semibold text-left border-2 transition ${selected === opt.value ? "bg-teal-100 border-teal-600 text-teal-700" : "bg-gray-50 border-gray-300 text-gray-700 hover:border-teal-400"}`}
-          >
-            {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
-          </button>
-        ))}
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full filter blur-2xl pointer-events-none"></div>
+
+      <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-8 font-display tracking-tight leading-snug">{title}</h2>
+      <div className="space-y-3.5 mb-8">
+        {options.map((opt: any) => {
+          const isSelected = selected === opt.value;
+          return (
+            <button
+              type="button"
+              key={opt.value}
+              onClick={() => onSelect(opt.value)}
+              className={`w-full flex items-center gap-4 p-5 rounded-2xl font-semibold text-left border transition-all duration-250 hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
+                isSelected
+                  ? "bg-teal-55/80 border-teal-500 text-teal-900 ring-4 ring-teal-500/10"
+                  : "bg-slate-50/50 border-slate-200/60 text-slate-700 hover:bg-slate-50 hover:border-teal-300"
+              }`}
+            >
+              <div
+                className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-200 shrink-0 ${
+                  isSelected
+                    ? "bg-teal-600 border-teal-600 text-white"
+                    : "border-slate-300 bg-white"
+                }`}
+              >
+                {isSelected && (
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
+                )}
+              </div>
+              <span className="text-sm sm:text-base leading-snug">
+                {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
+              </span>
+            </button>
+          );
+        })}
       </div>
       <NavigationFooter {...navProps} />
     </div>
@@ -569,24 +659,28 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
   const value = selected || minVal;
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-8">{title}</h2>
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full filter blur-2xl pointer-events-none"></div>
+
+      <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-8 font-display tracking-tight leading-snug">{title}</h2>
       <div className="mb-8">
-        <div className="text-center mb-6">
-          <span className="text-4xl font-bold text-teal-600">{value}</span>
-          <span className="text-lg text-gray-600 ml-2">{unit}</span>
+        <div className="text-center mb-8 bg-slate-50/50 p-6 rounded-2xl border border-slate-100/50 max-w-xs mx-auto shadow-inner">
+          <span className="text-5xl font-extrabold text-teal-600 font-display leading-none">{value}</span>
+          <span className="text-xs uppercase tracking-wider text-slate-500 font-bold block mt-1">{unit}</span>
         </div>
-        <input
-          type="range"
-          min={minVal}
-          max={maxVal}
-          value={value}
-          onChange={(e) => onSelect(Number(e.target.value))}
-          className="w-full h-3 bg-teal-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
-        />
-        <div className="flex justify-between mt-4 text-sm text-gray-600">
-          <span>{minVal}</span>
-          <span>{maxVal}</span>
+        <div className="relative mt-8 px-2">
+          <input
+            type="range"
+            min={minVal}
+            max={maxVal}
+            value={value}
+            onChange={(e) => onSelect(Number(e.target.value))}
+            className="w-full h-2.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-teal-600 hover:accent-teal-700 transition"
+          />
+          <div className="flex justify-between mt-4 text-xs font-bold uppercase tracking-wider text-slate-400">
+            <span>{minVal} {unit}</span>
+            <span>{maxVal} {unit}</span>
+          </div>
         </div>
       </div>
       <NavigationFooter {...navProps} />
@@ -688,33 +782,35 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
   ];
 
   return (
-    <div className="print-container bg-white rounded-2xl shadow-lg p-8 sm:p-12 print-report">
+    <div className="print-container bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 print-report relative overflow-hidden">
+      <div className="absolute -top-40 -left-40 w-80 h-80 bg-teal-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
+
       <div className="print-section mb-8 text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">{title}</h2>
-        <p className="text-center text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto whitespace-pre-line">{content}</p>
+        <h2 className="text-3xl font-extrabold text-slate-800 mb-4 text-center font-display tracking-tight">{title}</h2>
+        <p className="text-center text-slate-500 leading-relaxed font-light mb-10 max-w-2xl mx-auto whitespace-pre-line text-sm sm:text-base">{content}</p>
       </div>
 
-      <div className="print-section border-t border-gray-200 pt-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4">
+      <div className="print-section border-t border-slate-100 pt-8 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {summarySections.map((section) => (
-            <div key={section.id} className="py-1">
-              <p className="section-label text-sm font-semibold text-teal-600 uppercase tracking-wide mb-1">
+            <div key={section.id} className="bg-slate-50/50 border border-slate-100/50 rounded-2xl p-5 shadow-inner">
+              <p className="section-label text-xs font-bold text-teal-600 uppercase tracking-widest mb-1.5">
                 {t(section.labelKey) || section.defaultValue}
               </p>
-              <p className="section-value text-lg text-gray-800 font-light">{section.getValue()}</p>
+              <p className="section-value text-base text-slate-800 font-semibold">{section.getValue()}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 pt-6 border-t border-gray-200 no-print">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10 pt-8 border-t border-slate-100 no-print">
         <button
           type="button"
           onClick={() => window.print()}
-          className="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-gray-400 hover:bg-gray-50 transition flex items-center justify-center gap-2"
+          className="px-8 py-3.5 border border-slate-200 text-slate-600 hover:text-slate-800 hover:border-slate-300 hover:bg-slate-50 rounded-xl font-bold text-xs uppercase tracking-widest transition flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
           </svg>
           {t("print")}
         </button>
@@ -722,11 +818,11 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
           type="button"
           onClick={() => onNext()}
           disabled={loading}
-          className="px-12 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+          className="px-12 py-3.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-lg hover:shadow-teal-600/15 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
           {loading ? (
             <>
-              <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -734,8 +830,8 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
             </>
           ) : (
             <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               {t("completeSave")}
             </>
@@ -748,9 +844,11 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
 
 function TextScreen({ title, description, ...navProps }: BaseScreenProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 text-center">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">{title}</h2>
-      <p className="text-lg text-gray-700 mb-8">{description}</p>
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 text-center relative overflow-hidden">
+      <div className="absolute -top-40 -left-40 w-80 h-80 bg-teal-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
+
+      <h2 className="text-3xl font-extrabold text-slate-800 mb-6 font-display tracking-tight">{title}</h2>
+      <p className="text-base sm:text-lg text-slate-500 leading-relaxed font-light mb-8 max-w-2xl mx-auto">{description}</p>
       <NavigationFooter {...navProps} />
     </div>
   );
@@ -761,66 +859,86 @@ function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, 
   const symptoms = Array.isArray(answers["screen6_1_symptoms"]) ? answers["screen6_1_symptoms"].join(", ") : answers["screen6_1_symptoms"] || "None reported";
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-      <div className="flex justify-between items-center mb-8 pb-8 border-b border-teal-100 no-print">
-        <h1 className="text-sm font-bold uppercase tracking-widest text-teal-600">Assessment Report</h1>
-        <button type="button" onClick={onEditAssessment} className="text-[10px] font-bold text-teal-600 underline underline-offset-4 uppercase tracking-widest hover:text-teal-700 transition-colors">
-          Edit Assessment
+    <div className="bg-white/85 backdrop-blur-lg border border-slate-200/60 rounded-3xl shadow-2xl p-8 sm:p-12 relative overflow-hidden">
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
+
+      <div className="flex justify-between items-center mb-8 pb-6 border-b border-slate-100 no-print">
+        <h1 className="text-xs font-black uppercase tracking-widest text-teal-600 font-display">Assessment Report</h1>
+        <button
+          type="button"
+          onClick={onEditAssessment}
+          className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-xl text-[10px] font-bold uppercase tracking-widest transition active:scale-[0.98] cursor-pointer"
+        >
+          {t("editAnswers") || "Edit Assessment"}
         </button>
       </div>
 
       <div className="space-y-8 mb-8">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-3xl font-light text-teal-900 italic mb-2">PEN-PAL</h2>
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-teal-600">Patient Allergy Assessment</p>
+            <h2 className="text-4xl font-black bg-gradient-to-r from-teal-700 to-indigo-850 bg-clip-text text-transparent font-display tracking-tight leading-none mb-2">PEN-PAL</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Patient Allergy Assessment</p>
           </div>
           <div className="text-right">
-            <p className="text-xs font-medium text-teal-600 uppercase tracking-widest mb-2">Date Generated</p>
-            <p className="text-lg font-light text-teal-900">{new Date().toLocaleDateString("en-GB").split("/").join("-")}</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Date Generated</p>
+            <p className="text-lg font-bold text-slate-700 font-display">{new Date().toLocaleDateString("en-GB").split("/").join("-")}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8">
-          <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-600">Primary Allergy</p>
-            <p className="text-xl font-light text-teal-900">{allergy}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-slate-50/50 border border-slate-100/50 p-5 rounded-2xl shadow-inner">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-teal-600 mb-1.5">Primary Allergy</p>
+            <p className="text-lg font-semibold text-slate-800 font-display">{allergy}</p>
           </div>
-          <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-600">Reported Symptoms</p>
-            <p className="text-sm text-teal-900">{symptoms}</p>
+          <div className="bg-slate-50/50 border border-slate-100/50 p-5 rounded-2xl shadow-inner">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-teal-600 mb-1.5">Reported Symptoms</p>
+            <p className="text-sm font-semibold text-slate-800">{symptoms}</p>
           </div>
-          <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-600">Age at Reaction</p>
-            <p className="text-lg font-light text-teal-900">{answers["screen6_2_timing"] || "Not provided"} {locale === "es" ? "años" : "years old"}</p>
+          <div className="bg-slate-50/50 border border-slate-100/50 p-5 rounded-2xl shadow-inner">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-teal-600 mb-1.5">Age at Reaction</p>
+            <p className="text-lg font-semibold text-slate-800 font-display">{answers["screen6_2_timing"] || "Not provided"} {locale === "es" ? "años" : "years old"}</p>
           </div>
-          <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-600">Time to Onset</p>
-            <p className="text-sm text-teal-900">{answers["screen6_3_onset"] || "Not provided"}</p>
+          <div className="bg-slate-50/50 border border-slate-100/50 p-5 rounded-2xl shadow-inner">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-teal-600 mb-1.5">Time to Onset</p>
+            <p className="text-sm font-semibold text-slate-800">{answers["screen6_3_onset"] || "Not provided"}</p>
           </div>
         </div>
 
-        <div className="bg-teal-50 p-6 rounded-lg border border-teal-100 mt-8">
-          <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600 mb-4">Clinical Guidance</h3>
-          <p className="text-sm text-teal-700 leading-relaxed">
-            Based on the responses provided, your child has a documented history of <strong>{allergy}</strong> allergy. The symptoms reported ({symptoms}) indicate a clinical profile that may require further evaluation by a specialist.
+        <div className="bg-teal-50/30 p-6 rounded-2xl border border-teal-100/50 mt-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/5 rounded-full filter blur-xl pointer-events-none"></div>
+          <h3 className="text-xs font-black uppercase tracking-wider text-teal-800 mb-3 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-teal-600 rounded-full"></span>
+            Clinical Guidance
+          </h3>
+          <p className="text-sm text-slate-650 leading-relaxed">
+            Based on the responses provided, your child has a documented history of <strong className="text-teal-950 font-bold">{allergy}</strong> allergy. The symptoms reported ({symptoms}) indicate a clinical profile that may require further evaluation by a specialist.
           </p>
-          <p className="text-sm text-teal-700 leading-relaxed mt-4">
+          <p className="text-sm text-slate-650 leading-relaxed mt-4">
             This report is part of the PEN-PAL research study and should be discussed with your pediatrician or an allergist.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-teal-100 no-print">
-        <button type="button" onClick={() => window.print()} className="flex items-center justify-center gap-3 px-6 py-3 border border-teal-300 text-teal-600 hover:bg-teal-50 transition-colors rounded-lg text-sm font-bold uppercase tracking-widest flex-1 sm:flex-none">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-100 no-print justify-end">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="flex items-center justify-center gap-3 px-8 py-3.5 border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all rounded-xl text-xs font-bold uppercase tracking-widest flex-1 sm:flex-none cursor-pointer active:scale-[0.98]"
+        >
+          <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 9V2h12v7"></path>
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
             <rect x="6" y="14" width="12" height="8"></rect>
           </svg>
           Print Report
         </button>
-        <button type="button" onClick={onProceedToSurvey} disabled={navigating} className="flex items-center justify-center gap-2 px-6 py-3 bg-teal-600 text-white hover:bg-teal-700 transition-colors rounded-lg text-sm font-bold uppercase tracking-widest flex-1 sm:flex-none disabled:opacity-50">
+        <button
+          type="button"
+          onClick={onProceedToSurvey}
+          disabled={navigating}
+          className="flex items-center justify-center gap-2 px-12 py-3.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg hover:shadow-teal-600/15 flex-1 sm:flex-none disabled:opacity-50 cursor-pointer active:scale-[0.98]"
+        >
           {navigating ? (
             <>
               <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
@@ -845,7 +963,8 @@ function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, 
           html { background: white !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-shadow: none !important; }
           .rounded-2xl { border-radius: 0 !important; }
-          .shadow-lg { box-shadow: none !important; }
+          .rounded-3xl { border-radius: 0 !important; }
+          .shadow-lg, .shadow-2xl { box-shadow: none !important; }
           .bg-white { background: white !important; }
           .bg-teal-50 { background-color: #f0fdf4 !important; }
           .text-teal-600 { color: #14b8a6 !important; }
