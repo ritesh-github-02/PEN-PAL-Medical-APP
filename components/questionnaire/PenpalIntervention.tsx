@@ -249,17 +249,19 @@ export default function PenpalIntervention() {
   // IP-fingerprint mismatch — failed device/environment binding check
   if (bindingError) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-12 bg-white rounded-2xl shadow-lg text-center">
-          <div className="w-16 h-16 bg-teal-100 flex items-center justify-center mx-auto mb-8 rounded-lg text-3xl font-light text-teal-600">⚑</div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Session Unavailable</h2>
-          <p className="text-gray-600 mb-10 leading-relaxed">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans text-slate-800">
+        <div className="max-w-md w-full p-8 bg-white border border-slate-200 rounded-xl shadow-sm text-center">
+          <div className="w-12 h-12 bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-6 rounded-lg text-xl font-semibold text-amber-700">
+            ⚑
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Session Unavailable</h2>
+          <p className="text-sm text-slate-500 mb-6 leading-relaxed">
             This session is linked to a different device or network and can no longer be used here.
             Please request a new access token to continue.
           </p>
           <button
             onClick={() => { window.location.href = `/${locale}/intervention`; }}
-            className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition"
+            className="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition shadow-sm active:scale-[0.98]"
           >
             Request New Token
           </button>
@@ -402,14 +404,14 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t }: Omit<Base
 
 function IntroScreen({ title, description, content, onNext, onAnswer, loading, t }: BaseScreenProps & { onAnswer: (val: string) => void }) {
   return (
-    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 relative overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 sm:p-12">
       <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
         <div className="flex-1 space-y-6">
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-teal-700 to-indigo-850 bg-clip-text text-transparent font-display tracking-tight leading-tight">{title}</h1>
-            <p className="text-base text-slate-500 font-light leading-relaxed">{description}</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">{title}</h1>
+            <p className="text-sm text-slate-500 leading-relaxed">{description}</p>
           </div>
-          <div className="text-slate-700 leading-relaxed font-light whitespace-pre-line bg-slate-50/50 p-6 rounded-2xl border border-slate-100/50 text-sm sm:text-base">
+          <div className="text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 p-6 rounded-xl border border-slate-200/80 text-sm">
             {content}
           </div>
           <div className="flex gap-4 pt-2">
@@ -420,7 +422,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
                 onNext("yes");
               }}
               disabled={loading}
-              className="px-8 py-3.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-lg hover:shadow-teal-600/15 active:scale-[0.98] no-print cursor-pointer"
+              className="px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-sm active:scale-[0.98] no-print cursor-pointer"
             >
               {loading ? "..." : t("yes")}
             </button>
@@ -433,7 +435,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
             </button>
           </div>
         </div>
-        <div className="flex-shrink-0 w-32 h-32 bg-teal-50 border border-teal-100 rounded-3xl flex items-center justify-center text-6xl shadow-inner shadow-teal-500/5 select-none">
+        <div className="flex-shrink-0 w-32 h-32 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center text-6xl shadow-sm select-none">
           👩‍⚕️
         </div>
       </div>
@@ -781,33 +783,65 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
     },
   ];
 
-  return (
-    <div className="print-container bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 print-report relative overflow-hidden">
-      <div className="absolute -top-40 -left-40 w-80 h-80 bg-teal-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
+  // Parse Action Steps content
+  const paragraphs = (content || '').split('\n\n');
+  const steps = paragraphs.filter(p => p.startsWith('#'));
+  const calloutParagraph = paragraphs.find(p => p.toLowerCase().includes("say:") || p.toLowerCase().includes("decir:"));
+  const quoteParagraph = paragraphs.find(p => p.startsWith('"') || p.startsWith('“'));
 
-      <div className="print-section mb-8 text-center">
-        <h2 className="text-3xl font-extrabold text-slate-800 mb-4 text-center font-display tracking-tight">{title}</h2>
-        <p className="text-center text-slate-500 leading-relaxed font-light mb-10 max-w-2xl mx-auto whitespace-pre-line text-sm sm:text-base">{content}</p>
+  return (
+    <div className="print-container bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8 print-report relative overflow-hidden">
+      <div className="print-section mb-6 text-center">
+        <h2 className="text-2xl font-bold text-slate-900 mb-4 text-center tracking-tight">{title}</h2>
+        
+        {/* Step-by-step numbered actions */}
+        <div className="space-y-3.5 max-w-2xl mx-auto text-left mb-6">
+          {steps.map((step, idx) => {
+            const cleanText = step.replace(/^#\d+\.\s*/, "");
+            return (
+              <div key={idx} className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-50 border border-blue-200 text-blue-600 font-bold text-xs flex items-center justify-center mt-0.5">
+                  {idx + 1}
+                </span>
+                <p className="text-sm text-slate-650 leading-relaxed font-semibold">
+                  {cleanText}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Callout box for patient verbal guidance */}
+        {calloutParagraph && quoteParagraph && (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 max-w-2xl mx-auto text-left shadow-sm">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+              {calloutParagraph}
+            </p>
+            <p className="text-sm text-slate-700 italic font-medium leading-relaxed pl-3 border-l-2 border-slate-300">
+              {quoteParagraph}
+            </p>
+          </div>
+        )}
       </div>
 
-      <div className="print-section border-t border-slate-100 pt-8 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="print-section border-t border-slate-100 pt-6 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {summarySections.map((section) => (
-            <div key={section.id} className="bg-slate-50/50 border border-slate-100/50 rounded-2xl p-5 shadow-inner">
-              <p className="section-label text-xs font-bold text-teal-600 uppercase tracking-widest mb-1.5">
+            <div key={section.id} className="bg-slate-50 border border-slate-200/80 rounded-xl p-4">
+              <p className="section-label text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                 {t(section.labelKey) || section.defaultValue}
               </p>
-              <p className="section-value text-base text-slate-800 font-semibold">{section.getValue()}</p>
+              <p className="section-value text-sm text-slate-800 font-semibold">{section.getValue()}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10 pt-8 border-t border-slate-100 no-print">
+      <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6 pt-6 border-t border-slate-100 no-print">
         <button
           type="button"
           onClick={() => window.print()}
-          className="px-8 py-3.5 border border-slate-200 text-slate-600 hover:text-slate-800 hover:border-slate-300 hover:bg-slate-50 rounded-xl font-bold text-xs uppercase tracking-widest transition flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+          className="px-6 py-2.5 border border-slate-200 text-slate-655 hover:text-slate-800 hover:bg-slate-50 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -818,7 +852,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
           type="button"
           onClick={() => onNext()}
           disabled={loading}
-          className="px-12 py-3.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition shadow-lg hover:shadow-teal-600/15 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+          className="px-8 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
           {loading ? (
             <>
@@ -844,11 +878,9 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
 
 function TextScreen({ title, description, ...navProps }: BaseScreenProps) {
   return (
-    <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl p-8 sm:p-12 text-center relative overflow-hidden">
-      <div className="absolute -top-40 -left-40 w-80 h-80 bg-teal-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
-
-      <h2 className="text-3xl font-extrabold text-slate-800 mb-6 font-display tracking-tight">{title}</h2>
-      <p className="text-base sm:text-lg text-slate-500 leading-relaxed font-light mb-8 max-w-2xl mx-auto">{description}</p>
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 sm:p-12 text-center">
+      <h2 className="text-2xl font-bold text-slate-900 mb-6 tracking-tight">{title}</h2>
+      <p className="text-sm text-slate-500 leading-relaxed mb-8 max-w-2xl mx-auto">{description}</p>
       <NavigationFooter {...navProps} />
     </div>
   );
@@ -859,12 +891,9 @@ function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, 
   const symptoms = Array.isArray(answers["screen6_1_symptoms"]) ? answers["screen6_1_symptoms"].join(", ") : answers["screen6_1_symptoms"] || "None reported";
 
   return (
-    <div className="bg-white/85 backdrop-blur-lg border border-slate-200/60 rounded-3xl shadow-2xl p-8 sm:p-12 relative overflow-hidden">
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
-
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 sm:p-12 relative overflow-hidden">
       <div className="flex justify-between items-center mb-8 pb-6 border-b border-slate-100 no-print">
-        <h1 className="text-xs font-black uppercase tracking-widest text-teal-600 font-display">Assessment Report</h1>
+        <h1 className="text-xs font-bold uppercase tracking-wider text-slate-400">Assessment Report</h1>
         <button
           type="button"
           onClick={onEditAssessment}
@@ -877,44 +906,43 @@ function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, 
       <div className="space-y-8 mb-8">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-4xl font-black bg-gradient-to-r from-teal-700 to-indigo-850 bg-clip-text text-transparent font-display tracking-tight leading-none mb-2">PEN-PAL</h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Patient Allergy Assessment</p>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 leading-none mb-2">PEN-PAL</h2>
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Patient Allergy Assessment</p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Date Generated</p>
-            <p className="text-lg font-bold text-slate-700 font-display">{new Date().toLocaleDateString("en-GB").split("/").join("-")}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Date Generated</p>
+            <p className="text-base font-semibold text-slate-700">{new Date().toLocaleDateString("en-GB").split("/").join("-")}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-slate-50/50 border border-slate-100/50 p-5 rounded-2xl shadow-inner">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-teal-600 mb-1.5">Primary Allergy</p>
-            <p className="text-lg font-semibold text-slate-800 font-display">{allergy}</p>
+          <div className="bg-slate-50 p-5 border border-slate-200/80 rounded-xl">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Primary Allergy</p>
+            <p className="text-base font-bold text-slate-900">{allergy}</p>
           </div>
-          <div className="bg-slate-50/50 border border-slate-100/50 p-5 rounded-2xl shadow-inner">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-teal-600 mb-1.5">Reported Symptoms</p>
-            <p className="text-sm font-semibold text-slate-800">{symptoms}</p>
+          <div className="bg-slate-50 p-5 border border-slate-200/80 rounded-xl">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Reported Symptoms</p>
+            <p className="text-sm font-semibold text-slate-700 leading-normal">{symptoms}</p>
           </div>
-          <div className="bg-slate-50/50 border border-slate-100/50 p-5 rounded-2xl shadow-inner">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-teal-600 mb-1.5">Age at Reaction</p>
-            <p className="text-lg font-semibold text-slate-800 font-display">{answers["screen6_2_timing"] || "Not provided"} {locale === "es" ? "años" : "years old"}</p>
+          <div className="bg-slate-50 p-5 border border-slate-200/80 rounded-xl">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Age at Reaction</p>
+            <p className="text-base font-bold text-slate-900">{answers["screen6_2_timing"] || "Not provided"} {locale === "es" ? "años" : "years old"}</p>
           </div>
-          <div className="bg-slate-50/50 border border-slate-100/50 p-5 rounded-2xl shadow-inner">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-teal-600 mb-1.5">Time to Onset</p>
-            <p className="text-sm font-semibold text-slate-800">{answers["screen6_3_onset"] || "Not provided"}</p>
+          <div className="bg-slate-50 p-5 border border-slate-200/80 rounded-xl">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Time to Onset</p>
+            <p className="text-sm font-semibold text-slate-700 leading-normal">{answers["screen6_3_onset"] || "Not provided"}</p>
           </div>
         </div>
 
-        <div className="bg-teal-50/30 p-6 rounded-2xl border border-teal-100/50 mt-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/5 rounded-full filter blur-xl pointer-events-none"></div>
-          <h3 className="text-xs font-black uppercase tracking-wider text-teal-800 mb-3 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-teal-600 rounded-full"></span>
+        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200/80 mt-8">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-3 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
             Clinical Guidance
           </h3>
-          <p className="text-sm text-slate-650 leading-relaxed">
-            Based on the responses provided, your child has a documented history of <strong className="text-teal-950 font-bold">{allergy}</strong> allergy. The symptoms reported ({symptoms}) indicate a clinical profile that may require further evaluation by a specialist.
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Based on the responses provided, your child has a documented history of <strong className="font-semibold text-slate-900">{allergy}</strong> allergy. The symptoms reported ({symptoms}) indicate a clinical profile that may require further evaluation by a specialist.
           </p>
-          <p className="text-sm text-slate-650 leading-relaxed mt-4">
+          <p className="text-sm text-slate-600 leading-relaxed mt-4">
             This report is part of the PEN-PAL research study and should be discussed with your pediatrician or an allergist.
           </p>
         </div>
@@ -937,7 +965,7 @@ function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, 
           type="button"
           onClick={onProceedToSurvey}
           disabled={navigating}
-          className="flex items-center justify-center gap-2 px-12 py-3.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg hover:shadow-teal-600/15 flex-1 sm:flex-none disabled:opacity-50 cursor-pointer active:scale-[0.98]"
+          className="flex items-center justify-center gap-2 px-12 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-sm flex-1 sm:flex-none disabled:opacity-50 cursor-pointer active:scale-[0.98]"
         >
           {navigating ? (
             <>
@@ -962,16 +990,18 @@ function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, 
           body { background: white !important; padding: 0 !important; margin: 0 !important; font-size: 11pt; }
           html { background: white !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-shadow: none !important; }
+          .rounded-xl { border-radius: 0 !important; }
           .rounded-2xl { border-radius: 0 !important; }
           .rounded-3xl { border-radius: 0 !important; }
-          .shadow-lg, .shadow-2xl { box-shadow: none !important; }
+          .shadow-sm, .shadow-lg, .shadow-2xl { box-shadow: none !important; }
           .bg-white { background: white !important; }
-          .bg-teal-50 { background-color: #f0fdf4 !important; }
-          .text-teal-600 { color: #14b8a6 !important; }
-          .text-teal-900 { color: #0d3b40 !important; }
-          .text-teal-700 { color: #0f766e !important; }
-          .border-teal-100 { border-color: #ccf0ee !important; }
-          .p-8, .p-6 { padding: 0 !important; }
+          .bg-slate-50 { background-color: #f8fafc !important; }
+          .text-slate-400 { color: #94a3b8 !important; }
+          .text-slate-500 { color: #64748b !important; }
+          .text-slate-700 { color: #334155 !important; }
+          .text-slate-900 { color: #0f172a !important; }
+          .border-slate-200 { border-color: #e2e8f0 !important; }
+          .p-8, .p-6, .p-5 { padding: 0 !important; }
           .sm\\:p-12 { padding: 0 !important; }
           .space-y-8 > * + * { margin-top: 1rem !important; }
         }

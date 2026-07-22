@@ -161,22 +161,18 @@ export default async function AdminPage({ searchParams }: PageProps) {
   });
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans text-slate-800 relative overflow-hidden">
-      {/* Decorative ambient background glows */}
-      <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-350/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse duration-[8000ms]"></div>
-      <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-350/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse duration-[10000ms]"></div>
-
-      <div className="max-w-7xl mx-auto w-full space-y-8 relative z-10">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans text-slate-800 bg-slate-50">
+      <div className="max-w-7xl mx-auto w-full space-y-8">
         
         {/* Header */}
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-2xl shadow-sm gap-4">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white border border-slate-200 rounded-xl shadow-sm gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-550 to-indigo-650 rounded-xl flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center shadow-sm">
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 font-display flex items-center gap-2">
-                PEN-PAL <span className="font-light text-slate-400 text-lg">|</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-700 font-semibold text-xl">Admin Telemetry Portal</span>
+              <h1 className="text-xl font-bold tracking-tight text-slate-900 font-display flex items-center gap-2">
+                PEN-PAL <span className="font-light text-slate-400 text-base">|</span> <span className="font-semibold text-slate-700">Admin Telemetry Portal</span>
               </h1>
               <p className="text-[10px] text-slate-450 font-bold uppercase tracking-[0.15em] mt-0.5">Clinical Telemetry & Cohort Registry</p>
             </div>
@@ -189,7 +185,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
             <form action={logout}>
               <button 
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-1.5 border border-slate-200 text-xs font-bold text-slate-600 hover:text-rose-600 hover:border-rose-200 bg-white/80 hover:bg-rose-50/50 rounded-xl shadow-sm transition-all cursor-pointer uppercase tracking-wider"
+                className="flex items-center gap-1.5 px-4 py-1.5 border border-slate-200 text-xs font-bold text-slate-600 hover:text-rose-600 hover:border-rose-200 bg-white/80 hover:bg-rose-50/50 rounded-xl shadow-sm transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 Logout
@@ -216,18 +212,16 @@ export default async function AdminPage({ searchParams }: PageProps) {
         {/* Hero Metrics Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Hero Card: Total Enrolled */}
-          <div className="lg:col-span-1 bg-gradient-to-br from-teal-600 via-teal-650 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-teal-950/10 border border-teal-500/25 relative overflow-hidden group hover:scale-[1.01] hover:shadow-2xl transition-all duration-300 flex flex-col justify-between">
-            {/* Background design glow */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full filter blur-xl transform translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-700"></div>
+          <div className="lg:col-span-1 bg-slate-900 rounded-2xl p-6 text-white shadow-sm border border-slate-800 transition-all duration-300 flex flex-col justify-between">
             
             <div className="space-y-4">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-100 bg-white/10 px-3 py-1 rounded-full border border-white/10">Active Cohort</span>
-                <Users className="w-6 h-6 text-teal-100" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 bg-white/10 px-3 py-1 rounded-full border border-white/10">Active Cohort</span>
+                <Users className="w-6 h-6 text-slate-300" />
               </div>
               <div>
-                <p className="text-slate-200/90 text-xs font-medium uppercase tracking-wider">Total Enrolled Participants</p>
-                <p className="text-6xl font-extrabold tracking-tight mt-1 font-display">{participantCount}</p>
+                <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Enrolled Participants</p>
+                <p className="text-6xl font-extrabold tracking-tight mt-1 font-display text-white">{participantCount}</p>
               </div>
             </div>
             
@@ -564,7 +558,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
               <div className="flex gap-2 justify-end">
                 <button 
                   type="submit"
-                  className="px-5 py-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm hover:shadow transition-all cursor-pointer"
+                  className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition shadow-sm cursor-pointer"
                 >
                   Search
                 </button>

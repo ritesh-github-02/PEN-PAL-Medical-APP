@@ -178,16 +178,18 @@ export default function QuestionnaireEngine() {
 
   if (bindingError) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-orange-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-12 bg-white rounded-2xl shadow-lg text-center">
-          <div className="w-16 h-16 bg-teal-100 flex items-center justify-center mx-auto mb-8 rounded-lg text-3xl font-light text-teal-600">⚑</div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Session Unavailable</h2>
-          <p className="text-gray-600 mb-10 leading-relaxed">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans text-slate-800">
+        <div className="max-w-md w-full p-8 bg-white border border-slate-200 rounded-xl shadow-sm text-center">
+          <div className="w-12 h-12 bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-6 rounded-lg text-xl font-semibold text-amber-700">
+            ⚑
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Session Unavailable</h2>
+          <p className="text-sm text-slate-500 mb-6 leading-relaxed">
             This session is linked to a different device or network. Please request a new access token.
           </p>
           <button
             onClick={() => { window.location.href = `/${locale}/intervention`; }}
-            className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition"
+            className="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition shadow-sm active:scale-[0.98]"
           >
             Request New Token
           </button>

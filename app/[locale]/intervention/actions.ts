@@ -38,10 +38,39 @@ function requireAdminSecret(): string {
   if (secret.length < 16) {
     throw new Error(
       'ADMIN_SECRET is not set or too short — secure token auth cannot operate. ' +
-        'Set ADMIN_SECRET in your .env file (minimum 16 chars).',
+      'Set ADMIN_SECRET in your .env file (minimum 16 chars).',
     );
   }
   return secret;
+}
+
+/**
+ * Executes a database operation with a connection retry mechanism.
+ * Handles transient connectivity drops and Neon database wakeups (cold starts).
+ */
+async function runWithRetry<T>(fn: () => Promise<T>, retries = 4, delayMs = 2000): Promise<T> {
+  let lastError: any;
+  for (let i = 0; i < retries + 1; i++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      lastError = err;
+      const isConnectionError =
+        err.message?.includes("Can't reach database server") ||
+        err.message?.includes("Connection") ||
+        err.message?.includes("timeout") ||
+        err.code === 'P1001' || // Can't reach database server
+        err.code === 'P1002';   // Connection timed out
+
+      if (isConnectionError && i < retries) {
+        console.log(`Database connection failed. Retrying in ${delayMs}ms... (Attempt ${i + 1}/${retries})`);
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastError;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -161,8 +190,8 @@ async function activateTokenRecord(
 ): Promise<{ activated: boolean; sessionId: string }> {
   const now = new Date();
 
-  // If the token is already consumed or used up, bypass token update and just create a session!
-  if (tokenRecord.status === 'CONSUMED' || tokenRecord.useCount >= tokenRecord.useLimit) {
+  // If the token is already consumed or expired or used up, bypass token update and just create a session!
+  if (tokenRecord.status === 'CONSUMED' || tokenRecord.status === 'EXPIRED' || tokenRecord.useCount >= tokenRecord.useLimit) {
     const newSession = await prisma.session.create({
       data: {
         participantId: tokenRecord.participantId,
@@ -179,7 +208,7 @@ async function activateTokenRecord(
         lastUsedIp: ipAddress,
         lastUsedAgent: userAgent,
       },
-    }).catch(() => {});
+    }).catch(() => { });
 
     return { activated: true, sessionId: newSession.id };
   }
@@ -280,10 +309,10 @@ export async function generateSecureUrl(
 
   try {
     // ── Existing token path ──────────────────────────────────────────────────
-    const existingParticipant = await prisma.participant.findFirst({
+    const existingParticipant = await runWithRetry(() => prisma.participant.findFirst({
       where: { externalId: normalizedId },
       include: { tokens: true },
-    });
+    }));
 
     if (existingParticipant && existingParticipant.tokens.length > 0) {
       const stored = existingParticipant.tokens[0];
@@ -387,7 +416,7 @@ export async function generateSecureUrl(
     }
 
     // ── New token path ───────────────────────────────────────────────────────
-    const participant = await prisma.participant.create({
+    const participant = await runWithRetry(() => prisma.participant.create({
       data: {
         externalId: normalizedId,
         groupId: 'INTERVENTION',
@@ -403,7 +432,7 @@ export async function generateSecureUrl(
         },
       },
       include: { tokens: { select: { id: true } } },
-    });
+    }));
 
     // Generate crypto-secure token now that we have the participant record
     const extras = expiresInHours
@@ -540,11 +569,17 @@ export async function validateAndConsumeToken(
 
   // ── Look up by hash ────────────────────────────────────────────────────────
   // Use findFirst because tokenHash is not @unique after the legacy-fill migration
-  const tokenRecord = await prisma.participantToken.findFirst({
-    where: { tokenHash },
-    orderBy: { createdAt: 'desc' }, // prefer the newest if duplicates exist
-    include: { participant: true },
-  });
+  let tokenRecord;
+  try {
+    tokenRecord = await runWithRetry(() => prisma.participantToken.findFirst({
+      where: { tokenHash },
+      orderBy: { createdAt: 'desc' }, // prefer the newest if duplicates exist
+      include: { participant: true },
+    }));
+  } catch (err) {
+    console.error('Database connection timed out or failed:', err);
+    return { success: false, error: 'Database server is currently waking up or unreachable. Please try again in a few seconds.' };
+  }
 
   if (!tokenRecord) {
     await logTokenSecurityEvent({
@@ -559,7 +594,7 @@ export async function validateAndConsumeToken(
   }
 
   // ── ③ Status gate ──────────────────────────────────────────────────────────
-  if (!['PENDING', 'ACTIVE', 'CONSUMED'].includes(tokenRecord.status)) {
+  if (!['PENDING', 'ACTIVE', 'CONSUMED', 'EXPIRED'].includes(tokenRecord.status)) {
     await logTokenSecurityEvent({
       eventType: 'TOKEN_ALREADY_USED',
       tokenHash,
@@ -567,18 +602,19 @@ export async function validateAndConsumeToken(
       participantId: tokenRecord.participantId,
       ipAddress,
       userAgent,
-      reason: `Token status is ${tokenRecord.status}, not PENDING, ACTIVE, or CONSUMED.`,
+      reason: `Token status is ${tokenRecord.status}, not PENDING, ACTIVE, CONSUMED, or EXPIRED.`,
     });
     return { success: false, error: 'This access token has already been used or is invalid.' };
   }
 
   // ── ④ Expiry gate ──────────────────────────────────────────────────────────
-  if (tokenRecord.expiresAt && tokenRecord.expiresAt < new Date()) {
+  // Bypass expiry block for already completed/consumed/expired views (allow viewing progress)
+  if (tokenRecord.status !== 'CONSUMED' && tokenRecord.status !== 'EXPIRED' && tokenRecord.expiresAt && tokenRecord.expiresAt < new Date()) {
     // Mark expired (idempotent)
     await prisma.participantToken.update({
       where: { id: tokenRecord.id },
       data: { status: 'EXPIRED' },
-    }).catch(() => {});
+    }).catch(() => { });
 
     await logTokenSecurityEvent({
       eventType: 'TOKEN_EXPIRED',
@@ -593,8 +629,8 @@ export async function validateAndConsumeToken(
   }
 
   // ── ⑤ Single-use gate ──────────────────────────────────────────────────────
-  // Bypass single-use check if status is already CONSUMED (allows login for review)
-  if (tokenRecord.status !== 'CONSUMED' && tokenRecord.useCount >= tokenRecord.useLimit) {
+  // Bypass single-use check if status is already CONSUMED or EXPIRED (allows login for review)
+  if (tokenRecord.status !== 'CONSUMED' && tokenRecord.status !== 'EXPIRED' && tokenRecord.useCount >= tokenRecord.useLimit) {
     await logTokenSecurityEvent({
       eventType: 'TOKEN_OVERUSED',
       tokenHash,
@@ -652,7 +688,7 @@ export async function validateAndConsumeToken(
 
   return {
     success: true,
-    isCompleted: tokenRecord.status === 'CONSUMED' || tokenRecord.status === 'COMPLETED' || tokenRecord.participant.status === 'COMPLETED',
+    isCompleted: tokenRecord.status === 'CONSUMED' || tokenRecord.status === 'EXPIRED' || tokenRecord.status === 'COMPLETED' || tokenRecord.participant.status === 'COMPLETED',
   };
 }
 
