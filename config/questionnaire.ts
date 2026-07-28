@@ -58,38 +58,33 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     contentEn: 'Out of 100 kids who are said to have a penicillin allergy, only 5 have a real allergy',
     contentEs: 'De 100 niños que se dice que tienen alergia a la penicilina, solo 5 tienen una alergia real',
     required: true,
-    nextStepId: 'screen3_education'
+    nextStepId: 'screen3_5_knowledge_test'
   },
-  // Screen 3: Education
+  // Screen 3.5: Knowledge Test
   {
-    id: 'screen3_education',
-    type: 'education',
-    titleEn: 'Why do people often think children are allergic to penicillin when they are not?',
-    titleEs: '¿Por qué la gente a menudo piensa que los niños son alérgicos a la penicilina cuando no lo son?',
-    contentEn: '• The rash came from a virus, not penicillin.\n• Some kids felt sick or had diarrhea, but that was not an allergy.\n• People think allergies come from parents, but they do not.\n• Some kids had an allergy, but the allergy went away as they got older.',
-    contentEs: '• El sarpullido provino de un virus, no de la penicilina.\n• Algunos niños se sintieron mal o tuvieron diarrea, pero eso no fue una alergia.\n• La gente piensa que las alergias provienen de los padres, pero no es así.\n• Algunos niños tenían una alergia, pero la alergia desapareció cuando crecieron.',
-    required: true,
+    id: 'screen3_5_knowledge_test',
+    type: 'multiple_choice',
+    titleEn: 'What is true about penicillin?',
+    titleEs: '¿Qué es verdad sobre la penicilina?',
+    descriptionEn: 'Test your knowledge!',
+    descriptionEs: '¡Pon a prueba tus conocimientos!',
+    options: [
+      { value: 'curing_illnesses', labelEn: 'It is the best at curing many illnesses in kids and adults.', labelEs: 'Es la mejor para curar muchas enfermedades en niños y adultos.' },
+      { value: 'less_side_effects', labelEn: 'It has less side-effects than other antibiotics.', labelEs: 'Tiene menos efectos secundarios que otros antibióticos.' },
+      { value: 'tastes_bubblegum', labelEn: 'Kids tend to like the way it tastes, like bubblegum!', labelEs: 'A los niños les suele gustar el sabor, ¡como a chicle!' },
+      { value: 'cheaper_antibiotics', labelEn: 'It is cheaper than other antibiotics.', labelEs: 'Es más barata que otros antibióticos.' }
+    ],
+    required: false,
     nextStepId: 'screen4_testing'
   },
   // Screen 4: Testing Info
   {
     id: 'screen4_testing',
     type: 'testing_info',
-    titleEn: 'Speak with your child\'s doctor to see if testing is right for your child!',
-    titleEs: '¡Hable con el médico de su hijo para ver si las pruebas son apropiadas para su hijo!',
-    contentEn: '• There is a test that can tell if your child has a penicillin allergy.\n• For the test, kids take medicine by mouth.\n• Sometimes, kids also take medicine through a skin prick.\n\nIf your child can safely take penicillin, have the allergy removed from their medical record.',
-    contentEs: '• Hay una prueba que puede determinar si su hijo tiene alergia a la penicilina.\n• Para la prueba, los niños toman medicina por la boca.\n• A veces, los niños también toman medicina a través de un pinchazo en la piel.\n\nSi su hijo puede tomar penicilina de manera segura, retire la alergia de su historial médico.',
-    required: true,
-    nextStepId: 'screen5_testimonial'
-  },
-  // Screen 5: Testimonials
-  {
-    id: 'screen5_testimonial',
-    type: 'testimonial',
-    titleEn: 'Here\'s what parents had to say about testing:',
-    titleEs: 'Esto es lo que los padres tenían que decir sobre las pruebas:',
-    contentEn: '• Parents liked knowing the truth about their child.\n• Parents were happy knowing that their child could receive the best medicine.\n• Parents felt good knowing they had one less thing to worry about.\n• Parents were happy because penicillin doesn\'t cost much and is easy to get.',
-    contentEs: '• A los padres les gustó conocer la verdad sobre su hijo.\n• Los padres estaban felices sabiendo que su hijo podría recibir la mejor medicina.\n• Los padres se sintieron bien sabiendo que tenían una cosa menos de qué preocuparse.\n• Los padres estaban felices porque la penicilina no cuesta mucho y es fácil de conseguir.',
+    titleEn: 'Talk to the doctor about your child\'s allergy!',
+    titleEs: '¡Hable con el médico sobre la alergia de su hijo!',
+    contentEn: '• Doctors can check to see if your child\'s reaction was just a side-effect and not an allergy.\n• There is also a simple test that can tell if your child has an allergy.\n    For the test, kids swallow medicine.\n    Sometimes, kids also take medicine through a skin prick.\n\nIf your child can safely take penicillin, they are not allergic.',
+    contentEs: '• Los médicos pueden verificar si la reacción de su hijo fue solo un efecto secundario y no una alergia.\n• También hay una prueba sencilla que puede determinar si su hijo tiene una alergia.\n    Para la prueba, los niños tragan medicina.\n    A veces, los niños también toman medicina a través de un pinchazo en la piel.\n\nSi su hijo puede tomar penicilina de manera segura, no es alérgico.',
     required: true,
     nextStepId: 'screen6_survey_intro'
   },
@@ -97,10 +92,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
   {
     id: 'screen6_survey_intro',
     type: 'text',
-    titleEn: 'Tell us what happened when your child was said to be allergic to penicillin',
-    titleEs: 'Cuéntanos qué pasó cuando se dijo que tu hijo era alérgico a la penicilina',
-    contentEn: 'This will help determine if testing is right for your child.',
-    contentEs: 'Esto ayudará a determinar si las pruebas son apropiadas para su hijo.',
+    titleEn: 'The next set of questions can help you and the doctor see what\'s best for your child.',
+    titleEs: 'El siguiente conjunto de preguntas puede ayudarle a usted y al médico a ver qué es lo mejor para su hijo.',
     required: true,
     nextStepId: 'screen6_1_symptoms'
   },
@@ -108,21 +101,23 @@ export const questionnaireConfig: QuestionnaireStep[] = [
   {
     id: 'screen6_1_symptoms',
     type: 'multiple_choice',
-    titleEn: 'What happened to your child after taking penicillin?',
-    titleEs: '¿Qué le pasó a su hijo después de tomar penicilina?',
+    titleEn: 'Select what happened when your child was said to be allergic to penicillin.',
+    titleEs: 'Seleccione lo que sucedió cuando se dijo que su hijo era alérgico a la penicilina.',
     options: [
       { value: 'Rash', labelEn: 'Rash', labelEs: 'Sarpullido' },
       { value: 'Swelling', labelEn: 'Swelling', labelEs: 'Hinchazón' },
       { value: 'Fainting or dizziness', labelEn: 'Fainting or dizziness', labelEs: 'Desmayo o mareo' },
       { value: 'Itchiness', labelEn: 'Itchiness', labelEs: 'Picazón' },
       { value: 'Throat tightness', labelEn: 'Throat tightness', labelEs: 'Estrechez de garganta' },
-      { value: 'Shortness of breath', labelEn: 'Shortness of breath', labelEs: 'Falta de aire' },
+      { value: 'Shortness of breath', labelEn: 'Shortness of breath or hard time breathing', labelEs: 'Falta de aire o dificultad para respirar' },
       { value: 'Fever', labelEn: 'Fever (new fever or worse fever)', labelEs: 'Fiebre (fiebre nueva o peor)' },
-      { value: 'Abdominal pain', labelEn: 'Abdominal pain', labelEs: 'Dolor abdominal' },
+      { value: 'Belly pain', labelEn: 'Belly pain', labelEs: 'Dolor de barriga' },
       { value: 'Diarrhea', labelEn: 'Diarrhea', labelEs: 'Diarrea' },
-      { value: 'Joint pain and swelling', labelEn: 'Joint pain and swelling', labelEs: 'Dolor e hinchazón articular' },
-      { value: 'Nausea or vomiting', labelEn: 'Nausea or vomiting', labelEs: 'Náuseas o vómitos' },
-      { value: 'Muscle aches', labelEn: 'Muscle aches', labelEs: 'Dolores musculares' }
+      { value: 'Joint pain', labelEn: 'Joint pain', labelEs: 'Dolor articular' },
+      { value: 'Vomiting', labelEn: 'Wanted to throw up or threw up', labelEs: 'Quería vomitar o vomitó' },
+      { value: 'Muscle aches', labelEn: 'Muscle aches', labelEs: 'Dolores musculares' },
+      { value: 'Other', labelEn: 'Other: Please describe ________', labelEs: 'Otro: Por favor describa ________' },
+      { value: 'Unsure', labelEn: 'Unsure/I don\'t know', labelEs: 'Inseguro/No lo sé' }
     ],
     required: true,
     nextStepId: 'screen6_2_timing'
@@ -131,11 +126,13 @@ export const questionnaireConfig: QuestionnaireStep[] = [
   {
     id: 'screen6_2_timing',
     type: 'slider',
-    titleEn: 'What age was your child when something happened after taking penicillin?',
-    titleEs: '¿Qué edad tenía su hijo cuando algo sucedió después de tomar penicilina?',
+    titleEn: 'How old was your child when the reaction happened?',
+    titleEs: '¿Qué edad tenía su hijo cuando ocurrió la reacción?',
+    descriptionEn: 'At what age did your child have the reaction to penicillin (amoxicillin)?',
+    descriptionEs: '¿A qué edad tuvo su hijo la reacción a la penicilina (amoxicilina)?',
     min: 1,
     max: 26,
-    unitEn: 'year-old',
+    unitEn: 'year old',
     unitEs: 'años',
     required: true,
     nextStepId: 'screen6_3_onset'
@@ -144,8 +141,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
   {
     id: 'screen6_3_onset',
     type: 'single_choice',
-    titleEn: 'How long after taking penicillin did your child have a reaction?',
-    titleEs: '¿Cuánto tiempo después de tomar penicilina tuvo su hijo una reacción?',
+    titleEn: 'When did your child\'s symptoms start after taking penicillin?',
+    titleEs: '¿Cuándo comenzaron los síntomas de su hijo después de tomar penicilina?',
     options: [
       { value: 'Less than 1 hour', labelEn: '<1 hour', labelEs: '<1 hora' },
       { value: '1-24 hours', labelEn: '1-24 hours', labelEs: '1-24 horas' },

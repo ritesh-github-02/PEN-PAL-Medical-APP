@@ -38,7 +38,7 @@ export default async function LocaleLayout({
     <html lang={locale} suppressHydrationWarning>
       <head>
       </head>
-      <body className="bg-slate-50 text-slate-800 min-h-screen antialiased selection:bg-blue-600/10 selection:text-blue-900 font-sans">
+      <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans">
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>

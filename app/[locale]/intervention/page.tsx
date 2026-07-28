@@ -154,34 +154,34 @@ export default function InterventionEntryPage() {
 
   // --- MAIN COMPACT PORTAL ENTRY FORM ---
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-between py-6 px-4 font-sans text-slate-800 bg-slate-50">
+    <div className="h-screen w-screen flex flex-col items-center justify-between py-6 px-4 font-sans text-[#2d3748] bg-[#f4f8e8]">
       <div className="flex-1 flex flex-col justify-center max-w-sm w-full space-y-5">
         {/* App Branding Header */}
         <div className="space-y-2 text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 font-display">
+          <h2 className="text-4xl font-black tracking-tight text-[#35727f] font-display">
             PEN-PAL
           </h2>
           <div>
-            <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full inline-block shadow-sm">
+            <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#35727f] bg-white/80 border border-slate-200/60 px-3 py-0.5 rounded-full inline-block shadow-sm">
               Parents Engaged in Penicillin Allergies
             </span>
           </div>
-          <p className="text-xs text-slate-500 max-w-xs mx-auto font-light">
+          <p className="text-xs text-slate-600 max-w-xs mx-auto font-normal">
             Access the clinical assessment suite securely.
           </p>
         </div>
 
         {/* Single Form Card */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 sm:p-6 w-full">
+        <div className="bg-white/90 border border-slate-200/80 rounded-3xl shadow-sm p-6 w-full">
           {mode === 'login' ? (
             /* ACCESS FORM */
             <div className="space-y-4">
               <div className="text-center">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 bg-slate-100 border border-slate-200/50 px-2 py-0.5 rounded inline-block">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#35727f] bg-[#f4f8e8] border border-slate-200/60 px-2 py-0.5 rounded inline-block">
                   Secure Access
                 </span>
-                <h3 className="text-base font-bold text-slate-800 mt-2">Enter Study Token</h3>
-                <p className="text-[11px] text-slate-500 mt-1 font-light leading-normal">
+                <h3 className="text-base font-bold text-[#2d3748] mt-2">Enter Study Token</h3>
+                <p className="text-[11px] text-slate-600 mt-1 font-normal leading-normal">
                   Provide your 10-character research token to continue.
                 </p>
               </div>
@@ -190,17 +190,17 @@ export default function InterventionEntryPage() {
                 e.preventDefault();
                 const input = (e.currentTarget.elements.namedItem('token') as HTMLInputElement).value.trim();
                 if(input) handleValidation(input);
-              }} className="space-y-2.5">
+              }} className="space-y-3">
                 <input 
                   name="token" 
                   type="text" 
                   placeholder="PEN-ABCDEF" 
                   required
-                  className="h-10 w-full px-3.5 border border-slate-200 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-lg transition-all text-xs"
+                  className="h-10 w-full px-3.5 border border-slate-200 focus:outline-none focus:border-[#35727f] focus:ring-4 focus:ring-[#35727f]/10 font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl transition-all text-xs"
                 />
                 <button 
                   type="submit" 
-                  className="h-10 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-all shadow-md active:scale-[0.99] flex justify-center items-center cursor-pointer"
+                  className="h-10 w-full bg-[#96b8b3] hover:bg-[#85a7a2] text-[#1e3a3a] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer"
                 >
                   Enter Study →
                 </button>
@@ -210,7 +210,7 @@ export default function InterventionEntryPage() {
                 <button
                   type="button"
                   onClick={() => setMode('register')}
-                  className="text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-all cursor-pointer uppercase tracking-wider hover:underline"
+                  className="text-[10px] font-bold text-[#35727f] hover:underline transition-all cursor-pointer uppercase tracking-wider"
                 >
                   Create token if you are new
                 </button>
@@ -220,26 +220,26 @@ export default function InterventionEntryPage() {
             /* REGISTRATION / GENERATE TOKEN FORM */
             <div className="space-y-4">
               <div className="text-center">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 bg-slate-100 border border-slate-200/50 px-2 py-0.5 rounded inline-block">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#35727f] bg-[#f4f8e8] border border-slate-200/60 px-2 py-0.5 rounded inline-block">
                   Registration
                 </span>
-                <h3 className="text-base font-bold text-slate-800 mt-2">Need a Token?</h3>
-                <p className="text-[11px] text-slate-500 mt-1 font-light leading-normal">
+                <h3 className="text-base font-bold text-[#2d3748] mt-2">Need a Token?</h3>
+                <p className="text-[11px] text-slate-600 mt-1 font-normal leading-normal">
                   Generate a secure access token instantly by entering your unique research identifier.
                 </p>
               </div>
 
-              <form onSubmit={handleRequestToken} className="space-y-2.5">
+              <form onSubmit={handleRequestToken} className="space-y-3">
                 <input 
                   name="userId" 
                   type="text" 
                   placeholder="RESEARCH ID" 
                   required
-                  className="h-10 w-full px-3.5 border border-slate-200 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 text-center text-xs font-semibold tracking-wider bg-white text-slate-900 placeholder-slate-400 uppercase rounded-lg transition-all"
+                  className="h-10 w-full px-3.5 border border-slate-200 focus:outline-none focus:border-[#35727f] focus:ring-4 focus:ring-[#35727f]/10 text-center text-xs font-semibold tracking-wider bg-white text-slate-900 placeholder-slate-400 uppercase rounded-xl transition-all"
                 />
                 <button 
                   type="submit" 
-                  className="h-10 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-all shadow-md active:scale-[0.99] flex justify-center items-center cursor-pointer"
+                  className="h-10 w-full bg-[#96b8b3] hover:bg-[#85a7a2] text-[#1e3a3a] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer"
                 >
                   Request Access Token
                 </button>
@@ -249,7 +249,7 @@ export default function InterventionEntryPage() {
                 <button
                   type="button"
                   onClick={() => setMode('login')}
-                  className="text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-all cursor-pointer uppercase tracking-wider hover:underline"
+                  className="text-[10px] font-bold text-[#35727f] hover:underline transition-all cursor-pointer uppercase tracking-wider"
                 >
                   Already have a token? Log in
                 </button>
@@ -260,7 +260,7 @@ export default function InterventionEntryPage() {
       </div>
 
       <div className="w-full max-w-xs text-center">
-        <p className="text-[9px] text-slate-400 leading-normal font-light">
+        <p className="text-[9px] text-slate-500 leading-normal font-normal">
           Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.
         </p>
       </div>

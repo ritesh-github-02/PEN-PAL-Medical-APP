@@ -161,31 +161,31 @@ export default async function AdminPage({ searchParams }: PageProps) {
   });
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans text-slate-800 bg-slate-50">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans text-[#2d3748] bg-[#f4f8e8]">
       <div className="max-w-7xl mx-auto w-full space-y-8">
         
         {/* Header */}
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white border border-slate-200 rounded-xl shadow-sm gap-4">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white/90 border border-slate-200/80 rounded-3xl shadow-sm gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 bg-[#35727f] rounded-2xl flex items-center justify-center shadow-sm">
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900 font-display flex items-center gap-2">
-                PEN-PAL <span className="font-light text-slate-400 text-base">|</span> <span className="font-semibold text-slate-700">Admin Telemetry Portal</span>
+              <h1 className="text-xl font-black tracking-tight text-[#35727f] font-display flex items-center gap-2">
+                PEN-PAL <span className="font-light text-slate-400 text-base">|</span> <span className="font-bold text-[#2d3748]">Admin Telemetry Portal</span>
               </h1>
-              <p className="text-[10px] text-slate-450 font-bold uppercase tracking-[0.15em] mt-0.5">Clinical Telemetry & Cohort Registry</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.15em] mt-0.5">Clinical Telemetry & Cohort Registry</p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <span className="text-[10px] font-bold text-teal-700 bg-teal-50/80 border border-teal-100/80 rounded-full px-3 py-1 uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-              <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-ping"></span>
+            <span className="text-[10px] font-bold text-[#35727f] bg-[#f4f8e8] border border-slate-200/80 rounded-full px-3.5 py-1 uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 bg-[#35727f] rounded-full animate-ping"></span>
               Secure Socket
             </span>
             <form action={logout}>
               <button 
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-1.5 border border-slate-200 text-xs font-bold text-slate-600 hover:text-rose-600 hover:border-rose-200 bg-white/80 hover:bg-rose-50/50 rounded-xl shadow-sm transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-1.5 border border-slate-200 text-xs font-bold text-slate-600 hover:text-rose-600 hover:border-rose-200 bg-white hover:bg-rose-50/50 rounded-full shadow-sm transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 Logout
@@ -212,20 +212,20 @@ export default async function AdminPage({ searchParams }: PageProps) {
         {/* Hero Metrics Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Hero Card: Total Enrolled */}
-          <div className="lg:col-span-1 bg-slate-900 rounded-2xl p-6 text-white shadow-sm border border-slate-800 transition-all duration-300 flex flex-col justify-between">
+          <div className="lg:col-span-1 bg-[#35727f] rounded-3xl p-6 text-white shadow-sm border border-[#2d616c] transition-all duration-300 flex flex-col justify-between">
             
             <div className="space-y-4">
               <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 bg-white/10 px-3 py-1 rounded-full border border-white/10">Active Cohort</span>
-                <Users className="w-6 h-6 text-slate-300" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e2e8df] bg-white/10 px-3 py-1 rounded-full border border-white/10">Active Cohort</span>
+                <Users className="w-6 h-6 text-white" />
               </div>
               <div>
-                <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Enrolled Participants</p>
+                <p className="text-slate-100 text-xs font-medium uppercase tracking-wider">Total Enrolled Participants</p>
                 <p className="text-6xl font-extrabold tracking-tight mt-1 font-display text-white">{participantCount}</p>
               </div>
             </div>
             
-            <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between text-xs text-teal-100/80">
+            <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between text-xs text-[#e2e8df]">
               <span>Primary PEN-PAL Registry</span>
               <span className="flex items-center gap-1.5 font-medium">Live Database <span className="w-2 h-2 bg-emerald-450 rounded-full inline-block animate-pulse"></span></span>
             </div>
