@@ -10,6 +10,7 @@ import {
   completeQuestionnaire,
   loadQuestionnaireProgress,
 } from "./actions";
+import { logout } from "@/app/[locale]/intervention/actions";
 import Loader from "@/components/common/Loader";
 import AudioPlayer from "./AudioPlayer";
 
@@ -37,6 +38,7 @@ export default function PenpalIntervention() {
   const [loading, setLoading] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [navigating, setNavigating] = useState(false);
   const [bindingError, setBindingError] = useState<string | null>(null);
 
@@ -270,6 +272,32 @@ export default function PenpalIntervention() {
     );
   }
 
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 font-sans bg-[#f4f8e8]">
+        <div className="max-w-xl w-full bg-white border border-slate-200 p-8 sm:p-12 text-center shadow-md rounded-3xl">
+          <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-6 rounded-full text-2xl font-bold shadow-sm">
+            ✓
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Success</h2>
+          <p className="text-sm text-slate-600 leading-relaxed mb-8">
+            Your responses have been recorded. Thank you for participating in the PEN-PAL study.
+          </p>
+          
+          <div className="space-y-4 pt-6 border-t border-slate-100">
+            <button 
+              onClick={() => logout()}
+              className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition shadow-sm active:scale-[0.98] cursor-pointer"
+            >
+              Finish & Return Home
+            </button>
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Session will be cleared</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const content = locale === "es" ? currentStep.contentEs : currentStep.contentEn;
   const title = locale === "es" ? currentStep.titleEs : currentStep.titleEn;
   const description = locale === "es" ? currentStep.descriptionEs : currentStep.descriptionEn;
@@ -312,20 +340,12 @@ export default function PenpalIntervention() {
                 onProceedToSurvey={async () => {
                   try {
                     setNavigating(true);
-                    const targetUrl = `/${locale}/intervention/survey`;
-
-                    console.log("Navigating to:", targetUrl);
-
-                    // 1. Try soft navigation via Next.js router
-                    router.push(targetUrl);
-
-                    // 2. FIX: Hard-redirect fallback if router.push fails silently
-                    setTimeout(() => {
-                      window.location.href = targetUrl;
-                    }, 1500);
-
+                    await completeQuestionnaire();
+                    setShowSuccess(true);
                   } catch (error) {
-                    console.error("Navigation failed:", error);
+                    console.error("Completion error:", error);
+                    setShowSuccess(true);
+                  } finally {
                     setNavigating(false);
                   }
                 }}
@@ -419,7 +439,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
           </div>
 
           <div className="text-[#2b3e34] leading-relaxed whitespace-pre-line text-sm sm:text-base font-medium max-w-xl">
-            {content || "This is nurse Anna. Anna is giving information about allergies to penicillin in kids."}
+            This is nurse Anna. Anna is giving information about allergies to penicillin in kids.
           </div>
 
           <div className="space-y-2.5 pt-1">
@@ -448,10 +468,12 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center text-7xl sm:text-8xl select-none filter drop-shadow-md">
-            👩‍⚕️
-          </div>
+        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
+          <img
+            src="/images/nurse-anna.png"
+            alt="Nurse Anna"
+            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
         </div>
       </div>
     </div>
@@ -584,10 +606,12 @@ function TestingScreen(props: BaseScreenProps) {
             {props.content}
           </div>
         </div>
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-center">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center text-7xl sm:text-8xl select-none filter drop-shadow-md">
-            👩‍⚕️
-          </div>
+        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
+          <img
+            src="/images/nurse-anna.png"
+            alt="Nurse Anna"
+            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
         </div>
       </div>
 
@@ -697,10 +721,12 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-1 self-end md:self-center">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center text-6xl sm:text-7xl select-none filter drop-shadow-md">
-            👩‍⚕️
-          </div>
+        <div className="flex-shrink-0 relative flex items-center justify-center p-1 self-end md:self-end mt-auto">
+          <img
+            src="/images/nurse-anna.png"
+            alt="Nurse Anna"
+            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
         </div>
       </div>
 
@@ -756,10 +782,12 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-center">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center text-7xl sm:text-8xl select-none filter drop-shadow-md">
-            👩‍⚕️
-          </div>
+        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
+          <img
+            src="/images/nurse-anna.png"
+            alt="Nurse Anna"
+            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
         </div>
       </div>
 
@@ -829,10 +857,12 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-center">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center text-7xl sm:text-8xl select-none filter drop-shadow-md">
-            👩‍⚕️
-          </div>
+        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
+          <img
+            src="/images/nurse-anna.png"
+            alt="Nurse Anna"
+            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
         </div>
       </div>
 
@@ -865,10 +895,12 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center text-7xl sm:text-8xl select-none filter drop-shadow-md">
-            👩‍⚕️
-          </div>
+        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
+          <img
+            src="/images/nurse-anna.png"
+            alt="Nurse Anna"
+            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
         </div>
       </div>
 
@@ -981,7 +1013,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
   const quoteParagraph = paragraphs.find(p => p.startsWith('"') || p.startsWith('“'));
 
   return (
-    <div className="print-container bg-white border border-slate-200/80 rounded-2xl shadow-md p-3.5 sm:p-5 max-h-[85vh] overflow-y-auto flex flex-col justify-between">
+    <div className="print-container bg-white border border-slate-200/80 rounded-2xl shadow-md p-3.5 sm:p-5 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between">
       <div className="print-section text-center">
         <h2 className="text-base sm:text-lg font-black text-slate-900 mb-2 text-center tracking-tight leading-tight">{title}</h2>
 
@@ -1073,7 +1105,7 @@ function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, 
   const symptoms = Array.isArray(answers["screen6_1_symptoms"]) ? answers["screen6_1_symptoms"].join(", ") : answers["screen6_1_symptoms"] || "None reported";
 
   return (
-    <div className="bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 max-h-[85vh] overflow-y-auto flex flex-col justify-between relative">
+    <div className="bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between relative">
       <div>
         <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100 no-print">
           <h1 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Assessment Report</h1>

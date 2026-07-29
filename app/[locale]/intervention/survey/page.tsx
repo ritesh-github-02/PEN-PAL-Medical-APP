@@ -23,7 +23,7 @@ interface SectionDef {
 
 export default function SurveyPage() {
   const t = useTranslations('Intervention');
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(true);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
