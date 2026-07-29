@@ -599,20 +599,20 @@ const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: bool
 function TestingScreen(props: BaseScreenProps) {
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
-        <div className="flex-1 space-y-4">
-          <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{props.title}</h2>
-          <div className="text-[#3a2d24] leading-relaxed space-y-3 whitespace-pre-line text-sm sm:text-base font-medium">
-            {props.content}
-          </div>
+      <div className="space-y-4 max-w-xl pb-2">
+        <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{props.title}</h2>
+        <div className="text-[#3a2d24] leading-relaxed space-y-3 whitespace-pre-line text-sm sm:text-base font-medium">
+          {props.content}
         </div>
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
-          <img
-            src="/images/nurse-anna.png"
-            alt="Nurse Anna"
-            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+      </div>
+
+      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
+        <img
+          src="/images/nurse-anna.png"
+          alt="Nurse Anna"
+          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
+        />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -657,77 +657,75 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col md:flex-row gap-4 items-start justify-between">
-        <div className="flex-1 space-y-3">
-          <div>
-            {navProps.description && (
-              <p className="text-sm sm:text-base font-semibold text-[#3a2d24] mb-0.5">{navProps.description}</p>
-            )}
-            <h2 className="text-base sm:text-lg md:text-xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
-          </div>
+      <div className="space-y-3 max-w-xl pb-2">
+        <div>
+          {navProps.description && (
+            <p className="text-sm sm:text-base font-semibold text-[#3a2d24] mb-0.5">{navProps.description}</p>
+          )}
+          <h2 className="text-base sm:text-lg md:text-xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
+        </div>
 
-          {/* If Pill Style (e.g. Symptoms in Image 1) */}
-          {options[0]?.value && !options[0]?.value.startsWith("curing_") ? (
-            <div className="bg-[#8caeab] p-3.5 sm:p-4 rounded-2xl shadow-inner max-w-xl">
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {options.map((opt: any) => {
-                  const isSelected = selected?.includes(opt.value);
-                  return (
-                    <button
-                      type="button"
-                      key={opt.value}
-                      onClick={() => handleToggle(opt.value)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs border ${
-                        isSelected
-                          ? "bg-[#236f7a] text-white border-[#236f7a] scale-105 shadow-sm"
-                          : "bg-white text-[#1e3a3a] border-white/80 hover:bg-slate-50"
-                      }`}
-                    >
-                      {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            /* Toggle Switch Style (Knowledge Test) */
-            <div className="space-y-2.5 pt-1">
-              {options.map((opt: any, idx: number) => {
+        {/* If Pill Style (e.g. Symptoms in Image 1) */}
+        {options[0]?.value && !options[0]?.value.startsWith("curing_") ? (
+          <div className="bg-[#8caeab] p-3.5 sm:p-4 rounded-2xl shadow-inner max-w-xl">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+              {options.map((opt: any) => {
                 const isSelected = selected?.includes(opt.value);
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={opt.value}
                     onClick={() => handleToggle(opt.value)}
-                    className="flex items-center gap-3 cursor-pointer group select-none"
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs border ${
+                      isSelected
+                        ? "bg-[#236f7a] text-white border-[#236f7a] scale-105 shadow-sm"
+                        : "bg-white text-[#1e3a3a] border-white/80 hover:bg-slate-50"
+                    }`}
                   >
-                    <div className="flex flex-col items-center shrink-0 pt-0.5">
-                      <div className={`w-12 h-5 rounded-full p-0.5 transition-colors duration-200 ${isSelected ? 'bg-[#236f7a]' : 'bg-[#7d93a2]'}`}>
-                        <div className={`w-4 h-4 rounded-full bg-white border border-slate-300 shadow-sm transform transition-transform duration-200 ${isSelected ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                      </div>
-                      <div className="flex justify-between w-full px-1 text-[10px] font-extrabold text-[#3a2d24] mt-0.5 leading-none">
-                        <span>×</span>
-                        <span>✓</span>
-                      </div>
-                    </div>
-
-                    <span className="text-xs sm:text-sm font-semibold text-[#3a2d24] leading-snug">
-                      {idx + 1}. {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
-                    </span>
-                  </div>
+                    {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
+                  </button>
                 );
               })}
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          /* Toggle Switch Style (Knowledge Test) */
+          <div className="space-y-2.5 pt-1">
+            {options.map((opt: any, idx: number) => {
+              const isSelected = selected?.includes(opt.value);
+              return (
+                <div
+                  key={opt.value}
+                  onClick={() => handleToggle(opt.value)}
+                  className="flex items-center gap-3 cursor-pointer group select-none"
+                >
+                  <div className="flex flex-col items-center shrink-0 pt-0.5">
+                    <div className={`w-12 h-5 rounded-full p-0.5 transition-colors duration-200 ${isSelected ? 'bg-[#236f7a]' : 'bg-[#7d93a2]'}`}>
+                      <div className={`w-4 h-4 rounded-full bg-white border border-slate-300 shadow-sm transform transition-transform duration-200 ${isSelected ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                    </div>
+                    <div className="flex justify-between w-full px-1 text-[10px] font-extrabold text-[#3a2d24] mt-0.5 leading-none">
+                      <span>×</span>
+                      <span>✓</span>
+                    </div>
+                  </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-1 self-end md:self-end mt-auto">
-          <img
-            src="/images/nurse-anna.png"
-            alt="Nurse Anna"
-            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+                  <span className="text-xs sm:text-sm font-semibold text-[#3a2d24] leading-snug">
+                    {idx + 1}. {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
+        <img
+          src="/images/nurse-anna.png"
+          alt="Nurse Anna"
+          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
+        />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -748,47 +746,45 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string; onSelect: (val: string) => void }) {
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
-        <div className="flex-1 space-y-4">
-          <div>
-            {navProps.description && (
-              <p className="text-base sm:text-lg font-semibold text-[#3a2d24] mb-1">{navProps.description}</p>
-            )}
-            <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
-          </div>
-
-          {/* Teal Container Card with White Pill Buttons (Image 5) */}
-          <div className="bg-[#8caeab] p-6 rounded-3xl shadow-inner max-w-xl">
-            <div className="flex flex-wrap gap-3">
-              {options.map((opt: any) => {
-                const isSelected = selected === opt.value;
-                return (
-                  <button
-                    type="button"
-                    key={opt.value}
-                    onClick={() => onSelect(opt.value)}
-                    className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm border ${
-                      isSelected
-                        ? "bg-[#236f7a] text-white border-[#236f7a] scale-105 shadow-md"
-                        : "bg-white text-[#1e3a3a] border-white/80 hover:bg-slate-50"
-                    }`}
-                  >
-                    {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+      <div className="space-y-4 max-w-xl pb-2">
+        <div>
+          {navProps.description && (
+            <p className="text-base sm:text-lg font-semibold text-[#3a2d24] mb-1">{navProps.description}</p>
+          )}
+          <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
         </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
-          <img
-            src="/images/nurse-anna.png"
-            alt="Nurse Anna"
-            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
+        {/* Teal Container Card with White Pill Buttons (Image 5) */}
+        <div className="bg-[#8caeab] p-6 rounded-3xl shadow-inner max-w-xl">
+          <div className="flex flex-wrap gap-3">
+            {options.map((opt: any) => {
+              const isSelected = selected === opt.value;
+              return (
+                <button
+                  type="button"
+                  key={opt.value}
+                  onClick={() => onSelect(opt.value)}
+                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm border ${
+                    isSelected
+                      ? "bg-[#236f7a] text-white border-[#236f7a] scale-105 shadow-md"
+                      : "bg-white text-[#1e3a3a] border-white/80 hover:bg-slate-50"
+                  }`}
+                >
+                  {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
+                </button>
+              );
+            })}
+          </div>
         </div>
+      </div>
+
+      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
+        <img
+          src="/images/nurse-anna.png"
+          alt="Nurse Anna"
+          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
+        />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -813,57 +809,55 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
-        <div className="flex-1 space-y-4">
-          <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
+      <div className="space-y-4 max-w-xl pb-2">
+        <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
 
-          {/* Teal Container Card */}
-          <div className="bg-[#8caeab] p-6 rounded-3xl text-[#1e3a3a] shadow-inner relative space-y-6 max-w-xl">
-            <p className="text-sm sm:text-base font-semibold text-[#1e3a3a] leading-snug">
-              {navProps.description || "At what age did your child have the reaction to penicillin (amoxicillin)?"}
-            </p>
+        {/* Teal Container Card */}
+        <div className="bg-[#8caeab] p-6 rounded-3xl text-[#1e3a3a] shadow-inner relative space-y-6 max-w-xl">
+          <p className="text-sm sm:text-base font-semibold text-[#1e3a3a] leading-snug">
+            {navProps.description || "At what age did your child have the reaction to penicillin (amoxicillin)?"}
+          </p>
 
-            {/* Slider with Yellow Badge Indicator */}
-            <div className="relative pt-8 pb-4 px-2">
-              {/* Dynamic Yellow Badge floating above thumb */}
-              <div 
-                className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#2b3e34] font-black text-xs px-2.5 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all"
-                style={{
-                  left: `${((value - minVal) / (maxVal - minVal)) * 100}%`
-                }}
-              >
-                {value}
-              </div>
+          {/* Slider with Yellow Badge Indicator */}
+          <div className="relative pt-8 pb-4 px-2">
+            {/* Dynamic Yellow Badge floating above thumb */}
+            <div 
+              className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#2b3e34] font-black text-xs px-2.5 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all"
+              style={{
+                left: `${((value - minVal) / (maxVal - minVal)) * 100}%`
+              }}
+            >
+              {value}
+            </div>
 
-              <input
-                type="range"
-                min={minVal}
-                max={maxVal}
-                value={value}
-                onChange={(e) => onSelect(Number(e.target.value))}
-                className="w-full h-2 bg-[#2d565b] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition"
-              />
+            <input
+              type="range"
+              min={minVal}
+              max={maxVal}
+              value={value}
+              onChange={(e) => onSelect(Number(e.target.value))}
+              className="w-full h-2 bg-[#2d565b] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition"
+            />
 
-              {/* Timeline Tick Labels */}
-              <div className="flex justify-between mt-3 text-[11px] font-bold text-[#1e3a3a]">
-                <span>&lt;1<br/>year old</span>
-                <span>1<br/>year old</span>
-                <span>10<br/>year old</span>
-                <span>20<br/>year old</span>
-                <span>26<br/>year-old</span>
-              </div>
+            {/* Timeline Tick Labels */}
+            <div className="flex justify-between mt-3 text-[11px] font-bold text-[#1e3a3a]">
+              <span>&lt;1<br/>year old</span>
+              <span>1<br/>year old</span>
+              <span>10<br/>year old</span>
+              <span>20<br/>year old</span>
+              <span>26<br/>year-old</span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
-          <img
-            src="/images/nurse-anna.png"
-            alt="Nurse Anna"
-            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
+        <img
+          src="/images/nurse-anna.png"
+          alt="Nurse Anna"
+          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
+        />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -884,24 +878,22 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col md:flex-row gap-6 items-center justify-between min-h-[14rem]">
-        <div className="flex-1 space-y-4 text-center md:text-left">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#3a2d24] max-w-xl tracking-tight leading-relaxed">
-            {title}
-          </h2>
-          {description && (
-            <p className="text-sm sm:text-base font-medium text-[#3a2d24] max-w-xl">{description}</p>
-          )}
-        </div>
+      <div className="space-y-4 max-w-xl pb-2 text-center md:text-left min-h-[12rem]">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#3a2d24] max-w-xl tracking-tight leading-relaxed">
+          {title}
+        </h2>
+        {description && (
+          <p className="text-sm sm:text-base font-medium text-[#3a2d24] max-w-xl">{description}</p>
+        )}
+      </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
-          <img
-            src="/images/nurse-anna.png"
-            alt="Nurse Anna"
-            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
+        <img
+          src="/images/nurse-anna.png"
+          alt="Nurse Anna"
+          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
+        />
       </div>
 
       {/* Centered Yellow Next Button */}
