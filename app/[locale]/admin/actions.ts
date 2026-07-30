@@ -181,3 +181,41 @@ export async function getAuthTimeline(limit: number = 10) {
     return { error: 'Failed to fetch timeline' };
   }
 }
+
+// Get comprehensive details for a specific participant
+export async function getParticipantDetails(participantId: string) {
+  try {
+    const participant = await prisma.participant.findFirst({
+      where: {
+        OR: [
+          { id: participantId },
+          { externalId: participantId }
+        ]
+      },
+      include: {
+        responses: {
+          orderBy: { createdAt: 'desc' }
+        },
+        sessions: {
+          orderBy: { createdAt: 'desc' }
+        },
+        tokens: {
+          orderBy: { createdAt: 'desc' }
+        },
+        events: {
+          orderBy: { timestamp: 'desc' },
+          take: 50
+        }
+      }
+    });
+
+    if (!participant) {
+      return { error: 'Participant not found' };
+    }
+
+    return { success: true, participant };
+  } catch (error) {
+    console.error('Failed to fetch participant details:', error);
+    return { error: 'Failed to fetch details' };
+  }
+}

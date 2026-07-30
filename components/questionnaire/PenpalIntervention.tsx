@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, memo } from "react";
 import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { usePathname, useRouter } from "@/routing";
 import { questionnaireConfig, QuestionnaireStep } from "@/config/questionnaire";
 import { logInteraction } from "@/lib/tracking";
 import {
@@ -13,6 +14,35 @@ import {
 import { logout } from "@/app/[locale]/intervention/actions";
 import Loader from "@/components/common/Loader";
 import AudioPlayer from "./AudioPlayer";
+
+function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (newLocale: string) => void }) {
+  return (
+    <div className="flex items-center gap-1 bg-white/90 border border-slate-200/90 shadow-2xs rounded-full p-1 font-sans select-none no-print">
+      <button
+        type="button"
+        onClick={() => onSwitch("en")}
+        className={`px-2.5 py-0.5 text-[11px] font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+          locale === "en"
+            ? "bg-[#236f7a] text-white shadow-xs"
+            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+        }`}
+      >
+        <span>🇺🇸</span> English
+      </button>
+      <button
+        type="button"
+        onClick={() => onSwitch("es")}
+        className={`px-2.5 py-0.5 text-[11px] font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+          locale === "es"
+            ? "bg-[#236f7a] text-white shadow-xs"
+            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+        }`}
+      >
+        <span>🇲🇽</span> Español
+      </button>
+    </div>
+  );
+}
 
 // ============ Types ============
 interface BaseScreenProps {
@@ -30,8 +60,23 @@ interface BaseScreenProps {
 export default function PenpalIntervention() {
   const t = useTranslations("Intervention");
   const params = useParams();
-  const router = useRouter();
   const locale = (params.locale as string) || "en";
+
+  const handleLanguageSwitch = (targetLocale: string) => {
+    if (targetLocale === locale) return;
+    let currentPath = window.location.pathname;
+    // Strip existing /en or /es prefix to prevent double-prefixing like /en/en/
+    currentPath = currentPath.replace(/^\/(en|es)(\/|$)/, "/");
+    if (!currentPath.startsWith("/")) {
+      currentPath = "/" + currentPath;
+    }
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("step", String(currentStepIndex));
+    if (showSummary) {
+      searchParams.set("report", "true");
+    }
+    window.location.href = `/${targetLocale}${currentPath}?${searchParams.toString()}`;
+  };
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -80,8 +125,14 @@ export default function PenpalIntervention() {
       const searchParams = new URLSearchParams(window.location.search);
       const isEditMode = searchParams.get("edit") === "true";
       const showReport = searchParams.get("report") === "true";
+      const stepParam = searchParams.get("step");
 
-      if (isEditMode) {
+      if (stepParam !== null && !isNaN(Number(stepParam))) {
+        const parsedStep = parseInt(stepParam, 10);
+        if (parsedStep >= 0 && parsedStep < questionnaireConfig.length) {
+          targetIndex = parsedStep;
+        }
+      } else if (isEditMode) {
         targetIndex = 0;
         setShowSummary(false);
       } else if (showReport) {
@@ -180,7 +231,29 @@ export default function PenpalIntervention() {
     if (!currentStep) return;
 
     setLoading(true);
-    const answer = explicitAnswer !== undefined ? explicitAnswer : answers[currentStep.id];
+    let answer = explicitAnswer !== undefined ? explicitAnswer : answers[currentStep.id];
+
+    // Default age slider to 9 if unadjusted
+    if (answer === undefined && currentStep.type === "slider") {
+      answer = 9;
+      setAnswers((prev) => ({ ...prev, [currentStep.id]: 9 }));
+    }
+
+    // Default statistics to 5 if unadjusted
+    if (answer === undefined && currentStep.type === "statistics") {
+      answer = 5;
+      setAnswers((prev) => ({ ...prev, [currentStep.id]: 5 }));
+    }
+
+    // For informational / non-question screens, record "acknowledged" instead of literal "undefined"
+    if (answer === undefined || answer === null || answer === "undefined") {
+      if (["intro", "testing_info", "text", "summary"].includes(currentStep.type)) {
+        answer = "acknowledged";
+      } else {
+        answer = "none_selected";
+      }
+    }
+
     const answerPayload = typeof answer === "object" ? JSON.stringify(answer) : String(answer);
 
     try {
@@ -274,14 +347,21 @@ export default function PenpalIntervention() {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 font-sans bg-[#f4f8e8]">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 font-sans bg-[#f4f8e8] relative">
+        <div className="absolute top-6 right-6 z-20">
+          <LanguageSwitcher locale={locale} onSwitch={handleLanguageSwitch} />
+        </div>
         <div className="max-w-xl w-full bg-white border border-slate-200 p-8 sm:p-12 text-center shadow-md rounded-3xl">
           <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-6 rounded-full text-2xl font-bold shadow-sm">
             ✓
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Success</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">
+            {locale === "es" ? "¡Éxito!" : "Success"}
+          </h2>
           <p className="text-sm text-slate-600 leading-relaxed mb-8">
-            Your responses have been recorded. Thank you for participating in the PEN-PAL study.
+            {locale === "es"
+              ? "Sus respuestas han sido registradas. Gracias por participar en el estudio PEN-PAL."
+              : "Your responses have been recorded. Thank you for participating in the PEN-PAL study."}
           </p>
           
           <div className="space-y-4 pt-6 border-t border-slate-100">
@@ -289,9 +369,11 @@ export default function PenpalIntervention() {
               onClick={() => logout()}
               className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition shadow-sm active:scale-[0.98] cursor-pointer"
             >
-              Finish & Return Home
+              {locale === "es" ? "Finalizar y Volver al Inicio" : "Finish & Return Home"}
             </button>
-            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Session will be cleared</p>
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+              {locale === "es" ? "La sesión se borrará" : "Session will be cleared"}
+            </p>
           </div>
         </div>
       </div>
@@ -315,27 +397,44 @@ export default function PenpalIntervention() {
   };
 
   return (
-    <div className="min-h-screen max-h-screen flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4 relative font-sans bg-[#f4f8e8]">
       {/* Decorative ambient background glows */}
       <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse"></div>
       <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse"></div>
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
-      <div className="w-full max-w-3xl relative z-10 my-auto">
+      <div className="w-full max-w-3xl relative z-10 my-auto space-y-1.5 py-1">
+        {/* Header Bar with Logo and Language Selector */}
+        <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]"></span>
+            <span className="font-black text-xs tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
+            <span className="text-slate-300 text-xs">|</span>
+            <span className="text-[11px] font-bold text-slate-600">
+              {locale === "es"
+                ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}`
+                : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}`}
+            </span>
+          </div>
+
+          {/* Language Switcher Pill Button */}
+          <LanguageSwitcher locale={locale} onSwitch={handleLanguageSwitch} />
+        </div>
+
         {/* Compact Tablet / iPad Device Frame */}
-        <div className="bg-zinc-900 border-[8px] sm:border-[12px] border-zinc-900 rounded-[1.8rem] sm:rounded-[2.4rem] shadow-2xl relative p-0.5 ring-1 ring-white/10 overflow-hidden">
+        <div className="bg-zinc-900 border-[6px] sm:border-[10px] border-zinc-900 rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl relative p-0.5 ring-1 ring-white/10 overflow-hidden">
           {/* Tablet Front Camera Notch / Sensor Dot */}
           {/* <div className="hidden sm:block absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-zinc-800 border border-zinc-700/80 z-30 shadow-inner"></div> */}
 
-          <div className="rounded-[1.4rem] sm:rounded-[2rem] overflow-hidden">
+          <div className="rounded-[1.2rem] sm:rounded-[1.6rem] overflow-hidden">
             {showSummary ? (
               <SummaryReportScreen
                 answers={answers}
                 onEditAssessment={() => {
                   setShowSummary(false);
                   setCurrentStepIndex(0);
-                  router.push(`/${locale}/intervention/flow?edit=true`);
+                  window.location.href = `/${locale}/intervention/flow?edit=true`;
                 }}
                 onProceedToSurvey={async () => {
                   try {
@@ -428,22 +527,26 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t }: Omit<Base
 
 // ============ Screen Components ============
 
-function IntroScreen({ title, description, content, onNext, onAnswer, loading, t }: BaseScreenProps & { onAnswer: (val: string) => void }) {
+function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale }: BaseScreenProps & { onAnswer: (val: string) => void }) {
+  const introSubtitle = description || (locale === "es" ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
+  const mainContent = content ? content.split('\n\n')[0] : (locale === "es" ? "Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños." : "This is nurse Anna. Anna is giving information about allergies to penicillin in kids.");
+  const questionPrompt = content && content.split('\n\n')[1] ? content.split('\n\n')[1] : (locale === "es" ? "¿Quieres saber más?" : "Do you want to know more?");
+
   return (
     <div className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
         <div className="flex-1 space-y-4">
           <div className="space-y-1">
-            <h1 className="text-4xl sm:text-5xl font-black text-[#216d77] tracking-tight font-display">PEN–PAL</h1>
-            <p className="text-base sm:text-lg font-bold text-[#2b3e34]">Parents Engaged in Penicillin Allergies</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-[#216d77] tracking-tight font-display">{title || "PEN–PAL"}</h1>
+            <p className="text-base sm:text-lg font-bold text-[#2b3e34]">{introSubtitle}</p>
           </div>
 
           <div className="text-[#2b3e34] leading-relaxed whitespace-pre-line text-sm sm:text-base font-medium max-w-xl">
-            This is nurse Anna. Anna is giving information about allergies to penicillin in kids.
+            {mainContent}
           </div>
 
           <div className="space-y-2.5 pt-1">
-            <p className="text-base sm:text-lg font-bold text-[#2b3e34]">Do you want to know more?</p>
+            <p className="text-base sm:text-lg font-bold text-[#2b3e34]">{questionPrompt}</p>
             <div className="flex gap-3">
               <button
                 type="button"
@@ -480,7 +583,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   );
 }
 
-function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loading, t, isFirstStep }: BaseScreenProps & { value: any; onSelect: (val: number) => void }) {
+function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loading, t, locale, isFirstStep }: BaseScreenProps & { value: any; onSelect: (val: number) => void }) {
   const [allergicCount, setAllergicCount] = useState<number>(value !== undefined ? Number(value) : 5);
   const totalKids = 100;
 
@@ -496,19 +599,19 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
   }, [value]);
 
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-12 md:p-6 shadow-lg relative overflow-hidden">
-      <div className="text-center space-y-1.5 mb-4">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#3a2d24] max-w-xl mx-auto tracking-tight leading-snug">
+    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-3 sm:p-5 md:p-5 shadow-lg relative overflow-hidden">
+      <div className="text-center space-y-1 mb-2">
+        <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#3a2d24] max-w-xl mx-auto tracking-tight leading-snug">
           {title}
         </h2>
-        <p className="text-xs sm:text-sm md:text-base font-bold text-[#3a2d24] max-w-lg mx-auto">
+        <p className="text-xs sm:text-sm font-bold text-[#3a2d24] max-w-lg mx-auto">
           {content}
         </p>
       </div>
 
-      <div className="mb-4 text-center">
+      <div className="mb-2 text-center">
         {/* 100 Kids Icon Grid (5 rows x 20 cols) */}
-        <div className="grid grid-cols-10 sm:grid-cols-20 gap-1 sm:gap-0 mb-2 justify-center mx-auto max-w-xl p-2 bg-white/50 rounded-2xl border border-slate-200/50">
+        <div className="grid grid-cols-10 sm:grid-cols-20 gap-0.5 sm:gap-0 mb-1.5 justify-center mx-auto max-w-xl p-1.5 bg-white/50 rounded-2xl border border-slate-200/50">
           {Array(totalKids).fill(0).map((_, i) => {
             const isAllergic = i >= totalKids - allergicCount;
             const isGirl = i % 2 === 0;
@@ -528,18 +631,21 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
 
         <div className="flex justify-end max-w-xl mx-auto pr-2">
           <p className="text-xs sm:text-sm font-bold text-[#3a2d24]">
-            only <span className="text-base sm:text-lg font-black text-[#3a2d24] mx-0.5">{allergicCount}</span> have a real allergy
+            {locale === "es" 
+              ? <>solo <span className="text-sm sm:text-base font-black text-[#3a2d24] mx-0.5">{allergicCount}</span> tienen una alergia real</>
+              : <>only <span className="text-sm sm:text-base font-black text-[#3a2d24] mx-0.5">{allergicCount}</span> have a real allergy</>
+            }
           </p>
         </div>
       </div>
 
       {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-2 border-t border-slate-300/40">
+      <div className="flex justify-center pt-1.5 border-t border-slate-300/40">
         <button
           type="button"
           onClick={() => onNext(value !== undefined ? value : allergicCount)}
           disabled={loading}
-          className="px-7 py-1.5 sm:py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          className="px-7 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
           {loading ? "..." : t("next")}
         </button>
@@ -551,7 +657,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
 const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: boolean; isGirl: boolean }) {
   const color = isAllergic ? "#d95d39" : "#236f7a";
   return (
-    <svg viewBox="0 0 32 32" className="w-8 h-8 sm:w-8 sm:h-8 md:w-8 md:h-8 select-none transition-transform">
+    <svg viewBox="0 0 32 32" className="w-5 h-5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5 select-none transition-transform">
       {/* Shoulders / Shirt */}
       <path
         d="M 7 29 C 7 23, 25 23, 25 29"
@@ -841,11 +947,11 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 
             {/* Timeline Tick Labels */}
             <div className="flex justify-between mt-3 text-[11px] font-bold text-[#1e3a3a]">
-              <span>&lt;1<br/>year old</span>
-              <span>1<br/>year old</span>
-              <span>10<br/>year old</span>
-              <span>20<br/>year old</span>
-              <span>26<br/>year-old</span>
+              <span>&lt;1<br/>{navProps.locale === "es" ? "año" : "year old"}</span>
+              <span>1<br/>{navProps.locale === "es" ? "año" : "year old"}</span>
+              <span>10<br/>{navProps.locale === "es" ? "años" : "year old"}</span>
+              <span>20<br/>{navProps.locale === "es" ? "años" : "year old"}</span>
+              <span>26<br/>{navProps.locale === "es" ? "años" : "year-old"}</span>
             </div>
           </div>
         </div>

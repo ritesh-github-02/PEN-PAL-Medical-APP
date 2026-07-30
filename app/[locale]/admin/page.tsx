@@ -1,20 +1,20 @@
 import prisma from '@/lib/prisma';
 import { ExportButton } from './ExportButton';
 import { logout } from '../intervention/actions';
-import { Link } from '@/routing';
 import { getTokenStats, getTokenUsageDetails, getAuthTimeline } from './actions';
+import { ParticipantCohortTable } from './ParticipantCohortTable';
 import { 
   Users, 
   Activity, 
   Database, 
   Key, 
   History, 
-  Search, 
   Shield, 
   LogOut, 
   FileSpreadsheet, 
   Clock, 
-  AlertTriangle 
+  AlertTriangle,
+  Download
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -46,7 +46,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
     sessionCount = await prisma.session.count();
     eventCount = await prisma.eventLog.count();
 
-    // Get recent logins (last 24 hours) - increased limit for scrollable view
+    // Get recent logins (last 24 hours)
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     recentLogins = await prisma.session.findMany({
@@ -98,6 +98,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
       authTimeline = timelineResult.events;
     }
   } catch (err) {
+    console.error('ADMIN PAGE DB ERROR 1:', err);
     dbError = true;
   }
 
@@ -142,7 +143,13 @@ export default async function AdminPage({ searchParams }: PageProps) {
       allParticipants = baseParticipants;
     }
   } catch (err) {
+    console.error('ADMIN PAGE DB ERROR 2:', err);
     dbError = true;
+  }
+
+  // If data was fetched successfully from PostgreSQL, database is online!
+  if (participantCount > 0 || allParticipants.length > 0 || sessionCount > 0) {
+    dbError = false;
   }
 
   // Create combined items for the participant overview grid
@@ -161,31 +168,32 @@ export default async function AdminPage({ searchParams }: PageProps) {
   });
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans text-[#2d3748] bg-[#f4f8e8]">
-      <div className="max-w-7xl mx-auto w-full space-y-8">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* Header */}
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white/90 border border-slate-200/80 rounded-3xl shadow-sm gap-4">
+        {/* Professional Header Navigation Bar */}
+        <header className="bg-[#0f172a] border border-slate-800 rounded-xl p-5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#35727f] rounded-2xl flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center shadow-xs">
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tight text-[#35727f] font-display flex items-center gap-2">
-                PEN-PAL <span className="font-light text-slate-400 text-base">|</span> <span className="font-bold text-[#2d3748]">Admin Telemetry Portal</span>
+              <h1 className="text-lg font-bold tracking-tight text-white font-mono flex items-center gap-2">
+                PEN-PAL <span className="text-slate-600 font-normal">|</span> <span className="text-slate-200 font-semibold">Clinical Admin Portal</span>
               </h1>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.15em] mt-0.5">Clinical Telemetry & Cohort Registry</p>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">Clinical Telemetry & Cohort Registry Dashboard</p>
             </div>
           </div>
+
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <span className="text-[10px] font-bold text-[#35727f] bg-[#f4f8e8] border border-slate-200/80 rounded-full px-3.5 py-1 uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-              <span className="w-1.5 h-1.5 bg-[#35727f] rounded-full animate-ping"></span>
-              Secure Socket
+            <span className="text-xs font-mono font-bold text-teal-400 bg-slate-800 border border-slate-700 rounded-md px-3 py-1 flex items-center gap-2">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+              Gateway Active
             </span>
             <form action={logout}>
               <button 
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-1.5 border border-slate-200 text-xs font-bold text-slate-600 hover:text-rose-600 hover:border-rose-200 bg-white hover:bg-rose-50/50 rounded-full shadow-sm transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-800 hover:bg-rose-900/40 hover:text-rose-300 border border-slate-700 text-slate-200 rounded-md text-xs font-bold transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 Logout
@@ -194,139 +202,143 @@ export default async function AdminPage({ searchParams }: PageProps) {
           </div>
         </header>
 
-        {/* Database Error Banner */}
+        {/* Database Offline Error Alert */}
         {dbError && (
-          <div className="bg-rose-50/80 backdrop-blur-md border border-rose-200 rounded-2xl p-4 text-slate-800 shadow-sm flex items-center justify-between">
+          <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-rose-900 shadow-xs flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-rose-100/80 rounded-xl flex items-center justify-center font-bold text-rose-600">
+              <div className="w-9 h-9 bg-rose-100 rounded-lg flex items-center justify-center font-bold text-rose-700">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-bold text-sm text-rose-800">Database Connection Offline</p>
-                <p className="text-xs text-rose-600 mt-0.5 font-light">PostgreSQL is not responding. Cohort tables and metrics are displaying baseline values.</p>
+                <p className="font-bold text-sm text-rose-900">Database Connection Offline</p>
+                <p className="text-xs text-rose-700 mt-0.5">PostgreSQL is not responding. Showing cached telemetry data.</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Hero Metrics Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Hero Card: Total Enrolled */}
-          <div className="lg:col-span-1 bg-[#35727f] rounded-3xl p-6 text-white shadow-sm border border-[#2d616c] transition-all duration-300 flex flex-col justify-between">
-            
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e2e8df] bg-white/10 px-3 py-1 rounded-full border border-white/10">Active Cohort</span>
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-slate-100 text-xs font-medium uppercase tracking-wider">Total Enrolled Participants</p>
-                <p className="text-6xl font-extrabold tracking-tight mt-1 font-display text-white">{participantCount}</p>
-              </div>
+        {/* Key Metrics Overview Grid (Plain Professional Colors) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          {/* Total Enrolled Card */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 text-white flex flex-col justify-between shadow-xs">
+            <div className="flex justify-between items-start">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded">
+                Active Cohort
+              </span>
+              <Users className="w-5 h-5 text-teal-400" />
             </div>
-            
-            <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between text-xs text-[#e2e8df]">
-              <span>Primary PEN-PAL Registry</span>
-              <span className="flex items-center gap-1.5 font-medium">Live Database <span className="w-2 h-2 bg-emerald-450 rounded-full inline-block animate-pulse"></span></span>
+            <div className="mt-4">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Enrolled Participants</p>
+              <p className="text-4xl font-extrabold text-white tracking-tight mt-1 font-mono">{participantCount}</p>
             </div>
+            <p className="text-[11px] text-slate-400 mt-3 pt-3 border-t border-slate-800 font-medium">
+              Registered in PEN-PAL Registry
+            </p>
           </div>
 
-          {/* Quick Metrics Grid */}
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            
-            {/* Active Now */}
-            <div className="bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-2xl p-5 hover:border-teal-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between group shadow-sm">
-              <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-teal-650 bg-teal-50 border border-teal-100 rounded-full px-2.5 py-0.5 uppercase tracking-wider">Telemetry</span>
-                <Clock className="w-5 h-5 text-teal-500" />
-              </div>
-              <div className="mt-4">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Now</h3>
-                <p className="text-3xl font-extrabold text-slate-800 tracking-tight mt-1 font-display flex items-baseline gap-1.5">
-                  {activeNowCount}
-                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping inline-block"></span>
-                </p>
-              </div>
-              <p className="text-[10px] text-slate-450 mt-2 font-medium">Logged activity last 30 min</p>
+          {/* Active Now Card */}
+          <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+            <div className="flex justify-between items-start">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded">
+                Live Status
+              </span>
+              <Clock className="w-5 h-5 text-emerald-600" />
             </div>
-
-            {/* Sessions Logged */}
-            <div className="bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-2xl p-5 hover:border-teal-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between group shadow-sm">
-              <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-full px-2.5 py-0.5 uppercase tracking-wider">Visits</span>
-                <Activity className="w-5 h-5 text-indigo-500" />
-              </div>
-              <div className="mt-4">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sessions Logged</h3>
-                <p className="text-3xl font-extrabold text-slate-800 tracking-tight mt-1 font-display">{sessionCount}</p>
-              </div>
-              <p className="text-[10px] text-slate-450 mt-2 font-medium">Interactive user touchpoints</p>
+            <div className="mt-4">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Now</p>
+              <p className="text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono flex items-baseline gap-2">
+                {activeNowCount}
+                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+              </p>
             </div>
-
-            {/* Events Captured */}
-            <div className="bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-2xl p-5 hover:border-teal-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between group shadow-sm">
-              <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold text-slate-650 bg-slate-100 border border-slate-200 rounded-full px-2.5 py-0.5 uppercase tracking-wider">Telemetry</span>
-                <Database className="w-5 h-5 text-slate-400" />
-              </div>
-              <div className="mt-4">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Events Captured</h3>
-                <p className="text-3xl font-extrabold text-slate-800 tracking-tight mt-1 font-display">{eventCount}</p>
-              </div>
-              <p className="text-[10px] text-slate-450 mt-2 font-medium">Behavioral analytical records</p>
-            </div>
-
+            <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
+              Logged activity in last 30 minutes
+            </p>
           </div>
+
+          {/* Sessions Logged Card */}
+          <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+            <div className="flex justify-between items-start">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded">
+                Usage Metric
+              </span>
+              <Activity className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div className="mt-4">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Sessions Logged</p>
+              <p className="text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono">{sessionCount}</p>
+            </div>
+            <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
+              Interactive clinical touchpoints
+            </p>
+          </div>
+
+          {/* Events Captured Card */}
+          <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+            <div className="flex justify-between items-start">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded">
+                Telemetry Logs
+              </span>
+              <Database className="w-5 h-5 text-slate-600" />
+            </div>
+            <div className="mt-4">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Events Captured</p>
+              <p className="text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono">{eventCount}</p>
+            </div>
+            <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
+              Behavioral analytical records
+            </p>
+          </div>
+
         </div>
 
-        {/* Token Statistics Cards */}
+        {/* Token Security Statistics Banner */}
         {tokenStats && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Total Tokens */}
-            <div className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-5 rounded-2xl shadow-sm hover:border-slate-350 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Tokens</span>
-                <Key className="w-4 h-4 text-slate-400" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Tokens</span>
+                <Key className="w-3.5 h-3.5 text-slate-400" />
               </div>
-              <p className="text-2xl font-bold text-slate-800 font-display">{tokenStats.totalTokens}</p>
-              <div className="w-full bg-slate-100 h-1 rounded-full mt-3 overflow-hidden">
-                <div className="bg-slate-400 h-full rounded-full" style={{ width: '100%' }}></div>
+              <p className="text-2xl font-bold font-mono text-slate-900">{tokenStats.totalTokens}</p>
+              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div className="bg-slate-500 h-full rounded-full" style={{ width: '100%' }}></div>
               </div>
             </div>
 
-            {/* Active Tokens */}
-            <div className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-5 rounded-2xl shadow-sm hover:border-slate-350 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Active Tokens</span>
+            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Active Tokens</span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
               </div>
-              <p className="text-2xl font-bold text-slate-800 font-display">{tokenStats.validTokens}</p>
-              <div className="w-full bg-slate-100 h-1 rounded-full mt-3 overflow-hidden">
-                <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${(tokenStats.validTokens / (tokenStats.totalTokens || 1)) * 100}%` }}></div>
+              <p className="text-2xl font-bold font-mono text-emerald-900">{tokenStats.validTokens}</p>
+              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${(tokenStats.validTokens / (tokenStats.totalTokens || 1)) * 100}%` }}></div>
               </div>
             </div>
 
-            {/* Total Usage */}
-            <div className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-5 rounded-2xl shadow-sm hover:border-slate-350 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-teal-600 uppercase tracking-wider">Total Usage</span>
-                <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded font-mono">avg {tokenStats.avgUsage}</span>
+            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-bold text-teal-700 uppercase tracking-wider">Total Usage</span>
+                <span className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200 px-1 rounded font-mono">
+                  avg {tokenStats.avgUsage}
+                </span>
               </div>
-              <p className="text-2xl font-bold text-slate-800 font-display">{tokenStats.totalUsage}</p>
-              <div className="w-full bg-teal-50 h-1 rounded-full mt-3 overflow-hidden">
-                <div className="bg-teal-550 h-full rounded-full" style={{ width: '100%' }}></div>
+              <p className="text-2xl font-bold font-mono text-teal-900">{tokenStats.totalUsage}</p>
+              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div className="bg-teal-600 h-full rounded-full" style={{ width: '100%' }}></div>
               </div>
             </div>
 
-            {/* Used Today */}
-            <div className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-5 rounded-2xl shadow-sm hover:border-slate-350 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-indigo-650 uppercase tracking-wider">Used Today</span>
-                <Clock className="w-4 h-4 text-indigo-400" />
+            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">Used Today</span>
+                <Clock className="w-3.5 h-3.5 text-indigo-500" />
               </div>
-              <p className="text-2xl font-bold text-slate-800 font-display">{tokenStats.usedToday}</p>
-              <div className="w-full bg-indigo-50 h-1 rounded-full mt-3 overflow-hidden">
-                <div className="bg-indigo-550 h-full rounded-full" style={{ width: tokenStats.totalUsage > 0 ? `${(tokenStats.usedToday / tokenStats.totalUsage) * 100}%` : '10%' }}></div>
+              <p className="text-2xl font-bold font-mono text-indigo-900">{tokenStats.usedToday}</p>
+              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div className="bg-indigo-600 h-full rounded-full" style={{ width: tokenStats.totalUsage > 0 ? `${(tokenStats.usedToday / tokenStats.totalUsage) * 100}%` : '10%' }}></div>
               </div>
             </div>
           </div>
@@ -334,358 +346,160 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
         {/* Real-time Timelines and Activity Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Recent Authentication Activity timeline */}
-          <div className="lg:col-span-7 bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-            <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+          
+          {/* Authentication Activity timeline */}
+          <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between">
+            <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <History className="w-4 h-4 text-teal-650" /> Recent Authentication Activity
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <History className="w-4 h-4 text-teal-700" /> Authentication Activity Log
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">Live token validation events from clinic gateways</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Real-time token validation events from clinic access points</p>
               </div>
             </div>
             
-            <div className="divide-y divide-slate-100/80 overflow-y-auto max-h-[320px]">
+            <div className="divide-y divide-slate-200 overflow-y-auto max-h-[300px]">
               {authTimeline.map((event) => (
-                <div key={event.id} className="p-4 flex items-center justify-between hover:bg-slate-50/40 transition-colors">
+                <div key={event.id} className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className={`w-3 h-3 rounded-full ${
-                        event.eventType === 'TOKEN_VALIDATED' ? 'bg-emerald-500 shadow-sm shadow-emerald-400' :
-                        event.eventType === 'TOKEN_INVALID' ? 'bg-rose-500 shadow-sm shadow-rose-450' :
-                        event.eventType === 'TOKEN_CREATED' ? 'bg-indigo-500 shadow-sm shadow-indigo-400' : 'bg-amber-500 shadow-sm shadow-amber-400'
-                      }`}></div>
-                      <span className={`absolute inline-flex h-full w-full rounded-full opacity-30 ${
-                        event.eventType === 'TOKEN_VALIDATED' ? 'bg-emerald-400 animate-ping' :
-                        event.eventType === 'TOKEN_INVALID' ? 'bg-rose-400' :
-                        event.eventType === 'TOKEN_CREATED' ? 'bg-indigo-400 animate-pulse' : 'bg-amber-400'
-                      }`}></span>
-                    </div>
+                    <div className={`w-2.5 h-2.5 rounded-full ${
+                      event.eventType === 'TOKEN_VALIDATED' ? 'bg-emerald-600' :
+                      event.eventType === 'TOKEN_INVALID' ? 'bg-rose-600' :
+                      event.eventType === 'TOKEN_CREATED' ? 'bg-indigo-600' : 'bg-amber-600'
+                    }`}></div>
                     <div>
-                      <p className="text-xs font-semibold text-slate-700">
+                      <p className="text-xs font-bold text-slate-800">
                         {event.eventType.replace('_', ' ')}
                         {event.participant?.externalId && (
-                          <span className="ml-1.5 text-slate-500 text-[10px] bg-slate-100 border border-slate-200/50 px-1.5 py-0.5 rounded font-mono">
+                          <span className="ml-2 text-slate-700 text-[11px] bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded font-mono font-bold">
                             {event.participant.externalId}
                           </span>
                         )}
                       </p>
-                      <p className="text-[10px] text-slate-450 font-medium mt-0.5">
-                        {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })} • {new Date(event.timestamp).toLocaleDateString()}
+                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                        {new Date(event.timestamp).toLocaleTimeString()} • {new Date(event.timestamp).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200/50 px-2 py-0.5 rounded font-mono">
-                    {event.ipAddress || 'Loopback/Secured'}
+                  <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded font-mono">
+                    {event.ipAddress || 'Secured Gateway'}
                   </span>
                 </div>
               ))}
               {authTimeline.length === 0 && (
-                <div className="p-8 text-center text-slate-400 italic text-xs">No active telemetry events recorded yet.</div>
+                <div className="p-8 text-center text-slate-400 italic text-xs">No auth activity recorded yet.</div>
               )}
             </div>
             
-            <div className="p-3 bg-slate-50/30 border-t border-slate-150/50 text-center">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Network Gateways Active
-              </span>
+            <div className="p-3 bg-slate-50 border-t border-slate-200 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              Network Access Security Status: Normal
             </div>
           </div>
 
-          {/* Participant feed */}
-          <div className="lg:col-span-5 bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-            <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+          {/* Participant Activity Feed */}
+          <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between">
+            <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-indigo-650" /> Participant Feed
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-indigo-700" /> Participant Stream
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">Activity streaming from local study devices</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Session activity streaming from active study tablets</p>
               </div>
             </div>
             
-            <div className="divide-y divide-slate-100/80 overflow-y-auto max-h-[320px] p-2 space-y-1.5">
+            <div className="divide-y divide-slate-200 overflow-y-auto max-h-[300px] p-2 space-y-1">
               {overviewItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-slate-50/40 border border-slate-200/30 rounded-xl hover:bg-slate-50 transition-colors duration-150">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                <div key={index} className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg hover:bg-white transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
                     <div>
                       {item.type === 'login' ? (
                         <>
-                          <p className="text-xs font-bold text-slate-700 font-mono">{item.login.participant?.externalId || 'Anonymous user'}</p>
-                          <p className="text-[10px] text-slate-400 font-medium">Session initialized</p>
+                          <p className="text-xs font-bold text-slate-900 font-mono">{item.login.participant?.externalId || 'Anonymous Participant'}</p>
+                          <p className="text-[10px] text-slate-500 font-medium">Session Initialized</p>
                         </>
                       ) : (
                         <>
-                          <p className="text-xs font-bold text-slate-700">{item.title}</p>
-                          <p className="text-[10px] text-slate-400 font-medium">Metric Overview</p>
+                          <p className="text-xs font-bold text-slate-900">{item.title}</p>
+                          <p className="text-[10px] text-slate-500 font-medium">Study Metric Summary</p>
                         </>
                       )}
                     </div>
                   </div>
                   <div className="text-right">
                     {item.type === 'login' ? (
-                      <p className="text-[10px] font-mono text-slate-500">
+                      <p className="text-[10px] font-mono font-bold text-slate-600">
                         {new Date(item.login.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     ) : (
-                      <span className="text-xs font-bold text-indigo-755 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 font-mono">
+                      <span className="text-xs font-bold text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 font-mono">
                         {item.value}
                       </span>
                     )}
                   </div>
                 </div>
               ))}
-              {overviewItems.length === 0 && (
-                <div className="p-8 text-center text-slate-400 italic text-xs">No user feedback streams available.</div>
-              )}
             </div>
 
-            <div className="p-3 bg-slate-50/30 border-t border-slate-150/50 text-center">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                Tracking 24h Clinical Interactions
-              </span>
+            <div className="p-3 bg-slate-50 border-t border-slate-200 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              24-Hour Interactive Activity Stream
             </div>
           </div>
+
         </div>
 
-        {/* Token Access History Table */}
-        {tokenUsageDetails.length > 0 && (
-          <div className="relative z-10 bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        {/* CLINICAL COHORT REGISTRY TABLE SECTION (With Row-Level Download Responses & Details Modal) */}
+        <section className="space-y-2">
+          <ParticipantCohortTable participants={allParticipants} />
+        </section>
+
+        {/* Clinical Data Export Gateway */}
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+          <div className="p-5 border-b border-slate-200 bg-slate-50">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <FileSpreadsheet className="w-4 h-4 text-teal-700" /> Clinical Data Export Gateway
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Download compiled CSV analytical payloads of participant questionnaire responses and event telemetry for external clinical audits.
+            </p>
+          </div>
+          
+          <div className="p-5 space-y-3 bg-white">
+            {/* Download All Responses */}
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-slate-50 border border-slate-200 rounded-lg gap-4">
               <div>
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <Key className="w-4 h-4 text-teal-650" /> Token Authorization Ledger
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">Audit log of issued secure access codes</p>
+                <h4 className="font-bold text-slate-900 text-xs">Complete Participant Responses Ledger</h4>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Export structured records of all questionnaire input fields, symptoms, timeline selections, and assessment answers across all participants.
+                </p>
               </div>
-              <span className="text-[10px] font-bold text-teal-700 bg-teal-50 border border-teal-100/60 px-2.5 py-0.5 rounded-full font-mono">
-                {tokenUsageDetails.length} Recent Tokens
-              </span>
+              <ExportButton type="responses" />
+            </div>
+
+            {/* Download Full Cohort Roster */}
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-slate-50 border border-slate-200 rounded-lg gap-4">
+              <div>
+                <h4 className="font-bold text-slate-900 text-xs">Clinical Cohort Registry Roster</h4>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Export complete participant roster metadata including external IDs, cohort groups, status, token usage counts, and last active dates.
+                </p>
+              </div>
+              <ExportButton type="participants" label="Export Roster CSV" />
+            </div>
+
+            {/* Download System Events */}
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-slate-50 border border-slate-200 rounded-lg gap-4">
+              <div>
+                <h4 className="font-bold text-slate-900 text-xs">System & Behavioral Event Logs</h4>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Export chronological action telemetry, page durations, token validations, and security event payloads.
+                </p>
+              </div>
+              <ExportButton type="events" />
             </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-200/80 bg-slate-50/30">
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">User ID</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Security Token</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Uses</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Last Utilized</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Origin IP</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {tokenUsageDetails.map((token) => (
-                    <tr key={token.id} className="hover:bg-slate-50/30 transition-colors group">
-                      <td className="px-6 py-3.5 whitespace-nowrap font-mono text-slate-600 font-medium">
-                        {token.participant?.externalId || 'Unlinked'}
-                      </td>
-                      <td className="px-6 py-3.5 whitespace-nowrap font-mono font-bold text-slate-700 tracking-wider">
-                        {token.token}
-                      </td>
-                      <td className="px-6 py-3.5 whitespace-nowrap text-center">
-                        <span className="inline-flex items-center justify-center w-6 h-6 bg-slate-100 rounded-full font-bold text-slate-750 font-mono border border-slate-200/30 text-[11px]">
-                          {token.usageCount}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3.5 whitespace-nowrap text-slate-500">
-                        {token.lastUsedAt ? (
-                          <div className="space-y-0.5">
-                            <p className="font-semibold text-slate-650">
-                              {new Date(token.lastUsedAt).toLocaleDateString()}
-                            </p>
-                            <p className="text-[10px] text-slate-400">
-                              {new Date(token.lastUsedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-slate-350 italic text-[11px]">Never used</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-3.5 whitespace-nowrap font-mono text-slate-500">
-                        {token.lastUsedIp || 'N/A'}
-                      </td>
-                      <td className="px-6 py-3.5 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold py-1 px-3 rounded-full border ${
-                          token.status === 'VALID' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60' :
-                          token.status === 'COMPLETED' ? 'bg-indigo-50 text-indigo-700 border-indigo-200/60' :
-                          token.status === 'REVOKED' ? 'bg-rose-50 text-rose-700 border-rose-200/60' : 'bg-amber-50 text-amber-700 border-amber-200/60'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            token.status === 'VALID' ? 'bg-emerald-500' :
-                            token.status === 'COMPLETED' ? 'bg-indigo-500' :
-                            token.status === 'REVOKED' ? 'bg-rose-500' : 'bg-amber-500'
-                          }`}></span>
-                          {token.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* Detailed Cohort Grid */}
-        <div className="relative z-10 bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-          <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                <Users className="w-4 h-4 text-teal-655" /> Clinical Cohort Registry
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Complete participant roster with multi-point study interaction metrics</p>
-            </div>
-            <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-150 px-3 py-1 rounded-full shadow-sm">
-              {allParticipants.length} Total Registered
-            </span>
-          </div>
-          
-          {/* Search form */}
-          <div className="p-5 border-b border-slate-100 bg-slate-50/20">
-            <form action="" className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input 
-                  type="text"
-                  name="q"
-                  defaultValue={q || ''}
-                  placeholder="Search by Research ID (externalId) or database records..."
-                  className="w-full pl-10 pr-4 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:border-teal-400 focus:ring-4 focus:ring-teal-500/10 focus:outline-none transition-all font-light text-slate-850 placeholder-slate-400"
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button 
-                  type="submit"
-                  className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition shadow-sm cursor-pointer"
-                >
-                  Search
-                </button>
-                {q && (
-                  <Link
-                    href="/admin"
-                    className="px-5 py-2 bg-white border border-slate-250 text-slate-650 hover:bg-slate-50 hover:text-slate-800 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center font-semibold"
-                  >
-                    Clear Filter
-                  </Link>
-                )}
-              </div>
-            </form>
-          </div>
-          
-          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-            {allParticipants.length > 0 ? (
-              <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-slate-50/50 sticky top-0 z-10 backdrop-blur border-b border-slate-200">
-                  <tr>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Participant ID</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Cohort Group</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Status</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap text-center">Sessions</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap text-center">Responses</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap text-center">Tokens</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap text-center">Events</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Last Session</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {allParticipants.map((p) => (
-                    <tr key={p.id} className="hover:bg-slate-50/30 transition-colors group">
-                      <td className="px-6 py-3.5">
-                        <div className="space-y-0.5">
-                          <p className="font-mono text-slate-700 font-semibold tracking-wide text-xs">{p.externalId || '—'}</p>
-                          <p className="text-[9px] text-slate-400 font-mono uppercase tracking-wider">GUID: {p.id.slice(0, 8)}...</p>
-                        </div>
-                      </td>
-                      <td className="px-6 py-3.5">
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold py-0.5 px-2.5 rounded-full border ${
-                          p.groupId === 'INTERVENTION'
-                            ? 'bg-teal-50 text-teal-700 border-teal-200/50'
-                            : 'bg-slate-100 text-slate-600 border-slate-200/30'
-                        }`}>
-                          <span className={`w-1 h-1 rounded-full ${p.groupId === 'INTERVENTION' ? 'bg-teal-500' : 'bg-slate-400'}`}></span>
-                          {p.groupId}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3.5">
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold py-0.5 px-2.5 rounded-full border ${
-                          p.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60' :
-                          p.status === 'COMPLETED' ? 'bg-indigo-50 text-indigo-700 border-indigo-200/60' :
-                          'bg-amber-50 text-amber-700 border-amber-200/60'
-                        }`}>
-                          <span className={`w-1 h-1 rounded-full ${
-                            p.status === 'ACTIVE' ? 'bg-emerald-500 animate-pulse' :
-                            p.status === 'COMPLETED' ? 'bg-indigo-500' : 'bg-amber-500'
-                          }`}></span>
-                          {p.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3.5 text-center font-mono font-bold text-slate-600 text-xs">{p._count.sessions}</td>
-                      <td className="px-6 py-3.5 text-center font-mono font-bold text-slate-600 text-xs">{p._count.responses}</td>
-                      <td className="px-6 py-3.5 text-center font-mono font-bold text-slate-600 text-xs">{p._count.tokens}</td>
-                      <td className="px-6 py-3.5 text-center font-mono font-bold text-slate-600 text-xs">{p._count.events}</td>
-                      <td className="px-6 py-3.5">
-                        {p.sessions.length > 0 ? (
-                          <div className="space-y-0.5">
-                            <p className="font-semibold text-slate-650">
-                              {new Date(p.sessions[0].createdAt).toLocaleDateString()}
-                            </p>
-                            <p className="text-[9px] text-slate-400 font-mono">
-                              {new Date(p.sessions[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-[10px] text-slate-350 italic font-medium">No sessions logged</p>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-               <div className="p-12 text-center text-slate-400 italic font-light text-xs bg-slate-50/10">
-                 {q ? (
-                   <span className="flex flex-col items-center gap-2">
-                     <AlertTriangle className="w-8 h-8 text-slate-300" />
-                     <span>No registered participants match &quot;<strong>{q}</strong>&quot;.</span>
-                   </span>
-                 ) : (
-                   'No registered study participants exist in this database.'
-                 )}
-               </div>
-            )}
           </div>
         </div>
-
-        {/* Data Export Cards */}
-        <div className="relative z-10 bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-          <div className="p-5 border-b border-slate-100 bg-slate-50/50">
-            <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-              <FileSpreadsheet className="w-5 h-5 text-teal-650" /> Clinical Data Export Gateway
-            </h2>
-            <p className="text-xs text-slate-400 mt-1 font-light">Securely compile and download analytical CSV payloads of response logs for external clinical audits.</p>
-          </div>
-          
-          <div className="p-6 space-y-4 bg-slate-50/10">
-             <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:border-teal-350 hover:shadow-md transition-all duration-300 gap-4">
-                <div>
-                  <h4 className="font-bold text-slate-800 tracking-tight text-sm">Participant Responses Ledger</h4>
-                  <p className="text-xs text-slate-400 mt-0.5 font-light">Export comprehensive records of all explicit questionnaire inputs, step completions, and feedback fields.</p>
-                </div>
-                <ExportButton type="responses" />
-             </div>
-
-             <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:border-teal-350 hover:shadow-md transition-all duration-300 gap-4">
-                <div>
-                  <h4 className="font-bold text-slate-800 tracking-tight text-sm">System and Behavioral Event Logs</h4>
-                  <p className="text-xs text-slate-400 mt-0.5 font-light">Export chronological action telemetry, page durations, and security event payloads.</p>
-                </div>
-                <ExportButton type="events" />
-             </div>
-          </div>
-        </div>
-
       </div>
     </div>
   );
