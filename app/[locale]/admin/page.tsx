@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import prisma, { withDbRetry } from '@/lib/prisma';
 import { ExportButton } from './ExportButton';
 import { logout } from '../intervention/actions';
 import { getTokenStats, getTokenUsageDetails, getAuthTimeline } from './actions';
@@ -42,43 +42,51 @@ export default async function AdminPage({ searchParams }: PageProps) {
   let authTimeline: any[] = [];
 
   try {
-    participantCount = await prisma.participant.count();
-    sessionCount = await prisma.session.count();
-    eventCount = await prisma.eventLog.count();
+    const summaryData = await withDbRetry(async () => {
+      const pCount = await prisma.participant.count();
+      const sCount = await prisma.session.count();
+      const eCount = await prisma.eventLog.count();
 
-    // Get recent logins (last 24 hours)
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    recentLogins = await prisma.session.findMany({
-      where: {
-        createdAt: {
-          gte: yesterday
-        }
-      },
-      include: {
-        participant: {
-          select: {
-            externalId: true,
-            id: true
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const logins = await prisma.session.findMany({
+        where: {
+          createdAt: {
+            gte: yesterday
+          }
+        },
+        include: {
+          participant: {
+            select: {
+              externalId: true,
+              id: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 50
+      });
+
+      const thirtyMinutesAgo = new Date();
+      thirtyMinutesAgo.setMinutes(thirtyMinutesAgo.getMinutes() - 30);
+      const activeCount = await prisma.session.count({
+        where: {
+          createdAt: {
+            gte: thirtyMinutesAgo
           }
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      take: 50
+      });
+
+      return { pCount, sCount, eCount, logins, activeCount };
     });
 
-    // Count active now (last 30 minutes)
-    const thirtyMinutesAgo = new Date();
-    thirtyMinutesAgo.setMinutes(thirtyMinutesAgo.getMinutes() - 30);
-    activeNowCount = await prisma.session.count({
-      where: {
-        createdAt: {
-          gte: thirtyMinutesAgo
-        }
-      }
-    });
+    participantCount = summaryData.pCount;
+    sessionCount = summaryData.sCount;
+    eventCount = summaryData.eCount;
+    recentLogins = summaryData.logins;
+    activeNowCount = summaryData.activeCount;
 
     // Fetch token statistics
     const tokenStatsResult = await getTokenStats();
@@ -105,32 +113,34 @@ export default async function AdminPage({ searchParams }: PageProps) {
   // Get all participants for the detailed grid
   let allParticipants: any[] = [];
   try {
-    const baseParticipants = await prisma.participant.findMany({
-      include: {
-        _count: {
-          select: {
-            sessions: true,
-            responses: true,
-            tokens: true,
-            events: true,
+    const baseParticipants = await withDbRetry(async () => {
+      return await prisma.participant.findMany({
+        include: {
+          _count: {
+            select: {
+              sessions: true,
+              responses: true,
+              tokens: true,
+              events: true,
+            }
+          },
+          tokens: {
+            orderBy: {
+              createdAt: 'desc'
+            },
+            take: 1
+          },
+          sessions: {
+            orderBy: {
+              createdAt: 'desc'
+            },
+            take: 1
           }
         },
-        tokens: {
-          orderBy: {
-            createdAt: 'desc'
-          },
-          take: 1
-        },
-        sessions: {
-          orderBy: {
-            createdAt: 'desc'
-          },
-          take: 1
+        orderBy: {
+          createdAt: 'desc'
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      });
     });
 
     // Filter by search query if present

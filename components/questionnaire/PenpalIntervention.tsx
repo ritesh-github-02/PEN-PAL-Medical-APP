@@ -397,14 +397,14 @@ export default function PenpalIntervention() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4 relative font-sans bg-[#f4f8e8]">
+    <div className="h-screen h-[100dvh] w-full flex flex-col items-center justify-center p-2 sm:p-3 relative font-sans bg-[#f4f8e8] overflow-hidden select-none">
       {/* Decorative ambient background glows */}
       <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse"></div>
       <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse"></div>
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
-      <div className="w-full max-w-3xl relative z-10 my-auto space-y-1.5 py-1">
+      <div className="w-full max-w-3xl relative z-10 my-auto space-y-1.5 py-0">
         {/* Header Bar with Logo and Language Selector */}
         <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
           <div className="flex items-center gap-2">

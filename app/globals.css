@@ -7,28 +7,41 @@
   --font-display: "Outfit", system-ui, -apple-system, sans-serif;
 }
 
-/* Minimal Sleek Custom Scrollbar */
+/* Clean Viewport Fit - Hide Window Scrollbars */
+html, body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
 ::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  height: 0px;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar,
+.show-scrollbar::-webkit-scrollbar {
+  display: block;
   width: 4px;
   height: 4px;
 }
 
-::-webkit-scrollbar-track {
+.custom-scrollbar::-webkit-scrollbar-track,
+.show-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.show-scrollbar::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
