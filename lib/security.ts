@@ -131,8 +131,8 @@ function generateRandomBase32(length: number): string {
 export function parseToken(raw: string): ParsedToken {
   const trimmed = typeof raw === 'string' ? raw.trim() : '';
 
-  // 1. New short token format: PEN-{4to6Base32} (total 8 to 10 chars)
-  const newFormatMatch = /^PEN-([A-Z2-7]{4,6})$/i.exec(trimmed);
+  // 1. Short token format: PEN-{4to8} or P-{4to8} (total 6 to 12 chars)
+  const newFormatMatch = /^(?:PEN|P)-([A-Z0-9]{4,8})$/i.exec(trimmed);
   if (newFormatMatch) {
     const [, randomB32] = newFormatMatch;
     return {

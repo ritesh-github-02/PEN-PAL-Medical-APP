@@ -319,11 +319,11 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     <td className="px-5 py-3.5">
                       {p.sessions.length > 0 ? (
                         <div>
-                          <p className="font-semibold text-slate-800 text-xs">
-                            {new Date(p.sessions[0].createdAt).toLocaleDateString()}
+                          <p className="font-semibold text-slate-800 text-xs" suppressHydrationWarning>
+                            {new Date(p.sessions[0].createdAt).toLocaleDateString('en-US')}
                           </p>
-                          <p className="text-[10px] text-slate-500 font-mono">
-                            {new Date(p.sessions[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          <p className="text-[10px] text-slate-500 font-mono" suppressHydrationWarning>
+                            {new Date(p.sessions[0].createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
                       ) : (
@@ -460,8 +460,8 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                         </div>
                         <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Enrolled Date</p>
-                          <p className="text-xs font-bold text-slate-800 mt-0.5">
-                            {new Date(modalDetails.createdAt).toLocaleDateString()}
+                          <p className="text-xs font-bold text-slate-800 mt-0.5" suppressHydrationWarning>
+                            {new Date(modalDetails.createdAt).toLocaleDateString('en-US')}
                           </p>
                         </div>
                         <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
@@ -547,8 +547,8 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                                 <td className="p-3 font-bold text-slate-900">
                                   {formatDisplayAnswer(r.questionId, r.answerValue)}
                                 </td>
-                                <td className="p-3 text-right text-slate-500 font-mono text-[11px]">
-                                  {new Date(r.createdAt).toLocaleString()}
+                                <td className="p-3 text-right text-slate-500 font-mono text-[11px]" suppressHydrationWarning>
+                                  {new Date(r.createdAt).toLocaleString('en-US')}
                                 </td>
                               </tr>
                             ))}
@@ -575,8 +575,8 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                             <div key={tok.id} className="p-3.5 border border-slate-200 rounded-lg bg-slate-50 flex justify-between items-center">
                               <div>
                                 <p className="font-mono font-extrabold text-slate-900 text-xs">{tok.token}</p>
-                                <p className="text-[10px] text-slate-500 mt-0.5">
-                                  Uses: <strong className="text-slate-800">{tok.usageCount}</strong> • Last Used: {tok.lastUsedAt ? new Date(tok.lastUsedAt).toLocaleString() : 'Never'}
+                                <p className="text-[10px] text-slate-500 mt-0.5" suppressHydrationWarning>
+                                  Uses: <strong className="text-slate-800">{tok.usageCount}</strong> • Last Used: {tok.lastUsedAt ? new Date(tok.lastUsedAt).toLocaleString('en-US') : 'Never'}
                                 </p>
                               </div>
                               <span className={`px-2.5 py-1 text-[10px] font-bold rounded-md border ${

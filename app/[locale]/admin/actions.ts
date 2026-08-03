@@ -36,36 +36,44 @@ export async function getTokenAccessLogs(limit: number = 50) {
 // Get token statistics
 export async function getTokenStats() {
   try {
-    const statsData = await withDbRetry(async () => {
-      const totalTokens = await prisma.participantToken.count();
-      const validTokens = await prisma.participantToken.count({
-        where: { status: 'VALID' }
-      });
-      const completedTokens = await prisma.participantToken.count({
-        where: { status: 'COMPLETED' }
-      });
-      const revokedTokens = await prisma.participantToken.count({
-        where: { status: 'REVOKED' }
-      });
-      const expiredTokens = await prisma.participantToken.count({
-        where: { status: 'EXPIRED' }
-      });
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
 
-      const usageResult = await prisma.participantToken.aggregate({
-        _sum: { useCount: true }
-      });
-      const totalUsage = (usageResult._sum?.useCount) || 0;
-      const avgUsage = totalTokens > 0 ? Math.round((totalUsage / totalTokens) * 10) / 10 : 0;
+    const [statusGroups, usageResult, usedToday] = await Promise.all([
+      prisma.participantToken.groupBy({
+        by: ['status'],
+        _count: { _all: true },
+      }),
+      prisma.participantToken.aggregate({ _sum: { useCount: true } }),
+      prisma.participantToken.count({ where: { lastUsedAt: { gte: todayStart } } }),
+    ]);
 
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      const usedToday = await prisma.participantToken.count({
-        where: {
-          lastUsedAt: { gte: todayStart }
-        }
-      });
+    let totalTokens = 0;
+    let validTokens = 0;
+    let completedTokens = 0;
+    let revokedTokens = 0;
+    let expiredTokens = 0;
 
-      return {
+    for (const group of statusGroups) {
+      const cnt = group._count._all;
+      totalTokens += cnt;
+      if (group.status === 'VALID' || group.status === 'PENDING' || group.status === 'ACTIVE') {
+        validTokens += cnt;
+      } else if (group.status === 'COMPLETED') {
+        completedTokens += cnt;
+      } else if (group.status === 'REVOKED') {
+        revokedTokens += cnt;
+      } else if (group.status === 'EXPIRED') {
+        expiredTokens += cnt;
+      }
+    }
+
+    const totalUsage = usageResult._sum?.useCount || 0;
+    const avgUsage = totalTokens > 0 ? Math.round((totalUsage / totalTokens) * 10) / 10 : 0;
+
+    return {
+      success: true,
+      stats: {
         totalTokens,
         validTokens,
         completedTokens,
@@ -73,17 +81,12 @@ export async function getTokenStats() {
         expiredTokens,
         totalUsage,
         avgUsage,
-        usedToday
-      };
-    });
-
-    return {
-      success: true,
-      stats: statsData
+        usedToday,
+      },
     };
   } catch (error) {
     console.error('Failed to fetch token stats:', error);
-    return { error: 'Failed to fetch stats' };
+    return { error: 'Failed to fetch token stats' };
   }
 }
 
@@ -228,3 +231,87 @@ export async function getParticipantDetails(participantId: string) {
     return { error: 'Failed to fetch details' };
   }
 }
+
+// ── Campaign Management Server Actions ─────────────────────────────────────────
+
+// Create a new campaign QR & general link
+export async function createCampaign(name: string, arm: 'INTERVENTION' | 'CONTROL') {
+  try {
+    if (!name || name.trim().length < 2) {
+      return { success: false, error: 'Campaign name must be at least 2 characters.' };
+    }
+
+    const cleanName = name.trim();
+    let baseSlug = cleanName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+
+    if (!baseSlug) baseSlug = 'campaign';
+
+    let slug = baseSlug;
+    let count = 1;
+    while (await prisma.campaign.findUnique({ where: { slug } })) {
+      slug = `${baseSlug}_${count++}`;
+    }
+
+    const campaign = await prisma.campaign.create({
+      data: {
+        name: cleanName,
+        slug,
+        arm,
+        status: 'ACTIVE',
+      },
+    });
+
+    return { success: true, campaign };
+  } catch (error) {
+    console.error('Failed to create campaign:', error);
+    return { success: false, error: 'Failed to create campaign record.' };
+  }
+}
+
+// Toggle campaign active/deactivated status
+export async function toggleCampaignStatus(id: string, status: 'ACTIVE' | 'DEACTIVATED') {
+  try {
+    const updated = await prisma.campaign.update({
+      where: { id },
+      data: { status },
+    });
+    return { success: true, campaign: updated };
+  } catch (error) {
+    console.error('Failed to toggle campaign status:', error);
+    return { success: false, error: 'Failed to update campaign status.' };
+  }
+}
+
+// Get all active & deactivated campaigns with participant scan metrics
+export async function getCampaigns() {
+  try {
+    const campaigns = await prisma.campaign.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: {
+          select: { participants: true },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      campaigns: campaigns.map((c) => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        arm: c.arm,
+        status: c.status,
+        createdAt: c.createdAt,
+        totalScans: c._count.participants,
+      })),
+    };
+  } catch (error) {
+    console.error('Failed to fetch campaigns:', error);
+    return { success: false, error: 'Failed to load campaigns.' };
+  }
+}
+

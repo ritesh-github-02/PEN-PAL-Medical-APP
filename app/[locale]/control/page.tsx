@@ -1,5 +1,5 @@
-import { useTranslations } from 'next-intl';
-import { logout } from '../intervention/actions';
+import { getTranslations } from 'next-intl/server';
+import { logout, validateAndConsumeToken } from '../intervention/actions';
 import { 
   ShieldCheck, 
   BookOpen, 
@@ -11,8 +11,21 @@ import {
   FileCheck2
 } from 'lucide-react';
 
-export default function ControlSitePage() {
-  const t = useTranslations('Control');
+interface PageProps {
+  searchParams: Promise<{ token?: string }>;
+}
+
+export default async function ControlSitePage({ searchParams }: PageProps) {
+  const { token } = await searchParams;
+  if (token) {
+    try {
+      await validateAndConsumeToken(token, 'en');
+    } catch {
+      // Best-effort token consumption on landing
+    }
+  }
+
+  const t = await getTranslations('Control');
   
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8">

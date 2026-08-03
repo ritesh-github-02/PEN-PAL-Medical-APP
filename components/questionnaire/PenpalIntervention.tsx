@@ -80,6 +80,7 @@ export default function PenpalIntervention() {
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [activeToken, setActiveToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
@@ -94,6 +95,10 @@ export default function PenpalIntervention() {
       let progress = await loadQuestionnaireProgress();
       let localAnswers = false;
 
+      if (progress.tokenDisplay) {
+        setActiveToken(progress.tokenDisplay);
+      }
+
       // ── IP-fingerprint binding failure ────────────────────────────────────────
       // The session's IP fingerprint (captured at first token validation) does
       // not match the current request.  Treat this as a hard auth failure — the
@@ -104,7 +109,22 @@ export default function PenpalIntervention() {
         return;
       }
 
-      if (!progress.lastStepId) {
+      // ── Fresh Participant / Session Cache Reset ─────────────────────────────────
+      const currentParticipantId = progress.participantId;
+      const storedParticipantId = localStorage.getItem("penpal_participant_id");
+
+      if (
+        (currentParticipantId && storedParticipantId !== currentParticipantId) ||
+        (Object.keys(progress.answers || {}).length === 0)
+      ) {
+        localStorage.removeItem("penpal_progress");
+        if (currentParticipantId) {
+          localStorage.setItem("penpal_participant_id", currentParticipantId);
+        }
+        progress.answers = {};
+        progress.lastStepId = null;
+        localAnswers = false;
+      } else if (!progress.lastStepId) {
         try {
           const cached = localStorage.getItem("penpal_progress");
           if (cached) {
@@ -407,7 +427,7 @@ export default function PenpalIntervention() {
       <div className="w-full max-w-3xl relative z-10 my-auto space-y-1.5 py-0">
         {/* Header Bar with Logo and Language Selector */}
         <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]"></span>
             <span className="font-black text-xs tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
             <span className="text-slate-300 text-xs">|</span>
@@ -416,6 +436,14 @@ export default function PenpalIntervention() {
                 ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}`
                 : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}`}
             </span>
+            {activeToken && (
+              <>
+                <span className="text-slate-300 text-xs hidden xs:inline">|</span>
+                <span className="text-[10px] font-bold text-[#35727f] bg-[#f4f8e8] border border-[#35727f]/25 px-2.5 py-0.5 rounded-full font-mono flex items-center gap-1 shadow-2xs">
+                  🔑 <span className="text-[9px] uppercase tracking-wider text-slate-500">ID:</span> {activeToken}
+                </span>
+              </>
+            )}
           </div>
 
           {/* Language Switcher Pill Button */}
@@ -431,6 +459,7 @@ export default function PenpalIntervention() {
             {showSummary ? (
               <SummaryReportScreen
                 answers={answers}
+                activeToken={activeToken}
                 onEditAssessment={() => {
                   setShowSummary(false);
                   setCurrentStepIndex(0);
@@ -1198,7 +1227,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
 }
 
 
-function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, locale, navigating }: { answers: any; onEditAssessment: () => void; onProceedToSurvey: () => void; t: any; locale: string; navigating?: boolean }) {
+function SummaryReportScreen({ answers, activeToken, onEditAssessment, onProceedToSurvey, t, locale, navigating }: { answers: any; activeToken?: string | null; onEditAssessment: () => void; onProceedToSurvey: () => void; t: any; locale: string; navigating?: boolean }) {
   const allergy = answers["screen2_allergy"] || "Not Specified";
   const symptoms = Array.isArray(answers["screen6_1_symptoms"]) ? answers["screen6_1_symptoms"].join(", ") : answers["screen6_1_symptoms"] || "None reported";
 
@@ -1206,7 +1235,14 @@ function SummaryReportScreen({ answers, onEditAssessment, onProceedToSurvey, t, 
     <div className="bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between relative">
       <div>
         <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100 no-print">
-          <h1 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Assessment Report</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Assessment Report</h1>
+            {activeToken && (
+              <span className="text-[10px] font-bold text-[#35727f] bg-[#f4f8e8] border border-[#35727f]/25 px-2.5 py-0.5 rounded-full font-mono shadow-2xs">
+                🔑 <span className="text-[9px] uppercase tracking-wider text-slate-500">ID:</span> {activeToken}
+              </span>
+            )}
+          </div>
           <button
             type="button"
             onClick={onEditAssessment}

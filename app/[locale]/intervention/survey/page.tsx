@@ -199,8 +199,8 @@ export default function SurveyPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold text-[#35727f] tracking-tight leading-tight">Final Evaluation</h1>
             <p className="text-sm text-slate-600 leading-relaxed font-normal">Please help us improve the tool by providing your honest feedback. This takes less than 2 minutes.</p>
             {isEditMode && lastUpdated && (
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
-                Last updated: {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString()}
+              <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold" suppressHydrationWarning>
+                Last updated: {new Date(lastUpdated).toLocaleDateString('en-US')} at {new Date(lastUpdated).toLocaleTimeString('en-US')}
               </p>
             )}
           </div>

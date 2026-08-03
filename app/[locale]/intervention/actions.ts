@@ -549,7 +549,7 @@ export async function validateAndConsumeToken(
   // Normalize token to uppercase representation to make validation case-insensitive
   const normalizedToken = parsed.hmac
     ? `${TOKEN_PREFIX}-${parsed.participantId}:${parsed.randomB32}-${parsed.hmac}`
-    : `${TOKEN_PREFIX}-${parsed.randomB32}`;
+    : (parsed.raw ? parsed.raw.trim().toUpperCase() : `${TOKEN_PREFIX}-${parsed.randomB32}`);
   const tokenHash = normalizedToken;
 
   const secret = requireAdminSecret();
@@ -572,7 +572,14 @@ export async function validateAndConsumeToken(
   let tokenRecord;
   try {
     tokenRecord = await runWithRetry(() => prisma.participantToken.findFirst({
-      where: { tokenHash },
+      where: {
+        OR: [
+          { tokenHash },
+          { tokenHash: parsed.raw.toUpperCase() },
+          { tokenPayload: parsed.randomB32 },
+          { participant: { externalId: parsed.raw.trim().toUpperCase() } },
+        ],
+      },
       orderBy: { createdAt: 'desc' }, // prefer the newest if duplicates exist
       include: { participant: true },
     }));

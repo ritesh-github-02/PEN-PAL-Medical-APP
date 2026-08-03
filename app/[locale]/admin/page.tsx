@@ -1,8 +1,9 @@
 import prisma, { withDbRetry } from '@/lib/prisma';
 import { ExportButton } from './ExportButton';
 import { logout } from '../intervention/actions';
-import { getTokenStats, getTokenUsageDetails, getAuthTimeline } from './actions';
+import { getTokenStats, getAuthTimeline, getCampaigns } from './actions';
 import { ParticipantCohortTable } from './ParticipantCohortTable';
+import { CampaignQRManager } from './CampaignQRManager';
 import { 
   Users, 
   Activity, 
@@ -38,122 +39,80 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
   // Token tracking data
   let tokenStats: any = null;
-  let tokenUsageDetails: any[] = [];
   let authTimeline: any[] = [];
-
-  try {
-    const summaryData = await withDbRetry(async () => {
-      const pCount = await prisma.participant.count();
-      const sCount = await prisma.session.count();
-      const eCount = await prisma.eventLog.count();
-
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const logins = await prisma.session.findMany({
-        where: {
-          createdAt: {
-            gte: yesterday
-          }
-        },
-        include: {
-          participant: {
-            select: {
-              externalId: true,
-              id: true
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        take: 50
-      });
-
-      const thirtyMinutesAgo = new Date();
-      thirtyMinutesAgo.setMinutes(thirtyMinutesAgo.getMinutes() - 30);
-      const activeCount = await prisma.session.count({
-        where: {
-          createdAt: {
-            gte: thirtyMinutesAgo
-          }
-        }
-      });
-
-      return { pCount, sCount, eCount, logins, activeCount };
-    });
-
-    participantCount = summaryData.pCount;
-    sessionCount = summaryData.sCount;
-    eventCount = summaryData.eCount;
-    recentLogins = summaryData.logins;
-    activeNowCount = summaryData.activeCount;
-
-    // Fetch token statistics
-    const tokenStatsResult = await getTokenStats();
-    if (tokenStatsResult.success) {
-      tokenStats = tokenStatsResult.stats;
-    }
-
-    // Fetch recent token usage details
-    const tokenUsageResult = await getTokenUsageDetails(15);
-    if (tokenUsageResult.success) {
-      tokenUsageDetails = tokenUsageResult.tokens;
-    }
-
-    // Fetch authentication timeline
-    const timelineResult = await getAuthTimeline(10);
-    if (timelineResult.success) {
-      authTimeline = timelineResult.events;
-    }
-  } catch (err) {
-    console.error('ADMIN PAGE DB ERROR 1:', err);
-    dbError = true;
-  }
-
-  // Get all participants for the detailed grid
+  let initialCampaigns: any[] = [];
   let allParticipants: any[] = [];
+
   try {
-    const baseParticipants = await withDbRetry(async () => {
-      return await prisma.participant.findMany({
-        include: {
-          _count: {
-            select: {
-              sessions: true,
-              responses: true,
-              tokens: true,
-              events: true,
-            }
-          },
-          tokens: {
-            orderBy: {
-              createdAt: 'desc'
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const thirtyMinutesAgo = new Date();
+    thirtyMinutesAgo.setMinutes(thirtyMinutesAgo.getMinutes() - 30);
+
+    const [
+      pCount,
+      sCount,
+      eCount,
+      logins,
+      activeCount,
+      tokenStatsResult,
+      timelineResult,
+      campaignsResult,
+      baseParticipants,
+    ] = await withDbRetry(async () => {
+      return await Promise.all([
+        prisma.participant.count(),
+        prisma.session.count(),
+        prisma.eventLog.count(),
+        prisma.session.findMany({
+          where: { createdAt: { gte: yesterday } },
+          include: { participant: { select: { externalId: true, id: true } } },
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+        }),
+        prisma.session.count({ where: { createdAt: { gte: thirtyMinutesAgo } } }),
+        getTokenStats(),
+        getAuthTimeline(10),
+        getCampaigns(),
+        prisma.participant.findMany({
+          take: 100,
+          include: {
+            _count: {
+              select: {
+                sessions: true,
+                responses: true,
+                tokens: true,
+                events: true,
+              },
             },
-            take: 1
+            tokens: { orderBy: { createdAt: 'desc' }, take: 1 },
+            sessions: { orderBy: { createdAt: 'desc' }, take: 1 },
           },
-          sessions: {
-            orderBy: {
-              createdAt: 'desc'
-            },
-            take: 1
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      });
+          orderBy: { createdAt: 'desc' },
+        }),
+      ]);
     });
 
-    // Filter by search query if present
-    if (q) {
+    participantCount = pCount;
+    sessionCount = sCount;
+    eventCount = eCount;
+    recentLogins = logins;
+    activeNowCount = activeCount;
+
+    if (tokenStatsResult?.success) tokenStats = tokenStatsResult.stats;
+    if (timelineResult?.success) authTimeline = timelineResult.events;
+    if (campaignsResult?.success && campaignsResult.campaigns) initialCampaigns = campaignsResult.campaigns;
+
+    if (q && Array.isArray(baseParticipants)) {
       allParticipants = baseParticipants.filter((p: any) =>
         p.externalId?.toLowerCase().includes(q.toLowerCase()) ||
         p.id.toLowerCase().includes(q.toLowerCase())
       );
     } else {
-      allParticipants = baseParticipants;
+      allParticipants = baseParticipants || [];
     }
   } catch (err) {
-    console.error('ADMIN PAGE DB ERROR 2:', err);
+    console.error('ADMIN PAGE DB ERROR:', err);
     dbError = true;
   }
 
@@ -303,6 +262,9 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
         </div>
 
+        {/* Study QR Codes & Campaign Manager Section */}
+        <CampaignQRManager initialCampaigns={initialCampaigns} />
+
         {/* Token Security Statistics Banner */}
         {tokenStats && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -386,8 +348,8 @@ export default async function AdminPage({ searchParams }: PageProps) {
                           </span>
                         )}
                       </p>
-                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">
-                        {new Date(event.timestamp).toLocaleTimeString()} • {new Date(event.timestamp).toLocaleDateString()}
+                      <p className="text-[10px] text-slate-500 font-mono mt-0.5" suppressHydrationWarning>
+                        {new Date(event.timestamp).toLocaleTimeString('en-US')} • {new Date(event.timestamp).toLocaleDateString('en-US')}
                       </p>
                     </div>
                   </div>
@@ -438,8 +400,8 @@ export default async function AdminPage({ searchParams }: PageProps) {
                   </div>
                   <div className="text-right">
                     {item.type === 'login' ? (
-                      <p className="text-[10px] font-mono font-bold text-slate-600">
-                        {new Date(item.login.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      <p className="text-[10px] font-mono font-bold text-slate-600" suppressHydrationWarning>
+                        {new Date(item.login.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     ) : (
                       <span className="text-xs font-bold text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 font-mono">

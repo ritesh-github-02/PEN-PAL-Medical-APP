@@ -132,6 +132,8 @@ async function enforceSessionIP(): Promise<EnforceSessionIPResult> {
 interface LoadProgressResult {
   answers: Record<string, any>;
   lastStepId: string | null;
+  participantId?: string | null;
+  tokenDisplay?: string | null;
   bindingError?: string;
 }
 
@@ -148,8 +150,22 @@ export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
 
   const participantId = ipResult.participantId;
   let answers: Record<string, any> = {};
+  let tokenDisplay: string | null = null;
 
   try {
+    const participant = await prisma.participant.findUnique({
+      where: { id: participantId },
+      select: {
+        externalId: true,
+        tokens: {
+          select: { tokenHash: true },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+    tokenDisplay = participant?.externalId || participant?.tokens[0]?.tokenHash || null;
+
     const responses = await prisma.questionnaireResponse.findMany({
       where: { participantId },
       orderBy: { updatedAt: 'asc' },
@@ -181,7 +197,7 @@ export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
   }
 
   if (Object.keys(answers).length === 0) {
-    return { answers, lastStepId: null, bindingError: ipResult.bindingError };
+    return { answers, lastStepId: null, participantId, tokenDisplay, bindingError: ipResult.bindingError };
   }
 
   // ── Compute the furthest valid step ─────────────────────────────────────
@@ -218,7 +234,7 @@ export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
     index = nextIdx;
   }
 
-  return { answers, lastStepId: computedLastStepId, bindingError: ipResult.bindingError };
+  return { answers, lastStepId: computedLastStepId, participantId, tokenDisplay, bindingError: ipResult.bindingError };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
