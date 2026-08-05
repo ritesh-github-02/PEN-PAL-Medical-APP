@@ -1,0 +1,170 @@
+[
+  {
+    "stepId": "screen1_intro",
+    "screenIndex": 1,
+    "locale": "en",
+    "filename": "screen1_intro_en.mp3",
+    "text": "PEN-PAL. Parents Engaged in Penicillin Allergies. This is nurse Anna. Anna is giving information about allergies to penicillin in kids. Do you want to know more?"
+  },
+  {
+    "stepId": "screen1_intro",
+    "screenIndex": 1,
+    "locale": "es",
+    "filename": "screen1_intro_es.mp3",
+    "text": "PEN-PAL. Padres Involucrados en Alergias a la Penicilina. Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños. ¿Quieres saber más?"
+  },
+  {
+    "stepId": "screen2_statistics",
+    "screenIndex": 2,
+    "locale": "en",
+    "filename": "screen2_statistics_en.mp3",
+    "text": "Most kids who are told they are allergic to penicillin can safely take it. Out of 100 kids who are said to have a penicillin allergy, only 5 have a real allergy"
+  },
+  {
+    "stepId": "screen2_statistics",
+    "screenIndex": 2,
+    "locale": "es",
+    "filename": "screen2_statistics_es.mp3",
+    "text": "La mayoría de los niños a quienes se les dice que son alérgicos a la penicilina pueden tomarla de manera segura. De 100 niños que se dice que tienen alergia a la penicilina, solo 5 tienen una alergia real"
+  },
+  {
+    "stepId": "screen3_5_knowledge_test",
+    "screenIndex": 3,
+    "locale": "en",
+    "filename": "screen3_5_knowledge_test_en.mp3",
+    "text": "What is true about penicillin?. Test your knowledge!. Options: 1. It is the best at curing many illnesses in kids and adults. 2. It has less side-effects than other antibiotics. 3. Kids tend to like the way it tastes, like bubblegum!. 4. It is cheaper than other antibiotics."
+  },
+  {
+    "stepId": "screen3_5_knowledge_test",
+    "screenIndex": 3,
+    "locale": "es",
+    "filename": "screen3_5_knowledge_test_es.mp3",
+    "text": "¿Qué es verdad sobre la penicilina?. ¡Pon a prueba tus conocimientos!. Opciones: 1. Es la mejor para curar muchas enfermedades en niños y adultos. 2. Tiene menos efectos secundarios que otros antibióticos. 3. A los niños les suele gustar el sabor, ¡como a chicle!. 4. Es más barata que otros antibióticos."
+  },
+  {
+    "stepId": "screen4_testing",
+    "screenIndex": 4,
+    "locale": "en",
+    "filename": "screen4_testing_en.mp3",
+    "text": "Talk to the doctor about your child's allergy!. Doctors can check to see if your child's reaction was just a side-effect and not an allergy. There is also a simple test that can tell if your child has an allergy.     For the test, kids swallow medicine.     Sometimes, kids also take medicine through a skin prick. If your child can safely take penicillin, they are not allergic."
+  },
+  {
+    "stepId": "screen4_testing",
+    "screenIndex": 4,
+    "locale": "es",
+    "filename": "screen4_testing_es.mp3",
+    "text": "¡Hable con el médico sobre la alergia de su hijo!. Los médicos pueden verificar si la reacción de su hijo fue solo un efecto secundario y no una alergia. También hay una prueba sencilla que puede determinar si su hijo tiene una alergia.     Para la prueba, los niños tragan medicina.     A veces, los niños también toman medicina a través de un pinchazo en la piel. Si su hijo puede tomar penicilina de manera segura, no es alérgico."
+  },
+  {
+    "stepId": "screen6_survey_intro",
+    "screenIndex": 5,
+    "locale": "en",
+    "filename": "screen6_survey_intro_en.mp3",
+    "text": "The next set of questions can help you and the doctor see what's best for your child."
+  },
+  {
+    "stepId": "screen6_survey_intro",
+    "screenIndex": 5,
+    "locale": "es",
+    "filename": "screen6_survey_intro_es.mp3",
+    "text": "El siguiente conjunto de preguntas puede ayudarle a usted y al médico a ver qué es lo mejor para su hijo."
+  },
+  {
+    "stepId": "screen6_1_symptoms",
+    "screenIndex": 6,
+    "locale": "en",
+    "filename": "screen6_1_symptoms_en.mp3",
+    "text": "Select what happened when your child was said to be allergic to penicillin. Options: 1. Rash. 2. Swelling. 3. Fainting or dizziness. 4. Itchiness. 5. Throat tightness. 6. Shortness of breath or hard time breathing. 7. Fever (new fever or worse fever). 8. Belly pain. 9. Diarrhea. 10. Joint pain. 11. Wanted to throw up or threw up. 12. Muscle aches. 13. Other: Please describe ________. 14. Unsure/I don't know"
+  },
+  {
+    "stepId": "screen6_1_symptoms",
+    "screenIndex": 6,
+    "locale": "es",
+    "filename": "screen6_1_symptoms_es.mp3",
+    "text": "Seleccione lo que sucedió cuando se dijo que su hijo era alérgico a la penicilina. Opciones: 1. Sarpullido. 2. Hinchazón. 3. Desmayo o mareo. 4. Picazón. 5. Estrechez de garganta. 6. Falta de aire o dificultad para respirar. 7. Fiebre (fiebre nueva o peor). 8. Dolor de barriga. 9. Diarrea. 10. Dolor articular. 11. Quería vomitar o vomitó. 12. Dolores musculares. 13. Otro: Por favor describa ________. 14. Inseguro/No lo sé"
+  },
+  {
+    "stepId": "screen6_2_timing",
+    "screenIndex": 7,
+    "locale": "en",
+    "filename": "screen6_2_timing_en.mp3",
+    "text": "How old was your child when the reaction happened?. At what age did your child have the reaction to penicillin (amoxicillin)?"
+  },
+  {
+    "stepId": "screen6_2_timing",
+    "screenIndex": 7,
+    "locale": "es",
+    "filename": "screen6_2_timing_es.mp3",
+    "text": "¿Qué edad tenía su hijo cuando ocurrió la reacción?. ¿A qué edad tuvo su hijo la reacción a la penicilina (amoxicilina)?"
+  },
+  {
+    "stepId": "screen6_3_onset",
+    "screenIndex": 8,
+    "locale": "en",
+    "filename": "screen6_3_onset_en.mp3",
+    "text": "When did your child's symptoms start after taking penicillin?. Options: 1. <1 hour. 2. 1-24 hours. 3. 24+ hours. 4. Unsure/I don't know"
+  },
+  {
+    "stepId": "screen6_3_onset",
+    "screenIndex": 8,
+    "locale": "es",
+    "filename": "screen6_3_onset_es.mp3",
+    "text": "¿Cuándo comenzaron los síntomas de su hijo después de tomar penicilina?. Opciones: 1. <1 hora. 2. 1-24 horas. 3. 24+ horas. 4. Inseguro/No lo sé"
+  },
+  {
+    "stepId": "screen6_4_resolution",
+    "screenIndex": 9,
+    "locale": "en",
+    "filename": "screen6_4_resolution_en.mp3",
+    "text": "How did your child's reaction go away?. Options: 1. With medication. 2. On its own. 3. Over time. 4. Unknown"
+  },
+  {
+    "stepId": "screen6_4_resolution",
+    "screenIndex": 9,
+    "locale": "es",
+    "filename": "screen6_4_resolution_es.mp3",
+    "text": "¿Cómo desapareció la reacción de su hijo?. Opciones: 1. Con medicación. 2. Por sí solo. 3. Con el tiempo. 4. Desconocido"
+  },
+  {
+    "stepId": "screen6_5_yetagain",
+    "screenIndex": 10,
+    "locale": "en",
+    "filename": "screen6_5_yetagain_en.mp3",
+    "text": "Has your child received penicillin since the reaction?. Options: 1. Yes. 2. No. 3. Unsure/Don't know"
+  },
+  {
+    "stepId": "screen6_5_yetagain",
+    "screenIndex": 10,
+    "locale": "es",
+    "filename": "screen6_5_yetagain_es.mp3",
+    "text": "¿Ha recibido su hijo penicilina desde la reacción?. Opciones: 1. Sí. 2. No. 3. Inseguro/No lo sé"
+  },
+  {
+    "stepId": "screen7_summary",
+    "screenIndex": 11,
+    "locale": "en",
+    "filename": "screen7_summary_en.mp3",
+    "text": "Action Steps for Parents. Step Give the table below to your child's doctor. This says what happened when your child took penicillin. Step Bring pictures of your child's reaction to the doctor's visit. Step Ask your child's doctor if testing is right for your child. Here's what you can say:. \"I read about penicillin allergy testing in kids. It seems testing is good for kids. Could we talk about whether this might be right for my child?\""
+  },
+  {
+    "stepId": "screen7_summary",
+    "screenIndex": 11,
+    "locale": "es",
+    "filename": "screen7_summary_es.mp3",
+    "text": "Pasos de Acción para Padres. Step Dé la tabla a continuación al médico de su hijo. Esto dice lo que pasó cuando su hijo tomó penicilina. Step Traiga fotos de la reacción de su hijo a la cita del médico. Step Pregúntele al médico de su hijo si las pruebas son apropiadas para su hijo. Aquí está lo que puede decir:. \"Leí sobre las pruebas de alergia a la penicilina en niños. Parece que las pruebas son buenas para los niños. ¿Podríamos hablar sobre si esto podría ser apropiado para mi hijo?\""
+  },
+  {
+    "stepId": "screen_end",
+    "screenIndex": 12,
+    "locale": "en",
+    "filename": "screen_end_en.mp3",
+    "text": "Thank you. Thank you for your interest in PEN-PAL."
+  },
+  {
+    "stepId": "screen_end",
+    "screenIndex": 12,
+    "locale": "es",
+    "filename": "screen_end_es.mp3",
+    "text": "Gracias. Gracias por su interés en PEN-PAL."
+  }
+]

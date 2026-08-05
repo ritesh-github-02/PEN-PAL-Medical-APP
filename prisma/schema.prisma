@@ -39,14 +39,32 @@ model Participant {
   campaignId String?
   campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
 
-  tokens    ParticipantToken[]
-  sessions  Session[]
-  responses QuestionnaireResponse[]
-  surveys   SurveyResponse[]
-  events    EventLog[]
+  tokens       ParticipantToken[]
+  sessions     Session[]
+  responses    QuestionnaireResponse[]
+  surveys      SurveyResponse[]
+  events       EventLog[]
+  slideMetrics SlideMetric[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SlideMetric {
+  id            String      @id @default(cuid())
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  stepId        String      // e.g. "screen1_intro", "screen2_statistics", "screen6_1_symptoms"
+  stepIndex     Int         @default(0)
+  durationMs    Int         @default(0) // Total accumulated time spent on this slide in milliseconds
+  visitCount    Int         @default(1) // Total times this slide was viewed
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([participantId, stepId])
+  @@index([participantId])
 }
 
   model ParticipantToken {
@@ -119,6 +137,7 @@ model QuestionnaireResponse {
   
   questionId     String
   answerValue    String
+  timeSpentMs    Int?        @default(0) // Time spent to answer question in milliseconds
   // Storing additional context in JSON if needed
   metadata       String?     // Stored as JSON string to support flexibility
 

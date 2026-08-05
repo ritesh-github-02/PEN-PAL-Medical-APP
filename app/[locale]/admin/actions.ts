@@ -217,6 +217,9 @@ export async function getParticipantDetails(participantId: string) {
         events: {
           orderBy: { timestamp: 'desc' },
           take: 50
+        },
+        slideMetrics: {
+          orderBy: { stepIndex: 'asc' }
         }
       }
     });

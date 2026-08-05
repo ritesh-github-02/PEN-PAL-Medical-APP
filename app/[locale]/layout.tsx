@@ -12,7 +12,17 @@ export async function generateMetadata(
   const t = await getTranslations({locale, namespace: 'Index'});
   return {
     title: t('title'),
-    description: t('description')
+    description: t('description'),
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
+    },
   };
 }
 
@@ -38,7 +48,7 @@ export default async function LocaleLayout({
     <html lang={locale} suppressHydrationWarning>
       <head>
       </head>
-      <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans">
+      <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>

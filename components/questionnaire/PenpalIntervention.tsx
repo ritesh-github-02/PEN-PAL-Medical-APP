@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, memo } from "react";
+import React, { useState, useEffect, useRef, memo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { usePathname, useRouter } from "@/routing";
@@ -10,6 +10,7 @@ import {
   submitAnswer,
   completeQuestionnaire,
   loadQuestionnaireProgress,
+  recordSlideTiming,
 } from "./actions";
 import { logout } from "@/app/[locale]/intervention/actions";
 import Loader from "@/components/common/Loader";
@@ -141,88 +142,47 @@ export default function PenpalIntervention() {
 
       setAnswers(progress.answers || {});
 
-      let targetIndex = 0;
       const searchParams = new URLSearchParams(window.location.search);
-      const isEditMode = searchParams.get("edit") === "true";
       const showReport = searchParams.get("report") === "true";
       const stepParam = searchParams.get("step");
+
+      if (progress.isAllCompleted || showReport) {
+        setShowSummary(true);
+        setInitialized(true);
+        return;
+      }
 
       if (stepParam !== null && !isNaN(Number(stepParam))) {
         const parsedStep = parseInt(stepParam, 10);
         if (parsedStep >= 0 && parsedStep < questionnaireConfig.length) {
-          targetIndex = parsedStep;
+          setCurrentStepIndex(parsedStep);
+        } else {
+          setCurrentStepIndex(progress.resumeStepIndex || 0);
         }
-      } else if (isEditMode) {
-        targetIndex = 0;
-        setShowSummary(false);
-      } else if (showReport) {
-        setShowSummary(true);
-        setInitialized(true);
-        return;
-      } else if (progress.lastStepId && !localAnswers) {
-        const found = questionnaireConfig.findIndex(
-          (s) => s.id === progress.lastStepId
-        );
-        if (found !== -1) targetIndex = found;
-      } else if (Object.keys(progress.answers || {}).length > 0) {
-        let index = 0;
-        const visitedIds = new Set<string>();
-
-        while (index >= 0 && index < questionnaireConfig.length) {
-          const step = questionnaireConfig[index];
-          if (visitedIds.has(step.id)) break;
-          visitedIds.add(step.id);
-
-          const ans = (progress.answers || {})[step.id];
-
-          if (
-            ans === undefined ||
-            ans === null ||
-            (Array.isArray(ans) && ans.length === 0 && step.required)
-          ) {
-            targetIndex = index;
-            break;
-          }
-
-          let nextId = step.nextStepId;
-          if (step.branchLogic && ans !== undefined) {
-            const match = step.branchLogic.find((b) => b.value === String(ans));
-            if (match) nextId = match.targetStepId;
-          }
-
-          if (!nextId) {
-            targetIndex = index;
-            const allAnswered = questionnaireConfig.every((s) => {
-              const answer = (progress.answers || {})[s.id];
-              return (
-                answer !== undefined &&
-                answer !== null &&
-                (Array.isArray(answer) ? answer.length > 0 : true)
-              );
-            });
-            if (allAnswered) {
-              setShowSummary(true);
-              setInitialized(true);
-              return;
-            }
-            break;
-          }
-
-          const nextIdx = questionnaireConfig.findIndex((s) => s.id === nextId);
-          if (nextIdx === -1) {
-            targetIndex = index;
-            break;
-          }
-          index = nextIdx;
-        }
+      } else {
+        setCurrentStepIndex(progress.resumeStepIndex || 0);
       }
 
-      setCurrentStepIndex(targetIndex);
       setInitialized(true);
     }
 
     init();
   }, []);
+
+  const slideStartTimeRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    slideStartTimeRef.current = Date.now();
+    const activeStep = currentStep;
+    const stepIdx = currentStepIndex;
+
+    return () => {
+      const durationMs = Date.now() - slideStartTimeRef.current;
+      if (activeStep && durationMs > 100) {
+        recordSlideTiming(activeStep.id, stepIdx, durationMs).catch(() => {});
+      }
+    };
+  }, [currentStepIndex, initialized]);
 
   useEffect(() => {
     if (currentStep && initialized) {
@@ -460,11 +420,6 @@ export default function PenpalIntervention() {
               <SummaryReportScreen
                 answers={answers}
                 activeToken={activeToken}
-                onEditAssessment={() => {
-                  setShowSummary(false);
-                  setCurrentStepIndex(0);
-                  window.location.href = `/${locale}/intervention/flow?edit=true`;
-                }}
                 onProceedToSurvey={async () => {
                   try {
                     setNavigating(true);
@@ -1227,7 +1182,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
 }
 
 
-function SummaryReportScreen({ answers, activeToken, onEditAssessment, onProceedToSurvey, t, locale, navigating }: { answers: any; activeToken?: string | null; onEditAssessment: () => void; onProceedToSurvey: () => void; t: any; locale: string; navigating?: boolean }) {
+function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, locale, navigating }: { answers: any; activeToken?: string | null; onProceedToSurvey: () => void; t: any; locale: string; navigating?: boolean }) {
   const allergy = answers["screen2_allergy"] || "Not Specified";
   const symptoms = Array.isArray(answers["screen6_1_symptoms"]) ? answers["screen6_1_symptoms"].join(", ") : answers["screen6_1_symptoms"] || "None reported";
 
@@ -1243,13 +1198,9 @@ function SummaryReportScreen({ answers, activeToken, onEditAssessment, onProceed
               </span>
             )}
           </div>
-          <button
-            type="button"
-            onClick={onEditAssessment}
-            className="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-lg text-[9px] font-bold uppercase tracking-widest transition active:scale-[0.98] cursor-pointer"
-          >
-            {t("editAnswers") || "Edit Assessment"}
-          </button>
+          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            ✓ Complete & Saved
+          </span>
         </div>
 
         <div className="space-y-4 mb-4">

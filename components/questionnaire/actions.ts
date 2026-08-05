@@ -8,7 +8,7 @@ import { questionnaireConfig } from '@/config/questionnaire';
 // submitAnswer
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function submitAnswer(questionId: string, answerValue: string) {
+export async function submitAnswer(questionId: string, answerValue: string, timeSpentMs?: number) {
   const cookieStore = await cookies();
   const participantId = cookieStore.get('penpal_participant')?.value;
 
@@ -25,11 +25,15 @@ export async function submitAnswer(questionId: string, answerValue: string) {
           questionId: questionId,
         },
       },
-      update: { answerValue: answerValue },
+      update: {
+        answerValue: answerValue,
+        timeSpentMs: timeSpentMs ? { increment: timeSpentMs } : undefined,
+      },
       create: {
         participantId: participantId,
         questionId: questionId,
         answerValue: answerValue,
+        timeSpentMs: timeSpentMs || 0,
       },
     });
   } catch (error) {
@@ -37,6 +41,44 @@ export async function submitAnswer(questionId: string, answerValue: string) {
       return; // Silenced in preview
     }
     console.error('Save answer error', error);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// recordSlideTiming (Slide-by-slide 100% time metrics)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function recordSlideTiming(stepId: string, stepIndex: number, durationMs: number) {
+  const cookieStore = await cookies();
+  const participantId = cookieStore.get('penpal_participant')?.value;
+
+  if (!participantId || !stepId || durationMs < 50) return;
+
+  try {
+    await prisma.slideMetric.upsert({
+      where: {
+        participantId_stepId: {
+          participantId,
+          stepId,
+        },
+      },
+      update: {
+        durationMs: { increment: Math.round(durationMs) },
+        visitCount: { increment: 1 },
+      },
+      create: {
+        participantId,
+        stepId,
+        stepIndex,
+        durationMs: Math.round(durationMs),
+        visitCount: 1,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("Can't reach database server")) {
+      return;
+    }
+    console.error('Record slide timing error', error);
   }
 }
 
@@ -129,12 +171,58 @@ async function enforceSessionIP(): Promise<EnforceSessionIPResult> {
 // loadQuestionnaireProgress  (IP-binding gate centralised here)
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface LoadProgressResult {
+export interface LoadProgressResult {
   answers: Record<string, any>;
   lastStepId: string | null;
+  resumeStepIndex: number;
+  isAllCompleted: boolean;
   participantId?: string | null;
   tokenDisplay?: string | null;
   bindingError?: string;
+}
+
+export async function findNextUnansweredStepIndex(answers: Record<string, any>): Promise<{
+  targetIndex: number;
+  isAllCompleted: boolean;
+}> {
+  let index = 0;
+  const visitedIds = new Set<string>();
+
+  while (index >= 0 && index < questionnaireConfig.length) {
+    const step = questionnaireConfig[index];
+    if (visitedIds.has(step.id)) break;
+    visitedIds.add(step.id);
+
+    const ans = answers[step.id];
+
+    if (step.isTerminal) {
+      return { targetIndex: index, isAllCompleted: true };
+    }
+
+    const isAnswered =
+      ans !== undefined &&
+      ans !== null &&
+      ans !== 'undefined' &&
+      (Array.isArray(ans) ? ans.length > 0 : true);
+
+    if (!isAnswered) {
+      return { targetIndex: index, isAllCompleted: false };
+    }
+
+    let nextId = step.nextStepId;
+    if (step.branchLogic && ans !== undefined) {
+      const match = step.branchLogic.find((b: any) => b.value === String(ans));
+      if (match) nextId = match.targetStepId;
+    }
+
+    if (!nextId) break;
+
+    const nextIdx = questionnaireConfig.findIndex((s) => s.id === nextId);
+    if (nextIdx === -1) break;
+    index = nextIdx;
+  }
+
+  return { targetIndex: index, isAllCompleted: true };
 }
 
 export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
@@ -144,6 +232,8 @@ export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
     return {
       answers: {},
       lastStepId: null,
+      resumeStepIndex: 0,
+      isAllCompleted: false,
       bindingError: ipResult.reason ?? 'Session validation failed',
     };
   }
@@ -151,20 +241,26 @@ export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
   const participantId = ipResult.participantId;
   let answers: Record<string, any> = {};
   let tokenDisplay: string | null = null;
+  let isParticipantCompleted = false;
 
   try {
     const participant = await prisma.participant.findUnique({
       where: { id: participantId },
       select: {
         externalId: true,
+        status: true,
         tokens: {
-          select: { tokenHash: true },
+          select: { tokenHash: true, status: true },
           orderBy: { createdAt: 'desc' },
           take: 1,
         },
       },
     });
     tokenDisplay = participant?.externalId || participant?.tokens[0]?.tokenHash || null;
+    isParticipantCompleted =
+      participant?.status === 'COMPLETED' ||
+      participant?.tokens[0]?.status === 'CONSUMED' ||
+      participant?.tokens[0]?.status === 'COMPLETED';
 
     const responses = await prisma.questionnaireResponse.findMany({
       where: { participantId },
@@ -197,44 +293,28 @@ export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
   }
 
   if (Object.keys(answers).length === 0) {
-    return { answers, lastStepId: null, participantId, tokenDisplay, bindingError: ipResult.bindingError };
+    return {
+      answers,
+      lastStepId: null,
+      resumeStepIndex: 0,
+      isAllCompleted: isParticipantCompleted,
+      participantId,
+      tokenDisplay,
+      bindingError: ipResult.bindingError,
+    };
   }
 
-  // ── Compute the furthest valid step ─────────────────────────────────────
-  let index = 0;
-  const visitedIds = new Set<string>();
-  let computedLastStepId: string | null = null;
+  const { targetIndex, isAllCompleted } = await findNextUnansweredStepIndex(answers);
 
-  while (index >= 0 && index < questionnaireConfig.length) {
-    const step = questionnaireConfig[index];
-    if (visitedIds.has(step.id)) break;
-    visitedIds.add(step.id);
-
-    const ans = answers[step.id];
-    computedLastStepId = step.id;
-
-    if (
-      ans === undefined ||
-      ans === null ||
-      (Array.isArray(ans) && ans.length === 0 && step.required)
-    ) {
-      break;
-    }
-
-    let nextId = step.nextStepId;
-    if (step.branchLogic && ans !== undefined) {
-      const match = step.branchLogic.find((b: any) => b.value === String(ans));
-      if (match) nextId = (match as any).targetStepId;
-    }
-
-    if (!nextId) break;
-
-    const nextIdx = questionnaireConfig.findIndex((s: any) => s.id === nextId);
-    if (nextIdx === -1) break;
-    index = nextIdx;
-  }
-
-  return { answers, lastStepId: computedLastStepId, participantId, tokenDisplay, bindingError: ipResult.bindingError };
+  return {
+    answers,
+    lastStepId: questionnaireConfig[targetIndex]?.id || null,
+    resumeStepIndex: targetIndex,
+    isAllCompleted: isAllCompleted || isParticipantCompleted,
+    participantId,
+    tokenDisplay,
+    bindingError: ipResult.bindingError,
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

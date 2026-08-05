@@ -230,7 +230,7 @@ export default function InterventionEntryPage() {
                 onClick={() => setMode('register')}
                 className="text-[10px] font-bold text-slate-400 hover:text-[#35727f] transition-all cursor-pointer uppercase tracking-wider"
               >
-                Staff Access: Enter Token or Research ID ↓
+                {locale === 'es' ? 'Reanudar Evaluación: Ingrese Token o ID ↓' : 'Resume Assessment'}
               </button>
             ) : (
               <div className="space-y-3">

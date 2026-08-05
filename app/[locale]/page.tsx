@@ -3,116 +3,104 @@ import { Link } from '@/routing';
 
 export default function HomePage() {
   const t = useTranslations('Index');
-  
+
   return (
-    <main className="h-screen flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8 font-sans bg-[#f4f8e8]">
-      <div className="w-full max-w-4xl space-y-6 md:space-y-8">
-        {/* Header Section */}
-        <div className="text-center space-y-3">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#35727f] mb-1 tracking-tight font-display">
-            PEN-PAL
-          </h1>
-          <p className="text-sm sm:text-base text-[#2d3748] leading-relaxed font-normal max-w-lg mx-auto">
-            {t('description')}
-          </p>
-          <div className="pt-0.5">
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.22em] text-[#35727f] bg-white/80 border border-slate-200/80 px-4 py-1.5 rounded-full shadow-sm">
-              Parents Engaged in Penicillin Allergies
-            </span>
-          </div>
-        </div>
-
-        {/* Navigation Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 pt-1">
-          
-          {/* Control Site Card */}
-          <Link
-            href="/control"
-            className="group bg-white/80 border border-slate-200/80 hover:border-[#35727f] hover:shadow-md transition-all duration-300 hover:-translate-y-1 p-5 sm:p-6 rounded-3xl shadow-sm flex flex-col justify-between"
-          >
-            <div className="space-y-3">
-              <div className="w-10 h-10 bg-[#f4f8e8] rounded-xl flex items-center justify-center text-[#35727f] group-hover:bg-[#35727f] group-hover:text-white transition-colors duration-300 shadow-sm border border-slate-200/60">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base sm:text-lg font-extrabold text-[#2d3748] font-display">Control Site</h3>
-                <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-normal">
-                  Standard care information, research insights, and penicillin allergy resources.
-                </p>
-              </div>
-            </div>
-            <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#35727f] transition-colors flex items-center gap-1">
-                Access Portal <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
-              </span>
-            </div>
-          </Link>
-
-          {/* Intervention App Card (Featured Primary) */}
-          <Link
-            href="/intervention"
-            className="group bg-[#35727f] border border-[#2d616c] hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-5 sm:p-6 rounded-3xl flex flex-col justify-between text-white shadow-md"
-          >
-            <div className="space-y-3">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center border border-white/30">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 8.066l-5.666-1.337" />
-                </svg>
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base sm:text-lg font-extrabold text-white font-display">Intervention App</h3>
-                <p className="text-[11px] sm:text-xs text-slate-100 leading-relaxed font-normal">
-                  Interactive parent assessment tool, personalized telemetry, and questionnaire engine.
-                </p>
-              </div>
-            </div>
-            <div className="pt-3.5 mt-3 border-t border-white/20 flex items-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#e2e8df] group-hover:text-white transition-colors flex items-center gap-1">
-                Start Assessment <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
-              </span>
-            </div>
-          </Link>
-
-          {/* Admin Portal Card */}
-          <Link
-            href="/admin"
-            className="group bg-white/80 border border-slate-200/80 hover:border-[#35727f] hover:shadow-md transition-all duration-300 hover:-translate-y-1 p-5 sm:p-6 rounded-3xl shadow-sm flex flex-col justify-between"
-          >
-            <div className="space-y-3">
-              <div className="w-10 h-10 bg-[#f4f8e8] rounded-xl flex items-center justify-center text-[#35727f] group-hover:bg-[#35727f] group-hover:text-white transition-colors duration-300 shadow-sm border border-slate-200/60">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base sm:text-lg font-extrabold text-[#2d3748] font-display">Admin Portal</h3>
-                <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-normal">
-                  Study telemetry, live events tracker, access token creation, and participant logs exports.
-                </p>
-              </div>
-            </div>
-            <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#35727f] transition-colors flex items-center gap-1">
-                Admin Access <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
-              </span>
-            </div>
-          </Link>
-
-        </div>
-
-        {/* Footer */}
-        <div className="text-center pt-5 border-t border-slate-200/80">
-          <p className="text-[9px] text-[#35727f] font-bold uppercase tracking-[0.2em]">
-            A Federally Funded Healthcare Research Study
-          </p>
-          <p className="text-xs text-slate-500 mt-1 font-normal">
-            © {new Date().getFullYear()} PEN-PAL Study. All rights reserved.
-          </p>
+    <main className="h-screen w-screen overflow-hidden flex flex-col justify-between py-4 sm:py-6 px-4 sm:px-8 font-sans text-[#2d3748] bg-gradient-to-b from-[#f8faf4] via-[#f4f8e8] to-[#eef4e2] select-none">
+      
+      {/* Branding Header */}
+      <div className="space-y-1.5 text-center shrink-0">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-[#2b5d68] font-display drop-shadow-xs">
+          PEN-PAL
+        </h1>
+        <div>
+          <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#2b5d68] bg-white/90 border border-[#35727f]/20 px-3.5 py-1 rounded-full inline-block shadow-2xs backdrop-blur-xs">
+            Parents Engaged in Penicillin Allergies
+          </span>
         </div>
       </div>
+
+      {/* Horizontal Restricted Domain Access Glass Card */}
+      <div className="my-auto w-full max-w-4xl mx-auto bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-3xl shadow-xl p-5 sm:p-7 md:p-8 transition-all">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-8 items-center">
+          
+          {/* Left Column: Icon, Notice & Action Buttons */}
+          <div className="md:col-span-6 space-y-4 text-center md:text-left flex flex-col justify-center">
+            
+            <div className="flex items-center justify-center md:justify-start gap-3">
+              <div className="w-11 h-11 bg-gradient-to-br from-[#f4f8e8] to-[#e2eed2] border border-[#35727f]/30 text-[#2b5d68] rounded-xl flex items-center justify-center shadow-2xs shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[#2b5d68] bg-[#f4f8e8] border border-[#35727f]/20 px-3 py-1 rounded-full inline-block">
+                DIRECT SUB-DOMAIN ACCESS RESTRICTED
+              </span>
+            </div>
+
+            <div className="space-y-1.5">
+              <h2 className="text-lg sm:text-xl font-black text-[#2d3748] tracking-tight">
+                Unique Study Link Required
+              </h2>
+              <p className="text-xs text-slate-600 font-normal leading-relaxed">
+                Direct web browsing to this sub-domain is locked down. Access is exclusively granted via unique study URLs or poster QR codes.
+              </p>
+            </div>
+
+            {/* Action Links Bar */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
+              <Link
+                href="/intervention"
+                className="w-full sm:w-auto px-4 py-2.5 bg-[#35727f] hover:bg-[#2b5d68] text-white text-xs font-extrabold rounded-xl transition-all shadow-2xs hover:shadow-md flex items-center justify-center gap-1.5 group cursor-pointer"
+              >
+                Participant Access Gateway
+                <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+              </Link>
+              
+              <Link
+                href="/admin"
+                className="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center justify-center gap-1.5 group cursor-pointer"
+              >
+                Admin Portal
+                <span className="group-hover:translate-x-0.5 transition-transform text-slate-400">→</span>
+              </Link>
+            </div>
+
+          </div>
+
+          {/* Right Column: How to Access Box */}
+          <div className="md:col-span-6">
+            <div className="p-4 sm:p-5 bg-slate-50/90 border border-slate-200/90 rounded-2xl text-left space-y-3 shadow-2xs h-full flex flex-col justify-center">
+              <p className="text-[11px] font-extrabold text-[#2b5d68] uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#35727f]"></span>
+                HOW TO ACCESS:
+              </p>
+              <div className="space-y-2.5 text-xs text-slate-700 leading-relaxed font-normal">
+                <p className="flex items-start gap-2">
+                  <span className="text-[#35727f] font-bold text-sm leading-none shrink-0">•</span>
+                  <span>
+                    <strong>Participants:</strong> Click the unique invitation link sent to you or scan the QR code on your study flyer.
+                  </span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <span className="text-[#35727f] font-bold text-sm leading-none shrink-0">•</span>
+                  <span>
+                    <strong>Staff / Researchers:</strong> Use your assigned token or access the Admin Portal directly.
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="w-full text-center shrink-0">
+        <p className="text-[10px] text-slate-400 font-normal">
+          © {new Date().getFullYear()} PEN-PAL Study. Access restricted to authorized study participants.
+        </p>
+      </div>
+
     </main>
   );
 }

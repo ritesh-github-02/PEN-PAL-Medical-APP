@@ -43,6 +43,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     descriptionEs: 'Padres Involucrados en Alergias a la Penicilina',
     contentEn: 'This is nurse Anna. Anna is giving information about allergies to penicillin in kids.\n\nDo you want to know more?',
     contentEs: 'Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños.\n\n¿Quieres saber más?',
+    audioEn: '/audio/exported/screen1_intro_en.mp3',
+    audioEs: '/audio/exported/screen1_intro_es.mp3',
     required: true,
     branchLogic: [
       { value: 'yes', targetStepId: 'screen2_statistics' },
@@ -57,6 +59,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     titleEs: 'La mayoría de los niños a quienes se les dice que son alérgicos a la penicilina pueden tomarla de manera segura.',
     contentEn: 'Out of 100 kids who are said to have a penicillin allergy, only 5 have a real allergy',
     contentEs: 'De 100 niños que se dice que tienen alergia a la penicilina, solo 5 tienen una alergia real',
+    audioEn: '/audio/exported/screen2_statistics_en.mp3',
+    audioEs: '/audio/exported/screen2_statistics_es.mp3',
     required: true,
     nextStepId: 'screen3_5_knowledge_test'
   },
@@ -68,6 +72,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     titleEs: '¿Qué es verdad sobre la penicilina?',
     descriptionEn: 'Test your knowledge!',
     descriptionEs: '¡Pon a prueba tus conocimientos!',
+    audioEn: '/audio/exported/screen3_5_knowledge_test_en.mp3',
+    audioEs: '/audio/exported/screen3_5_knowledge_test_es.mp3',
     options: [
       { value: 'curing_illnesses', labelEn: 'It is the best at curing many illnesses in kids and adults.', labelEs: 'Es la mejor para curar muchas enfermedades en niños y adultos.' },
       { value: 'less_side_effects', labelEn: 'It has less side-effects than other antibiotics.', labelEs: 'Tiene menos efectos secundarios que otros antibióticos.' },
@@ -85,6 +91,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     titleEs: '¡Hable con el médico sobre la alergia de su hijo!',
     contentEn: '• Doctors can check to see if your child\'s reaction was just a side-effect and not an allergy.\n• There is also a simple test that can tell if your child has an allergy.\n    For the test, kids swallow medicine.\n    Sometimes, kids also take medicine through a skin prick.\n\nIf your child can safely take penicillin, they are not allergic.',
     contentEs: '• Los médicos pueden verificar si la reacción de su hijo fue solo un efecto secundario y no una alergia.\n• También hay una prueba sencilla que puede determinar si su hijo tiene una alergia.\n    Para la prueba, los niños tragan medicina.\n    A veces, los niños también toman medicina a través de un pinchazo en la piel.\n\nSi su hijo puede tomar penicilina de manera segura, no es alérgico.',
+    audioEn: '/audio/exported/screen4_testing_en.mp3',
+    audioEs: '/audio/exported/screen4_testing_es.mp3',
     required: true,
     nextStepId: 'screen6_survey_intro'
   },
@@ -94,6 +102,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'text',
     titleEn: 'The next set of questions can help you and the doctor see what\'s best for your child.',
     titleEs: 'El siguiente conjunto de preguntas puede ayudarle a usted y al médico a ver qué es lo mejor para su hijo.',
+    audioEn: '/audio/exported/screen6_survey_intro_en.mp3',
+    audioEs: '/audio/exported/screen6_survey_intro_es.mp3',
     required: true,
     nextStepId: 'screen6_1_symptoms'
   },
@@ -103,6 +113,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'multiple_choice',
     titleEn: 'Select what happened when your child was said to be allergic to penicillin.',
     titleEs: 'Seleccione lo que sucedió cuando se dijo que su hijo era alérgico a la penicilina.',
+    audioEn: '/audio/exported/screen6_1_symptoms_en.mp3',
+    audioEs: '/audio/exported/screen6_1_symptoms_es.mp3',
     options: [
       { value: 'Rash', labelEn: 'Rash', labelEs: 'Sarpullido' },
       { value: 'Swelling', labelEn: 'Swelling', labelEs: 'Hinchazón' },
@@ -130,6 +142,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     titleEs: '¿Qué edad tenía su hijo cuando ocurrió la reacción?',
     descriptionEn: 'At what age did your child have the reaction to penicillin (amoxicillin)?',
     descriptionEs: '¿A qué edad tuvo su hijo la reacción a la penicilina (amoxicilina)?',
+    audioEn: '/audio/exported/screen6_2_timing_en.mp3',
+    audioEs: '/audio/exported/screen6_2_timing_es.mp3',
     min: 1,
     max: 26,
     unitEn: 'year old',
@@ -143,6 +157,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'single_choice',
     titleEn: 'When did your child\'s symptoms start after taking penicillin?',
     titleEs: '¿Cuándo comenzaron los síntomas de su hijo después de tomar penicilina?',
+    audioEn: '/audio/exported/screen6_3_onset_en.mp3',
+    audioEs: '/audio/exported/screen6_3_onset_es.mp3',
     options: [
       { value: 'Less than 1 hour', labelEn: '<1 hour', labelEs: '<1 hora' },
       { value: '1-24 hours', labelEn: '1-24 hours', labelEs: '1-24 horas' },
@@ -158,6 +174,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'single_choice',
     titleEn: 'How did your child\'s reaction go away?',
     titleEs: '¿Cómo desapareció la reacción de su hijo?',
+    audioEn: '/audio/exported/screen6_4_resolution_en.mp3',
+    audioEs: '/audio/exported/screen6_4_resolution_es.mp3',
     options: [
       { value: 'With medication', labelEn: 'With medication', labelEs: 'Con medicación' },
       { value: 'On its own', labelEn: 'On its own', labelEs: 'Por sí solo' },
@@ -173,6 +191,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'single_choice',
     titleEn: 'Has your child received penicillin since the reaction?',
     titleEs: '¿Ha recibido su hijo penicilina desde la reacción?',
+    audioEn: '/audio/exported/screen6_5_yetagain_en.mp3',
+    audioEs: '/audio/exported/screen6_5_yetagain_es.mp3',
     options: [
       { value: 'Yes', labelEn: 'Yes', labelEs: 'Sí' },
       { value: 'No', labelEn: 'No', labelEs: 'No' },
@@ -189,6 +209,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     titleEs: 'Pasos de Acción para Padres',
     contentEn: '#1. Give the table below to your child\'s doctor. This says what happened when your child took penicillin.\n\n#2. Bring pictures of your child\'s reaction to the doctor\'s visit.\n\n#3. Ask your child\'s doctor if testing is right for your child.\n\nHere\'s what you can say:\n"I read about penicillin allergy testing in kids. It seems testing is good for kids. Could we talk about whether this might be right for my child?"',
     contentEs: '#1. Dé la tabla a continuación al médico de su hijo. Esto dice lo que pasó cuando su hijo tomó penicilina.\n\n#2. Traiga fotos de la reacción de su hijo a la cita del médico.\n\n#3. Pregúntele al médico de su hijo si las pruebas son apropiadas para su hijo.\n\nAquí está lo que puede decir:\n"Leí sobre las pruebas de alergia a la penicilina en niños. Parece que las pruebas son buenas para los niños. ¿Podríamos hablar sobre si esto podría ser apropiado para mi hijo?"',
+    audioEn: '/audio/exported/screen7_summary_en.mp3',
+    audioEs: '/audio/exported/screen7_summary_es.mp3',
     required: true,
     isTerminal: true
   },
@@ -200,6 +222,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     titleEs: 'Gracias',
     descriptionEn: 'Thank you for your interest in PEN-PAL.',
     descriptionEs: 'Gracias por su interés en PEN-PAL.',
+    audioEn: '/audio/exported/screen_end_en.mp3',
+    audioEs: '/audio/exported/screen_end_es.mp3',
     isTerminal: true
   }
 ];

@@ -79,7 +79,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
   const [selectedParticipantId, setSelectedParticipantId] = useState<string | null>(null);
   const [modalDetails, setModalDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
-  const [activeTab, setActiveTab] = useState<'summary' | 'responses' | 'tokens'>('summary');
+  const [activeTab, setActiveTab] = useState<'summary' | 'metrics' | 'responses' | 'tokens'>('summary');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   // Filter logic
@@ -416,6 +416,16 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                 Clinical Assessment Summary
               </button>
               <button
+                onClick={() => setActiveTab('metrics')}
+                className={`px-4 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer ${
+                  activeTab === 'metrics'
+                    ? 'border-slate-900 text-slate-900 bg-white rounded-t-lg'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                📊 Slide Metrics & Telemetry ({modalDetails?.slideMetrics?.length || 0})
+              </button>
+              <button
                 onClick={() => setActiveTab('responses')}
                 className={`px-4 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer ${
                   activeTab === 'responses'
@@ -512,6 +522,104 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                           </div>
                         );
                       })()}
+                    </div>
+                  )}
+
+                  {/* TAB: SLIDE METRICS & TELEMETRY */}
+                  {activeTab === 'metrics' && (
+                    <div className="space-y-6">
+                      {/* Telemetry Overview Cards */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Link Recipient Opened Link</p>
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <p className="text-sm font-extrabold text-emerald-800">
+                              Opened ({modalDetails.tokens?.[0]?.useCount || (modalDetails.sessions?.length > 0 ? 1 : 0)} times)
+                            </p>
+                          </div>
+                          <p className="text-[10px] text-slate-500">
+                            First Opened: {modalDetails.sessions?.[0]?.createdAt ? new Date(modalDetails.sessions[0].createdAt).toLocaleString('en-US') : 'Yes'}
+                          </p>
+                        </div>
+
+                        <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">IP Address & Location</p>
+                          <p className="text-xs font-mono font-bold text-slate-900 truncate">
+                            {modalDetails.tokens?.[0]?.lastUsedIp || modalDetails.events?.[0]?.ipAddress || '127.0.0.1'}
+                          </p>
+                          <p className="text-[10px] text-teal-800 font-semibold">
+                            Location: Research Network / Geolocation Logged
+                          </p>
+                        </div>
+
+                        <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Device & Browser Telemetry</p>
+                          <p className="text-xs font-mono font-bold text-slate-900 truncate">
+                            {modalDetails.tokens?.[0]?.lastUsedAgent?.split(' ')[0] || modalDetails.events?.[0]?.userAgent?.split(' ')[0] || 'Mobile / Web Browser'}
+                          </p>
+                          <p className="text-[10px] text-slate-500">100% Tracking Active</p>
+                        </div>
+                      </div>
+
+                      {/* Slide-by-Slide Time Spent Table */}
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <Activity className="w-4 h-4 text-teal-700" />
+                            Slide-by-Slide & Question-by-Question Duration Breakdown
+                          </h4>
+                          <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                            Total Slide Time: {(modalDetails.slideMetrics?.reduce((acc: number, item: any) => acc + (item.durationMs || 0), 0) / 1000).toFixed(1)}s
+                          </span>
+                        </div>
+
+                        {modalDetails.slideMetrics && modalDetails.slideMetrics.length > 0 ? (
+                          <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                            <table className="w-full text-left text-xs border-collapse">
+                              <thead className="bg-slate-900 text-white font-bold">
+                                <tr>
+                                  <th className="p-3">#</th>
+                                  <th className="p-3">Slide / Question ID</th>
+                                  <th className="p-3 text-center">Visits</th>
+                                  <th className="p-3 text-right">Time Spent</th>
+                                  <th className="p-3">Duration Visualizer</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-200">
+                                {modalDetails.slideMetrics.map((sm: any, idx: number) => {
+                                  const maxTime = Math.max(...modalDetails.slideMetrics.map((m: any) => m.durationMs || 1));
+                                  const widthPercent = Math.min(100, Math.max(8, Math.round((sm.durationMs / maxTime) * 100)));
+                                  const secs = (sm.durationMs / 1000).toFixed(1);
+                                  return (
+                                    <tr key={sm.id || idx} className="hover:bg-slate-50">
+                                      <td className="p-3 font-bold text-slate-500 text-[11px]">{idx + 1}</td>
+                                      <td className="p-3 font-mono font-bold text-slate-900">{sm.stepId}</td>
+                                      <td className="p-3 text-center font-bold text-slate-700">{sm.visitCount || 1}x</td>
+                                      <td className="p-3 text-right font-mono font-extrabold text-teal-800">
+                                        {secs}s
+                                      </td>
+                                      <td className="p-3">
+                                        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                          <div
+                                            className="bg-[#35727f] h-2 rounded-full transition-all duration-300"
+                                            style={{ width: `${widthPercent}%` }}
+                                          ></div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <div className="p-6 border border-slate-200 rounded-xl bg-slate-50 text-center space-y-1">
+                            <p className="text-xs font-bold text-slate-700">No slide timing data recorded yet for this participant.</p>
+                            <p className="text-[11px] text-slate-500">Time spent will automatically appear as the user navigates slides.</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 

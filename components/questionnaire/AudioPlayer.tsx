@@ -198,58 +198,83 @@ export default function AudioPlayer({
         />
       )}
 
-      {/* Floating Voiceover Widget */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+      {/* Floating Voiceover & Export Audio Widget */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5">
         {/* Tooltip label when not playing */}
         {!isPlaying && !isPaused && (
-          <div className="bg-zinc-900 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md shadow-lg mb-1 opacity-90">
+          <div className="bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-md shadow-lg opacity-90 font-sans">
             {locale === 'es' ? 'Voz Superpuesta' : 'Voiceover'}
           </div>
         )}
 
-        {/* Main floating button with progress ring */}
-        <button
-          onClick={togglePlayPause}
-          className="relative w-14 h-14 flex items-center justify-center bg-zinc-900 text-white rounded-full shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95"
-          aria-label={isPlaying ? 'Pause voiceover' : 'Play voiceover'}
-        >
-          {isPlaying ? (
-            // Pause Icon
+        <div className="flex items-center gap-2">
+          {/* Export Audio / Download Button */}
+          <a
+            href={audioSrc || `/audio/exported/${stepId}_${locale}.mp3`}
+            download={`${stepId}_${locale}.mp3`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative w-11 h-11 flex items-center justify-center bg-teal-800 hover:bg-teal-700 text-white rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 border border-teal-600/50"
+            title={locale === 'es' ? 'Descargar Audio de Diapositiva (.MP3)' : 'Export Slide Audio (.MP3)'}
+            aria-label="Export Audio File"
+            onClick={() => {
+              logInteraction('AUDIO_DOWNLOAD', { stepId, locale }, '/intervention/flow').catch(() => {});
+            }}
+          >
             <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-              <rect x="6" y="4" width="4" height="16" rx="1" />
-              <rect x="14" y="4" width="4" height="16" rx="1" />
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
             </svg>
-          ) : (
-            // Play Icon
-            <svg className="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          )}
 
-          {/* Progress indicator ring */}
-          {(isTTS || isPlaying) && (
-            <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
-              <circle
-                cx="28"
-                cy="28"
-                r="26"
-                fill="none"
-                stroke="rgba(255,255,255,0.2)"
-                strokeWidth="3"
-              />
-              <circle
-                cx="28"
-                cy="28"
-                r="26"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeDasharray={`${(progress / (isTTS ? ttsDuration : duration || 1)) * 163.36} 163.36`}
-                className="text-white transition-all"
-              />
-            </svg>
-          )}
-        </button>
+            {/* Hover Tooltip Label */}
+            <span className="absolute right-13 whitespace-nowrap bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-sans">
+              {locale === 'es' ? 'Descargar Audio MP3' : 'Export MP3 Audio'}
+            </span>
+          </a>
+
+          {/* Main floating play/pause button with progress ring */}
+          <button
+            onClick={togglePlayPause}
+            className="relative w-14 h-14 flex items-center justify-center bg-zinc-900 text-white rounded-full shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95"
+            aria-label={isPlaying ? 'Pause voiceover' : 'Play voiceover'}
+          >
+            {isPlaying ? (
+              // Pause Icon
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+              </svg>
+            ) : (
+              // Play Icon
+              <svg className="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            )}
+
+            {/* Progress indicator ring */}
+            {(isTTS || isPlaying) && (
+              <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="26"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.2)"
+                  strokeWidth="3"
+                />
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="26"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeDasharray={`${(progress / (isTTS ? ttsDuration : duration || 1)) * 163.36} 163.36`}
+                  className="text-white transition-all"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
 
         {/* Time tooltip on hover when playing */}
         {(isPlaying || isPaused) && (
