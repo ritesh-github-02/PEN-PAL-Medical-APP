@@ -18,28 +18,36 @@ import AudioPlayer from "./AudioPlayer";
 
 function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (newLocale: string) => void }) {
   return (
-    <div className="flex items-center gap-1 bg-white/90 border border-slate-200/90 shadow-2xs rounded-full p-1 font-sans select-none no-print">
+    <div 
+      className="flex items-center gap-1 bg-white/90 border border-slate-200/90 shadow-2xs rounded-full p-1 font-sans select-none no-print"
+      role="group"
+      aria-label={locale === "es" ? "Seleccionar idioma" : "Language selection"}
+    >
       <button
         type="button"
         onClick={() => onSwitch("en")}
+        aria-pressed={locale === "en"}
+        aria-label="Switch language to English"
         className={`px-2.5 py-0.5 text-[11px] font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 ${
           locale === "en"
             ? "bg-[#236f7a] text-white shadow-xs"
             : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
         }`}
       >
-        <span>🇺🇸</span> English
+        <span aria-hidden="true">🇺🇸</span> English
       </button>
       <button
         type="button"
         onClick={() => onSwitch("es")}
+        aria-pressed={locale === "es"}
+        aria-label="Cambiar idioma a Español"
         className={`px-2.5 py-0.5 text-[11px] font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 ${
           locale === "es"
             ? "bg-[#236f7a] text-white shadow-xs"
             : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
         }`}
       >
-        <span>🇲🇽</span> Español
+        <span aria-hidden="true">🇲🇽</span> Español
       </button>
     </div>
   );
@@ -377,30 +385,41 @@ export default function PenpalIntervention() {
   };
 
   return (
-    <div className="h-screen h-[100dvh] w-full flex flex-col items-center justify-center p-2 sm:p-3 relative font-sans bg-[#f4f8e8] overflow-hidden select-none">
+    <main 
+      className="h-screen h-[100dvh] w-full flex flex-col items-center justify-center p-2 sm:p-3 relative font-sans bg-[#f4f8e8] overflow-hidden select-none"
+      role="main"
+      aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
+    >
+      {/* Screen reader live announcement for step changes */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {locale === "es"
+          ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}: ${title}`
+          : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}: ${title}`}
+      </div>
+
       {/* Decorative ambient background glows */}
-      <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse"></div>
-      <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse"></div>
+      <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse" aria-hidden="true"></div>
+      <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse" aria-hidden="true"></div>
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
       <div className="w-full max-w-3xl relative z-10 my-auto space-y-1.5 py-0">
         {/* Header Bar with Logo and Language Selector */}
-        <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
+        <header className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]" aria-hidden="true"></span>
             <span className="font-black text-xs tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
-            <span className="text-slate-300 text-xs">|</span>
-            <span className="text-[11px] font-bold text-slate-600">
+            <span className="text-slate-300 text-xs" aria-hidden="true">|</span>
+            <span className="text-[11px] font-bold text-slate-700">
               {locale === "es"
                 ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}`
                 : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}`}
             </span>
             {activeToken && (
               <>
-                <span className="text-slate-300 text-xs hidden xs:inline">|</span>
-                <span className="text-[10px] font-bold text-[#35727f] bg-[#f4f8e8] border border-[#35727f]/25 px-2.5 py-0.5 rounded-full font-mono flex items-center gap-1 shadow-2xs">
-                  🔑 <span className="text-[9px] uppercase tracking-wider text-slate-500">ID:</span> {activeToken}
+                <span className="text-slate-300 text-xs hidden xs:inline" aria-hidden="true">|</span>
+                <span className="text-[10px] font-bold text-[#1f5c66] bg-[#f4f8e8] border border-[#35727f]/30 px-2.5 py-0.5 rounded-full font-mono flex items-center gap-1 shadow-2xs">
+                  <span aria-hidden="true">🔑</span> <span className="text-[9px] uppercase tracking-wider text-slate-600">ID:</span> {activeToken}
                 </span>
               </>
             )}
@@ -408,13 +427,10 @@ export default function PenpalIntervention() {
 
           {/* Language Switcher Pill Button */}
           <LanguageSwitcher locale={locale} onSwitch={handleLanguageSwitch} />
-        </div>
+        </header>
 
         {/* Compact Tablet / iPad Device Frame */}
         <div className="bg-zinc-900 border-[6px] sm:border-[10px] border-zinc-900 rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl relative p-0.5 ring-1 ring-white/10 overflow-hidden">
-          {/* Tablet Front Camera Notch / Sensor Dot */}
-          {/* <div className="hidden sm:block absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-zinc-800 border border-zinc-700/80 z-30 shadow-inner"></div> */}
-
           <div className="rounded-[1.2rem] sm:rounded-[1.6rem] overflow-hidden">
             {showSummary ? (
               <SummaryReportScreen
@@ -480,13 +496,13 @@ export default function PenpalIntervention() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
 // ============ Shared Components ============
 
-function NavigationFooter({ onBack, onNext, loading, isFirstStep, t }: Omit<BaseScreenProps, 'title' | 'content' | 'description' | 'locale'>) {
+function NavigationFooter({ onBack, onNext, loading, isFirstStep, t, locale }: Omit<BaseScreenProps, 'title' | 'content' | 'description'> & { locale?: string }) {
   return (
     <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center pt-4 mt-4 border-t border-slate-300/40 gap-3 sm:gap-0">
       <button
@@ -494,6 +510,7 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t }: Omit<Base
         className="px-5 py-2 text-xs font-bold uppercase tracking-widest text-[#2b3e34] hover:text-black disabled:opacity-0 transition-colors duration-250 no-print cursor-pointer"
         disabled={isFirstStep || loading}
         onClick={onBack}
+        aria-label={locale === "es" ? "Volver al paso anterior" : "Go back to previous step"}
       >
         ← {t("back")}
       </button>
@@ -501,6 +518,7 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t }: Omit<Base
         type="button"
         onClick={() => onNext()}
         disabled={loading}
+        aria-label={locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
         className="px-8 py-2 text-xs font-bold uppercase tracking-widest transition-all duration-250 flex items-center justify-center bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] rounded-full hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-sm no-print font-sans border border-[#71ad9d]"
       >
         {loading ? "..." : t("next")}
@@ -521,17 +539,17 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
       <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
         <div className="flex-1 space-y-4">
           <div className="space-y-1">
-            <h1 className="text-4xl sm:text-5xl font-black text-[#216d77] tracking-tight font-display">{title || "PEN–PAL"}</h1>
-            <p className="text-base sm:text-lg font-bold text-[#2b3e34]">{introSubtitle}</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-[#1d5c64] tracking-tight font-display">{title || "PEN–PAL"}</h1>
+            <p className="text-base sm:text-lg font-bold text-[#1f382f]">{introSubtitle}</p>
           </div>
 
-          <div className="text-[#2b3e34] leading-relaxed whitespace-pre-line text-sm sm:text-base font-medium max-w-xl">
+          <div className="text-[#1f382f] leading-relaxed whitespace-pre-line text-sm sm:text-base font-medium max-w-xl">
             {mainContent}
           </div>
 
           <div className="space-y-2.5 pt-1">
-            <p className="text-base sm:text-lg font-bold text-[#2b3e34]">{questionPrompt}</p>
-            <div className="flex gap-3">
+            <p className="text-base sm:text-lg font-bold text-[#1f382f]">{questionPrompt}</p>
+            <div className="flex gap-3" role="group" aria-label={questionPrompt}>
               <button
                 type="button"
                 onClick={() => {
@@ -539,13 +557,15 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
                   onNext("yes");
                 }}
                 disabled={loading}
-                className="px-6 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-xl font-bold text-sm transition shadow-sm active:scale-[0.98] no-print cursor-pointer"
+                aria-label={locale === "es" ? "Sí, quiero saber más sobre la alergia a la penicilina" : "Yes, I want to learn more about penicillin allergy"}
+                className="px-6 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-xl font-bold text-sm transition shadow-sm active:scale-[0.98] no-print cursor-pointer"
               >
                 {loading ? "..." : t("yes")}
               </button>
               <button
                 type="button"
                 disabled={loading}
+                aria-label={locale === "es" ? "No, salir o finalizar" : "No, do not continue"}
                 className="px-6 py-2 bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] border border-[#71ad9d] rounded-xl font-bold text-sm transition active:scale-[0.98] no-print cursor-pointer shadow-sm"
               >
                 {t("no")}
@@ -585,27 +605,36 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-3 sm:p-5 md:p-5 shadow-lg relative overflow-hidden">
       <div className="text-center space-y-1 mb-2">
-        <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#3a2d24] max-w-xl mx-auto tracking-tight leading-snug">
+        <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-[#2d221b] max-w-xl mx-auto tracking-tight leading-snug">
           {title}
         </h2>
-        <p className="text-xs sm:text-sm font-bold text-[#3a2d24] max-w-lg mx-auto">
+        <p className="text-xs sm:text-sm font-bold text-[#2d221b] max-w-lg mx-auto">
           {content}
         </p>
       </div>
 
       <div className="mb-2 text-center">
         {/* 100 Kids Icon Grid (5 rows x 20 cols) */}
-        <div className="grid grid-cols-10 sm:grid-cols-20 gap-0.5 sm:gap-0 mb-1.5 justify-center mx-auto max-w-xl p-1.5 bg-white/50 rounded-2xl border border-slate-200/50">
+        <div 
+          role="region"
+          aria-label={locale === "es" ? "Gráfico visual interactivo de 100 niños" : "Interactive visual grid of 100 children"}
+          className="grid grid-cols-10 sm:grid-cols-20 gap-0.5 sm:gap-0 mb-1.5 justify-center mx-auto max-w-xl p-1.5 bg-white/50 rounded-2xl border border-slate-200/50"
+        >
           {Array(totalKids).fill(0).map((_, i) => {
             const isAllergic = i >= totalKids - allergicCount;
             const isGirl = i % 2 === 0;
+            const kidNumber = totalKids - i;
             return (
               <button
                 type="button"
                 key={i}
-                onClick={() => handleSelect(totalKids - i)}
+                onClick={() => handleSelect(kidNumber)}
                 className="focus:outline-none transition-transform hover:scale-125 flex items-center justify-center cursor-pointer p-0.5"
-                aria-label={`Select ${totalKids - i} kids`}
+                aria-label={
+                  locale === "es"
+                    ? `Seleccionar ${kidNumber} niños ${isAllergic ? '(con alergia real)' : '(sin alergia real)'}`
+                    : `Select ${kidNumber} children ${isAllergic ? '(with true allergy)' : '(without true allergy)'}`
+                }
               >
                 <KidIcon isAllergic={isAllergic} isGirl={isGirl} />
               </button>
@@ -613,11 +642,11 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
           })}
         </div>
 
-        <div className="flex justify-end max-w-xl mx-auto pr-2">
-          <p className="text-xs sm:text-sm font-bold text-[#3a2d24]">
+        <div className="flex justify-end max-w-xl mx-auto pr-2" aria-live="polite">
+          <p className="text-xs sm:text-sm font-bold text-[#2d221b]">
             {locale === "es" 
-              ? <>solo <span className="text-sm sm:text-base font-black text-[#3a2d24] mx-0.5">{allergicCount}</span> tienen una alergia real</>
-              : <>only <span className="text-sm sm:text-base font-black text-[#3a2d24] mx-0.5">{allergicCount}</span> have a real allergy</>
+              ? <>solo <span className="text-sm sm:text-base font-black text-[#2d221b] mx-0.5">{allergicCount}</span> tienen una alergia real</>
+              : <>only <span className="text-sm sm:text-base font-black text-[#2d221b] mx-0.5">{allergicCount}</span> have a real allergy</>
             }
           </p>
         </div>
@@ -629,7 +658,8 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
           type="button"
           onClick={() => onNext(value !== undefined ? value : allergicCount)}
           disabled={loading}
-          className="px-7 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          aria-label={locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
+          className="px-7 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
           {loading ? "..." : t("next")}
         </button>
@@ -639,9 +669,9 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
 }
 
 const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: boolean; isGirl: boolean }) {
-  const color = isAllergic ? "#d95d39" : "#236f7a";
+  const color = isAllergic ? "#c84a26" : "#1f5c66";
   return (
-    <svg viewBox="0 0 32 32" className="w-5 h-5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5 select-none transition-transform">
+    <svg viewBox="0 0 32 32" className="w-5 h-5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5 select-none transition-transform" aria-hidden="true">
       {/* Shoulders / Shirt */}
       <path
         d="M 7 29 C 7 23, 25 23, 25 29"
@@ -690,8 +720,8 @@ function TestingScreen(props: BaseScreenProps) {
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-xl pb-2">
-        <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{props.title}</h2>
-        <div className="text-[#3a2d24] leading-relaxed space-y-3 whitespace-pre-line text-sm sm:text-base font-medium">
+        <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{props.title}</h2>
+        <div className="text-[#2d221b] leading-relaxed space-y-3 whitespace-pre-line text-sm sm:text-base font-medium">
           {props.content}
         </div>
       </div>
@@ -700,7 +730,7 @@ function TestingScreen(props: BaseScreenProps) {
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
-          alt="Nurse Anna"
+          alt="Nurse Anna providing allergy testing information"
           className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
         />
       </div>
@@ -711,7 +741,8 @@ function TestingScreen(props: BaseScreenProps) {
           type="button"
           onClick={() => props.onNext()}
           disabled={props.loading}
-          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          aria-label={props.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
+          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
           {props.loading ? "..." : props.t("next")}
         </button>
@@ -725,10 +756,12 @@ function TestimonialScreen(props: BaseScreenProps) {
     <div className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-8 sm:p-12 shadow-lg relative">
       <div className="flex flex-col md:flex-row gap-8 items-start">
         <div className="flex-1 space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2b3e34] tracking-tight leading-snug">{props.title}</h2>
-          <div className="text-[#2b3e34] leading-relaxed space-y-3 whitespace-pre-line text-base font-medium bg-white/70 p-6 rounded-2xl border border-white/80 shadow-sm backdrop-blur-sm italic">{props.content}</div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1f382f] tracking-tight leading-snug">{props.title}</h2>
+          <blockquote className="text-[#1f382f] leading-relaxed space-y-3 whitespace-pre-line text-base font-medium bg-white/70 p-6 rounded-2xl border border-white/80 shadow-sm backdrop-blur-sm italic">
+            {props.content}
+          </blockquote>
         </div>
-        <div className="flex-shrink-0 w-28 h-28 flex items-center justify-center text-7xl md:sticky md:top-4 select-none filter drop-shadow-md">
+        <div className="flex-shrink-0 w-28 h-28 flex items-center justify-center text-7xl md:sticky md:top-4 select-none filter drop-shadow-md" aria-hidden="true">
           👩‍👦
         </div>
       </div>
@@ -747,32 +780,43 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden">
-      <div className="space-y-3 max-w-xl pb-2">
+      <div className="space-y-3 max-w-xl pb-2" role="group" aria-label={title}>
         <div>
           {navProps.description && (
-            <p className="text-sm sm:text-base font-semibold text-[#3a2d24] mb-0.5">{navProps.description}</p>
+            <p className="text-sm sm:text-base font-semibold text-[#2d221b] mb-0.5">{navProps.description}</p>
           )}
-          <h2 className="text-base sm:text-lg md:text-xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
+          <h2 className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
         </div>
 
         {/* If Pill Style (e.g. Symptoms in Image 1) */}
         {options[0]?.value && !options[0]?.value.startsWith("curing_") ? (
-          <div className="bg-[#8caeab] p-3.5 sm:p-4 rounded-2xl shadow-inner max-w-xl">
+          <div className="bg-[#8caeab] p-3.5 sm:p-4 rounded-2xl shadow-inner max-w-xl" role="group" aria-label={title}>
             <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {options.map((opt: any) => {
                 const isSelected = selected?.includes(opt.value);
+                const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
                 return (
                   <button
                     type="button"
                     key={opt.value}
+                    role="checkbox"
+                    aria-checked={isSelected}
+                    tabIndex={0}
                     onClick={() => handleToggle(opt.value)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs border ${
+                    onKeyDown={(e) => {
+                      if (e.key === " " || e.key === "Enter") {
+                        e.preventDefault();
+                        handleToggle(opt.value);
+                      }
+                    }}
+                    aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : (navProps.locale === "es" ? 'no seleccionado' : 'not selected')}`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs border cursor-pointer ${
                       isSelected
-                        ? "bg-[#236f7a] text-white border-[#236f7a] scale-105 shadow-sm"
-                        : "bg-white text-[#1e3a3a] border-white/80 hover:bg-slate-50"
+                        ? "bg-[#1f5c66] text-white border-[#1f5c66] scale-105 shadow-sm"
+                        : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
                     }`}
                   >
-                    {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
+                    {label}
                   </button>
                 );
               })}
@@ -780,27 +824,38 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
           </div>
         ) : (
           /* Toggle Switch Style (Knowledge Test) */
-          <div className="space-y-2.5 pt-1">
+          <div className="space-y-2.5 pt-1" role="group" aria-label={title}>
             {options.map((opt: any, idx: number) => {
               const isSelected = selected?.includes(opt.value);
+              const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
               return (
                 <div
                   key={opt.value}
+                  role="checkbox"
+                  tabIndex={0}
+                  aria-checked={isSelected}
                   onClick={() => handleToggle(opt.value)}
-                  className="flex items-center gap-3 cursor-pointer group select-none"
+                  onKeyDown={(e) => {
+                    if (e.key === " " || e.key === "Enter") {
+                      e.preventDefault();
+                      handleToggle(opt.value);
+                    }
+                  }}
+                  aria-label={`${idx + 1}. ${label}, ${isSelected ? (navProps.locale === "es" ? 'verdadero' : 'true/checked') : (navProps.locale === "es" ? 'falso' : 'false/unchecked')}`}
+                  className="flex items-center gap-3 cursor-pointer group select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] rounded-xl p-1"
                 >
-                  <div className="flex flex-col items-center shrink-0 pt-0.5">
-                    <div className={`w-12 h-5 rounded-full p-0.5 transition-colors duration-200 ${isSelected ? 'bg-[#236f7a]' : 'bg-[#7d93a2]'}`}>
+                  <div className="flex flex-col items-center shrink-0 pt-0.5" aria-hidden="true">
+                    <div className={`w-12 h-5 rounded-full p-0.5 transition-colors duration-200 ${isSelected ? 'bg-[#1f5c66]' : 'bg-[#6b808e]'}`}>
                       <div className={`w-4 h-4 rounded-full bg-white border border-slate-300 shadow-sm transform transition-transform duration-200 ${isSelected ? 'translate-x-6' : 'translate-x-0'}`}></div>
                     </div>
-                    <div className="flex justify-between w-full px-1 text-[10px] font-extrabold text-[#3a2d24] mt-0.5 leading-none">
+                    <div className="flex justify-between w-full px-1 text-[10px] font-extrabold text-[#2d221b] mt-0.5 leading-none">
                       <span>×</span>
                       <span>✓</span>
                     </div>
                   </div>
 
-                  <span className="text-xs sm:text-sm font-semibold text-[#3a2d24] leading-snug">
-                    {idx + 1}. {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
+                  <span className="text-xs sm:text-sm font-semibold text-[#2d221b] leading-snug">
+                    {idx + 1}. {label}
                   </span>
                 </div>
               );
@@ -824,7 +879,8 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
           type="button"
           onClick={() => navProps.onNext(selected)}
           disabled={navProps.loading}
-          className="px-8 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer"
+          aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
+          className="px-8 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
           {navProps.loading ? "..." : navProps.t("next")}
         </button>
@@ -839,28 +895,39 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
       <div className="space-y-4 max-w-xl pb-2">
         <div>
           {navProps.description && (
-            <p className="text-base sm:text-lg font-semibold text-[#3a2d24] mb-1">{navProps.description}</p>
+            <p className="text-base sm:text-lg font-semibold text-[#2d221b] mb-1">{navProps.description}</p>
           )}
-          <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
         </div>
 
         {/* Teal Container Card with White Pill Buttons (Image 5) */}
-        <div className="bg-[#8caeab] p-6 rounded-3xl shadow-inner max-w-xl">
+        <div className="bg-[#8caeab] p-6 rounded-3xl shadow-inner max-w-xl" role="radiogroup" aria-label={title}>
           <div className="flex flex-wrap gap-3">
             {options.map((opt: any) => {
               const isSelected = selected === opt.value;
+              const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
               return (
                 <button
                   type="button"
                   key={opt.value}
+                  role="radio"
+                  aria-checked={isSelected}
+                  tabIndex={0}
                   onClick={() => onSelect(opt.value)}
-                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm border ${
+                  onKeyDown={(e) => {
+                    if (e.key === " " || e.key === "Enter") {
+                      e.preventDefault();
+                      onSelect(opt.value);
+                    }
+                  }}
+                  aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : ''}`}
+                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm border cursor-pointer ${
                     isSelected
-                      ? "bg-[#236f7a] text-white border-[#236f7a] scale-105 shadow-md"
-                      : "bg-white text-[#1e3a3a] border-white/80 hover:bg-slate-50"
+                      ? "bg-[#1f5c66] text-white border-[#1f5c66] scale-105 shadow-md"
+                      : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
                   }`}
                 >
-                  {navProps.locale === "es" ? opt.labelEs : opt.labelEn}
+                  {label}
                 </button>
               );
             })}
@@ -883,7 +950,8 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
           type="button"
           onClick={() => navProps.onNext(selected)}
           disabled={navProps.loading}
-          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
+          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
           {navProps.loading ? "..." : navProps.t("next")}
         </button>
@@ -900,19 +968,20 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-xl pb-2">
-        <h2 className="text-xl sm:text-2xl font-black text-[#3a2d24] tracking-tight leading-snug">{title}</h2>
+        <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
 
         {/* Teal Container Card */}
-        <div className="bg-[#8caeab] p-6 rounded-3xl text-[#1e3a3a] shadow-inner relative space-y-6 max-w-xl">
-          <p className="text-sm sm:text-base font-semibold text-[#1e3a3a] leading-snug">
-            {navProps.description || "At what age did your child have the reaction to penicillin (amoxicillin)?"}
+        <div className="bg-[#8caeab] p-6 rounded-3xl text-[#132c27] shadow-inner relative space-y-6 max-w-xl">
+          <p className="text-sm sm:text-base font-semibold text-[#132c27] leading-snug">
+            {navProps.description || (navProps.locale === "es" ? "¿A qué edad tuvo su hijo la reacción a la penicilina (amoxicilina)?" : "At what age did your child have the reaction to penicillin (amoxicillin)?")}
           </p>
 
           {/* Slider with Yellow Badge Indicator */}
           <div className="relative pt-8 pb-4 px-2">
             {/* Dynamic Yellow Badge floating above thumb */}
             <div 
-              className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#2b3e34] font-black text-xs px-2.5 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all"
+              aria-hidden="true"
+              className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#1f382f] font-black text-xs px-2.5 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all"
               style={{
                 left: `${((value - minVal) / (maxVal - minVal)) * 100}%`
               }}
@@ -925,12 +994,33 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
               min={minVal}
               max={maxVal}
               value={value}
+              role="slider"
+              aria-valuemin={minVal}
+              aria-valuemax={maxVal}
+              aria-valuenow={value}
+              aria-valuetext={navProps.locale === "es" ? `${value} ${unit || "años de edad"}` : `${value} ${unit || "years old"}`}
+              aria-label={title || "Age of penicillin reaction"}
               onChange={(e) => onSelect(Number(e.target.value))}
-              className="w-full h-2 bg-[#2d565b] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition"
+              onKeyDown={(e) => {
+                if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                  onSelect(Math.min(maxVal, value + 1));
+                } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                  onSelect(Math.max(minVal, value - 1));
+                } else if (e.key === "PageUp") {
+                  onSelect(Math.min(maxVal, value + 5));
+                } else if (e.key === "PageDown") {
+                  onSelect(Math.max(minVal, value - 5));
+                } else if (e.key === "Home") {
+                  onSelect(minVal);
+                } else if (e.key === "End") {
+                  onSelect(maxVal);
+                }
+              }}
+              className="w-full h-2 bg-[#234b50] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
             />
 
             {/* Timeline Tick Labels */}
-            <div className="flex justify-between mt-3 text-[11px] font-bold text-[#1e3a3a]">
+            <div className="flex justify-between mt-3 text-[11px] font-bold text-[#132c27]" aria-hidden="true">
               <span>&lt;1<br/>{navProps.locale === "es" ? "año" : "year old"}</span>
               <span>1<br/>{navProps.locale === "es" ? "año" : "year old"}</span>
               <span>10<br/>{navProps.locale === "es" ? "años" : "year old"}</span>
@@ -956,7 +1046,8 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
           type="button"
           onClick={() => navProps.onNext(value)}
           disabled={navProps.loading}
-          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
+          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
           {navProps.loading ? "..." : navProps.t("next")}
         </button>
@@ -969,11 +1060,11 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-xl pb-2 text-center md:text-left min-h-[12rem]">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#3a2d24] max-w-xl tracking-tight leading-relaxed">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2d221b] max-w-xl tracking-tight leading-relaxed">
           {title}
         </h2>
         {description && (
-          <p className="text-sm sm:text-base font-medium text-[#3a2d24] max-w-xl">{description}</p>
+          <p className="text-sm sm:text-base font-medium text-[#2d221b] max-w-xl">{description}</p>
         )}
       </div>
 
@@ -992,7 +1083,8 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
           type="button"
           onClick={() => navProps.onNext()}
           disabled={navProps.loading}
-          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#2b3e34] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
+          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
           {navProps.loading ? "..." : navProps.t("next")}
         </button>

@@ -202,7 +202,14 @@ export default function QuestionnaireEngine() {
   const isNextDisabled = currentStep.required && (currentAnswer === undefined || currentAnswer === '' || (Array.isArray(currentAnswer) && currentAnswer.length === 0));
 
   return (
-    <div className="bg-white border border-zinc-200 p-10 sm:p-16 relative overflow-hidden">
+    <div className="bg-white border border-zinc-200 p-10 sm:p-16 relative overflow-hidden" role="main">
+      {/* Screen reader live announcement for step changes */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {locale === 'es'
+          ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}: ${currentStep.titleEs || currentStep.titleEn}`
+          : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}: ${currentStep.titleEn}`}
+      </div>
+
       {/* Premium Loader Overlay for transitions */}
       {loading && <Loader fullScreen />}
       <div className="mb-16">
@@ -211,7 +218,7 @@ export default function QuestionnaireEngine() {
         </h2>
         
         {((locale === 'es' ? currentStep.descriptionEs : currentStep.descriptionEn)) && (
-          <p className="mt-6 text-zinc-500 leading-relaxed font-light text-lg">
+          <p className="mt-6 text-zinc-600 leading-relaxed font-light text-lg">
             {locale === 'es' ? currentStep.descriptionEs : currentStep.descriptionEn}
           </p>
         )}
@@ -225,63 +232,77 @@ export default function QuestionnaireEngine() {
         locale={locale} 
       />
 
-      <div className="space-y-4 mb-20 md:max-w-2xl">
+      <div className="space-y-4 mb-20 md:max-w-2xl" role="group" aria-label={currentStep.titleEn}>
         {currentStep.type === 'boolean' && (
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4" role="radiogroup" aria-label={currentStep.titleEn}>
             <button 
+              type="button"
+              role="radio"
+              aria-checked={currentAnswer === true}
               onClick={() => setAnswerLocal(true)}
-              className={`flex-1 py-5 px-6 border transition-colors text-left sm:text-center ${currentAnswer === true ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 hover:border-zinc-400 text-zinc-900 bg-white'}`}
+              className={`flex-1 py-5 px-6 border transition-colors text-left sm:text-center cursor-pointer ${currentAnswer === true ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 hover:border-zinc-400 text-zinc-900 bg-white'}`}
             >
               <span className="font-medium tracking-wide uppercase text-sm">{locale === 'es' ? 'Sí' : 'Yes'}</span>
             </button>
             <button 
+              type="button"
+              role="radio"
+              aria-checked={currentAnswer === false}
               onClick={() => setAnswerLocal(false)}
-              className={`flex-1 py-5 px-6 border transition-colors text-left sm:text-center ${currentAnswer === false ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 hover:border-zinc-400 text-zinc-900 bg-white'}`}
+              className={`flex-1 py-5 px-6 border transition-colors text-left sm:text-center cursor-pointer ${currentAnswer === false ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 hover:border-zinc-400 text-zinc-900 bg-white'}`}
             >
               <span className="font-medium tracking-wide uppercase text-sm">{locale === 'es' ? 'No' : 'No'}</span>
             </button>
           </div>
         )}
 
-        {currentStep.type === 'single_choice' && currentStep.options?.map(opt => (
-          <label key={opt.value} className={`block p-6 border cursor-pointer transition-colors ${currentAnswer === opt.value ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 hover:border-zinc-400 bg-white'}`}>
-            <div className="flex items-center">
-              <input 
-                type="radio" 
-                name={currentStep.id} 
-                value={opt.value}
-                onChange={() => setAnswerLocal(opt.value)}
-                className="mr-5 text-zinc-900 focus:ring-zinc-900 w-5 h-5 border-zinc-300"
-                checked={currentAnswer === opt.value}
-              />
-              <span className={`text-lg font-light ${currentAnswer === opt.value ? 'text-zinc-900 font-medium' : 'text-zinc-700'}`}>{locale === 'es' ? opt.labelEs : opt.labelEn}</span>
-            </div>
-          </label>
-        ))}
+        {currentStep.type === 'single_choice' && (
+          <div role="radiogroup" aria-label={currentStep.titleEn} className="space-y-4">
+            {currentStep.options?.map(opt => (
+              <label key={opt.value} className={`block p-6 border cursor-pointer transition-colors ${currentAnswer === opt.value ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 hover:border-zinc-400 bg-white'}`}>
+                <div className="flex items-center">
+                  <input 
+                    type="radio" 
+                    name={currentStep.id} 
+                    value={opt.value}
+                    onChange={() => setAnswerLocal(opt.value)}
+                    className="mr-5 text-zinc-900 focus:ring-zinc-900 w-5 h-5 border-zinc-300"
+                    checked={currentAnswer === opt.value}
+                  />
+                  <span className={`text-lg font-light ${currentAnswer === opt.value ? 'text-zinc-900 font-medium' : 'text-zinc-700'}`}>{locale === 'es' ? opt.labelEs : opt.labelEn}</span>
+                </div>
+              </label>
+            ))}
+          </div>
+        )}
         
-        {currentStep.type === 'multiple_choice' && currentStep.options?.map(opt => (
-          <label key={opt.value} className={`block p-6 border cursor-pointer transition-colors ${Array.isArray(currentAnswer) && currentAnswer.includes(opt.value) ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 hover:border-zinc-400 bg-white'}`}>
-            <div className="flex items-center">
-              <input 
-                type="checkbox" 
-                value={opt.value}
-                onChange={(e) => {
-                  const checked = e.target.checked;
-                  let current = Array.isArray(currentAnswer) ? [...currentAnswer] : [];
-                  if (checked) current.push(opt.value);
-                  else current = current.filter(c => c !== opt.value);
-                  setAnswerLocal(current);
-                }}
-                className="mr-5 text-zinc-900 rounded-none focus:ring-zinc-900 w-5 h-5 border-zinc-300"
-                checked={Array.isArray(currentAnswer) && currentAnswer.includes(opt.value)}
-              />
-              <span className={`text-lg font-light ${Array.isArray(currentAnswer) && currentAnswer.includes(opt.value) ? 'text-zinc-900 font-medium' : 'text-zinc-700'}`}>{locale === 'es' ? opt.labelEs : opt.labelEn}</span>
-            </div>
-          </label>
-        ))}
+        {currentStep.type === 'multiple_choice' && (
+          <div role="group" aria-label={currentStep.titleEn} className="space-y-4">
+            {currentStep.options?.map(opt => (
+              <label key={opt.value} className={`block p-6 border cursor-pointer transition-colors ${Array.isArray(currentAnswer) && currentAnswer.includes(opt.value) ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 hover:border-zinc-400 bg-white'}`}>
+                <div className="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    value={opt.value}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      let current = Array.isArray(currentAnswer) ? [...currentAnswer] : [];
+                      if (checked) current.push(opt.value);
+                      else current = current.filter(c => c !== opt.value);
+                      setAnswerLocal(current);
+                    }}
+                    className="mr-5 text-zinc-900 rounded-none focus:ring-zinc-900 w-5 h-5 border-zinc-300"
+                    checked={Array.isArray(currentAnswer) && currentAnswer.includes(opt.value)}
+                  />
+                  <span className={`text-lg font-light ${Array.isArray(currentAnswer) && currentAnswer.includes(opt.value) ? 'text-zinc-900 font-medium' : 'text-zinc-700'}`}>{locale === 'es' ? opt.labelEs : opt.labelEn}</span>
+                </div>
+              </label>
+            ))}
+          </div>
+        )}
 
         {currentStep.type === 'likert' && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4" role="radiogroup" aria-label={currentStep.titleEn}>
              {currentStep.options?.map(opt => (
               <label key={opt.value} className={`block p-6 border cursor-pointer transition-colors ${currentAnswer === opt.value ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 hover:border-zinc-400 bg-white'}`}>
                 <div className="flex items-center">
@@ -303,17 +324,21 @@ export default function QuestionnaireEngine() {
 
       <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center pt-8 border-t border-zinc-100 gap-6 sm:gap-0">
         <button 
-           className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-900 disabled:opacity-0 transition-colors"
+           type="button"
+           className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-900 disabled:opacity-0 transition-colors cursor-pointer"
            disabled={currentStepIndex === 0 || loading}
            onClick={() => setCurrentStepIndex(state => Math.max(0, state - 1))}
+           aria-label={locale === 'es' ? 'Volver al paso anterior' : 'Go back to previous step'}
         >
           ← {t('back')}
         </button>
 
         <button 
+          type="button"
           onClick={handleNext} 
           disabled={isNextDisabled || loading}
-          className={`px-12 py-4 text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center ${isNextDisabled ? 'bg-zinc-100 text-zinc-400 border border-zinc-100 cursor-not-allowed' : 'bg-zinc-900 text-white border border-zinc-900 hover:bg-zinc-800'}`}
+          aria-label={locale === 'es' ? 'Continuar al siguiente paso' : 'Continue to next step'}
+          className={`px-12 py-4 text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center cursor-pointer ${isNextDisabled ? 'bg-zinc-100 text-zinc-400 border border-zinc-100 cursor-not-allowed' : 'bg-zinc-900 text-white border border-zinc-900 hover:bg-zinc-800'}`}
         >
           {loading ? '...' : (currentStep.isTerminal ? t('submit') : t('next'))}
         </button>

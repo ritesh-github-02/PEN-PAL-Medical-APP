@@ -28,24 +28,24 @@ export default async function ControlSitePage({ searchParams }: PageProps) {
   const t = await getTranslations('Control');
   
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8">
+    <main className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8" role="main" aria-label="Control Group Portal">
       <div className="max-w-4xl mx-auto space-y-6">
         
         {/* Professional Header Navigation Bar */}
         <header className="bg-[#0f172a] border border-slate-800 rounded-xl p-5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 bg-teal-700 rounded-lg flex items-center justify-center shadow-xs" aria-hidden="true">
               <ShieldCheck className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight text-white font-mono flex items-center gap-2">
-                PEN-PAL <span className="text-slate-600 font-normal">|</span> <span className="text-slate-200 font-semibold">Control Group Portal</span>
+                PEN-PAL <span className="text-slate-500 font-normal" aria-hidden="true">|</span> <span className="text-slate-100 font-semibold">Control Group Portal</span>
               </h1>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="bg-slate-800 border border-slate-700 text-teal-400 text-[10px] font-bold font-mono px-2.5 py-0.5 rounded">
+                <span className="bg-slate-800 border border-slate-700 text-teal-300 text-[10px] font-bold font-mono px-2.5 py-0.5 rounded">
                   Protocol Version 2.1
                 </span>
-                <span className="text-[11px] font-semibold text-slate-400">
+                <span className="text-[11px] font-semibold text-slate-300">
                   Research Baseline Site
                 </span>
               </div>
@@ -55,9 +55,10 @@ export default async function ControlSitePage({ searchParams }: PageProps) {
           <form action={logout}>
             <button 
               type="submit"
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-rose-900/40 hover:text-rose-300 border border-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              aria-label="Exit study and logout"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-rose-900/50 hover:text-rose-200 border border-slate-700 text-slate-100 rounded-lg text-xs font-bold transition-all cursor-pointer"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-3.5 h-3.5 text-teal-300" aria-hidden="true" />
               Exit & Logout
             </button>
           </form>
@@ -231,6 +232,6 @@ export default async function ControlSitePage({ searchParams }: PageProps) {
         </footer>
 
       </div>
-    </div>
+    </main>
   );
 }

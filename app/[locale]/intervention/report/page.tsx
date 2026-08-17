@@ -72,78 +72,82 @@ export default function ReportPage() {
     : answers['q3_symptoms'] || 'None reported';
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 font-sans text-slate-800">
+    <main className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 font-sans text-slate-800" role="main" aria-label="Clinical Allergy Assessment Report">
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Navigation / Header */}
-        <div className="flex justify-between items-center no-print">
+        <header className="flex justify-between items-center no-print">
           <div className="flex items-center gap-4">
-            <h1 className="text-xs font-bold uppercase tracking-wider text-slate-400">{t('reportTitle')}</h1>
+            <h1 className="text-xs font-bold uppercase tracking-wider text-slate-600">{t('reportTitle')}</h1>
             <button 
+              type="button"
               onClick={() => window.location.href = `/${locale}/intervention/flow?edit=true`}
-              className="text-xs font-bold text-blue-600 underline underline-offset-4 uppercase tracking-wider hover:text-blue-700 transition-colors"
+              aria-label={locale === 'es' ? 'Editar respuestas anteriores' : 'Edit previous questionnaire answers'}
+              className="text-xs font-bold text-blue-700 underline underline-offset-4 uppercase tracking-wider hover:text-blue-900 transition-colors cursor-pointer"
             >
               {t('editAnswers')}
             </button>
           </div>
           <button 
+            type="button"
             onClick={() => logout()}
-            className="text-xs font-bold text-slate-400 hover:text-red-600 uppercase tracking-wider transition-colors"
+            aria-label="Exit report and logout"
+            className="text-xs font-bold text-slate-600 hover:text-red-700 uppercase tracking-wider transition-colors cursor-pointer"
           >
             Exit
           </button>
-        </div>
+        </header>
 
         {/* Report Card */}
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden print:border-none print:shadow-none">
           {/* Decorative Top Bar */}
-          <div className="h-1.5 bg-blue-600 w-full" />
+          <div className="h-1.5 bg-[#1d5c64] w-full" aria-hidden="true" />
           
           <div className="p-8 sm:p-12 space-y-10">
             <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b border-slate-100 pb-8">
               <div className="space-y-1">
                 <h2 className="text-3xl font-black tracking-tight text-slate-900">PEN-PAL</h2>
-                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">Patient Allergy Assessment</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-600">Patient Allergy Assessment</p>
               </div>
               <div className="text-left sm:text-right w-full sm:w-auto">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('dateGenerated')}</p>
-                <p className="text-base font-semibold text-slate-700 mt-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{t('dateGenerated')}</p>
+                <p className="text-base font-semibold text-slate-800 mt-1">
                   {new Date().toLocaleDateString('en-GB').split('/').join('-')}
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <section className="space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-l-2 border-blue-600 pl-3">Identified Condition</h3>
-                <div className="bg-slate-50/50 p-6 border border-slate-200/80 rounded-lg">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">{t('primaryAllergy')}</p>
+              <section className="space-y-4" aria-label="Identified Condition">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-l-2 border-[#1d5c64] pl-3">Identified Condition</h3>
+                <div className="bg-slate-50/80 p-6 border border-slate-200/80 rounded-lg">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">{t('primaryAllergy')}</p>
                   <p className="text-2xl font-bold text-slate-900">{allergy}</p>
                 </div>
               </section>
 
-              <section className="space-y-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-l-2 border-blue-600 pl-3">Reported Symptoms</h3>
-                <div className="bg-slate-50/50 p-6 border border-slate-200/80 rounded-lg min-h-[120px]">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Historical Reactions</p>
+              <section className="space-y-4" aria-label="Reported Symptoms">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-l-2 border-[#1d5c64] pl-3">Reported Symptoms</h3>
+                <div className="bg-slate-50/80 p-6 border border-slate-200/80 rounded-lg min-h-[120px]">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Historical Reactions</p>
                   <div className="flex flex-wrap gap-2">
                     {Array.isArray(answers['q3_symptoms']) ? (
                       answers['q3_symptoms'].map((s: string) => (
-                        <span key={s} className="px-2.5 py-1 bg-white border border-slate-200 text-[11px] font-medium text-slate-700 rounded shadow-sm">
+                        <span key={s} className="px-2.5 py-1 bg-white border border-slate-200 text-[11px] font-medium text-slate-800 rounded shadow-sm">
                           {s}
                         </span>
                       ))
                     ) : (
-                      <p className="text-slate-600 text-sm font-medium">{symptoms}</p>
+                      <p className="text-slate-700 text-sm font-medium">{symptoms}</p>
                     )}
                   </div>
                 </div>
               </section>
             </div>
 
-            <section className="space-y-4 pt-8 border-t border-slate-100">
+            <section className="space-y-4 pt-8 border-t border-slate-100" aria-label="Details & Clinical Guidance">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">Details & Clinical Guidance</h3>
-              <div className="text-sm text-slate-600 leading-relaxed space-y-4">
+              <div className="text-sm text-slate-700 leading-relaxed space-y-4 font-normal">
                 <p>
                   Based on the responses provided, your child has a documented history of <strong className="font-semibold text-slate-900">{allergy}</strong> allergy. 
                   The symptoms reported ({symptoms}) indicate a clinical profile that may require further evaluation by a specialist.
@@ -157,12 +161,14 @@ export default function ReportPage() {
 
             <div className="bg-slate-900 p-6 rounded-lg text-white flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
                <div className="text-center sm:text-left">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Next Step</p>
-                  <p className="text-xs text-slate-300 font-normal">Complete the final system evaluation to finish the study.</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-0.5">Next Step</p>
+                  <p className="text-xs text-slate-200 font-normal">Complete the final system evaluation to finish the study.</p>
                </div>
                <button 
+                  type="button"
                   onClick={() => window.location.href = `/${locale}/intervention/survey`}
-                  className="px-6 py-2.5 bg-white text-slate-900 text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition rounded-md shadow-sm active:scale-[0.98]"
+                  aria-label="Proceed to final usability survey"
+                  className="px-6 py-2.5 bg-white text-slate-900 text-xs font-bold uppercase tracking-wider hover:bg-slate-100 transition rounded-md shadow-sm active:scale-[0.98] cursor-pointer"
                >
                   {t('proceedToSurvey')} →
                </button>
@@ -170,12 +176,14 @@ export default function ReportPage() {
           </div>
           
           <div className="bg-slate-50 px-8 py-4 border-t border-slate-200/80 flex justify-between items-center no-print">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Allergy Report v1.0</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Allergy Report v1.0</p>
             <button 
+              type="button"
               onClick={handlePrint}
-              className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600 hover:text-blue-700 transition-colors"
+              aria-label="Print or download allergy report"
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-700 hover:text-blue-900 transition-colors cursor-pointer"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
               <span>{t('downloadReport')}</span>
             </button>
           </div>
@@ -295,6 +303,6 @@ export default function ReportPage() {
           }
         `}</style>
       </div>
-    </div>
+    </main>
   );
 }

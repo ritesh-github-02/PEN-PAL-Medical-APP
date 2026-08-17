@@ -6,6 +6,66 @@
   --font-display: "Outfit", system-ui, -apple-system, sans-serif;
 }
 
+/* ==========================================================================
+   WCAG 2.1 Level AA Accessibility Enhancements
+   ========================================================================== */
+
+/* High-Contrast Visible Focus Rings for Keyboard Navigation */
+:focus-visible {
+  outline: 3px solid #236f7a !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[role="radio"]:focus-visible,
+[role="checkbox"]:focus-visible,
+[role="slider"]:focus-visible {
+  outline: 3px solid #236f7a !important;
+  outline-offset: 2px !important;
+}
+
+/* Reduced Motion for users with vestibular or motion sensitivities */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Screen Reader Only Utility */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.not-sr-only {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: inherit !important;
+  margin: inherit !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
 /* Clean Viewport Fit - Hide Window Scrollbars */
 html, body {
   -ms-overflow-style: none;  /* IE and Edge */
