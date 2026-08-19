@@ -43,6 +43,19 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Escape key handler for modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        setIsModalOpen(false);
+      }
+    };
+    if (isModalOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen]);
+
   // Derive origin safely on client
   const [origin, setOrigin] = useState('');
   useEffect(() => {
@@ -282,24 +295,26 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
 
       {/* Modal Popup Workflow */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="campaign-modal-title">
           <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
             <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-indigo-600/30 border border-indigo-400/30 rounded-xl text-indigo-300">
+                <div className="p-2 bg-indigo-600/30 border border-indigo-400/30 rounded-xl text-indigo-300" aria-hidden="true">
                   <QrCode className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm tracking-tight">Create Campaign QR & Link</h3>
+                  <h3 id="campaign-modal-title" className="font-extrabold text-sm tracking-tight">Create Campaign QR & Link</h3>
                   <p className="text-[11px] text-slate-400 font-light">Generate passwordless scan access</p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
+                aria-label="Close create campaign dialog"
                 className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 

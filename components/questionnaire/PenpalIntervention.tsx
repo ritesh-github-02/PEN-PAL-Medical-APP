@@ -455,20 +455,14 @@ export default function PenpalIntervention() {
             ) : (
               <>
                 <AudioPlayer
-                  textToSpeak={
-                    locale === "es"
-                      ? currentStep.titleEs || currentStep.contentEs || ""
-                      : currentStep.titleEn || currentStep.contentEn || ""
-                  }
                   audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
                   stepId={currentStep.id}
                   locale={locale}
-                  title={title}
-                  description={description}
-                  content={content}
-                  options={currentStep.options || []}
-                  selected={answers[currentStep.id]}
-                  isMultipleChoice={currentStep.type === "multiple_choice"}
+                  transcriptText={
+                    locale === "es"
+                      ? `${currentStep.titleEs || ""}. ${currentStep.descriptionEs || ""}`
+                      : `${currentStep.titleEn || ""}. ${currentStep.descriptionEn || ""}`
+                  }
                 />
 
                 {currentStep.type === "intro" && (

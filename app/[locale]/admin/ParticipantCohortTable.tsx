@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Download, 
@@ -81,6 +81,19 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [activeTab, setActiveTab] = useState<'summary' | 'metrics' | 'responses' | 'tokens'>('summary');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  // Escape key handler for modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedParticipantId) {
+        setSelectedParticipantId(null);
+      }
+    };
+    if (selectedParticipantId) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedParticipantId]);
 
   // Filter logic
   const filteredParticipants = participants.filter((p) => {
@@ -376,7 +389,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
 
       {/* ================= PARTICIPANT DETAILS MODAL ================= */}
       {selectedParticipantId && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="participant-modal-title">
           <div className="bg-white border border-slate-300 rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             
             {/* Modal Header */}
@@ -386,7 +399,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                   <span className="text-xs font-bold uppercase tracking-wider text-teal-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
                     Participant Profile
                   </span>
-                  <h3 className="text-lg font-extrabold font-mono text-white">
+                  <h3 id="participant-modal-title" className="text-lg font-extrabold font-mono text-white">
                     {modalDetails?.externalId || selectedParticipantId}
                   </h3>
                 </div>
@@ -396,10 +409,12 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
               </div>
 
               <button
+                type="button"
                 onClick={() => setSelectedParticipantId(null)}
+                aria-label="Close participant details dialog"
                 className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 

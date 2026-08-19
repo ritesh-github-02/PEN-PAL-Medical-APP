@@ -224,12 +224,16 @@ export default function QuestionnaireEngine() {
         )}
       </div>
 
-      {/* Always render AudioPlayer, it will use TTS if no audioSrc exists */}
+      {/* Render recorded audio player if audioSrc exists */}
       <AudioPlayer 
-        textToSpeak={locale === 'es' ? currentStep.titleEs : currentStep.titleEn}
         audioSrc={locale === 'es' ? currentStep.audioEs : currentStep.audioEn} 
         stepId={currentStep.id} 
         locale={locale} 
+        transcriptText={
+          locale === 'es'
+            ? `${currentStep.titleEs || ''}. ${currentStep.descriptionEs || ''}`
+            : `${currentStep.titleEn || ''}. ${currentStep.descriptionEn || ''}`
+        }
       />
 
       <div className="space-y-4 mb-20 md:max-w-2xl" role="group" aria-label={currentStep.titleEn}>

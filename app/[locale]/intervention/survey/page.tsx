@@ -108,7 +108,11 @@ export default function SurveyPage() {
       setGlobalError(`Please complete all required fields.`);
       const firstErrorId = Object.keys(newErrors)[0];
       const el = document.getElementById(`question-${firstErrorId}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const focusable = el.querySelector('input, textarea, button') as HTMLElement;
+        if (focusable) focusable.focus();
+      }
       return;
     }
 
