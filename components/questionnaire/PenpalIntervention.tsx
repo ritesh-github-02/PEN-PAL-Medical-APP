@@ -177,20 +177,69 @@ export default function PenpalIntervention() {
     init();
   }, []);
 
-  const slideStartTimeRef = useRef<number>(Date.now());
+  const slideActiveMsRef = useRef<number>(0);
+  const slideLastActiveRef = useRef<number>(Date.now());
+  const isSlideVisibleRef = useRef<boolean>(true);
 
+  // Active time tracker per slide with visibility change support
   useEffect(() => {
-    slideStartTimeRef.current = Date.now();
+    slideActiveMsRef.current = 0;
+    slideLastActiveRef.current = Date.now();
+    isSlideVisibleRef.current = document.visibilityState === 'visible';
+
     const activeStep = currentStep;
     const stepIdx = currentStepIndex;
 
-    return () => {
-      const durationMs = Date.now() - slideStartTimeRef.current;
+    const flushDuration = (useBeacon = false) => {
+      const now = Date.now();
+      if (isSlideVisibleRef.current) {
+        const delta = now - slideLastActiveRef.current;
+        if (delta > 0 && delta < 300000) {
+          slideActiveMsRef.current += delta;
+        }
+      }
+      slideLastActiveRef.current = now;
+
+      const durationMs = slideActiveMsRef.current;
       if (activeStep && durationMs > 100) {
-        recordSlideTiming(activeStep.id, stepIdx, durationMs).catch(() => {});
+        slideActiveMsRef.current = 0;
+        if (useBeacon && typeof navigator !== 'undefined' && navigator.sendBeacon) {
+          const blob = new Blob([JSON.stringify({
+            stepId: activeStep.id,
+            stepIndex: stepIdx,
+            durationMs,
+            path: '/intervention/flow',
+          })], { type: 'application/json' });
+          navigator.sendBeacon('/api/tracking', blob);
+        } else {
+          recordSlideTiming(activeStep.id, stepIdx, durationMs).catch(() => {});
+        }
       }
     };
-  }, [currentStepIndex, initialized]);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        flushDuration(true);
+        isSlideVisibleRef.current = false;
+      } else {
+        isSlideVisibleRef.current = true;
+        slideLastActiveRef.current = Date.now();
+      }
+    };
+
+    const handleUnload = () => {
+      flushDuration(true);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('beforeunload', handleUnload);
+      flushDuration(false);
+    };
+  }, [currentStepIndex, initialized, currentStep]);
 
   useEffect(() => {
     if (currentStep && initialized) {
@@ -221,6 +270,16 @@ export default function PenpalIntervention() {
     setLoading(true);
     let answer = explicitAnswer !== undefined ? explicitAnswer : answers[currentStep.id];
 
+    // Calculate time spent on this question before submitting
+    const now = Date.now();
+    let currentSlideDwellMs = slideActiveMsRef.current;
+    if (isSlideVisibleRef.current) {
+      const delta = now - slideLastActiveRef.current;
+      if (delta > 0 && delta < 300000) {
+        currentSlideDwellMs += delta;
+      }
+    }
+
     // Default age slider to 9 if unadjusted
     if (answer === undefined && currentStep.type === "slider") {
       answer = 9;
@@ -245,10 +304,10 @@ export default function PenpalIntervention() {
     const answerPayload = typeof answer === "object" ? JSON.stringify(answer) : String(answer);
 
     try {
-      await submitAnswer(currentStep.id, answerPayload);
+      await submitAnswer(currentStep.id, answerPayload, Math.round(currentSlideDwellMs));
       await logInteraction(
         "QUESTION_ANSWER",
-        { stepId: currentStep.id, answer },
+        { stepId: currentStep.id, answer, dwellMs: Math.round(currentSlideDwellMs) },
         `/intervention/flow`
       );
     } catch (e) {

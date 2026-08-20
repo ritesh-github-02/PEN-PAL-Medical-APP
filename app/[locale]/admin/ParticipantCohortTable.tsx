@@ -190,6 +190,13 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
         {/* Global Export Action Buttons */}
         <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-start lg:justify-end">
           <button
+            onClick={() => window.location.href = '/api/export?type=slide_metrics'}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+          >
+            <Activity className="w-3.5 h-3.5 text-teal-300" />
+            Slide Telemetry (CSV)
+          </button>
+          <button
             onClick={() => window.location.href = '/api/export?type=responses'}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
           >

@@ -2,6 +2,7 @@
 
 import prisma, { withDbRetry } from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 // Get recent token access logs with participant details
 export async function getTokenAccessLogs(limit: number = 50) {
@@ -281,6 +282,7 @@ export async function toggleCampaignStatus(id: string, status: 'ACTIVE' | 'DEACT
       where: { id },
       data: { status },
     });
+    revalidatePath('/[locale]/admin', 'page');
     return { success: true, campaign: updated };
   } catch (error) {
     console.error('Failed to toggle campaign status:', error);

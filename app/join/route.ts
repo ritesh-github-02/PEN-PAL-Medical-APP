@@ -24,16 +24,22 @@ export async function GET(request: Request) {
     const isControl = rawArm.toLowerCase().trim() === 'control';
     const armGroup = isControl ? 'CONTROL' : 'INTERVENTION';
 
-    // Optional campaign lookup
+    // Optional campaign lookup & status validation
     let campaignId: string | null = null;
     if (campaignSlug) {
       const campaign = await prisma.campaign.findFirst({
         where: {
           OR: [{ slug: campaignSlug }, { id: campaignSlug }],
-          status: 'ACTIVE',
         },
       });
       if (campaign) {
+        if (campaign.status === 'DEACTIVATED') {
+          const deactivatedUrl = new URL(
+            `/${locale}/join/deactivated?campaign=${encodeURIComponent(campaign.name)}&arm=${encodeURIComponent(rawArm)}`,
+            request.url
+          );
+          return NextResponse.redirect(deactivatedUrl, 302);
+        }
         campaignId = campaign.id;
       }
     }

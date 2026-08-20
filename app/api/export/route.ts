@@ -119,6 +119,24 @@ export async function GET(request: Request) {
       }));
       filename = 'penpal_events.csv';
     }
+    else if (type === 'slide_metrics') {
+      const metrics = await prisma.slideMetric.findMany({
+        include: { participant: true },
+        orderBy: [{ participantId: 'asc' }, { stepIndex: 'asc' }],
+      });
+      data = metrics.map(m => ({
+        MetricID: m.id,
+        ParticipantID: m.participant?.externalId || m.participantId,
+        CohortGroup: m.participant?.groupId || 'N/A',
+        StepID: m.stepId,
+        StepIndex: m.stepIndex,
+        DurationSeconds: (m.durationMs / 1000).toFixed(2),
+        DurationMs: m.durationMs,
+        VisitCount: m.visitCount,
+        UpdatedAt: m.updatedAt.toISOString(),
+      }));
+      filename = 'penpal_slide_telemetry_metrics.csv';
+    }
     else {
       return new NextResponse('Invalid export type', { status: 400 });
     }

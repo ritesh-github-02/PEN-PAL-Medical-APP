@@ -1,4 +1,5 @@
 import { logout, validateAndConsumeToken } from '../intervention/actions';
+import { completeUserSession } from '@/lib/tracking';
 import { 
   ShieldCheck, 
   BookOpen, 
@@ -11,6 +12,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
+import ControlTracker from './ControlTracker';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -31,8 +33,17 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
     }
   }
 
+  async function handleFinishAndLogout() {
+    'use server';
+    await completeUserSession(`/${locale}/control`);
+    await logout();
+  }
+
   return (
     <main className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8" role="main" aria-label={isEs ? "Portal del Grupo de Control" : "Control Group Portal"}>
+      {/* 100% Client Telemetry & Scroll Tracker */}
+      <ControlTracker locale={locale} />
+
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Professional Header Navigation Bar */}
@@ -119,7 +130,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
             
             {/* Left Col: Why does it matter & Did you know? */}
             <div className="lg:col-span-6 space-y-6">
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-3">
+              <div id="section-why-it-matters" className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-3">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#128a96]" aria-hidden="true"></span>
                   {isEs ? "¿Por qué es importante?" : "Why does it matter?"}
@@ -132,7 +143,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
               </div>
 
               {/* Did you know? */}
-              <div className="bg-[#f0f9fa] border border-[#bfe7ea] rounded-xl p-6 space-y-3.5">
+              <div id="section-did-you-know" className="bg-[#f0f9fa] border border-[#bfe7ea] rounded-xl p-6 space-y-3.5">
                 <h3 className="text-base sm:text-lg font-bold text-[#0d5f67] flex items-center gap-2">
                   <HelpCircle className="w-5 h-5 text-[#128a96]" aria-hidden="true" />
                   {isEs ? "¿Sabías que?" : "Did you know?"}
@@ -163,7 +174,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
             </div>
 
             {/* Right Col: Large Sharp Infographic Image */}
-            <div className="lg:col-span-6 flex flex-col items-center justify-center">
+            <div id="section-infographic" className="lg:col-span-6 flex flex-col items-center justify-center">
               <div className="w-full bg-[#1b6b93] border border-slate-300 shadow-lg overflow-hidden flex items-center justify-center">
                 <img
                   src={isEs ? "/images/Spanish.png" : "/images/English.png"}
@@ -181,7 +192,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
         </div>
 
         {/* Section: Take the Challenge! */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-4 shadow-xs">
+        <div id="section-take-challenge" className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-4 shadow-xs">
           <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
             <CheckCircle2 className="w-6 h-6 text-[#128a96]" aria-hidden="true" />
             <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
@@ -211,7 +222,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
         </div>
 
         {/* Section: Delayed Medication Reactions */}
-        <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-6 sm:p-8 space-y-4 shadow-xs">
+        <div id="section-delayed-reactions" className="bg-amber-50/70 border border-amber-200 rounded-xl p-6 sm:p-8 space-y-4 shadow-xs">
           <div className="flex items-center gap-2 border-b border-amber-200 pb-3">
             <AlertTriangle className="w-6 h-6 text-amber-700" aria-hidden="true" />
             <h3 className="text-xl font-extrabold text-amber-950 tracking-tight">
@@ -253,7 +264,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
         </div>
 
         {/* Section: Participation Completion & Logout */}
-        <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-6 sm:p-8 space-y-4 shadow-xs">
+        <div id="section-completion" className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-6 sm:p-8 space-y-4 shadow-xs">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center text-white shrink-0 shadow-xs" aria-hidden="true">
               <FileCheck2 className="w-5 h-5" />
@@ -277,7 +288,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
           </p>
 
           <div className="pt-2 flex justify-end">
-            <form action={logout}>
+            <form action={handleFinishAndLogout}>
               <button 
                 type="submit"
                 aria-label={isEs ? "Finalizar y cerrar sesión" : "Finish and logout"}
