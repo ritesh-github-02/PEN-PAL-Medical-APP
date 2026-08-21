@@ -55,10 +55,10 @@ export const questionnaireConfig: QuestionnaireStep[] = [
   {
     id: 'screen2_statistics',
     type: 'statistics',
-    titleEn: 'Most kids who are told they are allergic to penicillin can safely take it.',
-    titleEs: 'La mayoría de los niños a quienes se les dice que son alérgicos a la penicilina pueden tomarla de manera segura.',
-    contentEn: 'Out of 100 kids who are said to have a penicillin allergy, only 5 have a real allergy',
-    contentEs: 'De 100 niños que se dice que tienen alergia a la penicilina, solo 5 tienen una alergia real',
+    titleEn: 'Most kids who are told they are allergic to penicillin (amoxicillin) can safely take it.',
+    titleEs: 'La mayoría de los niños a los que se les dice que son alérgicos a la penicilina (amoxicilina) pueden tomarla de manera segura.',
+    contentEn: 'Out of 100 kids who are said to have a penicillin (amoxicillin) allergy',
+    contentEs: 'De cada 100 niños que se dice que tienen alergia a la penicilina (amoxicilina)',
     audioEn: '/audio/exported/screen2_statistics_en.mp3',
     audioEs: '/audio/exported/screen2_statistics_es.mp3',
     required: true,
@@ -69,15 +69,15 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     id: 'screen3_5_knowledge_test',
     type: 'multiple_choice',
     titleEn: 'What is true about penicillin?',
-    titleEs: '¿Qué es verdad sobre la penicilina?',
+    titleEs: '¿Qué es cierto sobre la penicilina?',
     descriptionEn: 'Test your knowledge!',
-    descriptionEs: '¡Pon a prueba tus conocimientos!',
+    descriptionEs: '¡Ponga a prueba sus conocimientos!',
     audioEn: '/audio/exported/screen3_5_knowledge_test_en.mp3',
     audioEs: '/audio/exported/screen3_5_knowledge_test_es.mp3',
     options: [
-      { value: 'curing_illnesses', labelEn: 'It is the best at curing many illnesses in kids and adults.', labelEs: 'Es la mejor para curar muchas enfermedades en niños y adultos.' },
+      { value: 'curing_illnesses', labelEn: 'It is the best at curing many illnesses in kids and adults.', labelEs: 'Es lo mejor para curar muchas enfermedades en niños y adultos.' },
       { value: 'less_side_effects', labelEn: 'It has less side-effects than other antibiotics.', labelEs: 'Tiene menos efectos secundarios que otros antibióticos.' },
-      { value: 'tastes_bubblegum', labelEn: 'Kids tend to like the way it tastes, like bubblegum!', labelEs: 'A los niños les suele gustar el sabor, ¡como a chicle!' },
+      { value: 'tastes_bubblegum', labelEn: 'Kids tend to like the way it tastes, like bubblegum!', labelEs: '¡A los niños les gusta cómo sabe, como el chicle!' },
       { value: 'cheaper_antibiotics', labelEn: 'It is cheaper than other antibiotics.', labelEs: 'Es más barata que otros antibióticos.' }
     ],
     required: false,
@@ -90,7 +90,7 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     titleEn: 'Talk to the doctor about your child\'s allergy!',
     titleEs: '¡Hable con el médico sobre la alergia de su hijo!',
     contentEn: '• Doctors can check to see if your child\'s reaction was just a side-effect and not an allergy.\n• There is also a simple test that can tell if your child has an allergy.\n    For the test, kids swallow medicine.\n    Sometimes, kids also take medicine through a skin prick.\n\nIf your child can safely take penicillin, they are not allergic.',
-    contentEs: '• Los médicos pueden verificar si la reacción de su hijo fue solo un efecto secundario y no una alergia.\n• También hay una prueba sencilla que puede determinar si su hijo tiene una alergia.\n    Para la prueba, los niños tragan medicina.\n    A veces, los niños también toman medicina a través de un pinchazo en la piel.\n\nSi su hijo puede tomar penicilina de manera segura, no es alérgico.',
+    contentEs: 'Los médicos pueden comprobar si la reacción de su hijo fue solo un efecto secundario y no una alergia.\n\nTambién hay una prueba simple que puede saber si su hijo tiene una alergia.\n* Para la prueba, los niños tragan medicamentos.\n* A veces, los niños también toman medicamentos a través de un pinchazo en la piel.\n\nSi su hijo puede tomar penicilina de manera segura, no es alérgico.',
     audioEn: '/audio/exported/screen4_testing_en.mp3',
     audioEs: '/audio/exported/screen4_testing_es.mp3',
     required: true,
@@ -101,7 +101,7 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     id: 'screen6_survey_intro',
     type: 'text',
     titleEn: 'The next set of questions can help you and the doctor see what\'s best for your child.',
-    titleEs: 'El siguiente conjunto de preguntas puede ayudarle a usted y al médico a ver qué es lo mejor para su hijo.',
+    titleEs: 'El siguiente conjunto de preguntas puede ayudarlo a usted y al médico a decidir qué es lo mejor para su hijo.',
     audioEn: '/audio/exported/screen6_survey_intro_en.mp3',
     audioEs: '/audio/exported/screen6_survey_intro_es.mp3',
     required: true,
@@ -112,24 +112,24 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     id: 'screen6_1_symptoms',
     type: 'multiple_choice',
     titleEn: 'Select what happened when your child was said to be allergic to penicillin.',
-    titleEs: 'Seleccione lo que sucedió cuando se dijo que su hijo era alérgico a la penicilina.',
+    titleEs: 'Seleccione lo que sucedió cuando se le dijo que su hijo era alérgico a la penicilina.',
     audioEn: '/audio/exported/screen6_1_symptoms_en.mp3',
     audioEs: '/audio/exported/screen6_1_symptoms_es.mp3',
     options: [
       { value: 'Rash', labelEn: 'Rash', labelEs: 'Sarpullido' },
-      { value: 'Swelling', labelEn: 'Swelling', labelEs: 'Hinchazón' },
-      { value: 'Fainting or dizziness', labelEn: 'Fainting or dizziness', labelEs: 'Desmayo o mareo' },
+      { value: 'Swelling', labelEn: 'Swelling', labelEs: 'Inflamación' },
+      { value: 'Fainting or dizziness', labelEn: 'Fainting or dizziness', labelEs: 'Desmayos o mareos' },
       { value: 'Itchiness', labelEn: 'Itchiness', labelEs: 'Picazón' },
-      { value: 'Throat tightness', labelEn: 'Throat tightness', labelEs: 'Estrechez de garganta' },
+      { value: 'Throat tightness', labelEn: 'Throat tightness', labelEs: 'Opresión en la garganta' },
       { value: 'Shortness of breath', labelEn: 'Shortness of breath or hard time breathing', labelEs: 'Falta de aire o dificultad para respirar' },
-      { value: 'Fever', labelEn: 'Fever (new fever or worse fever)', labelEs: 'Fiebre (fiebre nueva o peor)' },
-      { value: 'Belly pain', labelEn: 'Belly pain', labelEs: 'Dolor de barriga' },
+      { value: 'Fever', labelEn: 'Fever (new fever or worse fever)', labelEs: 'Fiebre (aparición de fiebre o empeoramiento de la fiebre)' },
+      { value: 'Belly pain', labelEn: 'Belly pain', labelEs: 'Dolor abdominal' },
       { value: 'Diarrhea', labelEn: 'Diarrhea', labelEs: 'Diarrea' },
-      { value: 'Joint pain', labelEn: 'Joint pain', labelEs: 'Dolor articular' },
-      { value: 'Vomiting', labelEn: 'Wanted to throw up or threw up', labelEs: 'Quería vomitar o vomitó' },
+      { value: 'Joint pain', labelEn: 'Joint pain', labelEs: 'Dolor en articulaciones' },
+      { value: 'Vomiting', labelEn: 'Wanted to throw up or threw up', labelEs: 'Ganas de vomitar o vomitó' },
       { value: 'Muscle aches', labelEn: 'Muscle aches', labelEs: 'Dolores musculares' },
-      { value: 'Other', labelEn: 'Other: Please describe ________', labelEs: 'Otro: Por favor describa ________' },
-      { value: 'Unsure', labelEn: 'Unsure/I don\'t know', labelEs: 'Inseguro/No lo sé' }
+      { value: 'Other', labelEn: 'Other: Please describe ________', labelEs: 'Otro: por favor describa' },
+      { value: 'Unsure', labelEn: 'Unsure/I don\'t know', labelEs: 'No estoy seguro/ No lo sé' }
     ],
     required: true,
     nextStepId: 'screen6_2_timing'
@@ -162,8 +162,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     options: [
       { value: 'Less than 1 hour', labelEn: '<1 hour', labelEs: '<1 hora' },
       { value: '1-24 hours', labelEn: '1-24 hours', labelEs: '1-24 horas' },
-      { value: 'More than 24 hours', labelEn: '24+ hours', labelEs: '24+ horas' },
-      { value: 'Unsure', labelEn: 'Unsure/I don\'t know', labelEs: 'Inseguro/No lo sé' }
+      { value: 'More than 24 hours', labelEn: '24+ hours', labelEs: 'Más de 24 horas' },
+      { value: 'Unsure', labelEn: 'Unsure/I don\'t know', labelEs: 'No estoy seguro/ No lo sé' }
     ],
     required: true,
     nextStepId: 'screen6_4_resolution'
@@ -172,15 +172,30 @@ export const questionnaireConfig: QuestionnaireStep[] = [
   {
     id: 'screen6_4_resolution',
     type: 'single_choice',
-    titleEn: 'How did your child\'s reaction go away?',
-    titleEs: '¿Cómo desapareció la reacción de su hijo?',
+    titleEn: 'Did your child receive medical care for their reaction?',
+    titleEs: '¿Su hijo recibió atención médica por su reacción?',
     audioEn: '/audio/exported/screen6_4_resolution_en.mp3',
     audioEs: '/audio/exported/screen6_4_resolution_es.mp3',
     options: [
+      { value: 'Yes', labelEn: 'Yes', labelEs: 'Sí' },
+      { value: 'No', labelEn: 'No', labelEs: 'No' },
+      { value: 'Unsure', labelEn: 'Unsure/I don\'t know', labelEs: 'No estoy seguro/ No lo sé' }
+    ],
+    required: true,
+    nextStepId: 'screen6_4b_resolution_type'
+  },
+  // Screen 6.4b: Reaction Resolution Type
+  {
+    id: 'screen6_4b_resolution_type',
+    type: 'single_choice',
+    titleEn: 'How did your child\'s reaction go away?',
+    titleEs: '¿Cómo desapareció la reacción de su hijo?',
+    audioEn: '/audio/exported/screen6_4b_resolution_type_en.mp3',
+    audioEs: '/audio/exported/screen6_4b_resolution_type_es.mp3',
+    options: [
       { value: 'With medication', labelEn: 'With medication', labelEs: 'Con medicación' },
-      { value: 'On its own', labelEn: 'On its own', labelEs: 'Por sí solo' },
-      { value: 'Over time', labelEn: 'Over time', labelEs: 'Con el tiempo' },
-      { value: 'Unknown', labelEn: 'Unknown', labelEs: 'Desconocido' }
+      { value: 'On its own', labelEn: 'On its own', labelEs: 'Por sí sola' },
+      { value: 'Unsure', labelEn: 'Unsure/I don\'t know', labelEs: 'No estoy seguro/ No lo sé' }
     ],
     required: true,
     nextStepId: 'screen6_5_yetagain'
@@ -196,7 +211,7 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     options: [
       { value: 'Yes', labelEn: 'Yes', labelEs: 'Sí' },
       { value: 'No', labelEn: 'No', labelEs: 'No' },
-      { value: 'Unsure', labelEn: 'Unsure/Don\'t know', labelEs: 'Inseguro/No lo sé' }
+      { value: 'Unsure', labelEn: 'Unsure/I don\'t know', labelEs: 'No estoy seguro/ No lo sé' }
     ],
     required: true,
     nextStepId: 'screen7_summary'
