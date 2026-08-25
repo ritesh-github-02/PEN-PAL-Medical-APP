@@ -220,6 +220,7 @@ export default function InterventionEntryPage() {
           {/* Instant Passwordless Access Button */}
           <a
             href={`/join?arm=intervention&locale=${locale}`}
+            onClick={() => setLoading(true)}
             className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
           >
             ⚡ Instant Study Access (One-Click)

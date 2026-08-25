@@ -72,23 +72,32 @@ interface BaseScreenProps {
 export default function PenpalIntervention() {
   const t = useTranslations("Intervention");
   const params = useParams();
-  const locale = (params.locale as string) || "en";
+  const initialLocale = (params.locale as string) || "en";
+  const [currentLocale, setCurrentLocale] = useState<string>(initialLocale);
 
   const handleLanguageSwitch = (targetLocale: string) => {
-    if (targetLocale === locale) return;
-    let currentPath = window.location.pathname;
-    // Strip existing /en or /es prefix to prevent double-prefixing like /en/en/
-    currentPath = currentPath.replace(/^\/(en|es)(\/|$)/, "/");
-    if (!currentPath.startsWith("/")) {
-      currentPath = "/" + currentPath;
+    if (targetLocale === currentLocale) return;
+    setCurrentLocale(targetLocale);
+    try {
+      if (typeof window !== "undefined") {
+        let currentPath = window.location.pathname;
+        currentPath = currentPath.replace(/^\/(en|es)(\/|$)/, "/");
+        if (!currentPath.startsWith("/")) {
+          currentPath = "/" + currentPath;
+        }
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set("step", String(currentStepIndex));
+        if (showSummary) {
+          searchParams.set("report", "true");
+        }
+        window.history.replaceState(null, "", `/${targetLocale}${currentPath}?${searchParams.toString()}`);
+      }
+    } catch (e) {
+      console.warn("URL update warning:", e);
     }
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("step", String(currentStepIndex));
-    if (showSummary) {
-      searchParams.set("report", "true");
-    }
-    window.location.href = `/${targetLocale}${currentPath}?${searchParams.toString()}`;
   };
+
+  const locale = currentLocale;
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -468,7 +477,7 @@ export default function PenpalIntervention() {
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
-      <div className={`w-full ${locale === "es" ? "max-w-6xl" : "max-w-3xl"} relative z-10 my-0 space-y-1.5 py-0 transition-all duration-300`}>
+      <div className="w-full max-w-3xl relative z-10 my-0 space-y-1.5 py-0 transition-all duration-300">
         {/* Header Bar with Logo and Language Selector */}
         <header className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
           <div className="flex items-center gap-2 flex-wrap">
@@ -494,231 +503,7 @@ export default function PenpalIntervention() {
           <LanguageSwitcher locale={locale} onSwitch={handleLanguageSwitch} />
         </header>
 
-        <div className={`flex flex-col ${locale === "es" ? "lg:flex-row items-start" : ""} gap-3`}>
-          {/* Spanish Translation Text Box on LEFT side for screen1_intro */}
-          {locale === "es" && currentStep.id === "screen1_intro" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold text-sm">PEN-PAL</p>
-              <p className="leading-snug text-slate-800 font-medium">Padres Involucrados en Alergias a la Penicilina</p>
-              <div className="space-y-1.5 pt-1 text-slate-800">
-                <p>Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños.</p>
-                <p className="font-semibold pt-1">¿Quieres saber más?</p>
-              </div>
-              <div className="space-y-1 pt-2 font-bold text-slate-900">
-                <p>Sí</p>
-                <p>No</p>
-              </div>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen2_statistics */}
-          {locale === "es" && (currentStep.id === "screen2_statistics" || currentStep.type === "statistics") && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-normal">
-                La mayoría de los niños a los que se les dice que son alérgicos a la penicilina (amoxicilina) pueden tomarla de manera segura.
-              </p>
-              <p className="leading-snug text-slate-900 font-normal">
-                De cada 100 niños que se dice que tienen alergia a la penicilina (amoxicilina)
-              </p>
-              <p className="leading-snug text-slate-900 font-normal">
-                solo <span className="font-bold">{answers[currentStep.id] !== undefined ? answers[currentStep.id] : 5}</span> tienen una alergia real
-              </p>
-              <p className="leading-snug text-slate-900 font-bold pt-2">
-                Siguiente
-              </p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen3_5_knowledge_test */}
-          {locale === "es" && currentStep.id === "screen3_5_knowledge_test" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold text-sm">¿Qué es cierto sobre la penicilina?</p>
-              <p className="leading-snug text-slate-800 font-medium">¡Ponga a prueba sus conocimientos!</p>
-              <div className="space-y-2 pt-1 text-slate-800">
-                <p>1- Es lo mejor para curar muchas enfermedades en niños y adultos.</p>
-                <p>2- Tiene menos efectos secundarios que otros antibióticos.</p>
-                <p>3- ¡A los niños les gusta cómo sabe, como el chicle!</p>
-                <p>4- Es más barata que otros antibióticos.</p>
-              </div>
-              <p className="leading-snug text-slate-900 font-bold pt-2">Siguiente</p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen4_testing */}
-          {locale === "es" && (currentStep.id === "screen4_testing" || currentStep.type === "testing_info") && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold text-sm">
-                ¡Hable con el médico sobre la alergia de su hijo!
-              </p>
-              <div className="space-y-2 text-slate-800 leading-snug">
-                <p>Los médicos pueden comprobar si la reacción de su hijo fue solo un efecto secundario y no una alergia.</p>
-                <p>También hay una prueba simple que puede saber si su hijo tiene una alergia.</p>
-                <p>• Para la prueba, los niños tragan medicamentos.</p>
-                <p>• A veces, los niños también toman medicamentos a través de un pinchazo en la piel.</p>
-                <p className="font-bold">Si su hijo puede tomar penicilina de manera segura, no es alérgico.</p>
-              </div>
-              <p className="leading-snug text-slate-900 font-bold pt-2">Siguiente</p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen6_survey_intro */}
-          {locale === "es" && currentStep.id === "screen6_survey_intro" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold">
-                El siguiente conjunto de preguntas puede ayudarlo a usted y al médico a decidir qué es lo mejor para su hijo.
-              </p>
-              <p className="leading-snug text-slate-900 font-bold pt-3">
-                Siguiente
-              </p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen6_1_symptoms */}
-          {locale === "es" && currentStep.id === "screen6_1_symptoms" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-2 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold">
-                Seleccione lo que sucedió cuando se le dijo que su hijo era alérgico a la penicilina.
-              </p>
-              <div className="space-y-1 pt-1 font-normal text-slate-800">
-                <p>Sarpullido</p>
-                <p>Inflamación</p>
-                <p>Desmayos o mareos</p>
-                <p>Picazón</p>
-                <p>Opresión en la garganta</p>
-                <p>Falta de aire o dificultad para respirar</p>
-                <p>Fiebre (aparición de fiebre o empeoramiento de la fiebre)</p>
-                <p>Dolor abdominal</p>
-                <p>Diarrea</p>
-                <p>Dolor en articulaciones</p>
-                <p>Ganas de vomitar o vomitó</p>
-                <p>Dolores musculares</p>
-                <p>Otro: por favor describa</p>
-                <p>No estoy seguro/ No lo sé</p>
-              </div>
-              <p className="leading-snug text-slate-900 font-bold pt-2">
-                Siguiente
-              </p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen6_2_timing */}
-          {locale === "es" && currentStep.id === "screen6_2_timing" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold">
-                ¿Qué edad tenía su hijo cuando ocurrió la reacción?
-              </p>
-              <p className="leading-snug text-slate-800 font-normal">
-                ¿A qué edad tuvo su hijo la reacción a la penicilina (amoxicilina)?
-              </p>
-              <div className="space-y-1.5 pt-1 font-normal text-slate-800">
-                <p>&lt;1 año</p>
-                <p>1 año</p>
-                <p>10 años</p>
-                <p>20 años</p>
-                <p>26 años</p>
-              </div>
-              <p className="leading-snug text-slate-900 font-bold pt-3">
-                Siguiente
-              </p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen6_3_onset */}
-          {locale === "es" && currentStep.id === "screen6_3_onset" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold">
-                ¿Cuándo comenzaron los síntomas de su hijo después de tomar penicilina?
-              </p>
-              <div className="space-y-1.5 pt-1 font-normal text-slate-800">
-                <p>&lt;1 hora</p>
-                <p>1-24 horas</p>
-                <p>Más de 24 horas</p>
-                <p>No estoy seguro/ No lo sé</p>
-              </div>
-              <p className="leading-snug text-slate-900 font-bold pt-3">
-                Siguiente
-              </p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen6_4_resolution */}
-          {locale === "es" && currentStep.id === "screen6_4_resolution" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold">
-                ¿Su hijo recibió atención médica por su reacción?
-              </p>
-              <div className="space-y-1.5 pt-1 font-normal text-slate-800">
-                <p>Sí</p>
-                <p>No</p>
-                <p>No estoy seguro/ No lo sé</p>
-              </div>
-              <p className="leading-snug text-slate-900 font-bold pt-3">
-                Siguiente
-              </p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen6_4b_resolution_type */}
-          {locale === "es" && currentStep.id === "screen6_4b_resolution_type" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold">
-                ¿Cómo desapareció la reacción de su hijo?
-              </p>
-              <div className="space-y-1.5 pt-1 font-normal text-slate-800">
-                <p>Con medicación</p>
-                <p>Por sí sola</p>
-                <p>No estoy seguro/ No lo sé</p>
-              </div>
-              <p className="leading-snug text-slate-900 font-bold pt-3">
-                Siguiente
-              </p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen6_5_yetagain */}
-          {locale === "es" && currentStep.id === "screen6_5_yetagain" && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold">
-                ¿Su hijo ha recibido penicilina desde la reacción?
-              </p>
-              <div className="space-y-1.5 pt-1 font-normal text-slate-800">
-                <p>Sí</p>
-                <p>No</p>
-                <p>No estoy seguro/ No lo sé</p>
-              </div>
-              <p className="leading-snug text-slate-900 font-bold pt-3">
-                Siguiente
-              </p>
-            </div>
-          )}
-
-          {/* Spanish Translation Text Box on LEFT side for screen7_summary */}
-          {locale === "es" && (currentStep.id === "screen7_summary" || currentStep.type === "summary") && (
-            <div className="w-full lg:w-[22rem] xl:w-[24rem] p-4 bg-white border border-slate-300 rounded-2xl shadow-sm text-slate-800 space-y-3 font-sans text-xs sm:text-xs text-left shrink-0">
-              <p className="leading-snug text-slate-900 font-bold">
-                Pasos a seguir de los padres
-              </p>
-              <div className="space-y-2 pt-1 font-normal text-slate-800 leading-snug">
-                <p className="font-bold">
-                  1. Hable con el médico de su hijo sobre la alergia en su próxima visita.
-                </p>
-                <p className="italic text-slate-700">
-                  Esto es lo que puede decir: &quot;Leí sobre las alergias a la penicilina en los niños. ¿Podríamos hablar sobre verificar si mi hijo realmente tiene una alergia?&quot;
-                </p>
-                <p className="font-bold">
-                  2. Comparta imágenes de la reacción de su hijo con el médico.
-                </p>
-                <p className="font-bold">
-                  3. Entregue la siguiente tabla al médico de su hijo. Esto dice lo que sucedió cuando su hijo tomó penicilina.
-                </p>
-              </div>
-              <div className="space-y-1 pt-3 font-bold text-slate-900">
-                <p>Imprimir</p>
-                <p>Guardar</p>
-              </div>
-            </div>
-          )}
-
+        <div className="w-full">
           {/* Compact Tablet / iPad Device Frame */}
           <div className="flex-1 w-full bg-zinc-900 border-[6px] sm:border-[10px] border-zinc-900 rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl relative p-0.5 ring-1 ring-white/10 overflow-hidden">
             <div className="rounded-[1.2rem] sm:rounded-[1.6rem] overflow-hidden">
@@ -817,12 +602,9 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t, locale }: O
 // ============ Screen Components ============
 
 function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale }: BaseScreenProps & { onAnswer: (val: string) => void }) {
-  const isSpanishMode = locale === "es";
-  const introSubtitle = isSpanishMode ? "Parents Engaged in Penicillin Allergies" : (description || "Parents Engaged in Penicillin Allergies");
-  const mainContent = isSpanishMode ? "This is nurse Anna. Anna is giving information about allergies to penicillin in kids." : (content ? content.split('\n\n')[0] : "This is nurse Anna. Anna is giving information about allergies to penicillin in kids.");
-  const questionPrompt = isSpanishMode ? "Do you want to know more?" : (content && content.split('\n\n')[1] ? content.split('\n\n')[1] : "Do you want to know more?");
-  const yesLabel = isSpanishMode ? "Yes" : t("yes");
-  const noLabel = isSpanishMode ? "No" : t("no");
+  const introSubtitle = description || (locale === "es" ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
+  const mainContent = content ? content.split('\n\n')[0] : (locale === "es" ? "Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños." : "This is nurse Anna. Anna is giving information about allergies to penicillin in kids.");
+  const questionPrompt = content && content.split('\n\n')[1] ? content.split('\n\n')[1] : (locale === "es" ? "¿Quieres saber más?" : "Do you want to know more?");
 
   return (
     <div className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
@@ -877,7 +659,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   );
 }
 
-function StatisticsScreen({ title, content, titleEn, contentEn, value, onNext, onBack, onSelect, loading, t, locale, isFirstStep }: BaseScreenProps & { value: any; onSelect: (val: number) => void }) {
+function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loading, t, locale, isFirstStep }: BaseScreenProps & { value: any; onSelect: (val: number) => void }) {
   const [allergicCount, setAllergicCount] = useState<number>(value !== undefined ? Number(value) : 5);
   const totalKids = 100;
 
@@ -896,15 +678,15 @@ function StatisticsScreen({ title, content, titleEn, contentEn, value, onNext, o
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-2xl p-2.5 sm:p-4 shadow-lg relative overflow-hidden">
       <div className="text-center space-y-0.5 mb-1.5">
         <h2 className="text-sm sm:text-base md:text-lg font-extrabold text-[#2d221b] max-w-xl mx-auto tracking-tight leading-snug">
-          {locale === "es" ? (titleEn || title) : title}
+          {title}
         </h2>
         <p className="text-[11px] sm:text-xs font-bold text-[#2d221b] max-w-lg mx-auto">
-          {locale === "es" ? (contentEn || content) : content}
+          {content}
         </p>
       </div>
 
       <div className="mb-1.5 text-center">
-        {/* 100 Kids Icon Grid (5 rows x 20 cols) */}
+        {/* 100 Kids Icon Grid */}
         <div 
           role="region"
           aria-label={locale === "es" ? "Gráfico visual interactivo de 100 niños" : "Interactive visual grid of 100 children"}
@@ -934,7 +716,7 @@ function StatisticsScreen({ title, content, titleEn, contentEn, value, onNext, o
 
         <div className="flex justify-end max-w-xl mx-auto pr-2" aria-live="polite">
           <p className="text-[11px] sm:text-xs font-bold text-[#2d221b]">
-            only <span className="text-xs sm:text-sm font-black text-[#2d221b] mx-0.5">{allergicCount}</span> have a real allergy
+            {locale === "es" ? "solo" : "only"} <span className="text-xs sm:text-sm font-black text-[#2d221b] mx-0.5">{allergicCount}</span> {locale === "es" ? "tienen una alergia real" : "have a real allergy"}
           </p>
         </div>
       </div>
@@ -948,7 +730,7 @@ function StatisticsScreen({ title, content, titleEn, contentEn, value, onNext, o
           aria-label={locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-6 py-1 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
-          {loading ? "..." : (locale === "es" ? "Next" : t("next"))}
+          {loading ? "..." : t("next")}
         </button>
       </div>
     </div>
@@ -1004,23 +786,20 @@ const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: bool
 
 
 function TestingScreen(props: BaseScreenProps) {
-  const displayTitle = props.locale === "es" ? (props.titleEn || props.title) : props.title;
-  const displayContent = props.locale === "es" ? (props.contentEn || props.content) : props.content;
-
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
       <div className="space-y-3 max-w-xl pb-2">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{displayTitle}</h2>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{props.title}</h2>
         <div className="text-[#2d221b] leading-relaxed space-y-2 whitespace-pre-line text-xs sm:text-sm font-medium">
-          {displayContent}
+          {props.content}
         </div>
       </div>
 
-      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      {/* Nurse Anna Illustration */}
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
-          alt="Nurse Anna providing allergy testing information"
+          alt="Nurse Anna"
           className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
         />
       </div>
@@ -1034,7 +813,7 @@ function TestingScreen(props: BaseScreenProps) {
           aria-label={props.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
-          {props.loading ? "..." : (props.locale === "es" ? "Next" : props.t("next"))}
+          {props.loading ? "..." : props.t("next")}
         </button>
       </div>
     </div>
@@ -1069,29 +848,24 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
   };
 
   const isKnowledgeTest = options[0]?.value?.startsWith("curing_");
-  const isSymptomsStep = options[0]?.value === "Rash";
-  const useEnglishInTablet = navProps.locale === "es" && (isKnowledgeTest || isSymptomsStep);
-
-  const displayDescription = useEnglishInTablet ? (navProps.descriptionEn || navProps.description) : navProps.description;
-  const displayTitle = useEnglishInTablet ? (navProps.titleEn || title) : title;
 
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden">
-      <div className="space-y-3 max-w-xl pb-2" role="group" aria-label={displayTitle}>
+      <div className="space-y-3 max-w-xl pb-2" role="group" aria-label={title}>
         <div>
-          {displayDescription && (
-            <p className="text-sm sm:text-base font-semibold text-[#2d221b] mb-0.5">{displayDescription}</p>
+          {navProps.description && (
+            <p className="text-sm sm:text-base font-semibold text-[#2d221b] mb-0.5">{navProps.description}</p>
           )}
-          <h2 className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug">{displayTitle}</h2>
+          <h2 className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
         </div>
 
-        {/* If Pill Style (e.g. Symptoms in Image 1) */}
+        {/* If Pill Style */}
         {!isKnowledgeTest ? (
-          <div className="bg-[#8caeab] p-3.5 sm:p-4 rounded-2xl shadow-inner max-w-xl" role="group" aria-label={displayTitle}>
+          <div className="bg-[#8caeab] p-3.5 sm:p-4 rounded-2xl shadow-inner max-w-xl" role="group" aria-label={title}>
             <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {options.map((opt: any) => {
                 const isSelected = selected?.includes(opt.value);
-                const label = useEnglishInTablet ? opt.labelEn : (navProps.locale === "es" ? opt.labelEs : opt.labelEn);
+                const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
                 return (
                   <button
                     type="button"
@@ -1121,10 +895,10 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
           </div>
         ) : (
           /* Toggle Switch Style (Knowledge Test) */
-          <div className="space-y-2.5 pt-1" role="group" aria-label={displayTitle}>
+          <div className="space-y-2.5 pt-1" role="group" aria-label={title}>
             {options.map((opt: any, idx: number) => {
               const isSelected = selected?.includes(opt.value);
-              const label = (navProps.locale === "es" && isKnowledgeTest) ? opt.labelEn : (navProps.locale === "es" ? opt.labelEs : opt.labelEn);
+              const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
               return (
                 <div
                   key={opt.value}
@@ -1161,7 +935,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
         )}
       </div>
 
-      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      {/* Nurse Anna Illustration */}
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
@@ -1179,7 +953,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
           aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
-          {navProps.loading ? "..." : (navProps.locale === "es" && isKnowledgeTest ? "Next" : navProps.t("next"))}
+          {navProps.loading ? "..." : navProps.t("next")}
         </button>
       </div>
     </div>
@@ -1187,26 +961,22 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 }
 
 function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string; onSelect: (val: string) => void }) {
-  const useEnglishInTablet = navProps.locale === "es";
-  const displayTitle = useEnglishInTablet ? (navProps.titleEn || title) : title;
-  const displayDescription = useEnglishInTablet ? (navProps.descriptionEn || navProps.description) : navProps.description;
-
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-xl pb-2">
         <div>
-          {displayDescription && (
-            <p className="text-base sm:text-lg font-semibold text-[#2d221b] mb-1">{displayDescription}</p>
+          {navProps.description && (
+            <p className="text-base sm:text-lg font-semibold text-[#2d221b] mb-1">{navProps.description}</p>
           )}
-          <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{displayTitle}</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
         </div>
 
-        {/* Teal Container Card with White Pill Buttons (Image 5) */}
-        <div className="bg-[#8caeab] p-6 rounded-3xl shadow-inner max-w-xl" role="radiogroup" aria-label={displayTitle}>
+        {/* Teal Container Card with White Pill Buttons */}
+        <div className="bg-[#8caeab] p-6 rounded-3xl shadow-inner max-w-xl" role="radiogroup" aria-label={title}>
           <div className="flex flex-wrap gap-3">
             {options.map((opt: any) => {
               const isSelected = selected === opt.value;
-              const label = useEnglishInTablet ? opt.labelEn : (navProps.locale === "es" ? opt.labelEs : opt.labelEn);
+              const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
               return (
                 <button
                   type="button"
@@ -1236,7 +1006,7 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
         </div>
       </div>
 
-      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      {/* Nurse Anna Illustration */}
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
@@ -1254,7 +1024,7 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
           aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
-          {navProps.loading ? "..." : (navProps.locale === "es" ? "Next" : navProps.t("next"))}
+          {navProps.loading ? "..." : navProps.t("next")}
         </button>
       </div>
     </div>
@@ -1266,19 +1036,18 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
   const maxVal = max || 26;
   const value = selected || 9;
 
-  const displayTitle = navProps.locale === "es" ? (navProps.titleEn || "How old was your child when the reaction happened?") : title;
-  const displayDescription = navProps.locale === "es" ? (navProps.descriptionEn || "At what age did your child have the reaction to penicillin (amoxicillin)?") : (navProps.description || "At what age did your child have the reaction to penicillin (amoxicillin)?");
-
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-xl pb-2">
-        <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{displayTitle}</h2>
+        <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
 
         {/* Teal Container Card */}
         <div className="bg-[#8caeab] p-6 rounded-3xl text-[#132c27] shadow-inner relative space-y-6 max-w-xl">
-          <p className="text-sm sm:text-base font-semibold text-[#132c27] leading-snug">
-            {displayDescription}
-          </p>
+          {navProps.description && (
+            <p className="text-sm sm:text-base font-semibold text-[#132c27] leading-snug">
+              {navProps.description}
+            </p>
+          )}
 
           {/* Slider with Yellow Badge Indicator */}
           <div className="relative pt-8 pb-4 px-2">
@@ -1305,37 +1074,22 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
               aria-valuetext={navProps.locale === "es" ? `${value} ${unit || "años de edad"}` : `${value} ${unit || "years old"}`}
               aria-label={title || "Age of penicillin reaction"}
               onChange={(e) => onSelect(Number(e.target.value))}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                  onSelect(Math.min(maxVal, value + 1));
-                } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                  onSelect(Math.max(minVal, value - 1));
-                } else if (e.key === "PageUp") {
-                  onSelect(Math.min(maxVal, value + 5));
-                } else if (e.key === "PageDown") {
-                  onSelect(Math.max(minVal, value - 5));
-                } else if (e.key === "Home") {
-                  onSelect(minVal);
-                } else if (e.key === "End") {
-                  onSelect(maxVal);
-                }
-              }}
               className="w-full h-2 bg-[#234b50] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
             />
 
             {/* Timeline Tick Labels */}
             <div className="flex justify-between mt-3 text-[11px] font-bold text-[#132c27]" aria-hidden="true">
-              <span>&lt;1<br/>{navProps.locale === "es" ? "year old" : "year old"}</span>
-              <span>1<br/>{navProps.locale === "es" ? "year old" : "year old"}</span>
-              <span>10<br/>{navProps.locale === "es" ? "year old" : "year old"}</span>
-              <span>20<br/>{navProps.locale === "es" ? "year old" : "year old"}</span>
-              <span>26<br/>{navProps.locale === "es" ? "year-old" : "year-old"}</span>
+              <span>&lt;1<br/>{navProps.locale === "es" ? "año" : "year old"}</span>
+              <span>1<br/>{navProps.locale === "es" ? "año" : "year old"}</span>
+              <span>10<br/>{navProps.locale === "es" ? "años" : "years old"}</span>
+              <span>20<br/>{navProps.locale === "es" ? "años" : "years old"}</span>
+              <span>26<br/>{navProps.locale === "es" ? "años" : "years old"}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      {/* Nurse Anna Illustration */}
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
@@ -1353,7 +1107,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
           aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
-          {navProps.loading ? "..." : (navProps.locale === "es" ? "Next" : navProps.t("next"))}
+          {navProps.loading ? "..." : navProps.t("next")}
         </button>
       </div>
     </div>
@@ -1361,21 +1115,18 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 }
 
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
-  const displayTitle = navProps.locale === "es" ? (navProps.titleEn || title) : title;
-  const displayDescription = navProps.locale === "es" ? (navProps.descriptionEn || description) : description;
-
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-xl pb-2 text-center md:text-left min-h-[12rem]">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2d221b] max-w-xl tracking-tight leading-relaxed">
-          {displayTitle}
+          {title}
         </h2>
-        {displayDescription && (
-          <p className="text-sm sm:text-base font-medium text-[#2d221b] max-w-xl">{displayDescription}</p>
+        {description && (
+          <p className="text-sm sm:text-base font-medium text-[#2d221b] max-w-xl">{description}</p>
         )}
       </div>
 
-      {/* Nurse Anna Illustration - Absolute Bottom Right */}
+      {/* Nurse Anna Illustration */}
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
@@ -1393,7 +1144,7 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
           aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
         >
-          {navProps.loading ? "..." : (navProps.locale === "es" ? "Next" : navProps.t("next"))}
+          {navProps.loading ? "..." : navProps.t("next")}
         </button>
       </div>
     </div>
