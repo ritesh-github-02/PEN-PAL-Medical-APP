@@ -39,7 +39,13 @@
     "allergyFew": "only {count, plural, one {# child has a real allergy} other {# children have a real allergy}}",
     "yes": "Yes",
     "no": "No",
-    "continue": "Continue"
+    "continue": "Continue",
+    "assessmentReport": "Assessment Report",
+    "completeSaved": "Complete & Saved",
+    "patientAllergyAssessment": "Patient Allergy Assessment",
+    "clinicalGuidance": "Clinical Guidance",
+    "notSpecified": "Not Specified",
+    "noneReported": "None reported"
   },
   "Common": {
     "loading": "Loading...",

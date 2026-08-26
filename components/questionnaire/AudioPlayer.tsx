@@ -160,7 +160,8 @@ export default function AudioPlayer({
           <button
             type="button"
             onClick={togglePlayPause}
-            className="relative w-14 h-14 flex items-center justify-center bg-zinc-900 text-white rounded-full shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            aria-pressed={isPlaying}
+            className="relative w-14 h-14 flex items-center justify-center bg-zinc-900 text-white rounded-full shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
             aria-label={
               isPlaying 
                 ? (locale === 'es' ? 'Pausar audio grabado' : 'Pause recorded audio') 
@@ -210,6 +211,13 @@ export default function AudioPlayer({
             {formatTime(progress)} / {formatTime(duration)}
           </div>
         )}
+
+        {/* Dynamic Live Status Announcement for Screen Readers */}
+        <div role="status" aria-live="polite" className="sr-only">
+          {isPlaying
+            ? (locale === 'es' ? 'Reproduciendo audio de la enfermera Anna' : 'Playing Nurse Anna audio narration')
+            : (locale === 'es' ? 'Audio en pausa' : 'Audio narration paused')}
+        </div>
       </div>
     </>
   );

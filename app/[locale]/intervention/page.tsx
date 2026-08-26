@@ -19,7 +19,7 @@ export default function InterventionEntryPage() {
   const locale = (params.locale as string) || 'en';
 
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(Boolean(token));
   const [requestStatus, setRequestStatus] = useState<{ message: string; token: string } | null>(null);
   const [mode, setMode] = useState<'login' | 'register'>('login');
 
@@ -94,24 +94,24 @@ export default function InterventionEntryPage() {
               !
             </div>
             <div className="space-y-1.5">
-              <h1 className="text-lg font-bold text-slate-900">Access Link Issue</h1>
+              <h1 className="text-lg font-bold text-slate-900">{locale === 'es' ? 'Problema con el enlace de acceso' : 'Access Link Issue'}</h1>
               <p className="text-slate-700 text-xs font-medium leading-relaxed">{error}</p>
             </div>
 
             {/* Support Contacts Card */}
             <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-left space-y-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">
-                Study Support Contacts
+                {locale === 'es' ? 'Contactos de soporte del estudio' : 'Study Support Contacts'}
               </span>
               <div className="space-y-1 text-xs text-slate-800 font-medium">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Support Email:</span>
+                  <span className="text-slate-600">{locale === 'es' ? 'Correo de soporte:' : 'Support Email:'}</span>
                   <a href="mailto:support@pen-pal-study.org" className="text-[#1d5c64] font-bold hover:underline">
                     support@pen-pal-study.org
                   </a>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Support Phone:</span>
+                  <span className="text-slate-600">{locale === 'es' ? 'Teléfono de soporte:' : 'Support Phone:'}</span>
                   <a href="tel:18005550199" className="text-[#1d5c64] font-bold hover:underline">
                     +1 (800) 555-0199
                   </a>
@@ -124,14 +124,16 @@ export default function InterventionEntryPage() {
               onClick={() => { setError(null); setRequestStatus(null); }}
               className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.98] cursor-pointer"
             >
-              Try Scanning QR Code Again
+              {locale === 'es' ? 'Intentar escanear código QR nuevamente' : 'Try Scanning QR Code Again'}
             </button>
           </div>
         </div>
         
         <div className="w-full max-w-xs text-center">
           <p className="text-[9px] text-slate-600 leading-normal font-normal">
-            Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.
+            {locale === 'es'
+              ? 'Aviso de seguridad: Los tokens de acceso a la sesión son privados, están asegurados criptográficamente y tienen límite de intentos.'
+              : 'Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.'}
           </p>
         </div>
       </main>
@@ -148,13 +150,13 @@ export default function InterventionEntryPage() {
               ✓
             </div>
             <div className="space-y-1">
-              <h1 className="text-base font-bold text-slate-900">Token Ready</h1>
+              <h1 className="text-base font-bold text-slate-900">{locale === 'es' ? 'Token listo' : 'Token Ready'}</h1>
               <p className="text-slate-600 text-xs font-medium leading-normal">{requestStatus.message}</p>
             </div>
             
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors select-all cursor-pointer" tabIndex={0} aria-label={`Generated token: ${requestStatus.token}. Click or press to select and copy`}>
                <p className="text-xs font-mono tracking-wider text-slate-900 break-all font-bold">{requestStatus.token}</p>
-               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500 mt-1.5">Click to select and copy</p>
+               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500 mt-1.5">{locale === 'es' ? 'Haga clic para seleccionar y copiar' : 'Click to select and copy'}</p>
             </div>
 
             <div className="space-y-2 pt-1">
@@ -163,7 +165,7 @@ export default function InterventionEntryPage() {
                 onClick={() => handleValidation(requestStatus.token)}
                 className="w-full h-10 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-all shadow-md active:scale-[0.98] cursor-pointer flex justify-center items-center"
               >
-                Use Token & Start
+                {locale === 'es' ? 'Usar token y comenzar' : 'Use Token & Start'}
               </button>
               
               <button 
@@ -171,7 +173,7 @@ export default function InterventionEntryPage() {
                 onClick={() => { setRequestStatus(null); setMode('login'); }}
                 className="block w-full text-center text-[10px] font-bold text-slate-500 hover:text-slate-700 uppercase tracking-widest transition-colors cursor-pointer"
               >
-                Cancel
+                {locale === 'es' ? 'Cancelar' : 'Cancel'}
               </button>
             </div>
           </div>
@@ -179,7 +181,9 @@ export default function InterventionEntryPage() {
 
         <div className="w-full max-w-xs text-center">
           <p className="text-[9px] text-slate-600 leading-normal font-normal">
-            Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.
+            {locale === 'es'
+              ? 'Aviso de seguridad: Los tokens de acceso a la sesión son privados, están asegurados criptográficamente y tienen límite de intentos.'
+              : 'Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.'}
           </p>
         </div>
       </main>
@@ -197,11 +201,11 @@ export default function InterventionEntryPage() {
           </h1>
           <div>
             <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#1d5c64] bg-white/80 border border-slate-200/60 px-3 py-0.5 rounded-full inline-block shadow-sm">
-              Parents Engaged in Penicillin Allergies
+              {locale === 'es' ? 'Padres Involucrados en Alergias a la Penicilina' : 'Parents Engaged in Penicillin Allergies'}
             </span>
           </div>
           <p className="text-xs text-slate-700 max-w-xs mx-auto font-medium">
-            Access the clinical assessment suite securely.
+            {locale === 'es' ? 'Acceda a la suite de evaluación clínica de forma segura.' : 'Access the clinical assessment suite securely.'}
           </p>
         </div>
 
@@ -209,11 +213,13 @@ export default function InterventionEntryPage() {
         <div className="bg-white/90 border border-slate-200/80 rounded-3xl shadow-sm p-6 sm:p-7 w-full text-center space-y-5">
           <div className="space-y-2">
             <span className="text-[9px] font-bold uppercase tracking-widest text-[#1d5c64] bg-[#f4f8e8] border border-slate-200/60 px-3 py-1 rounded-full inline-block">
-              100% Passwordless Access
+              {locale === 'es' ? 'Acceso 100% Sin Contraseña' : '100% Passwordless Access'}
             </span>
-            <h2 className="text-base font-bold text-[#1f2937]">Scan Poster QR or Use Direct Link</h2>
+            <h2 className="text-base font-bold text-[#1f2937]">{locale === 'es' ? 'Escanee el QR del póster o use el enlace directo' : 'Scan Poster QR or Use Direct Link'}</h2>
             <p className="text-xs text-slate-600 font-normal leading-relaxed">
-              Scanning your study poster QR code automatically logs you in. No password or manual ID typing required.
+              {locale === 'es'
+                ? 'Escanear el código QR de su póster de estudio lo conecta automáticamente. No se requiere contraseña ni escribir ID manualmente.'
+                : 'Scanning your study poster QR code automatically logs you in. No password or manual ID typing required.'}
             </p>
           </div>
 
@@ -223,7 +229,7 @@ export default function InterventionEntryPage() {
             onClick={() => setLoading(true)}
             className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
           >
-            ⚡ Instant Study Access (One-Click)
+            {locale === 'es' ? '⚡ Acceso Instantáneo al Estudio (Un Clic)' : '⚡ Instant Study Access (One-Click)'}
           </a>
 
           {/* Optional Pre-assigned token toggle for research staff */}
@@ -250,7 +256,7 @@ export default function InterventionEntryPage() {
                     id="token-input"
                     name="token" 
                     type="text" 
-                    placeholder="Token or Research ID (e.g. PEN-PXOVE2)" 
+                    placeholder={locale === 'es' ? "Token o ID de investigación (ej. PEN-PXOVE2)" : "Token or Research ID (e.g. PEN-PXOVE2)"} 
                     required
                     aria-required="true"
                     className="h-10 w-full px-3.5 border border-slate-300 focus:outline-none focus:border-[#1d5c64] font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl text-xs"
@@ -259,7 +265,7 @@ export default function InterventionEntryPage() {
                     type="submit" 
                     className="h-10 w-full bg-slate-900 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all cursor-pointer"
                   >
-                    Resume Assessment →
+                    {locale === 'es' ? 'Reanudar Evaluación →' : 'Resume Assessment →'}
                   </button>
                 </form>
                 <button
@@ -267,7 +273,7 @@ export default function InterventionEntryPage() {
                   onClick={() => setMode('login')}
                   className="text-[10px] font-bold text-slate-500 hover:text-slate-700 transition-all cursor-pointer uppercase tracking-wider"
                 >
-                  Hide Token Input
+                  {locale === 'es' ? 'Ocultar entrada de token' : 'Hide Token Input'}
                 </button>
               </div>
             )}
@@ -277,7 +283,9 @@ export default function InterventionEntryPage() {
 
       <div className="w-full max-w-xs text-center">
         <p className="text-[9px] text-slate-600 leading-normal font-normal">
-          Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.
+          {locale === 'es'
+            ? 'Aviso de seguridad: Los tokens de acceso a la sesión son privados, están asegurados criptográficamente y tienen límite de intentos.'
+            : 'Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.'}
         </p>
       </div>
     </main>

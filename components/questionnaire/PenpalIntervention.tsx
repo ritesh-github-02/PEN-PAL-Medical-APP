@@ -67,13 +67,19 @@ interface BaseScreenProps {
   t: any;
   isFirstStep: boolean;
   locale?: string;
+  headingRef?: React.RefObject<HTMLHeadingElement | null>;
+  exitHeadingRef?: React.RefObject<HTMLHeadingElement | null>;
 }
 
 export default function PenpalIntervention() {
   const t = useTranslations("Intervention");
   const params = useParams();
+  const router = useRouter();
   const initialLocale = (params.locale as string) || "en";
   const [currentLocale, setCurrentLocale] = useState<string>(initialLocale);
+
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const exitHeadingRef = useRef<HTMLHeadingElement | null>(null);
 
   const handleLanguageSwitch = (targetLocale: string) => {
     if (targetLocale === currentLocale) return;
@@ -90,7 +96,8 @@ export default function PenpalIntervention() {
         if (showSummary) {
           searchParams.set("report", "true");
         }
-        window.history.replaceState(null, "", `/${targetLocale}${currentPath}?${searchParams.toString()}`);
+        const targetUrl = `/${targetLocale}${currentPath}?${searchParams.toString()}`;
+        window.history.replaceState(null, "", targetUrl);
       }
     } catch (e) {
       console.warn("URL update warning:", e);
@@ -110,6 +117,17 @@ export default function PenpalIntervention() {
   const [bindingError, setBindingError] = useState<string | null>(null);
 
   const currentStep = questionnaireConfig[currentStepIndex];
+
+  // Programmatic Focus Reset: Focus slide heading when step or summary changes (WCAG 2.4.3)
+  useEffect(() => {
+    if (initialized) {
+      setTimeout(() => {
+        if (headingRef.current) {
+          headingRef.current.focus();
+        }
+      }, 50);
+    }
+  }, [currentStepIndex, showSummary, initialized]);
 
   useEffect(() => {
     async function init() {
@@ -456,6 +474,8 @@ export default function PenpalIntervention() {
     t,
     isFirstStep: currentStepIndex === 0,
     locale,
+    headingRef,
+    exitHeadingRef,
   };
 
   return (
@@ -484,7 +504,10 @@ export default function PenpalIntervention() {
             <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]" aria-hidden="true"></span>
             <span className="font-black text-xs tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
             <span className="text-slate-300 text-xs" aria-hidden="true">|</span>
-            <span className="text-[11px] font-bold text-slate-700">
+            <span 
+              className="text-[11px] font-bold text-slate-700"
+              aria-label={locale === "es" ? `Progreso: Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}` : `Progress: Step ${currentStepIndex + 1} of ${questionnaireConfig.length}`}
+            >
               {locale === "es"
                 ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}`
                 : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}`}
@@ -492,7 +515,11 @@ export default function PenpalIntervention() {
             {activeToken && (
               <>
                 <span className="text-slate-300 text-xs hidden xs:inline" aria-hidden="true">|</span>
-                <span className="text-[10px] font-bold text-[#1f5c66] bg-[#f4f8e8] border border-[#35727f]/30 px-2.5 py-0.5 rounded-full font-mono flex items-center gap-1 shadow-2xs">
+                <span 
+                  role="region"
+                  aria-label={locale === "es" ? `ID de participante: ${activeToken}` : `Participant ID: ${activeToken}`}
+                  className="text-[10px] font-bold text-[#1f5c66] bg-[#f4f8e8] border border-[#35727f]/30 px-2.5 py-0.5 rounded-full font-mono flex items-center gap-1 shadow-2xs"
+                >
                   <span aria-hidden="true">🔑</span> <span className="text-[9px] uppercase tracking-wider text-slate-600">ID:</span> {activeToken}
                 </span>
               </>
@@ -601,7 +628,7 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t, locale }: O
 
 // ============ Screen Components ============
 
-function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale }: BaseScreenProps & { onAnswer: (val: string) => void }) {
+function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale, headingRef }: BaseScreenProps & { onAnswer: (val: string) => void }) {
   const introSubtitle = description || (locale === "es" ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
   const mainContent = content ? content.split('\n\n')[0] : (locale === "es" ? "Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños." : "This is nurse Anna. Anna is giving information about allergies to penicillin in kids.");
   const questionPrompt = content && content.split('\n\n')[1] ? content.split('\n\n')[1] : (locale === "es" ? "¿Quieres saber más?" : "Do you want to know more?");
@@ -611,7 +638,13 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
       <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
         <div className="flex-1 space-y-4">
           <div className="space-y-1">
-            <h1 className="text-4xl sm:text-5xl font-black text-[#1d5c64] tracking-tight font-display">{title || "PEN–PAL"}</h1>
+            <h1 
+              ref={headingRef}
+              tabIndex={-1}
+              className="text-4xl sm:text-5xl font-black text-[#1d5c64] tracking-tight font-display outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+            >
+              {title || "PEN–PAL"}
+            </h1>
             <p className="text-base sm:text-lg font-bold text-[#1f382f]">{introSubtitle}</p>
           </div>
 
@@ -619,8 +652,8 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
             {mainContent}
           </div>
 
-          <div className="space-y-2.5 pt-1">
-            <p className="text-base sm:text-lg font-bold text-[#1f382f]">{questionPrompt}</p>
+          <fieldset className="border-0 p-0 m-0 space-y-2.5 pt-1">
+            <legend className="text-base sm:text-lg font-bold text-[#1f382f] mb-2">{questionPrompt}</legend>
             <div className="flex gap-3" role="group" aria-label={questionPrompt}>
               <button
                 type="button"
@@ -630,7 +663,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
                 }}
                 disabled={loading}
                 aria-label={locale === "es" ? "Sí, quiero saber más sobre la alergia a la penicilina" : "Yes, I want to learn more about penicillin allergy"}
-                className="px-6 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-xl font-bold text-sm transition shadow-sm active:scale-[0.98] no-print cursor-pointer"
+                className="px-6 py-2.5 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-xl font-bold text-sm transition shadow-sm active:scale-[0.98] no-print cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
               >
                 {loading ? "..." : t("yes")}
               </button>
@@ -638,19 +671,21 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
                 type="button"
                 disabled={loading}
                 aria-label={locale === "es" ? "No, salir o finalizar" : "No, do not continue"}
-                className="px-6 py-2 bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] border border-[#71ad9d] rounded-xl font-bold text-sm transition active:scale-[0.98] no-print cursor-pointer shadow-sm"
+                className="px-6 py-2.5 min-h-[44px] bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] border border-[#71ad9d] rounded-xl font-bold text-sm transition active:scale-[0.98] no-print cursor-pointer shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
               >
                 {t("no")}
               </button>
             </div>
-          </div>
+          </fieldset>
         </div>
 
         {/* Nurse Anna Illustration */}
         <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
           <img
             src="/images/nurse-anna.png"
-            alt="Nurse Anna"
+            alt={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            role="img"
+            aria-label={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
@@ -659,7 +694,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   );
 }
 
-function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loading, t, locale, isFirstStep }: BaseScreenProps & { value: any; onSelect: (val: number) => void }) {
+function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { value: any; onSelect: (val: number) => void }) {
   const [allergicCount, setAllergicCount] = useState<number>(value !== undefined ? Number(value) : 5);
   const totalKids = 100;
 
@@ -677,7 +712,11 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-2xl p-2.5 sm:p-4 shadow-lg relative overflow-hidden">
       <div className="text-center space-y-0.5 mb-1.5">
-        <h2 className="text-sm sm:text-base md:text-lg font-extrabold text-[#2d221b] max-w-xl mx-auto tracking-tight leading-snug">
+        <h2 
+          ref={headingRef}
+          tabIndex={-1}
+          className="text-sm sm:text-base md:text-lg font-extrabold text-[#2d221b] max-w-xl mx-auto tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+        >
           {title}
         </h2>
         <p className="text-[11px] sm:text-xs font-bold text-[#2d221b] max-w-lg mx-auto">
@@ -686,37 +725,44 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
       </div>
 
       <div className="mb-1.5 text-center">
-        {/* 100 Kids Icon Grid */}
+        {/* 100 Kids Infographic Container (WCAG 1.1.1 & 1.4.1) */}
         <div 
           role="region"
-          aria-label={locale === "es" ? "Gráfico visual interactivo de 100 niños" : "Interactive visual grid of 100 children"}
-          className="grid grid-cols-10 sm:grid-cols-20 gap-0.5 sm:gap-0 mb-1 justify-center mx-auto max-w-xl p-1 bg-white/50 rounded-xl border border-slate-200/50"
+          aria-label={
+            locale === "es"
+              ? `Infografía: De 100 niños diagnosticados con alergia a la penicilina, 95 no tienen una alergia real y solo ${allergicCount} tienen una alergia real.`
+              : `Infographic: Out of 100 children diagnosed with penicillin allergy, 95 do not have a real allergy, and only ${allergicCount} have a true allergy.`
+          }
+          className="mx-auto max-w-xl p-1 bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/80 shadow-xs mb-1"
         >
-          {Array(totalKids).fill(0).map((_, i) => {
-            const isAllergic = i >= totalKids - allergicCount;
-            const isGirl = i % 2 === 0;
-            const kidNumber = totalKids - i;
-            return (
-              <button
-                type="button"
-                key={i}
-                onClick={() => handleSelect(kidNumber)}
-                className="focus:outline-none transition-transform hover:scale-125 flex items-center justify-center cursor-pointer p-0.5"
-                aria-label={
-                  locale === "es"
-                    ? `Seleccionar ${kidNumber} niños ${isAllergic ? '(con alergia real)' : '(sin alergia real)'}`
-                    : `Select ${kidNumber} children ${isAllergic ? '(with true allergy)' : '(without true allergy)'}`
-                }
-              >
-                <KidIcon isAllergic={isAllergic} isGirl={isGirl} />
-              </button>
-            );
-          })}
+          {/* Visual Icon Grid (Hidden from Screen Reader Noise, summary read above) */}
+          <div 
+            aria-hidden="true"
+            className="grid grid-cols-10 sm:grid-cols-20 gap-0.5 sm:gap-0 justify-center"
+          >
+            {Array(totalKids).fill(0).map((_, i) => {
+              const isAllergic = i >= totalKids - allergicCount;
+              const isGirl = i % 2 === 0;
+              const kidNumber = totalKids - i;
+              return (
+                <button
+                  type="button"
+                  key={i}
+                  tabIndex={-1}
+                  onClick={() => handleSelect(kidNumber)}
+                  className="focus:outline-none transition-transform hover:scale-125 flex items-center justify-center cursor-pointer p-0.5"
+                >
+                  <KidIcon isAllergic={isAllergic} isGirl={isGirl} />
+                </button>
+              );
+            })}
+          </div>
         </div>
 
+        {/* Color-Blind Safe Bordered Summary Container */}
         <div className="flex justify-end max-w-xl mx-auto pr-2" aria-live="polite">
-          <p className="text-[11px] sm:text-xs font-bold text-[#2d221b]">
-            {locale === "es" ? "solo" : "only"} <span className="text-xs sm:text-sm font-black text-[#2d221b] mx-0.5">{allergicCount}</span> {locale === "es" ? "tienen una alergia real" : "have a real allergy"}
+          <p className="text-[11px] sm:text-xs font-bold text-[#2d221b] bg-amber-50/80 border border-amber-200 px-3 py-1 rounded-lg">
+            {locale === "es" ? "solo" : "only"} <span className="text-xs sm:text-sm font-black text-[#c84a26] mx-0.5">{allergicCount}</span> {locale === "es" ? "tienen una alergia real" : "have a real allergy"}
           </p>
         </div>
       </div>
@@ -728,7 +774,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
           onClick={() => onNext(value !== undefined ? value : allergicCount)}
           disabled={loading}
           aria-label={locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
-          className="px-6 py-1 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer"
+          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {loading ? "..." : t("next")}
         </button>
@@ -768,13 +814,11 @@ const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: bool
       
       {/* Hair */}
       {isGirl ? (
-        /* Girl Hair: Shoulder length with side drapes */
         <path
           d="M 16 5.5 C 10 5.5, 7.5 9.5, 7.5 15 C 7.5 19.5, 9 22, 10.5 22 C 11.5 21, 11 18, 10 16 C 12.5 11.5, 15 10.5, 16.5 10.5 C 18 10.5, 20 11.5, 22 16 C 21 18, 20.5 21, 21.5 22 C 23 22, 24.5 19.5, 24.5 15 C 24.5 9.5, 22 5.5, 16 5.5 Z"
           fill={color}
         />
       ) : (
-        /* Boy Hair: Short hair with side-swept bangs */
         <path
           d="M 16 5.5 C 10.5 5.5, 8 9, 8 13.5 C 10 12.8, 12 11, 14.5 11.8 C 17 10.8, 20.5 10.8, 24 13.5 C 24 9, 21.5 5.5, 16 5.5 Z"
           fill={color}
@@ -786,20 +830,41 @@ const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: bool
 
 
 function TestingScreen(props: BaseScreenProps) {
+  // Parse bullets into semantic HTML list items (WCAG 1.3.1)
+  const rawLines = (props.content || "").split("\n").map(l => l.trim()).filter(Boolean);
+
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
       <div className="space-y-3 max-w-xl pb-2">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{props.title}</h2>
-        <div className="text-[#2d221b] leading-relaxed space-y-2 whitespace-pre-line text-xs sm:text-sm font-medium">
-          {props.content}
-        </div>
+        <h2 
+          ref={props.headingRef}
+          tabIndex={-1}
+          className="text-lg sm:text-xl md:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+        >
+          {props.title}
+        </h2>
+        
+        {/* Semantic HTML List for Screen Readers */}
+        <ul className="space-y-2 text-[#2d221b] text-xs sm:text-sm font-medium leading-relaxed">
+          {rawLines.map((line, idx) => {
+            const cleanLine = line.replace(/^[•*\-\s]+/, "");
+            return (
+              <li key={idx} className="flex items-start gap-2">
+                <span className="text-[#236f7a] font-bold shrink-0 mt-0.5">•</span>
+                <span>{cleanLine}</span>
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
       {/* Nurse Anna Illustration */}
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
-          alt="Nurse Anna"
+          alt={props.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+          role="img"
+          aria-label={props.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
           className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
         />
       </div>
@@ -811,7 +876,7 @@ function TestingScreen(props: BaseScreenProps) {
           onClick={() => props.onNext()}
           disabled={props.loading}
           aria-label={props.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
-          className="px-8 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer"
+          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {props.loading ? "..." : props.t("next")}
         </button>
@@ -825,7 +890,13 @@ function TestimonialScreen(props: BaseScreenProps) {
     <div className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-8 sm:p-12 shadow-lg relative">
       <div className="flex flex-col md:flex-row gap-8 items-start">
         <div className="flex-1 space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1f382f] tracking-tight leading-snug">{props.title}</h2>
+          <h2 
+            ref={props.headingRef}
+            tabIndex={-1}
+            className="text-2xl sm:text-3xl font-extrabold text-[#1f382f] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+          >
+            {props.title}
+          </h2>
           <blockquote className="text-[#1f382f] leading-relaxed space-y-3 whitespace-pre-line text-base font-medium bg-white/70 p-6 rounded-2xl border border-white/80 shadow-sm backdrop-blur-sm italic">
             {props.content}
           </blockquote>
@@ -851,28 +922,69 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden">
-      <div className="space-y-3 max-w-xl pb-2" role="group" aria-label={title}>
-        <div>
-          {navProps.description && (
-            <p className="text-sm sm:text-base font-semibold text-[#2d221b] mb-0.5">{navProps.description}</p>
-          )}
-          <h2 className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
-        </div>
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
+        <fieldset className="border-0 p-0 m-0 space-y-3 flex-1 max-w-xl pb-2">
+          <legend className="sr-only">{title}</legend>
+          <div>
+            {navProps.description && (
+              <p className="text-sm sm:text-base font-semibold text-[#2d221b] mb-0.5">{navProps.description}</p>
+            )}
+            <h2 
+              ref={navProps.headingRef}
+              tabIndex={-1}
+              className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+            >
+              {title}
+            </h2>
+          </div>
 
-        {/* If Pill Style */}
-        {!isKnowledgeTest ? (
-          <div className="bg-[#8caeab] p-3.5 sm:p-4 rounded-2xl shadow-inner max-w-xl" role="group" aria-label={title}>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {options.map((opt: any) => {
+          {/* If Pill Style (Symptoms Multi-Select) */}
+          {!isKnowledgeTest ? (
+            <div className="bg-[#8caeab] p-3.5 sm:p-4.5 rounded-2xl shadow-inner max-w-xl">
+              <div className="flex flex-wrap gap-2.5 sm:gap-3">
+                {options.map((opt: any) => {
+                  const isSelected = selected?.includes(opt.value);
+                  const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
+                  return (
+                    <button
+                      type="button"
+                      key={opt.value}
+                      role="checkbox"
+                      aria-checked={isSelected}
+                      tabIndex={0}
+                      onClick={() => handleToggle(opt.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === " " || e.key === "Enter") {
+                          e.preventDefault();
+                          handleToggle(opt.value);
+                        }
+                      }}
+                      aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : (navProps.locale === "es" ? 'no seleccionado' : 'not selected')}`}
+                      className={`px-3.5 py-2.5 min-h-[44px] inline-flex items-center gap-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs border cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                        isSelected
+                          ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                          : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
+                      }`}
+                    >
+                      {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            /* Toggle Switch Style (Knowledge Test) - WCAG 4.1.2 */
+            <div className="space-y-2.5 pt-1">
+              {options.map((opt: any, idx: number) => {
                 const isSelected = selected?.includes(opt.value);
                 const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
                 return (
                   <button
                     type="button"
                     key={opt.value}
-                    role="checkbox"
+                    role="switch"
                     aria-checked={isSelected}
-                    tabIndex={0}
                     onClick={() => handleToggle(opt.value)}
                     onKeyDown={(e) => {
                       if (e.key === " " || e.key === "Enter") {
@@ -880,68 +992,39 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
                         handleToggle(opt.value);
                       }
                     }}
-                    aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : (navProps.locale === "es" ? 'no seleccionado' : 'not selected')}`}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-2xs border cursor-pointer ${
-                      isSelected
-                        ? "bg-[#1f5c66] text-white border-[#1f5c66] scale-105 shadow-sm"
-                        : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
-                    }`}
+                    aria-label={`${idx + 1}. ${label}, ${isSelected ? (navProps.locale === "es" ? 'verdadero' : 'true/checked') : (navProps.locale === "es" ? 'falso' : 'false/unchecked')}`}
+                    className="w-full text-left flex items-center gap-3 cursor-pointer group select-none focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-xl p-1 min-h-[44px]"
                   >
-                    {label}
+                    <div className="flex flex-col items-center shrink-0 pt-0.5" aria-hidden="true">
+                      <div className={`w-12 h-5 rounded-full p-0.5 transition-colors duration-200 ${isSelected ? 'bg-[#1f5c66]' : 'bg-[#6b808e]'}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white border border-slate-300 shadow-sm transform transition-transform duration-200 ${isSelected ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                      </div>
+                      <div className="flex justify-between w-full px-1 text-[10px] font-extrabold text-[#2d221b] mt-0.5 leading-none">
+                        <span>×</span>
+                        <span>✓</span>
+                      </div>
+                    </div>
+
+                    <span className="text-xs sm:text-sm font-semibold text-[#2d221b] leading-snug">
+                      {idx + 1}. {label}
+                    </span>
                   </button>
                 );
               })}
             </div>
-          </div>
-        ) : (
-          /* Toggle Switch Style (Knowledge Test) */
-          <div className="space-y-2.5 pt-1" role="group" aria-label={title}>
-            {options.map((opt: any, idx: number) => {
-              const isSelected = selected?.includes(opt.value);
-              const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
-              return (
-                <div
-                  key={opt.value}
-                  role="checkbox"
-                  tabIndex={0}
-                  aria-checked={isSelected}
-                  onClick={() => handleToggle(opt.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === " " || e.key === "Enter") {
-                      e.preventDefault();
-                      handleToggle(opt.value);
-                    }
-                  }}
-                  aria-label={`${idx + 1}. ${label}, ${isSelected ? (navProps.locale === "es" ? 'verdadero' : 'true/checked') : (navProps.locale === "es" ? 'falso' : 'false/unchecked')}`}
-                  className="flex items-center gap-3 cursor-pointer group select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] rounded-xl p-1"
-                >
-                  <div className="flex flex-col items-center shrink-0 pt-0.5" aria-hidden="true">
-                    <div className={`w-12 h-5 rounded-full p-0.5 transition-colors duration-200 ${isSelected ? 'bg-[#1f5c66]' : 'bg-[#6b808e]'}`}>
-                      <div className={`w-4 h-4 rounded-full bg-white border border-slate-300 shadow-sm transform transition-transform duration-200 ${isSelected ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                    </div>
-                    <div className="flex justify-between w-full px-1 text-[10px] font-extrabold text-[#2d221b] mt-0.5 leading-none">
-                      <span>×</span>
-                      <span>✓</span>
-                    </div>
-                  </div>
+          )}
+        </fieldset>
 
-                  <span className="text-xs sm:text-sm font-semibold text-[#2d221b] leading-snug">
-                    {idx + 1}. {label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Nurse Anna Illustration */}
-      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
-        <img
-          src="/images/nurse-anna.png"
-          alt="Nurse Anna"
-          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
-        />
+        {/* Nurse Anna Illustration */}
+        <div className="flex-shrink-0 self-end md:self-end mt-auto p-1 hidden sm:block">
+          <img
+            src="/images/nurse-anna.png"
+            alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            role="img"
+            aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            className="w-16 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
+        </div>
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -951,7 +1034,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
           onClick={() => navProps.onNext(selected)}
           disabled={navProps.loading}
           aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
-          className="px-8 py-1.5 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer"
+          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navProps.loading ? "..." : navProps.t("next")}
         </button>
@@ -962,57 +1045,68 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 
 function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string; onSelect: (val: string) => void }) {
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="space-y-4 max-w-xl pb-2">
-        <div>
-          {navProps.description && (
-            <p className="text-base sm:text-lg font-semibold text-[#2d221b] mb-1">{navProps.description}</p>
-          )}
-          <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
-        </div>
-
-        {/* Teal Container Card with White Pill Buttons */}
-        <div className="bg-[#8caeab] p-6 rounded-3xl shadow-inner max-w-xl" role="radiogroup" aria-label={title}>
-          <div className="flex flex-wrap gap-3">
-            {options.map((opt: any) => {
-              const isSelected = selected === opt.value;
-              const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
-              return (
-                <button
-                  type="button"
-                  key={opt.value}
-                  role="radio"
-                  aria-checked={isSelected}
-                  tabIndex={0}
-                  onClick={() => onSelect(opt.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === " " || e.key === "Enter") {
-                      e.preventDefault();
-                      onSelect(opt.value);
-                    }
-                  }}
-                  aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : ''}`}
-                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm border cursor-pointer ${
-                    isSelected
-                      ? "bg-[#1f5c66] text-white border-[#1f5c66] scale-105 shadow-md"
-                      : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
+    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
+        <fieldset className="border-0 p-0 m-0 space-y-4 flex-1 max-w-xl pb-2">
+          <legend className="sr-only">{title}</legend>
+          <div>
+            {navProps.description && (
+              <p className="text-base sm:text-lg font-semibold text-[#2d221b] mb-1">{navProps.description}</p>
+            )}
+            <h2 
+              ref={navProps.headingRef}
+              tabIndex={-1}
+              className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+            >
+              {title}
+            </h2>
           </div>
-        </div>
-      </div>
 
-      {/* Nurse Anna Illustration */}
-      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
-        <img
-          src="/images/nurse-anna.png"
-          alt="Nurse Anna"
-          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
-        />
+          {/* Teal Container Card with White Pill Buttons */}
+          <div className="bg-[#8caeab] p-4 sm:p-5 rounded-3xl shadow-inner max-w-xl" role="radiogroup" aria-label={title}>
+            <div className="flex flex-wrap gap-2.5 sm:gap-3">
+              {options.map((opt: any) => {
+                const isSelected = selected === opt.value;
+                const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
+                return (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    role="radio"
+                    aria-checked={isSelected}
+                    tabIndex={0}
+                    onClick={() => onSelect(opt.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === " " || e.key === "Enter") {
+                        e.preventDefault();
+                        onSelect(opt.value);
+                      }
+                    }}
+                    aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : ''}`}
+                    className={`px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm border cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isSelected
+                        ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                        : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </fieldset>
+
+        {/* Nurse Anna Illustration */}
+        <div className="flex-shrink-0 self-end md:self-end mt-auto p-1 hidden sm:block">
+          <img
+            src="/images/nurse-anna.png"
+            alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            role="img"
+            aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            className="w-16 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
+        </div>
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -1022,7 +1116,7 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
           onClick={() => navProps.onNext(selected)}
           disabled={navProps.loading}
           aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
-          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navProps.loading ? "..." : navProps.t("next")}
         </button>
@@ -1039,7 +1133,13 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-xl pb-2">
-        <h2 className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug">{title}</h2>
+        <h2 
+          ref={navProps.headingRef}
+          tabIndex={-1}
+          className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+        >
+          {title}
+        </h2>
 
         {/* Teal Container Card */}
         <div className="bg-[#8caeab] p-6 rounded-3xl text-[#132c27] shadow-inner relative space-y-6 max-w-xl">
@@ -1074,7 +1174,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
               aria-valuetext={navProps.locale === "es" ? `${value} ${unit || "años de edad"}` : `${value} ${unit || "years old"}`}
               aria-label={title || "Age of penicillin reaction"}
               onChange={(e) => onSelect(Number(e.target.value))}
-              className="w-full h-2 bg-[#234b50] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+              className="w-full h-3 bg-[#234b50] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
             />
 
             {/* Timeline Tick Labels */}
@@ -1093,7 +1193,9 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
-          alt="Nurse Anna"
+          alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+          role="img"
+          aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
           className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
         />
       </div>
@@ -1105,7 +1207,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
           onClick={() => navProps.onNext(value)}
           disabled={navProps.loading}
           aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
-          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navProps.loading ? "..." : navProps.t("next")}
         </button>
@@ -1118,7 +1220,11 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-xl pb-2 text-center md:text-left min-h-[12rem]">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2d221b] max-w-xl tracking-tight leading-relaxed">
+        <h2 
+          ref={navProps.headingRef}
+          tabIndex={-1}
+          className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2d221b] max-w-xl tracking-tight leading-relaxed outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+        >
           {title}
         </h2>
         {description && (
@@ -1130,7 +1236,9 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
-          alt="Nurse Anna"
+          alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+          role="img"
+          aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
           className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
         />
       </div>
@@ -1142,7 +1250,7 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
           onClick={() => navProps.onNext()}
           disabled={navProps.loading}
           aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
-          className="px-8 py-2 bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer"
+          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navProps.loading ? "..." : navProps.t("next")}
         </button>
@@ -1151,7 +1259,7 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
   );
 }
 
-function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, locale, isFirstStep }: BaseScreenProps & { answers: any }) {
+function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { answers: any }) {
   const summarySections = [
     {
       id: "screen2_statistics",
@@ -1247,7 +1355,13 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
   return (
     <div className="print-container bg-white border border-slate-200/80 rounded-2xl shadow-md p-3.5 sm:p-5 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between">
       <div className="print-section text-center">
-        <h2 className="text-base sm:text-lg font-black text-slate-900 mb-2 text-center tracking-tight leading-tight">{title}</h2>
+        <h2 
+          ref={headingRef}
+          tabIndex={-1}
+          className="text-base sm:text-lg font-black text-slate-900 mb-2 text-center tracking-tight leading-tight outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+        >
+          {title}
+        </h2>
 
         {/* Step-by-step numbered actions */}
         <div className="space-y-1.5 max-w-xl mx-auto text-left mb-3">
@@ -1296,7 +1410,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
         <button
           type="button"
           onClick={() => window.print()}
-          className="px-4 py-1.5 border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98]"
+          className="px-4 py-2 min-h-[44px] border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -1307,7 +1421,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
           type="button"
           onClick={() => onNext()}
           disabled={loading}
-          className="px-6 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+          className="px-6 py-2 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {loading ? (
             <>
@@ -1315,7 +1429,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Saving...
+              {locale === "es" ? "Guardando..." : "Saving..."}
             </>
           ) : (
             <>
@@ -1333,15 +1447,51 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
 
 
 function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, locale, navigating }: { answers: any; activeToken?: string | null; onProceedToSurvey: () => void; t: any; locale: string; navigating?: boolean }) {
-  const allergy = answers["screen2_allergy"] || "Not Specified";
-  const symptoms = Array.isArray(answers["screen6_1_symptoms"]) ? answers["screen6_1_symptoms"].join(", ") : answers["screen6_1_symptoms"] || "None reported";
+  const isEs = locale === "es";
+
+  // Formatted Allergy
+  const rawAllergy = answers["screen2_allergy"];
+  const allergy = rawAllergy
+    ? (isEs && (rawAllergy === "Not Specified" || rawAllergy === "No especificada") ? t("notSpecified") : rawAllergy)
+    : t("notSpecified");
+
+  // Formatted Symptoms
+  const rawSymptoms = answers["screen6_1_symptoms"];
+  const formatSymptoms = () => {
+    if (!rawSymptoms || (Array.isArray(rawSymptoms) && rawSymptoms.length === 0)) {
+      return t("noneReported");
+    }
+    const symArray = Array.isArray(rawSymptoms) ? rawSymptoms : [rawSymptoms];
+    const symptomsStep = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
+    return symArray.map((v: string) => {
+      const opt = symptomsStep?.options?.find((o) => o.value === v || o.labelEn === v || o.labelEs === v);
+      return isEs ? (opt?.labelEs || v) : (opt?.labelEn || v);
+    }).join(", ");
+  };
+  const symptoms = formatSymptoms();
+
+  // Formatted Timing / Age
+  const rawTiming = answers["screen6_2_timing"];
+  const formattedTiming = rawTiming
+    ? `${rawTiming} ${isEs ? "años" : "years old"}`
+    : t("notProvided");
+
+  // Formatted Time to Onset
+  const rawOnset = answers["screen6_3_onset"];
+  const formatOnset = () => {
+    if (!rawOnset) return t("notProvided");
+    const onsetStep = questionnaireConfig.find((s) => s.id === "screen6_3_onset");
+    const opt = onsetStep?.options?.find((o) => o.value === rawOnset || o.labelEn === rawOnset || o.labelEs === rawOnset);
+    return isEs ? (opt?.labelEs || rawOnset) : (opt?.labelEn || rawOnset);
+  };
+  const onset = formatOnset();
 
   return (
     <div className="bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between relative">
       <div>
         <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100 no-print">
           <div className="flex items-center gap-2">
-            <h1 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Assessment Report</h1>
+            <h1 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("assessmentReport")}</h1>
             {activeToken && (
               <span className="text-[10px] font-bold text-[#35727f] bg-[#f4f8e8] border border-[#35727f]/25 px-2.5 py-0.5 rounded-full font-mono shadow-2xs">
                 🔑 <span className="text-[9px] uppercase tracking-wider text-slate-500">ID:</span> {activeToken}
@@ -1349,7 +1499,7 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
             )}
           </div>
           <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-            ✓ Complete & Saved
+            ✓ {t("completeSaved")}
           </span>
         </div>
 
@@ -1357,43 +1507,53 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 leading-none mb-1">PEN-PAL</h2>
-              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-500">Patient Allergy Assessment</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-500">{t("patientAllergyAssessment")}</p>
             </div>
             <div className="text-right">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Date Generated</p>
-              <p className="text-xs sm:text-sm font-semibold text-slate-700">{new Date().toLocaleDateString("en-GB").split("/").join("-")}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("dateGenerated")}</p>
+              <p className="text-xs sm:text-sm font-semibold text-slate-700">{new Date().toLocaleDateString(isEs ? "es-ES" : "en-GB").split("/").join("-")}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <div className="bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80 rounded-lg">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Primary Allergy</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("primaryAllergy")}</p>
               <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">{allergy}</p>
             </div>
             <div className="bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80 rounded-lg">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Reported Symptoms</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("reportedSymptoms")}</p>
               <p className="text-xs font-semibold text-slate-700 leading-tight truncate sm:whitespace-normal">{symptoms}</p>
             </div>
             <div className="bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80 rounded-lg">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Age at Reaction</p>
-              <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">{answers["screen6_2_timing"] || "Not provided"} {locale === "es" ? "años" : "years old"}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("timing")}</p>
+              <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">{formattedTiming}</p>
             </div>
             <div className="bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80 rounded-lg">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Time to Onset</p>
-              <p className="text-xs font-semibold text-slate-700 leading-tight truncate">{answers["screen6_3_onset"] || "Not provided"}</p>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("onset")}</p>
+              <p className="text-xs font-semibold text-slate-700 leading-tight truncate">{onset}</p>
             </div>
           </div>
 
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80 mt-3">
             <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-800 mb-1 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-              Clinical Guidance
+              {t("clinicalGuidance")}
             </h3>
             <p className="text-xs text-slate-600 leading-snug">
-              Based on the responses provided, your child has a documented history of <strong className="font-semibold text-slate-900">{allergy}</strong> allergy. The symptoms reported ({symptoms}) indicate a clinical profile that may require further evaluation by a specialist.
+              {isEs ? (
+                <>
+                  Según las respuestas proporcionadas, su hijo tiene un historial documentado de alergia a <strong className="font-semibold text-slate-900">{allergy}</strong>. Los síntomas reportados ({symptoms}) indican un perfil clínico que puede requerir una evaluación adicional por parte de un especialista.
+                </>
+              ) : (
+                <>
+                  Based on the responses provided, your child has a documented history of <strong className="font-semibold text-slate-900">{allergy}</strong> allergy. The symptoms reported ({symptoms}) indicate a clinical profile that may require further evaluation by a specialist.
+                </>
+              )}
             </p>
             <p className="text-xs text-slate-600 leading-snug mt-1.5">
-              This report is part of the PEN-PAL research study and should be discussed with your pediatrician or an allergist.
+              {isEs
+                ? "Este informe es parte del estudio de investigación PEN-PAL y debe conversarse con su pediatra o un alergólogo."
+                : "This report is part of the PEN-PAL research study and should be discussed with your pediatrician or an allergist."}
             </p>
           </div>
         </div>
@@ -1410,7 +1570,7 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
             <rect x="6" y="14" width="12" height="8"></rect>
           </svg>
-          Print Report
+          {t("print")}
         </button>
         <button
           type="button"
@@ -1424,11 +1584,11 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Redirecting...
+              {isEs ? "Redirigiendo..." : "Redirecting..."}
             </>
           ) : (
             <>
-              <span>✓</span> Complete & Save
+              <span>✓</span> {t("completeSave")}
             </>
           )}
         </button>
