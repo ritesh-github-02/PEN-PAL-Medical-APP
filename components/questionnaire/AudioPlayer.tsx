@@ -138,24 +138,6 @@ export default function AudioPlayer({
             <span className="text-sm font-bold">CC</span>
           </button>
 
-          {/* Download Audio Button */}
-          <a
-            href={audioSrc}
-            download={`${stepId}_${locale}.mp3`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative w-11 h-11 flex items-center justify-center bg-teal-800 hover:bg-teal-700 text-white rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 border border-teal-600/50 cursor-pointer"
-            title={locale === 'es' ? 'Descargar Audio (.MP3)' : 'Download Audio (.MP3)'}
-            aria-label={locale === 'es' ? 'Descargar archivo de audio MP3' : 'Download audio MP3'}
-            onClick={() => {
-              logInteraction('AUDIO_DOWNLOAD', { stepId, locale }, '/intervention/flow').catch(() => {});
-            }}
-          >
-            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-            </svg>
-          </a>
-
           {/* Main Play/Pause Button */}
           <button
             type="button"

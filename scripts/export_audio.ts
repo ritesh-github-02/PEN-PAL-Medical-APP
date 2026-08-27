@@ -108,7 +108,7 @@ async function exportAllScreenAudio() {
     const screenNum = i + 1;
 
     for (const locale of ['en', 'es'] as const) {
-      const langCode = locale === 'es' ? 'es' : 'en';
+      const langCode = locale === 'es' ? 'es-US' : 'en-US';
       const textScript = buildScreenScript(step, locale);
       const filename = `${step.id}_${locale}.mp3`;
       const filePath = path.join(outputDir, filename);

@@ -45,10 +45,10 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className="overflow-x-hidden" suppressHydrationWarning>
       <head>
       </head>
-      <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans" suppressHydrationWarning>
+      <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans overflow-x-hidden" suppressHydrationWarning>
         {/* WCAG 2.1 AA Skip to Content Link */}
         <a
           href="#main-content"
@@ -58,7 +58,7 @@ export default async function LocaleLayout({
         </a>
 
         <NextIntlClientProvider messages={messages}>
-          <div id="main-content" tabIndex={-1} className="outline-none min-h-screen">
+          <div id="main-content" tabIndex={-1} className="outline-none min-h-screen overflow-x-hidden">
             {children}
           </div>
         </NextIntlClientProvider>

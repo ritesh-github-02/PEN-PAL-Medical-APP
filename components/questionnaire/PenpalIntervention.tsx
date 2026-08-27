@@ -19,7 +19,7 @@ import AudioPlayer from "./AudioPlayer";
 function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (newLocale: string) => void }) {
   return (
     <div 
-      className="flex items-center gap-1 bg-white/90 border border-slate-200/90 shadow-2xs rounded-full p-1 font-sans select-none no-print"
+      className="flex items-center gap-1 bg-white/90 border border-slate-200/90 shadow-2xs rounded-full p-1 font-sans no-print"
       role="group"
       aria-label={locale === "es" ? "Seleccionar idioma" : "Language selection"}
     >
@@ -28,7 +28,7 @@ function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (new
         onClick={() => onSwitch("en")}
         aria-pressed={locale === "en"}
         aria-label="Switch language to English"
-        className={`px-2.5 py-0.5 text-[11px] font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+        className={`px-3 py-1.5 min-h-[32px] text-xs font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
           locale === "en"
             ? "bg-[#236f7a] text-white shadow-xs"
             : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -41,7 +41,7 @@ function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (new
         onClick={() => onSwitch("es")}
         aria-pressed={locale === "es"}
         aria-label="Cambiar idioma a Español"
-        className={`px-2.5 py-0.5 text-[11px] font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 ${
+        className={`px-3 py-1.5 min-h-[32px] text-xs font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
           locale === "es"
             ? "bg-[#236f7a] text-white shadow-xs"
             : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -115,19 +115,22 @@ export default function PenpalIntervention() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [navigating, setNavigating] = useState(false);
   const [bindingError, setBindingError] = useState<string | null>(null);
+  const [isTerminated, setIsTerminated] = useState(false);
 
   const currentStep = questionnaireConfig[currentStepIndex];
 
-  // Programmatic Focus Reset: Focus slide heading when step or summary changes (WCAG 2.4.3)
+  // Programmatic Focus Reset: Focus slide heading or exit heading when step changes (WCAG 2.4.3)
   useEffect(() => {
     if (initialized) {
       setTimeout(() => {
-        if (headingRef.current) {
+        if (isTerminated && exitHeadingRef.current) {
+          exitHeadingRef.current.focus();
+        } else if (headingRef.current) {
           headingRef.current.focus();
         }
       }, 50);
     }
-  }, [currentStepIndex, showSummary, initialized]);
+  }, [currentStepIndex, showSummary, isTerminated, initialized]);
 
   useEffect(() => {
     async function init() {
@@ -480,24 +483,25 @@ export default function PenpalIntervention() {
 
   return (
     <main 
-      className="min-h-screen min-h-[100dvh] w-full flex flex-col items-center justify-start p-2 sm:p-4 pt-2 sm:pt-3 pb-3 relative font-sans bg-[#f4f8e8] overflow-y-auto select-none"
+      className="min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col items-center justify-start p-2 sm:p-3 pt-1.5 sm:pt-2 pb-2 relative font-sans bg-[#f4f8e8] overflow-x-hidden overflow-y-auto"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
-      {/* Screen reader live announcement for step changes */}
-      <div aria-live="polite" aria-atomic="true" className="sr-only">
-        {locale === "es"
-          ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}: ${title}`
-          : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}: ${title}`}
-      </div>
+      {/* WCAG 2.4.1 Skip Link */}
+      <a 
+        href="#slide-content" 
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#236f7a] focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-none"
+      >
+        {locale === "es" ? "Saltar al contenido principal" : "Skip to main content"}
+      </a>
 
-      {/* Decorative ambient background glows */}
-      <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse" aria-hidden="true"></div>
-      <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse" aria-hidden="true"></div>
+      {/* Decorative ambient background glows with motion-reduce safety */}
+      <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
+      <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
-      <div className="w-full max-w-3xl relative z-10 my-0 space-y-1.5 py-0 transition-all duration-300">
+      <div className="w-full max-w-4xl relative z-10 my-0 space-y-1.5 py-0 transition-all duration-300 overflow-x-hidden">
         {/* Header Bar with Logo and Language Selector */}
         <header className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
           <div className="flex items-center gap-2 flex-wrap">
@@ -533,8 +537,31 @@ export default function PenpalIntervention() {
         <div className="w-full">
           {/* Compact Tablet / iPad Device Frame */}
           <div className="flex-1 w-full bg-zinc-900 border-[6px] sm:border-[10px] border-zinc-900 rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl relative p-0.5 ring-1 ring-white/10 overflow-hidden">
-            <div className="rounded-[1.2rem] sm:rounded-[1.6rem] overflow-hidden">
-              {showSummary ? (
+            <div id="slide-content" className="rounded-[1.2rem] sm:rounded-[1.6rem] overflow-hidden">
+              {isTerminated ? (
+                <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg text-center max-w-xl mx-auto space-y-4 my-2">
+                  <h2
+                    ref={exitHeadingRef}
+                    tabIndex={-1}
+                    className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+                  >
+                    {locale === "es" ? "¡Gracias por su tiempo!" : "Thank You for Your Time!"}
+                  </h2>
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto font-medium">
+                    {locale === "es"
+                      ? "Actualmente este estudio está destinado a padres de niños con sospecha de alergia a la penicilina. Dado que su hijo no presenta alergia a la penicilina, no se requiere ninguna acción adicional."
+                      : "This study is currently intended for parents of children who have a reported or suspected penicillin allergy. Since your child does not have a penicillin allergy, no further action is needed."}
+                  </p>
+                  <div className="pt-3">
+                    <a
+                      href="/"
+                      className="inline-block bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] font-bold py-2.5 px-8 rounded-full text-xs sm:text-sm transition shadow-sm cursor-pointer border border-[#71ad9d] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                    >
+                      {locale === "es" ? "Volver al inicio" : "Return to Start"}
+                    </a>
+                  </div>
+                </div>
+              ) : showSummary ? (
                 <SummaryReportScreen
                   answers={answers}
                   activeToken={activeToken}
@@ -568,7 +595,11 @@ export default function PenpalIntervention() {
                   />
 
                   {currentStep.type === "intro" && (
-                    <IntroScreen {...baseProps} onAnswer={handleAnswer} />
+                    <IntroScreen
+                      {...baseProps}
+                      onAnswer={handleAnswer}
+                      onNoBranching={() => setIsTerminated(true)}
+                    />
                   )}
                   {currentStep.type === "statistics" && (
                     <StatisticsScreen {...baseProps} value={answers[currentStep.id]} onSelect={handleAnswer} />
@@ -583,17 +614,15 @@ export default function PenpalIntervention() {
                   {currentStep.type === "slider" && (
                     <SurveySlider {...baseProps} min={currentStep.min} max={currentStep.max} unit={locale === "es" ? currentStep.unitEs : currentStep.unitEn} selected={answers[currentStep.id]} onSelect={handleAnswer} />
                   )}
+                  {currentStep.type === "text" && <TextScreen {...baseProps} />}
                   {currentStep.type === "summary" && (
                     <SummaryScreen {...baseProps} answers={answers} />
                   )}
-                  {currentStep.type === "text" && <TextScreen {...baseProps} />}
                 </>
               )}
             </div>
           </div>
         </div>
-
-        {/* (Old bottom Spanish boxes removed - now all rendered in left side panel) */}
       </div>
     </main>
   );
@@ -628,7 +657,7 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t, locale }: O
 
 // ============ Screen Components ============
 
-function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale, headingRef }: BaseScreenProps & { onAnswer: (val: string) => void }) {
+function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale, headingRef, onNoBranching }: BaseScreenProps & { onAnswer: (val: string) => void; onNoBranching?: () => void }) {
   const introSubtitle = description || (locale === "es" ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
   const mainContent = content ? content.split('\n\n')[0] : (locale === "es" ? "Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños." : "This is nurse Anna. Anna is giving information about allergies to penicillin in kids.");
   const questionPrompt = content && content.split('\n\n')[1] ? content.split('\n\n')[1] : (locale === "es" ? "¿Quieres saber más?" : "Do you want to know more?");
@@ -654,7 +683,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
 
           <fieldset className="border-0 p-0 m-0 space-y-2.5 pt-1">
             <legend className="text-base sm:text-lg font-bold text-[#1f382f] mb-2">{questionPrompt}</legend>
-            <div className="flex gap-3" role="group" aria-label={questionPrompt}>
+            <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -669,6 +698,12 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
               </button>
               <button
                 type="button"
+                onClick={() => {
+                  onAnswer("no");
+                  if (onNoBranching) {
+                    onNoBranching();
+                  }
+                }}
                 disabled={loading}
                 aria-label={locale === "es" ? "No, salir o finalizar" : "No, do not continue"}
                 className="px-6 py-2.5 min-h-[44px] bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] border border-[#71ad9d] rounded-xl font-bold text-sm transition active:scale-[0.98] no-print cursor-pointer shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
@@ -694,75 +729,60 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   );
 }
 
-function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { value: any; onSelect: (val: number) => void }) {
-  const [allergicCount, setAllergicCount] = useState<number>(value !== undefined ? Number(value) : 5);
+function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { value?: any; onSelect?: (val: number) => void }) {
+  const allergicCount = 5;
   const totalKids = 100;
 
-  const handleSelect = (count: number) => {
-    setAllergicCount(count);
-    onSelect(count);
-  };
-
-  useEffect(() => {
-    if (value !== undefined && Number(value) !== allergicCount) {
-      setAllergicCount(Number(value));
-    }
-  }, [value]);
-
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-2xl p-2.5 sm:p-4 shadow-lg relative overflow-hidden">
-      <div className="text-center space-y-0.5 mb-1.5">
+    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-2xl p-3 sm:p-4.5 md:p-5 shadow-lg relative overflow-hidden">
+      <div className="text-center space-y-0.5 mb-2">
         <h2 
           ref={headingRef}
           tabIndex={-1}
-          className="text-sm sm:text-base md:text-lg font-extrabold text-[#2d221b] max-w-xl mx-auto tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+          className="text-base sm:text-lg md:text-xl font-extrabold text-[#2d221b] max-w-3xl mx-auto tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
         >
           {title}
         </h2>
-        <p className="text-[11px] sm:text-xs font-bold text-[#2d221b] max-w-lg mx-auto">
+        <p className="text-xs sm:text-xs font-bold text-[#2d221b] max-w-2xl mx-auto">
           {content}
         </p>
       </div>
 
-      <div className="mb-1.5 text-center">
-        {/* 100 Kids Infographic Container (WCAG 1.1.1 & 1.4.1) */}
+      <div className="mb-2 text-center select-none">
+        {/* 100 Kids Infographic Container (WCAG 1.1.1 & 1.4.1 Static Illustration) */}
         <div 
           role="region"
           aria-label={
             locale === "es"
-              ? `Infografía: De 100 niños diagnosticados con alergia a la penicilina, 95 no tienen una alergia real y solo ${allergicCount} tienen una alergia real.`
-              : `Infographic: Out of 100 children diagnosed with penicillin allergy, 95 do not have a real allergy, and only ${allergicCount} have a true allergy.`
+              ? `Infografía: De 100 niños diagnosticados con alergia a la penicilina, 95 no tienen una alergia real y solo 5 tienen una alergia real.`
+              : `Infographic: Out of 100 children diagnosed with penicillin allergy, 95 do not have a real allergy, and only 5 have a true allergy.`
           }
-          className="mx-auto max-w-xl p-1 bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/80 shadow-xs mb-1"
+          className="mx-auto max-w-2xl sm:max-w-3xl p-2 sm:p-3 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-xs mb-1.5 pointer-events-none"
         >
-          {/* Visual Icon Grid (Hidden from Screen Reader Noise, summary read above) */}
+          {/* Visual Icon Grid (Static, non-interactive) */}
           <div 
             aria-hidden="true"
-            className="grid grid-cols-10 sm:grid-cols-20 gap-0.5 sm:gap-0 justify-center"
+            className="grid grid-cols-10 sm:grid-cols-20 gap-0.5 sm:gap-1 justify-center pointer-events-none"
           >
             {Array(totalKids).fill(0).map((_, i) => {
               const isAllergic = i >= totalKids - allergicCount;
               const isGirl = i % 2 === 0;
-              const kidNumber = totalKids - i;
               return (
-                <button
-                  type="button"
+                <div
                   key={i}
-                  tabIndex={-1}
-                  onClick={() => handleSelect(kidNumber)}
-                  className="focus:outline-none transition-transform hover:scale-125 flex items-center justify-center cursor-pointer p-0.5"
+                  className="flex items-center justify-center p-0.5 pointer-events-none select-none"
                 >
                   <KidIcon isAllergic={isAllergic} isGirl={isGirl} />
-                </button>
+                </div>
               );
             })}
           </div>
         </div>
 
         {/* Color-Blind Safe Bordered Summary Container */}
-        <div className="flex justify-end max-w-xl mx-auto pr-2" aria-live="polite">
-          <p className="text-[11px] sm:text-xs font-bold text-[#2d221b] bg-amber-50/80 border border-amber-200 px-3 py-1 rounded-lg">
-            {locale === "es" ? "solo" : "only"} <span className="text-xs sm:text-sm font-black text-[#c84a26] mx-0.5">{allergicCount}</span> {locale === "es" ? "tienen una alergia real" : "have a real allergy"}
+        <div className="flex justify-end max-w-2xl sm:max-w-3xl mx-auto pr-2" aria-live="polite">
+          <p className="text-[11px] sm:text-xs font-bold text-[#2d221b] bg-amber-50/80 border border-amber-200 px-3 py-1 rounded-xl shadow-2xs">
+            {locale === "es" ? "solo" : "only"} <span className="text-xs sm:text-sm font-black text-[#c84a26] mx-0.5">5</span> {locale === "es" ? "tienen una alergia real" : "have a real allergy"}
           </p>
         </div>
       </div>
@@ -771,7 +791,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
       <div className="flex justify-center pt-1 border-t border-slate-300/40">
         <button
           type="button"
-          onClick={() => onNext(value !== undefined ? value : allergicCount)}
+          onClick={() => onNext(5)}
           disabled={loading}
           aria-label={locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
@@ -786,7 +806,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
 const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: boolean; isGirl: boolean }) {
   const color = isAllergic ? "#c84a26" : "#1f5c66";
   return (
-    <svg viewBox="0 0 32 32" className="w-5 h-5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5 select-none transition-transform" aria-hidden="true">
+    <svg viewBox="0 0 32 32" className="w-4.5 h-4.5 sm:w-5 sm:h-5 md:w-5.5 md:h-5.5 select-none pointer-events-none" aria-hidden="true">
       {/* Shoulders / Shirt */}
       <path
         d="M 7 29 C 7 23, 25 23, 25 29"
@@ -835,7 +855,7 @@ function TestingScreen(props: BaseScreenProps) {
 
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
-      <div className="space-y-3 max-w-xl pb-2">
+      <div className="space-y-3 max-w-3xl pb-2">
         <h2 
           ref={props.headingRef}
           tabIndex={-1}
@@ -911,10 +931,17 @@ function TestimonialScreen(props: BaseScreenProps) {
 }
 
 function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string[]; onSelect: (val: string[]) => void }) {
+  const [otherText, setOtherText] = useState<string>("");
+
   const handleToggle = (value: string) => {
-    const updated = selected?.includes(value)
-      ? selected.filter((v: string) => v !== value)
-      : [...(selected || []), value];
+    if (value === "Unsure") {
+      onSelect(selected?.includes("Unsure") ? [] : ["Unsure"]);
+      return;
+    }
+    const cleanList = selected?.filter((v: string) => v !== "Unsure") || [];
+    const updated = cleanList.includes(value)
+      ? cleanList.filter((v: string) => v !== value)
+      : [...cleanList, value];
     onSelect(updated);
   };
 
@@ -923,7 +950,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden">
       <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
-        <fieldset className="border-0 p-0 m-0 space-y-3 flex-1 max-w-xl pb-2">
+        <fieldset className="border-0 p-0 m-0 space-y-3 flex-1 max-w-3xl pb-2">
           <legend className="sr-only">{title}</legend>
           <div>
             {navProps.description && (
@@ -940,11 +967,54 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 
           {/* If Pill Style (Symptoms Multi-Select) */}
           {!isKnowledgeTest ? (
-            <div className="bg-[#8caeab] p-3.5 sm:p-4.5 rounded-2xl shadow-inner max-w-xl">
+            <div className="bg-[#8caeab] p-3.5 sm:p-4.5 rounded-2xl shadow-inner max-w-3xl">
               <div className="flex flex-wrap gap-2.5 sm:gap-3">
                 {options.map((opt: any) => {
                   const isSelected = selected?.includes(opt.value);
                   const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
+
+                  if (opt.value === "Other") {
+                    return (
+                      <div
+                        key={opt.value}
+                        className={`px-3.5 py-2 min-h-[44px] inline-flex items-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs border ${
+                          isSelected
+                            ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                            : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          role="checkbox"
+                          aria-checked={isSelected}
+                          onClick={() => handleToggle("Other")}
+                          onKeyDown={(e) => {
+                            if (e.key === " " || e.key === "Enter") {
+                              e.preventDefault();
+                              handleToggle("Other");
+                            }
+                          }}
+                          aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : (navProps.locale === "es" ? 'no seleccionado' : 'not selected')}`}
+                          className="inline-flex items-center gap-1.5 cursor-pointer focus:outline-none"
+                        >
+                          {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                          <span>{navProps.locale === "es" ? "Otro: por favor describa" : "Other: Please describe"}</span>
+                        </button>
+                        {isSelected && (
+                          <input
+                            type="text"
+                            id="other-symptom-text"
+                            aria-label={navProps.locale === "es" ? "Describa otro síntoma" : "Describe other symptom"}
+                            placeholder="..."
+                            value={otherText}
+                            onChange={(e) => setOtherText(e.target.value)}
+                            className="bg-white/20 text-white placeholder-white/60 border-b border-white/80 px-2 py-0.5 text-xs font-semibold focus:outline-none max-w-[130px] rounded"
+                          />
+                        )}
+                      </div>
+                    );
+                  }
+
                   return (
                     <button
                       type="button"
@@ -1047,7 +1117,7 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
       <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
-        <fieldset className="border-0 p-0 m-0 space-y-4 flex-1 max-w-xl pb-2">
+        <fieldset className="border-0 p-0 m-0 space-y-4 flex-1 max-w-3xl pb-2">
           <legend className="sr-only">{title}</legend>
           <div>
             {navProps.description && (
@@ -1063,7 +1133,7 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
           </div>
 
           {/* Teal Container Card with White Pill Buttons */}
-          <div className="bg-[#8caeab] p-4 sm:p-5 rounded-3xl shadow-inner max-w-xl" role="radiogroup" aria-label={title}>
+          <div className="bg-[#8caeab] p-4 sm:p-5 rounded-3xl shadow-inner max-w-3xl">
             <div className="flex flex-wrap gap-2.5 sm:gap-3">
               {options.map((opt: any) => {
                 const isSelected = selected === opt.value;
@@ -1132,7 +1202,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="space-y-4 max-w-xl pb-2">
+      <div className="space-y-4 max-w-3xl pb-2">
         <h2 
           ref={navProps.headingRef}
           tabIndex={-1}
@@ -1142,7 +1212,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
         </h2>
 
         {/* Teal Container Card */}
-        <div className="bg-[#8caeab] p-6 rounded-3xl text-[#132c27] shadow-inner relative space-y-6 max-w-xl">
+        <div className="bg-[#8caeab] p-6 rounded-3xl text-[#132c27] shadow-inner relative space-y-6 max-w-3xl">
           {navProps.description && (
             <p className="text-sm sm:text-base font-semibold text-[#132c27] leading-snug">
               {navProps.description}
@@ -1219,16 +1289,16 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   return (
     <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="space-y-4 max-w-xl pb-2 text-center md:text-left min-h-[12rem]">
+      <div className="space-y-4 max-w-3xl pb-2 text-center md:text-left min-h-[12rem]">
         <h2 
           ref={navProps.headingRef}
           tabIndex={-1}
-          className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2d221b] max-w-xl tracking-tight leading-relaxed outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+          className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2d221b] max-w-3xl tracking-tight leading-relaxed outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
         >
           {title}
         </h2>
         {description && (
-          <p className="text-sm sm:text-base font-medium text-[#2d221b] max-w-xl">{description}</p>
+          <p className="text-sm sm:text-base font-medium text-[#2d221b] max-w-3xl">{description}</p>
         )}
       </div>
 
