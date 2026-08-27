@@ -734,7 +734,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
   const totalKids = 100;
 
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-2xl p-3 sm:p-4.5 md:p-5 shadow-lg relative overflow-hidden">
+    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-2xl p-3 sm:p-4.5 md:p-5 shadow-lg relative overflow-hidden">
       <div className="text-center space-y-0.5 mb-2">
         <h2 
           ref={headingRef}
@@ -749,40 +749,81 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
       </div>
 
       <div className="mb-2 text-center select-none">
-        {/* 100 Kids Infographic Container (WCAG 1.1.1 & 1.4.1 Static Illustration) */}
-        <div 
-          role="region"
-          aria-label={
-            locale === "es"
-              ? `Infografía: De 100 niños diagnosticados con alergia a la penicilina, 95 no tienen una alergia real y solo 5 tienen una alergia real.`
-              : `Infographic: Out of 100 children diagnosed with penicillin allergy, 95 do not have a real allergy, and only 5 have a true allergy.`
-          }
-          className="mx-auto max-w-2xl sm:max-w-3xl p-2 sm:p-3 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-xs mb-1.5 pointer-events-none"
-        >
-          {/* Visual Icon Grid (Static, non-interactive) */}
-          <div 
-            aria-hidden="true"
-            className="grid grid-cols-10 sm:grid-cols-20 gap-0.5 sm:gap-1 justify-center pointer-events-none"
-          >
-            {Array(totalKids).fill(0).map((_, i) => {
-              const isAllergic = i >= totalKids - allergicCount;
-              const isGirl = i % 2 === 0;
-              return (
-                <div
-                  key={i}
-                  className="flex items-center justify-center p-0.5 pointer-events-none select-none"
-                >
-                  <KidIcon isAllergic={isAllergic} isGirl={isGirl} />
-                </div>
-              );
-            })}
+        {/* Main 100 Kids Card */}
+        <div className="mx-auto max-w-2xl sm:max-w-3xl p-3 sm:p-4 bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-xs mb-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {/* GROUP 1: 95 Safe Children (Treated as an accessible graphic) */}
+            <div
+              role="img"
+              aria-label={
+                locale === "es"
+                  ? "Grupo de 95 niños que no tienen una alergia real y pueden tomar penicilina de manera segura."
+                  : "Group of 95 children who do not have a real allergy and can safely take penicillin."
+              }
+              className="grid grid-cols-10 sm:grid-cols-19 gap-0.5 sm:gap-1 justify-center p-1"
+            >
+              {/* Screen reader text backup (guarantees VoiceOver speaks it) */}
+              <span className="sr-only">
+                {locale === "es"
+                  ? "Grupo de 95 niños que pueden tomar penicilina de manera segura."
+                  : "Group of 95 children who can safely take penicillin."}
+              </span>
+              {/* Visual icons hidden from audio clutter */}
+              <div aria-hidden="true" className="contents">
+                {Array(95)
+                  .fill(0)
+                  .map((_, i) => {
+                    const isGirl = i % 2 === 0;
+                    return (
+                      <div key={`safe-${i}`} className="flex items-center justify-center p-0.5">
+                        <KidIcon isAllergic={false} isGirl={isGirl} />
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+
+            {/* GROUP 2: 5 Allergic Children (Treated as an accessible graphic + color-blind box) */}
+            <div
+              role="img"
+              aria-label={
+                locale === "es"
+                  ? "Grupo de 5 niños destacados en un recuadro que sí tienen una alergia real a la penicilina."
+                  : "Group of 5 children highlighted in an orange box who have a true penicillin allergy."
+              }
+              className="flex items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 bg-orange-100/90 border-2 border-[#c84a26] rounded-xl shadow-2xs"
+            >
+              {/* Screen reader text backup */}
+              <span className="sr-only">
+                {locale === "es"
+                  ? "Grupo de 5 niños destacados en un recuadro que sí tienen una alergia real a la penicilina."
+                  : "Group of 5 children highlighted in an orange box who have a true penicillin allergy."}
+              </span>
+              {/* Visual icons hidden from audio clutter */}
+              <div aria-hidden="true" className="contents">
+                {Array(5)
+                  .fill(0)
+                  .map((_, i) => {
+                    const isGirl = i % 2 === 0;
+                    return (
+                      <div key={`allergic-${i}`} className="flex items-center justify-center p-0.5">
+                        <KidIcon isAllergic={true} isGirl={isGirl} />
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Color-Blind Safe Bordered Summary Container */}
-        <div className="flex justify-end max-w-2xl sm:max-w-3xl mx-auto pr-2" aria-live="polite">
+        {/* Text Summary Badge */}
+        <div className="flex justify-end max-w-2xl sm:max-w-3xl mx-auto pr-2">
           <p className="text-[11px] sm:text-xs font-bold text-[#2d221b] bg-amber-50/80 border border-amber-200 px-3 py-1 rounded-xl shadow-2xs">
-            {locale === "es" ? "solo" : "only"} <span className="text-xs sm:text-sm font-black text-[#c84a26] mx-0.5">5</span> {locale === "es" ? "tienen una alergia real" : "have a real allergy"}
+            {locale === "es" ? "solo" : "only"}{" "}
+            <span className="text-xs sm:text-sm font-black text-[#c84a26] mx-0.5">
+              {allergicCount}
+            </span>{" "}
+            {locale === "es" ? "tienen una alergia real" : "have a real allergy"}
           </p>
         </div>
       </div>
