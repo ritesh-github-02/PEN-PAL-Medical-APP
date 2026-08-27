@@ -989,11 +989,11 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
   const isKnowledgeTest = options[0]?.value?.startsWith("curing_");
 
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden">
+    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden">
       <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
-        <fieldset className="border-0 p-0 m-0 space-y-3 flex-1 max-w-3xl pb-2">
-          <legend className="sr-only">{title}</legend>
-          <div>
+        <div className="flex-1 max-w-3xl pb-2">
+          {/* 1. Heading & Subtitle Outside Fieldset (Eliminates Double Title Announcement) */}
+          <div className="mb-3">
             {navProps.description && (
               <p className="text-sm sm:text-base font-semibold text-[#2d221b] mb-0.5">{navProps.description}</p>
             )}
@@ -1006,63 +1006,102 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
             </h2>
           </div>
 
-          {/* If Pill Style (Symptoms Multi-Select) */}
-          {!isKnowledgeTest ? (
-            <div className="bg-[#8caeab] p-3.5 sm:p-4.5 rounded-2xl shadow-inner max-w-3xl">
-              <div className="flex flex-wrap gap-2.5 sm:gap-3">
-                {options.map((opt: any) => {
-                  const isSelected = selected?.includes(opt.value);
-                  const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
+          {/* 2. Semantic Fieldset Grouping Only for Options */}
+          <fieldset className="border-0 p-0 m-0 space-y-2.5">
+            <legend className="sr-only">
+              {navProps.locale === "es" ? "Opciones de preguntas" : "Question options"}
+            </legend>
 
-                  if (opt.value === "Other") {
+            {/* If Pill Style (Symptoms Multi-Select) */}
+            {!isKnowledgeTest ? (
+              <div className="bg-[#8caeab] p-3.5 sm:p-4.5 rounded-2xl shadow-inner max-w-3xl">
+                <div className="flex flex-wrap gap-2.5 sm:gap-3">
+                  {options.map((opt: any) => {
+                    const isSelected = selected?.includes(opt.value);
+                    const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
+
+                    if (opt.value === "Other") {
+                      return (
+                        <div
+                          key={opt.value}
+                          className={`px-3.5 py-2 min-h-[44px] inline-flex items-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs border ${
+                            isSelected
+                              ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                              : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            role="checkbox"
+                            aria-checked={isSelected}
+                            onClick={() => handleToggle("Other")}
+                            onKeyDown={(e) => {
+                              if (e.key === " " || e.key === "Enter") {
+                                e.preventDefault();
+                                handleToggle("Other");
+                              }
+                            }}
+                            aria-label={label}
+                            className="inline-flex items-center gap-1.5 cursor-pointer focus:outline-none"
+                          >
+                            {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                            <span>{navProps.locale === "es" ? "Otro: por favor describa" : "Other: Please describe"}</span>
+                          </button>
+                          {isSelected && (
+                            <input
+                              type="text"
+                              id="other-symptom-text"
+                              aria-label={navProps.locale === "es" ? "Describa otro síntoma" : "Describe other symptom"}
+                              placeholder="..."
+                              value={otherText}
+                              onChange={(e) => setOtherText(e.target.value)}
+                              className="bg-white/20 text-white placeholder-white/60 border-b border-white/80 px-2 py-0.5 text-xs font-semibold focus:outline-none max-w-[130px] rounded"
+                            />
+                          )}
+                        </div>
+                      );
+                    }
+
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={opt.value}
-                        className={`px-3.5 py-2 min-h-[44px] inline-flex items-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs border ${
+                        role="checkbox"
+                        aria-checked={isSelected}
+                        tabIndex={0}
+                        onClick={() => handleToggle(opt.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === " " || e.key === "Enter") {
+                            e.preventDefault();
+                            handleToggle(opt.value);
+                          }
+                        }}
+                        aria-label={label}
+                        className={`px-3.5 py-2.5 min-h-[44px] inline-flex items-center gap-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs border cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
                           isSelected
                             ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
                             : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
                         }`}
                       >
-                        <button
-                          type="button"
-                          role="checkbox"
-                          aria-checked={isSelected}
-                          onClick={() => handleToggle("Other")}
-                          onKeyDown={(e) => {
-                            if (e.key === " " || e.key === "Enter") {
-                              e.preventDefault();
-                              handleToggle("Other");
-                            }
-                          }}
-                          aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : (navProps.locale === "es" ? 'no seleccionado' : 'not selected')}`}
-                          className="inline-flex items-center gap-1.5 cursor-pointer focus:outline-none"
-                        >
-                          {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
-                          <span>{navProps.locale === "es" ? "Otro: por favor describa" : "Other: Please describe"}</span>
-                        </button>
-                        {isSelected && (
-                          <input
-                            type="text"
-                            id="other-symptom-text"
-                            aria-label={navProps.locale === "es" ? "Describa otro síntoma" : "Describe other symptom"}
-                            placeholder="..."
-                            value={otherText}
-                            onChange={(e) => setOtherText(e.target.value)}
-                            className="bg-white/20 text-white placeholder-white/60 border-b border-white/80 px-2 py-0.5 text-xs font-semibold focus:outline-none max-w-[130px] rounded"
-                          />
-                        )}
-                      </div>
+                        {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                        <span>{label}</span>
+                      </button>
                     );
-                  }
-
+                  })}
+                </div>
+              </div>
+            ) : (
+              /* Toggle Switch Style (Knowledge Test) - WCAG 4.1.2 Clean */
+              <div className="space-y-2.5 pt-1">
+                {options.map((opt: any, idx: number) => {
+                  const isSelected = selected?.includes(opt.value);
+                  const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
                   return (
                     <button
                       type="button"
                       key={opt.value}
-                      role="checkbox"
+                      role="switch"
                       aria-checked={isSelected}
-                      tabIndex={0}
                       onClick={() => handleToggle(opt.value)}
                       onKeyDown={(e) => {
                         if (e.key === " " || e.key === "Enter") {
@@ -1070,61 +1109,30 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
                           handleToggle(opt.value);
                         }
                       }}
-                      aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : (navProps.locale === "es" ? 'no seleccionado' : 'not selected')}`}
-                      className={`px-3.5 py-2.5 min-h-[44px] inline-flex items-center gap-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs border cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-                        isSelected
-                          ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
-                          : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
-                      }`}
+                      aria-label={(idx + 1) + ". " + label}
+                      className="w-full text-left flex items-center gap-3 cursor-pointer group select-none focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-xl p-1 min-h-[44px]"
                     >
-                      {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
-                      <span>{label}</span>
+                      {/* Visual Toggle Track (Suppressed from screen readers) */}
+                      <div className="flex flex-col items-center shrink-0 pt-0.5" aria-hidden="true">
+                        <div className={`w-12 h-5 rounded-full p-0.5 transition-colors duration-200 ${isSelected ? 'bg-[#1f5c66]' : 'bg-[#6b808e]'}`}>
+                          <div className={`w-4 h-4 rounded-full bg-white border border-slate-300 shadow-sm transform transition-transform duration-200 ${isSelected ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                        </div>
+                        <div className="flex justify-between w-full px-1 text-[10px] font-extrabold text-[#2d221b] mt-0.5 leading-none">
+                          <span>×</span>
+                          <span>✓</span>
+                        </div>
+                      </div>
+
+                      <span className="text-xs sm:text-sm font-semibold text-[#2d221b] leading-snug">
+                        {idx + 1}. {label}
+                      </span>
                     </button>
                   );
                 })}
               </div>
-            </div>
-          ) : (
-            /* Toggle Switch Style (Knowledge Test) - WCAG 4.1.2 */
-            <div className="space-y-2.5 pt-1">
-              {options.map((opt: any, idx: number) => {
-                const isSelected = selected?.includes(opt.value);
-                const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
-                return (
-                  <button
-                    type="button"
-                    key={opt.value}
-                    role="switch"
-                    aria-checked={isSelected}
-                    onClick={() => handleToggle(opt.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === " " || e.key === "Enter") {
-                        e.preventDefault();
-                        handleToggle(opt.value);
-                      }
-                    }}
-                    aria-label={`${idx + 1}. ${label}, ${isSelected ? (navProps.locale === "es" ? 'verdadero' : 'true/checked') : (navProps.locale === "es" ? 'falso' : 'false/unchecked')}`}
-                    className="w-full text-left flex items-center gap-3 cursor-pointer group select-none focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-xl p-1 min-h-[44px]"
-                  >
-                    <div className="flex flex-col items-center shrink-0 pt-0.5" aria-hidden="true">
-                      <div className={`w-12 h-5 rounded-full p-0.5 transition-colors duration-200 ${isSelected ? 'bg-[#1f5c66]' : 'bg-[#6b808e]'}`}>
-                        <div className={`w-4 h-4 rounded-full bg-white border border-slate-300 shadow-sm transform transition-transform duration-200 ${isSelected ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                      </div>
-                      <div className="flex justify-between w-full px-1 text-[10px] font-extrabold text-[#2d221b] mt-0.5 leading-none">
-                        <span>×</span>
-                        <span>✓</span>
-                      </div>
-                    </div>
-
-                    <span className="text-xs sm:text-sm font-semibold text-[#2d221b] leading-snug">
-                      {idx + 1}. {label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </fieldset>
+            )}
+          </fieldset>
+        </div>
 
         {/* Nurse Anna Illustration */}
         <div className="flex-shrink-0 self-end md:self-end mt-auto p-1 hidden sm:block">
@@ -1144,7 +1152,6 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
           type="button"
           onClick={() => navProps.onNext(selected)}
           disabled={navProps.loading}
-          aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navProps.loading ? "..." : navProps.t("next")}
