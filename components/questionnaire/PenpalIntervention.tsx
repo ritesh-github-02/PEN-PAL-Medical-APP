@@ -483,7 +483,7 @@ export default function PenpalIntervention() {
 
   return (
     <main 
-      className="min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col items-center justify-start p-2 sm:p-3 pt-1.5 sm:pt-2 pb-2 relative font-sans bg-[#f4f8e8] overflow-x-hidden overflow-y-auto"
+      className="min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 relative font-sans bg-[#f4f8e8] overflow-x-hidden overflow-y-auto"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -501,7 +501,7 @@ export default function PenpalIntervention() {
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
-      <div className="w-full max-w-4xl relative z-10 my-0 space-y-1.5 py-0 transition-all duration-300 overflow-x-hidden">
+      <div className="w-full max-w-4xl relative z-10 my-auto space-y-2 py-0 transition-all duration-300 overflow-x-hidden">
         {/* Header Bar with Logo and Language Selector */}
         <header className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
           <div className="flex items-center gap-2 flex-wrap">
@@ -537,7 +537,7 @@ export default function PenpalIntervention() {
         <div className="w-full">
           {/* Compact Tablet / iPad Device Frame */}
           <div className="flex-1 w-full bg-zinc-900 border-[6px] sm:border-[10px] border-zinc-900 rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl relative p-0.5 ring-1 ring-white/10 overflow-hidden">
-            <div id="slide-content" className="rounded-[1.2rem] sm:rounded-[1.6rem] overflow-hidden">
+            <div className="rounded-[1.2rem] sm:rounded-[1.6rem] overflow-hidden">
               {isTerminated ? (
                 <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg text-center max-w-xl mx-auto space-y-4 my-2">
                   <h2
@@ -663,7 +663,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   const questionPrompt = content && content.split('\n\n')[1] ? content.split('\n\n')[1] : (locale === "es" ? "¿Quieres saber más?" : "Do you want to know more?");
 
   return (
-    <div className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
+    <div id="slide-content" className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
         <div className="flex-1 space-y-4">
           <div className="space-y-1">
