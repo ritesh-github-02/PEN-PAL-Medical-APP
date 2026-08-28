@@ -10,13 +10,7 @@
    WCAG 2.1 Level AA Accessibility Enhancements
    ========================================================================== */
 
-/* High-Contrast Visible Focus Rings for Keyboard Navigation */
-:focus-visible {
-  outline: 3px solid #236f7a !important;
-  outline-offset: 2px !important;
-  border-radius: 4px;
-}
-
+/* High-Contrast Visible Focus Rings for Interactive Keyboard Navigation Controls */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -25,9 +19,27 @@ textarea:focus-visible,
 [role="button"]:focus-visible,
 [role="radio"]:focus-visible,
 [role="checkbox"]:focus-visible,
-[role="slider"]:focus-visible {
+[role="switch"]:focus-visible,
+[role="slider"]:focus-visible,
+[tabindex="0"]:focus-visible {
   outline: 3px solid #236f7a !important;
   outline-offset: 2px !important;
+  border-radius: 4px;
+}
+
+/* Explicitly strip focus outline from programmatically focused headings & non-interactive elements */
+h1:focus,
+h1:focus-visible,
+h2:focus,
+h2:focus-visible,
+h3:focus,
+h3:focus-visible,
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 /* Reduced Motion for users with vestibular or motion sensitivities */

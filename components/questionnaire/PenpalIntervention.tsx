@@ -673,7 +673,8 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
             <h1 
               ref={headingRef}
               tabIndex={-1}
-              className="text-4xl sm:text-5xl font-black text-[#1d5c64] tracking-tight font-display outline-none focus:outline-none"
+              style={{ outline: "none", boxShadow: "none" }}
+              className="text-4xl sm:text-5xl font-black text-[#1d5c64] tracking-tight font-display outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 select-none"
             >
               {title || "PEN–PAL"}
             </h1>
