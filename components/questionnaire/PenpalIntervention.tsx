@@ -1279,43 +1279,74 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
   );
 }
 
+// Milestone tick marks for accurate positioning
+const milestoneTicks = [
+  { val: 1, labelEn: "<1 yr", labelEs: "<1 año" },
+  { val: 5, labelEn: "5 yrs", labelEs: "5 años" },
+  { val: 10, labelEn: "10 yrs", labelEs: "10 años" },
+  { val: 15, labelEn: "15 yrs", labelEs: "15 años" },
+  { val: 20, labelEn: "20 yrs", labelEs: "20 años" },
+  { val: 26, labelEn: "26 yrs", labelEs: "26 años" },
+];
+
 function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }: BaseScreenProps & { min?: number; max?: number; unit?: string; selected: number; onSelect: (val: number) => void }) {
+  const isSpanish = navProps.locale === "es";
   const minVal = min || 1;
   const maxVal = max || 26;
   const value = selected || 9;
 
+  const displayTitle =
+    title ||
+    (isSpanish
+      ? "¿Qué edad tenía su hijo cuando ocurrió la reacción?"
+      : "How old was your child when the reaction happened?");
+  const instructionText =
+    navProps.description ||
+    (isSpanish
+      ? "Arrastre el control o use las teclas de flecha para seleccionar la edad."
+      : "Drag the slider or use arrow keys to select your child's age.");
+
+  // Mathematical percentage calculation (0% to 100%)
+  const percentage = Math.max(
+    0,
+    Math.min(100, ((value - minVal) / (maxVal - minVal)) * 100)
+  );
+
   return (
-    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
+    <div
+      id="slide-content"
+      className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden"
+    >
       <div className="space-y-4 max-w-3xl pb-2">
+        {/* Main Heading (Auto-Focus Target) */}
         <h2 
           ref={navProps.headingRef}
           tabIndex={-1}
           className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
         >
-          {title}
+          {displayTitle}
         </h2>
 
-        {/* Teal Container Card */}
-        <div className="bg-[#8caeab] p-6 rounded-3xl text-[#132c27] shadow-inner relative space-y-6 max-w-3xl">
-          {navProps.description && (
-            <p className="text-sm sm:text-base font-semibold text-[#132c27] leading-snug">
-              {navProps.description}
-            </p>
-          )}
+        {/* Sage Container Card with Safe Right Padding to prevent Nurse Anna collision */}
+        <div className="bg-[#8caeab] p-6 sm:p-7 pr-16 sm:pr-24 rounded-3xl text-[#132c27] shadow-inner relative space-y-5 max-w-3xl">
+          <p className="text-xs sm:text-sm font-semibold text-[#132c27] leading-snug">
+            {instructionText}
+          </p>
 
-          {/* Slider with Yellow Badge Indicator */}
-          <div className="relative pt-8 pb-4 px-2">
-            {/* Dynamic Yellow Badge floating above thumb */}
+          {/* Interactive Slider Area */}
+          <div className="relative pt-8 pb-6 px-1">
+            {/* Dynamic Floating Yellow Value Badge */}
             <div 
               aria-hidden="true"
-              className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#1f382f] font-black text-xs px-2.5 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all pointer-events-none"
+              className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#1f382f] font-black text-xs px-3 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all pointer-events-none whitespace-nowrap"
               style={{
-                left: (((value - minVal) / (maxVal - minVal)) * 100) + "%"
+                left: percentage + "%"
               }}
             >
-              {value}
+              {value} {isSpanish ? (value === 1 ? "año" : "años") : (value === 1 ? "yr" : "yrs")}
             </div>
 
+            {/* Native Accessible Range Input */}
             <input
               type="range"
               min={minVal}
@@ -1325,35 +1356,47 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
               aria-valuemax={maxVal}
               aria-valuenow={value}
               aria-valuetext={
-                navProps.locale === "es"
-                  ? value + " " + (unit || "años de edad")
-                  : value + " " + (unit || "years old")
+                isSpanish
+                  ? value + " " + (unit || (value === 1 ? "año de edad" : "años de edad"))
+                  : value + " " + (unit || (value === 1 ? "year old" : "years old"))
               }
-              aria-label={title || (navProps.locale === "es" ? "Edad de la reacción a la penicilina" : "Age of penicillin reaction")}
+              aria-label={displayTitle}
               onChange={(e) => onSelect(Number(e.target.value))}
-              className="w-full h-3 bg-[#234b50] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+              className="w-full h-3.5 bg-[#234b50] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
             />
 
-            {/* Timeline Tick Labels */}
-            <div className="flex justify-between mt-3 text-[11px] font-bold text-[#132c27]" aria-hidden="true">
-              <span>&lt;1<br/>{navProps.locale === "es" ? "año" : "year old"}</span>
-              <span>1<br/>{navProps.locale === "es" ? "año" : "year old"}</span>
-              <span>10<br/>{navProps.locale === "es" ? "años" : "years old"}</span>
-              <span>20<br/>{navProps.locale === "es" ? "años" : "years old"}</span>
-              <span>26<br/>{navProps.locale === "es" ? "años" : "years old"}</span>
+            {/* Mathematically Aligned Milestone Ticks */}
+            <div
+              className="relative w-full h-6 mt-3 text-[10px] sm:text-[11px] font-bold text-[#132c27] select-none"
+              aria-hidden="true"
+            >
+              {milestoneTicks.map((tick) => {
+                const tickPct = ((tick.val - minVal) / (maxVal - minVal)) * 100;
+                return (
+                  <span
+                    key={tick.val}
+                    className="absolute -translate-x-1/2 whitespace-nowrap text-center"
+                    style={{ left: tickPct + "%" }}
+                  >
+                    {isSpanish ? tick.labelEs : tick.labelEn}
+                  </span>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Nurse Anna Illustration */}
-      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
+      {/* Nurse Anna Illustration (Safe Positioned Outside Text Area) */}
+      <div className="absolute bottom-8 right-3 sm:bottom-10 sm:right-6 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
-          alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          role="img"
-          aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          alt={
+            isSpanish
+              ? "Ilustración de la enfermera Anna sonriendo"
+              : "Illustration of Nurse Anna smiling in blue scrubs"
+          }
+          className="w-20 sm:w-24 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
         />
       </div>
 

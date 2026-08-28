@@ -3,6 +3,7 @@ import {getMessages, getTranslations} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {routing} from '@/routing'; // We need to configure @ alias or relative path
 import type {Metadata} from 'next';
+import ExtensionErrorShield from '@/components/ExtensionErrorShield';
 import '../globals.css'; 
 
 export async function generateMetadata(
@@ -49,6 +50,9 @@ export default async function LocaleLayout({
       <head>
       </head>
       <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans overflow-x-hidden" suppressHydrationWarning>
+        {/* Shield to prevent Chrome extension runtime errors from crashing Next.js dev overlay */}
+        <ExtensionErrorShield />
+
         {/* WCAG 2.1 AA Skip to Content Link */}
         <a
           href="#main-content"
