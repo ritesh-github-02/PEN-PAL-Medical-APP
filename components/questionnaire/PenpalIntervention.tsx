@@ -673,7 +673,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
             <h1 
               ref={headingRef}
               tabIndex={-1}
-              className="text-4xl sm:text-5xl font-black text-[#1d5c64] tracking-tight font-display outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+              className="text-4xl sm:text-5xl font-black text-[#1d5c64] tracking-tight font-display outline-none focus:outline-none"
             >
               {title || "PEN–PAL"}
             </h1>
@@ -1566,7 +1566,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
       defaultValue: "Age at Reaction",
       getValue: () => {
         const val = answers?.screen6_2_timing;
-        if (!val) return t("notProvided");
+        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
         return locale === "es" ? (val + " años") : (val + " years old");
       },
     },
@@ -1576,7 +1576,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
       defaultValue: "Time to Onset",
       getValue: () => {
         const val = answers?.screen6_3_onset;
-        if (!val) return t("notProvided");
+        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_3_onset");
         const opt = step?.options?.find((o: any) => o.value === val);
         return locale === "es" ? opt?.labelEs || val : opt?.labelEn || val;
@@ -1585,11 +1585,23 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
     {
       id: "screen6_4_resolution",
       labelKey: "resolution",
-      defaultValue: "Resolution Method",
+      defaultValue: "Medical Care Received",
       getValue: () => {
         const val = answers?.screen6_4_resolution;
-        if (!val) return t("notProvided");
+        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_4_resolution");
+        const opt = step?.options?.find((o: any) => o.value === val);
+        return locale === "es" ? opt?.labelEs || val : opt?.labelEn || val;
+      },
+    },
+    {
+      id: "screen6_4b_resolution_type",
+      labelKey: "resolutionType",
+      defaultValue: "Symptom Resolution",
+      getValue: () => {
+        const val = answers?.screen6_4b_resolution_type;
+        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
+        const step = questionnaireConfig.find((s) => s.id === "screen6_4b_resolution_type");
         const opt = step?.options?.find((o: any) => o.value === val);
         return locale === "es" ? opt?.labelEs || val : opt?.labelEn || val;
       },
@@ -1597,10 +1609,10 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
     {
       id: "screen6_5_yetagain",
       labelKey: "yetagain",
-      defaultValue: "Re-exposure Since Reaction",
+      defaultValue: "Penicillin Since Reaction",
       getValue: () => {
         const val = answers?.screen6_5_yetagain;
-        if (!val) return t("notProvided");
+        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_5_yetagain");
         const opt = step?.options?.find((o: any) => o.value === val);
         return locale === "es" ? opt?.labelEs || val : opt?.labelEn || val;
@@ -1711,12 +1723,6 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
 function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, locale, navigating }: { answers: any; activeToken?: string | null; onProceedToSurvey: () => void; t: any; locale: string; navigating?: boolean }) {
   const isEs = locale === "es";
 
-  // Formatted Allergy
-  const rawAllergy = answers["screen2_allergy"];
-  const allergy = rawAllergy
-    ? (isEs && (rawAllergy === "Not Specified" || rawAllergy === "No especificada") ? t("notSpecified") : rawAllergy)
-    : t("notSpecified");
-
   // Formatted Symptoms
   const rawSymptoms = answers["screen6_1_symptoms"];
   const formatSymptoms = () => {
@@ -1757,16 +1763,24 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
   };
   const symptoms = formatSymptoms();
 
+  // Formatted Allergy
+  const rawAllergy = answers["screen2_allergy"];
+  const allergy = rawAllergy && rawAllergy !== "none_selected" && rawAllergy !== "undefined"
+    ? (isEs && (rawAllergy === "Not Specified" || rawAllergy === "No especificada") ? t("notSpecified") : rawAllergy)
+    : (isEs ? "Penicilina (Amoxicilina)" : "Penicillin (Amoxicillin)");
+
   // Formatted Timing / Age
   const rawTiming = answers["screen6_2_timing"];
-  const formattedTiming = rawTiming
+  const formattedTiming = rawTiming && rawTiming !== "none_selected" && rawTiming !== "undefined"
     ? rawTiming + (isEs ? " años" : " years old")
-    : t("notProvided");
+    : (isEs ? "No provisto" : "Not provided");
 
   // Formatted Time to Onset
   const rawOnset = answers["screen6_3_onset"];
   const formatOnset = () => {
-    if (!rawOnset) return t("notProvided");
+    if (!rawOnset || rawOnset === "none_selected" || rawOnset === "undefined") {
+      return isEs ? "No provisto" : "Not provided";
+    }
     const onsetStep = questionnaireConfig.find((s) => s.id === "screen6_3_onset");
     const opt = onsetStep?.options?.find((o) => o.value === rawOnset || o.labelEn === rawOnset || o.labelEs === rawOnset);
     return isEs ? (opt?.labelEs || rawOnset) : (opt?.labelEn || rawOnset);
