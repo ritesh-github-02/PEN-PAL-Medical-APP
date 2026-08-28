@@ -117,14 +117,6 @@ export default function HomePage() {
                     <strong className="text-[#12262a] font-semibold">Participants</strong> &mdash; click the unique invitation link sent to you, or scan the QR code on your study flyer.
                   </p>
                 </div>
-                <div className="flex gap-3">
-                  <span className="shrink-0 w-5 h-5 rounded-full bg-white border border-[#e4e0d3] text-[#9c6b3f] text-[10px] font-bold flex items-center justify-center mt-0.5" aria-hidden="true">
-                    2
-                  </span>
-                  <p className="text-[13px] text-[#374544] leading-relaxed">
-                    <strong className="text-[#12262a] font-semibold">Staff / researchers</strong> &mdash; use your assigned token, or open the Admin Portal directly.
-                  </p>
-                </div>
               </div>
             </div>
 
