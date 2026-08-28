@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
       const links = campaign.participants.map((p, idx) => {
         const token = p.tokens[0]?.tokenHash || p.externalId || '';
-        const url = `${baseUrl}/${targetPath}?token=${encodeURIComponent(token)}`;
+        const url = `${baseUrl}/en/${targetPath}?token=${encodeURIComponent(token)}`;
         return {
           index: idx + 1,
           participantId: p.id,

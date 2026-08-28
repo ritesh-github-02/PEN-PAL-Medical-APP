@@ -14,6 +14,9 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Match internationalized pathnames and gateway routes
-  matcher: ['/', '/(en|es)/:path*', '/join', '/app', '/handout']
+  // Match all request paths (including /intervention, /control, /admin, /join) except:
+  // - API routes (/api/*)
+  // - Static files (/images/*, favicon.ico, robots.txt, etc.)
+  // - Next.js internal files (/_next/*, /_vercel/*)
+  matcher: ['/((?!api|_next|_vercel|images|.*\\..*).*)']
 };
