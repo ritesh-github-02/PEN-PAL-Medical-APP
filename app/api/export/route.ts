@@ -42,12 +42,14 @@ function formatAnswerValue(questionId: string, rawVal: any): string {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type');
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
 
   try {
     let data: any[] = [];
     let filename = '';
 
     const participantId = searchParams.get('participantId');
+    const campaignId = searchParams.get('campaignId');
 
     if (type === 'responses' || type === 'participant_responses') {
       const whereClause = participantId ? { participantId } : {};
@@ -73,6 +75,7 @@ export async function GET(request: Request) {
     else if (type === 'participants') {
       const participants = await prisma.participant.findMany({
         include: {
+          campaign: true,
           _count: {
             select: {
               sessions: true,
@@ -93,6 +96,7 @@ export async function GET(request: Request) {
         ParticipantID: p.externalId || p.id,
         DatabaseID: p.id,
         CohortGroup: p.groupId,
+        Campaign: p.campaign?.name || 'Unassigned',
         Status: p.status,
         SessionsCount: p._count.sessions,
         ResponsesCount: p._count.responses,
@@ -102,6 +106,48 @@ export async function GET(request: Request) {
         EnrolledAt: p.createdAt.toISOString()
       }));
       filename = 'penpal_clinical_cohort_roster.csv';
+    }
+    else if (type === 'campaign_links' || type === 'campaign_tokens') {
+      const whereClause = campaignId ? { campaignId } : { campaignId: { not: null } };
+      
+      const participants = await prisma.participant.findMany({
+        where: whereClause,
+        include: {
+          campaign: true,
+          tokens: {
+            orderBy: { createdAt: 'desc' },
+            take: 1
+          }
+        },
+        orderBy: [{ campaignId: 'asc' }, { createdAt: 'asc' }]
+      });
+
+      let campaignSlug = 'all';
+      if (campaignId && participants[0]?.campaign?.slug) {
+        campaignSlug = participants[0].campaign.slug;
+      }
+
+      data = participants.map((p, idx) => {
+        const token = p.tokens[0]?.tokenHash || p.externalId || '';
+        const targetPath = p.groupId === 'CONTROL' ? 'control' : 'intervention';
+        const directUrl = `${baseUrl}/${targetPath}?token=${encodeURIComponent(token)}`;
+
+        return {
+          Index: idx + 1,
+          ParticipantID: p.externalId || `PARTICIPANT-${idx + 1}`,
+          AccessToken: token,
+          DirectInvitationURL: directUrl,
+          StudyArm: p.groupId,
+          CampaignName: p.campaign?.name || 'Unassigned',
+          CampaignSlug: p.campaign?.slug || 'none',
+          Status: p.tokens[0]?.status || p.status,
+          TimesUsed: p.tokens[0]?.useCount || 0,
+          CreatedAt: p.createdAt.toISOString()
+        };
+      });
+
+      const timestamp = new Date().toISOString().slice(0, 10);
+      filename = `penpal_campaign_${campaignSlug}_links_${timestamp}.csv`;
     }
     else if (type === 'events') {
       const events = await prisma.eventLog.findMany({
@@ -141,22 +187,23 @@ export async function GET(request: Request) {
       return new NextResponse('Invalid export type', { status: 400 });
     }
 
-    const csv = Papa.unparse(data);
+    // Include UTF-8 BOM for flawless Excel compatibility
+    const csvContent = '\uFEFF' + Papa.unparse(data);
 
-    return new NextResponse(csv, {
+    return new NextResponse(csvContent, {
       headers: {
-        'Content-Type': 'text/csv',
+        'Content-Type': 'text/csv; charset=utf-8',
         'Content-Disposition': `attachment; filename="${filename}"`
       }
     });
 
   } catch (error) {
-    const fallbackCsv = Papa.unparse([{ Notice: 'Database connection unavailable in preview environment.' }]);
+    const fallbackCsv = '\uFEFF' + Papa.unparse([{ Notice: 'Database connection unavailable in preview environment.' }]);
     
     return new NextResponse(fallbackCsv, {
       status: 200,
       headers: {
-        'Content-Type': 'text/csv',
+        'Content-Type': 'text/csv; charset=utf-8',
         'Content-Disposition': `attachment; filename="preview_notice.csv"`
       }
     });

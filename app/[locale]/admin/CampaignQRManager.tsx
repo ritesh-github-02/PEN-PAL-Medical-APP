@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import QRCode from 'qrcode';
+import Papa from 'papaparse';
 import {
   QrCode,
   Plus,
@@ -19,7 +20,12 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Share2,
+  FileSpreadsheet,
+  Printer,
+  Sparkles,
+  Link as LinkIcon,
+  Layers,
+  ChevronRight,
 } from 'lucide-react';
 
 export interface CampaignItem {
@@ -32,48 +38,78 @@ export interface CampaignItem {
   totalScans: number;
 }
 
+export interface GeneratedLinkItem {
+  index: number;
+  participantId: string;
+  externalId: string;
+  token: string;
+  url: string;
+  arm: string;
+  status: string;
+  useCount?: number;
+  lastUsedAt?: string | null;
+  createdAt: string | Date;
+}
+
 export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: CampaignItem[] }) {
   const [campaigns, setCampaigns] = useState<CampaignItem[]>(initialCampaigns || []);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isViewLinksModalOpen, setIsViewLinksModalOpen] = useState(false);
+  const [isQrPreviewModalOpen, setIsQrPreviewModalOpen] = useState(false);
+
   const [loading, setLoading] = useState(false);
+  const [linksLoading, setLinksLoading] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  // Search & Filter State
+  // Search & Filter State for Main Table
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'DEACTIVATED'>('ALL');
   const [armFilter, setArmFilter] = useState<'ALL' | 'INTERVENTION' | 'CONTROL'>('ALL');
 
-  // Form State inside Modal
+  // Form State inside Create Modal
   const [name, setName] = useState('');
   const [arm, setArm] = useState<'INTERVENTION' | 'CONTROL'>('INTERVENTION');
+  const [quantity, setQuantity] = useState<number>(10);
+  const [customQuantity, setCustomQuantity] = useState<string>('10');
 
-  // Preview & Generated Item State inside modal
-  const [generatedLink, setGeneratedLink] = useState('');
-  const [qrDataUrl, setQrDataUrl] = useState('');
+  // Generated Batch State (Post Creation)
+  const [createdCampaign, setCreatedCampaign] = useState<any | null>(null);
+  const [generatedLinks, setGeneratedLinks] = useState<GeneratedLinkItem[]>([]);
+  const [batchSearchTerm, setBatchSearchTerm] = useState('');
+
+  // Selected Campaign for "View Links & QR Codes" Drawer
+  const [activeCampaign, setActiveCampaign] = useState<CampaignItem | null>(null);
+  const [activeCampaignLinks, setActiveCampaignLinks] = useState<GeneratedLinkItem[]>([]);
+  const [addQuantity, setAddQuantity] = useState<number>(10);
+  const [addingMore, setAddingMore] = useState(false);
+
+  // Single QR Code Preview State
+  const [previewQrItem, setPreviewQrItem] = useState<{
+    title: string;
+    subtitle: string;
+    token: string;
+    url: string;
+    qrDataUrl: string;
+  } | null>(null);
+
+  // Single QR Poster State for Open Campaign (General)
+  const [generalPosterQr, setGeneralPosterQr] = useState<{
+    campaign: CampaignItem;
+    url: string;
+    qrDataUrl: string;
+  } | null>(null);
+
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Derive origin safely on client
+  // Origin
   const [origin, setOrigin] = useState('');
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setOrigin(window.location.origin);
     }
   }, []);
-
-  // Escape key handler for modal
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isModalOpen) {
-        setIsModalOpen(false);
-      }
-    };
-    if (isModalOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen]);
 
   // Toast timer
   useEffect(() => {
@@ -98,12 +134,11 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
     }
   };
 
-  // Optimistic & 100% Reliable Toggle Status Function via API
+  // Optimistic Toggle Status Function
   const handleToggle = async (id: string, currentStatus: string, campaignName: string) => {
     const nextStatus: 'ACTIVE' | 'DEACTIVATED' = currentStatus === 'ACTIVE' ? 'DEACTIVATED' : 'ACTIVE';
     setTogglingId(id);
 
-    // 1. Instant Optimistic State Update
     setCampaigns((prev) =>
       prev.map((c) => (c.id === id ? { ...c, status: nextStatus } : c))
     );
@@ -118,7 +153,6 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        // Rollback on failure
         setCampaigns((prev) =>
           prev.map((c) => (c.id === id ? { ...c, status: currentStatus } : c))
         );
@@ -130,7 +164,6 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         );
       }
     } catch (err: any) {
-      // Rollback on exception
       setCampaigns((prev) =>
         prev.map((c) => (c.id === id ? { ...c, status: currentStatus } : c))
       );
@@ -140,16 +173,23 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
     }
   };
 
+  // Create Campaign & Generate N Links
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
+    const qty = Math.max(1, Math.min(Number(quantity) || 1, 500));
+
     try {
       const res = await fetch('/api/campaigns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, arm }),
+        body: JSON.stringify({
+          name,
+          arm,
+          quantity: qty,
+        }),
       });
 
       const data = await res.json();
@@ -159,12 +199,78 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         return;
       }
 
-      const campaign = data.campaign;
-      const armParam = campaign.arm.toLowerCase();
-      const link = `${origin || 'https://domain.com'}/join?arm=${armParam}&campaign=${encodeURIComponent(campaign.slug)}`;
+      setCreatedCampaign(data.campaign);
+      setGeneratedLinks(data.links || []);
+      showToast(`🎉 Created "${data.campaign.name}" with ${data.totalGenerated} unique links!`, 'success');
+      await refreshCampaigns();
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while generating campaign links.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      const qrUrl = await QRCode.toDataURL(link, {
-        width: 500,
+  // Open "View Links & QR Codes" Drawer for an Existing Campaign
+  const handleOpenCampaignLinks = async (campaign: CampaignItem) => {
+    setActiveCampaign(campaign);
+    setIsViewLinksModalOpen(true);
+    setLinksLoading(true);
+
+    try {
+      const res = await fetch(`/api/campaigns?campaignId=${encodeURIComponent(campaign.id)}`, {
+        cache: 'no-store',
+      });
+      const data = await res.json();
+      if (data.success && data.links) {
+        setActiveCampaignLinks(data.links);
+      } else {
+        setActiveCampaignLinks([]);
+      }
+    } catch (err) {
+      console.error('Failed to load campaign links:', err);
+      showToast('Failed to load links for this campaign.', 'error');
+    } finally {
+      setLinksLoading(false);
+    }
+  };
+
+  // Append N More Links to an Existing Campaign
+  const handleAddMoreLinks = async () => {
+    if (!activeCampaign) return;
+    setAddingMore(true);
+
+    const qty = Math.max(1, Math.min(Number(addQuantity) || 1, 500));
+
+    try {
+      const res = await fetch('/api/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          campaignId: activeCampaign.id,
+          quantity: qty,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.newlyGenerated) {
+        setActiveCampaignLinks((prev) => [...prev, ...data.newlyGenerated]);
+        showToast(`Added ${data.totalAdded} new links to "${activeCampaign.name}"!`, 'success');
+        await refreshCampaigns();
+      } else {
+        showToast(data.error || 'Failed to add links', 'error');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Error adding links', 'error');
+    } finally {
+      setAddingMore(false);
+    }
+  };
+
+  // Open QR Code Preview Modal for a Single Link
+  const handlePreviewQr = async (item: GeneratedLinkItem, campaignTitle: string) => {
+    try {
+      const qrDataUrl = await QRCode.toDataURL(item.url, {
+        width: 600,
         margin: 2,
         color: {
           dark: '#0f172a',
@@ -172,61 +278,120 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         },
       });
 
-      setGeneratedLink(link);
-      setQrDataUrl(qrUrl);
-      showToast(`Campaign "${campaign.name}" created successfully!`, 'success');
-      await refreshCampaigns();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred while generating QR code.');
-    } finally {
-      setLoading(false);
+      setPreviewQrItem({
+        title: campaignTitle,
+        subtitle: `Participant Research ID: ${item.externalId}`,
+        token: item.token,
+        url: item.url,
+        qrDataUrl,
+      });
+      setIsQrPreviewModalOpen(true);
+    } catch (err) {
+      console.error('QR generate error:', err);
     }
   };
 
-  const generateQrForLink = async (link: string): Promise<string> => {
-    return QRCode.toDataURL(link, {
-      width: 600,
-      margin: 2,
-      color: {
-        dark: '#0f172a',
-        light: '#ffffff',
-      },
-    });
+  // Open General Poster QR Modal
+  const handleOpenGeneralPoster = async (campaign: CampaignItem) => {
+    const link = `${origin || 'https://domain.com'}/join?arm=${campaign.arm.toLowerCase()}&campaign=${encodeURIComponent(campaign.slug)}`;
+    try {
+      const qrDataUrl = await QRCode.toDataURL(link, {
+        width: 600,
+        margin: 2,
+        color: {
+          dark: '#0f172a',
+          light: '#ffffff',
+        },
+      });
+
+      setGeneralPosterQr({
+        campaign,
+        url: link,
+        qrDataUrl,
+      });
+    } catch (err) {
+      console.error('General QR error:', err);
+    }
   };
 
+  // ── CSV & Excel Export Engine (Clean & Formatted with UTF-8 BOM) ───────────────
+  const exportLinksToCSV = (links: GeneratedLinkItem[], campaignName: string, campaignSlug: string) => {
+    if (!links || links.length === 0) {
+      showToast('No links available to export.', 'error');
+      return;
+    }
+
+    const exportRows = links.map((link, idx) => ({
+      Index: idx + 1,
+      ParticipantID: link.externalId,
+      AccessToken: link.token,
+      DirectInvitationURL: link.url,
+      StudyArm: link.arm,
+      CampaignName: campaignName,
+      CampaignSlug: campaignSlug,
+      Status: link.status || 'PENDING',
+      TimesUsed: link.useCount || 0,
+      DateCreated: typeof link.createdAt === 'string' ? link.createdAt : new Date(link.createdAt).toISOString(),
+    }));
+
+    const csvContent = '\uFEFF' + Papa.unparse(exportRows);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const timestamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `PEN-PAL_${campaignSlug || 'Campaign'}_Links_${timestamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast(`Downloaded CSV spreadsheet for "${campaignName}"!`, 'success');
+  };
+
+  // Download Individual QR Code PNG
+  const handleDownloadQrPng = (dataUrl: string, filename: string) => {
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `${filename}_QRCode.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast(`Downloaded QR Code PNG for ${filename}`);
+  };
+
+  // Copy Single Link
   const handleCopy = (text: string, id: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(text);
       setCopiedId(id);
-      showToast('Campaign invitation link copied to clipboard!');
+      showToast('Copied link to clipboard!');
       setTimeout(() => setCopiedId(null), 2000);
     }
   };
 
-  const handleDownload = async (link: string, filename: string) => {
-    try {
-      const dataUrl = await generateQrForLink(link);
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = `${filename}_QR_Poster.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      showToast(`Downloaded QR Poster for ${filename}`);
-    } catch (err) {
-      console.error('Download QR failed', err);
+  // Copy All Links to Clipboard (Newline-separated)
+  const handleCopyAllLinks = (links: GeneratedLinkItem[]) => {
+    if (!links || links.length === 0) return;
+    const text = links.map((l) => `${l.externalId}\t${l.token}\t${l.url}`).join('\n');
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      showToast(`Copied ${links.length} links to clipboard!`);
     }
   };
 
-  const resetForm = () => {
+  // Reset Create Modal Form
+  const resetCreateForm = () => {
     setName('');
     setArm('INTERVENTION');
-    setGeneratedLink('');
-    setQrDataUrl('');
+    setQuantity(10);
+    setCustomQuantity('10');
+    setCreatedCampaign(null);
+    setGeneratedLinks([]);
     setError(null);
   };
 
-  // Filtered list
+  // Filtered Main Campaigns
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((c) => {
       const matchesSearch =
@@ -249,7 +414,6 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
 
   return (
     <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden space-y-0">
-      
       {/* Toast Alert Notification */}
       {toastMessage && (
         <div
@@ -281,7 +445,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 Study QR Codes & Campaign Manager
               </h2>
               <p className="text-xs text-slate-300 font-light">
-                Generate and control self-enrollment poster QR codes and direct links with instant active/deactivated toggling.
+                Create research campaigns, generate batches of unique participant links & QR codes, and export formatted CSV/Excel rosters.
               </p>
             </div>
           </div>
@@ -290,13 +454,13 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         <button
           type="button"
           onClick={() => {
-            resetForm();
-            setIsModalOpen(true);
+            resetCreateForm();
+            setIsCreateModalOpen(true);
           }}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 active:scale-[0.98] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" />
-          Create New Campaign QR
+          Create New Campaign & Batch Links
         </button>
       </div>
 
@@ -317,7 +481,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Posters</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Campaigns</p>
             <div className="flex items-center gap-1.5">
               <span className="text-lg font-extrabold font-mono text-emerald-700">{activeCount}</span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -340,7 +504,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
             <Activity className="w-4 h-4 text-indigo-600" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Participant Scans</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enrolled Participants</p>
             <p className="text-lg font-extrabold font-mono text-indigo-900">{totalScans}</p>
           </div>
         </div>
@@ -401,7 +565,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         </div>
       </div>
 
-      {/* Roster Table */}
+      {/* Campaigns Main Table */}
       {filteredCampaigns.length === 0 ? (
         <div className="text-center py-12 bg-slate-50/50">
           <QrCode className="w-10 h-10 mx-auto text-slate-300 mb-2" />
@@ -409,7 +573,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto font-light">
             {searchTerm || statusFilter !== 'ALL' || armFilter !== 'ALL'
               ? 'Try clearing your filters or search keywords.'
-              : 'Click "Create New Campaign QR" to generate your first study campaign.'}
+              : 'Click "Create New Campaign & Batch Links" to generate your first study campaign.'}
           </p>
         </div>
       ) : (
@@ -419,14 +583,13 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
               <tr className="border-b border-slate-200 bg-slate-100/75 text-slate-500 font-mono uppercase text-[10px] tracking-wider">
                 <th className="py-3 px-5 font-bold">Campaign Name & Slug</th>
                 <th className="py-3 px-5 font-bold">Study Arm</th>
-                <th className="py-3 px-5 font-bold text-center">Total Scans</th>
+                <th className="py-3 px-5 font-bold text-center">Participants</th>
                 <th className="py-3 px-5 font-bold text-center">Access Status</th>
                 <th className="py-3 px-5 text-right font-bold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredCampaigns.map((item) => {
-                const link = `${origin || 'https://domain.com'}/join?arm=${item.arm.toLowerCase()}&campaign=${encodeURIComponent(item.slug)}`;
                 const isActive = item.status === 'ACTIVE';
                 const isToggling = togglingId === item.id;
 
@@ -449,105 +612,85 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     {/* Study Arm */}
                     <td className="py-4 px-5">
                       {item.arm === 'INTERVENTION' ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-bold bg-teal-50 text-teal-800 border border-teal-200/80 font-mono">
-                          <Smartphone className="w-3.5 h-3.5 text-teal-600" />
-                          Intervention App
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                          <Smartphone className="w-3 h-3" />
+                          Intervention
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-800 border border-slate-200/90 font-mono">
-                          <BookOpen className="w-3.5 h-3.5 text-slate-600" />
-                          Control Handout
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                          <BookOpen className="w-3 h-3" />
+                          Control
                         </span>
                       )}
                     </td>
 
-                    {/* Total Scans */}
-                    <td className="py-4 px-5 text-center font-mono font-extrabold text-slate-900 text-sm">
-                      <span className="bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg">
-                        {item.totalScans}
+                    {/* Participant / Link Count */}
+                    <td className="py-4 px-5 text-center font-mono font-bold text-slate-800">
+                      <span className="bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg text-xs">
+                        {item.totalScans || 0} links
                       </span>
                     </td>
 
-                    {/* Status & Interactive Toggle Pill */}
+                    {/* Active / Deactivated Switch */}
                     <td className="py-4 px-5 text-center">
                       <button
                         type="button"
-                        onClick={() => handleToggle(item.id, item.status, item.name)}
                         disabled={isToggling}
-                        title={`Click to ${isActive ? 'Deactivate' : 'Activate'} campaign`}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border shadow-2xs ${
+                        onClick={() => handleToggle(item.id, item.status, item.name)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase transition-all shadow-2xs cursor-pointer border ${
                           isActive
-                            ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300'
-                            : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-300'
-                        } ${isToggling ? 'opacity-50 pointer-events-none' : ''}`}
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                            : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
+                        } ${isToggling ? 'opacity-50 cursor-wait' : 'active:scale-95'}`}
+                        title={isActive ? 'Click to deactivate campaign' : 'Click to activate campaign'}
                       >
                         {isToggling ? (
-                          <Loader2 className="w-3 h-3 animate-spin text-slate-500" />
+                          <Loader2 className="w-3 h-3 animate-spin" />
                         ) : (
                           <span
-                            className={`w-2 h-2 rounded-full ${
+                            className={`w-1.5 h-1.5 rounded-full ${
                               isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
                             }`}
-                          ></span>
+                          />
                         )}
                         <span>{isActive ? 'Active' : 'Deactivated'}</span>
                       </button>
                     </td>
 
-                    {/* Actions Column */}
-                    <td className="py-4 px-5 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {/* Copy Link Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(link, item.id)}
-                          title="Copy Direct Invitation Link"
-                          className="flex items-center gap-1 px-2.5 py-1.5 text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-bold transition-all cursor-pointer active:scale-95"
-                        >
-                          {copiedId === item.id ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              <span className="text-emerald-700">Copied</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5 text-slate-600" />
-                              <span>Copy Link</span>
-                            </>
-                          )}
-                        </button>
+                    {/* Row Actions */}
+                    <td className="py-4 px-5 text-right space-x-1.5 whitespace-nowrap">
+                      {/* View & Manage Links */}
+                      <button
+                        type="button"
+                        onClick={() => handleOpenCampaignLinks(item)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold rounded-lg border border-indigo-200 transition-colors shadow-2xs cursor-pointer"
+                        title="View and manage unique links & QR codes"
+                      >
+                        <Layers className="w-3.5 h-3.5" />
+                        <span>Manage Links</span>
+                      </button>
 
-                        {/* Download QR Poster Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleDownload(link, item.slug)}
-                          title="Download High-Res QR Code Poster (PNG)"
-                          className="flex items-center gap-1 px-2.5 py-1.5 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-xs font-bold transition-all cursor-pointer active:scale-95"
-                        >
-                          <Download className="w-3.5 h-3.5 text-indigo-600" />
-                          <span>QR Poster</span>
-                        </button>
+                      {/* Export CSV Direct */}
+                      <a
+                        href={`/api/export?type=campaign_links&campaignId=${item.id}`}
+                        download
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold rounded-lg border border-emerald-200 transition-colors shadow-2xs cursor-pointer"
+                        title="Export CSV spreadsheet of all unique links"
+                      >
+                        <FileSpreadsheet className="w-3.5 h-3.5" />
+                        <span>CSV / Excel</span>
+                      </a>
 
-                        {/* Direct Toggle Action Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggle(item.id, item.status, item.name)}
-                          disabled={isToggling}
-                          title={isActive ? 'Deactivate this campaign access' : 'Activate this campaign access'}
-                          className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border active:scale-95 ${
-                            isActive
-                              ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
-                              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
-                          } ${isToggling ? 'opacity-50 pointer-events-none' : ''}`}
-                        >
-                          {isToggling ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Power className="w-3.5 h-3.5" />
-                          )}
-                          <span>{isActive ? 'Deactivate' : 'Activate'}</span>
-                        </button>
-                      </div>
+                      {/* General Poster QR */}
+                      <button
+                        type="button"
+                        onClick={() => handleOpenGeneralPoster(item)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-bold rounded-lg border border-slate-200 transition-colors shadow-2xs cursor-pointer"
+                        title="View open poster QR code"
+                      >
+                        <QrCode className="w-3.5 h-3.5" />
+                        <span>Poster QR</span>
+                      </button>
                     </td>
                   </tr>
                 );
@@ -557,184 +700,642 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         </div>
       )}
 
-      {/* ================= MODAL: CREATE CAMPAIGN QR ================= */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="campaign-modal-title"
-        >
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      {/* =========================================================================
+          MODAL 1: Create New Campaign & Generate N Links
+          ========================================================================= */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-8">
             {/* Modal Header */}
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-indigo-600/30 border border-indigo-400/30 rounded-xl text-indigo-300" aria-hidden="true">
-                  <QrCode className="w-5 h-5" />
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                  <Sparkles className="w-4 h-4" />
                 </div>
-                <div>
-                  <h3 id="campaign-modal-title" className="font-extrabold text-sm tracking-tight text-white">
-                    Create Campaign QR & Link
-                  </h3>
-                  <p className="text-[11px] text-slate-300 font-light">
-                    Generate passwordless access for clinic posters and study flyers
-                  </p>
-                </div>
+                <h3 className="font-black text-slate-900 text-base tracking-tight">
+                  {createdCampaign ? 'Batch Links Generated Successfully' : 'Create Campaign & Generate Links'}
+                </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setIsModalOpen(false)}
-                aria-label="Close create campaign dialog"
-                className="text-slate-400 hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer"
+                onClick={() => setIsCreateModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition cursor-pointer"
               >
-                <X className="w-5 h-5" aria-hidden="true" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Modal Form Body */}
-            <div className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
-              {error && (
-                <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleCreate} className="space-y-4">
-                {/* Campaign Name */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                    Campaign / Poster Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Clinic Room A Poster, General Pediatric Flyer"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500"
-                  />
-                  <p className="text-[11px] text-slate-400">
-                    A unique web slug will automatically be derived from this name.
-                  </p>
-                </div>
-
-                {/* Study Arm Selector Cards */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                    Target Study Arm
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* Intervention Option */}
-                    <button
-                      type="button"
-                      onClick={() => setArm('INTERVENTION')}
-                      className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
-                        arm === 'INTERVENTION'
-                          ? 'border-teal-500 bg-teal-50/80 ring-2 ring-teal-500/20 text-teal-900'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <Smartphone className={`w-4 h-4 ${arm === 'INTERVENTION' ? 'text-teal-700' : 'text-slate-500'}`} />
-                        <span className="font-bold text-xs">Intervention App</span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 font-light">
-                        Interactive delabeling curriculum & risk calculator
-                      </p>
-                    </button>
-
-                    {/* Control Option */}
-                    <button
-                      type="button"
-                      onClick={() => setArm('CONTROL')}
-                      className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
-                        arm === 'CONTROL'
-                          ? 'border-indigo-500 bg-indigo-50/80 ring-2 ring-indigo-500/20 text-indigo-900'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <BookOpen className={`w-4 h-4 ${arm === 'CONTROL' ? 'text-indigo-700' : 'text-slate-500'}`} />
-                        <span className="font-bold text-xs">Control Handout</span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 font-light">
-                        Baseline educational brochure & infographic
-                      </p>
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || !name.trim()}
-                  className="w-full py-3 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Generating QR & Link...</span>
-                    </>
-                  ) : (
-                    <>
-                      <QrCode className="w-4 h-4" />
-                      <span>Generate Campaign QR Code</span>
-                    </>
+            {/* Modal Body */}
+            <div className="p-6">
+              {!createdCampaign ? (
+                /* Step 1: Form to Create Campaign & Specify N Quantity */
+                <form onSubmit={handleCreate} className="space-y-5">
+                  {error && (
+                    <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs font-semibold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{error}</span>
+                    </div>
                   )}
-                </button>
-              </form>
 
-              {/* QR Preview & Download Section */}
-              {generatedLink && qrDataUrl && (
-                <div className="mt-5 p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4 animate-in fade-in slide-in-from-top-2">
-                  <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>QR Code Generated Successfully</span>
+                  {/* Campaign Name */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Campaign / Site Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Children's Hospital Waiting Room A, Clinic B Flyer"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 font-medium transition"
+                    />
+                    <p className="text-[11px] text-slate-400">
+                      A descriptive title to track where these links and QR codes will be distributed.
+                    </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-4 bg-white p-4 border border-slate-200 rounded-xl">
-                    <div className="bg-white p-2 border border-slate-200 rounded-xl shadow-xs shrink-0">
-                      <img src={qrDataUrl} alt="Campaign QR Code" className="w-28 h-28 object-contain" />
-                    </div>
+                  {/* Study Arm Selector */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Study Arm Destination
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setArm('INTERVENTION')}
+                        className={`p-3.5 border rounded-xl flex items-center gap-3 text-left transition cursor-pointer ${
+                          arm === 'INTERVENTION'
+                            ? 'border-teal-500 bg-teal-50/60 ring-2 ring-teal-500/20 text-teal-900'
+                            : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                        }`}
+                      >
+                        <Smartphone className={`w-5 h-5 ${arm === 'INTERVENTION' ? 'text-teal-600' : 'text-slate-400'}`} />
+                        <div>
+                          <p className="text-xs font-extrabold">Intervention Arm</p>
+                          <p className="text-[10px] text-slate-500">PEN-PAL Interactive Wizard</p>
+                        </div>
+                      </button>
 
-                    <div className="space-y-2 w-full text-left">
-                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Access Link</p>
-                      <p className="text-xs font-mono font-bold text-slate-800 break-all bg-slate-50 p-2 rounded-lg border border-slate-200 select-all">
-                        {generatedLink}
-                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setArm('CONTROL')}
+                        className={`p-3.5 border rounded-xl flex items-center gap-3 text-left transition cursor-pointer ${
+                          arm === 'CONTROL'
+                            ? 'border-amber-500 bg-amber-50/60 ring-2 ring-amber-500/20 text-amber-900'
+                            : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                        }`}
+                      >
+                        <BookOpen className={`w-5 h-5 ${arm === 'CONTROL' ? 'text-amber-600' : 'text-slate-400'}`} />
+                        <div>
+                          <p className="text-xs font-extrabold">Control Arm</p>
+                          <p className="text-[10px] text-slate-500">Standard Educational Site</p>
+                        </div>
+                      </button>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Number of Unique Links to Generate (N) */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Number of Unique Links & QR Codes to Generate (N)
+                      </label>
+                      <span className="text-xs font-bold font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                        {quantity} links
+                      </span>
+                    </div>
+
+                    {/* Quick Preset Buttons */}
+                    <div className="flex flex-wrap gap-2">
+                      {[5, 10, 25, 50, 100, 250].map((num) => (
+                        <button
+                          key={num}
+                          type="button"
+                          onClick={() => {
+                            setQuantity(num);
+                            setCustomQuantity(String(num));
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                            quantity === num
+                              ? 'bg-indigo-600 text-white shadow-sm'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          }`}
+                        >
+                          {num} links
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Custom Number Input */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-xs text-slate-500">Or custom quantity:</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={500}
+                        value={customQuantity}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCustomQuantity(val);
+                          const num = parseInt(val, 10);
+                          if (!isNaN(num) && num > 0) {
+                            setQuantity(num);
+                          }
+                        }}
+                        className="w-24 px-2.5 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-indigo-500"
+                      />
+                      <span className="text-[11px] text-slate-400">(Max 500 per batch)</span>
+                    </div>
+                  </div>
+
+                  {/* Explanatory Note */}
+                  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-600 text-xs leading-relaxed space-y-1">
+                    <p className="font-bold text-slate-800 flex items-center gap-1.5">
+                      <QrCode className="w-3.5 h-3.5 text-indigo-600" />
+                      What will be generated:
+                    </p>
+                    <p className="text-[11px]">
+                      Each participant link will receive a unique clean Research ID (<span className="font-mono text-slate-800 font-bold">PEN-XXX-001</span>), a cryptographically secure access token (<span className="font-mono text-slate-800 font-bold">PEN-4K9L2M</span>), and a direct high-res QR code. You can immediately download all links as a CSV/Excel spreadsheet.
+                    </p>
+                  </div>
+
+                  {/* Submit Action Button */}
+                  <div className="pt-3 flex justify-end gap-2">
                     <button
                       type="button"
-                      onClick={() => handleCopy(generatedLink, 'modal-link')}
-                      className="py-2.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5"
+                      onClick={() => setIsCreateModalOpen(false)}
+                      className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer"
                     >
-                      {copiedId === 'modal-link' ? (
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading || !name.trim()}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer disabled:opacity-50"
+                    >
+                      {loading ? (
                         <>
-                          <Check className="w-4 h-4 text-emerald-600" />
-                          <span className="text-emerald-700">Copied</span>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Generating {quantity} Unique Links...</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="w-4 h-4 text-slate-600" />
-                          <span>Copy Link</span>
+                          <Sparkles className="w-4 h-4" />
+                          <span>Generate {quantity} Links & QR Codes</span>
                         </>
                       )}
                     </button>
+                  </div>
+                </form>
+              ) : (
+                /* Step 2: Batch Generated Success & Download Actions */
+                <div className="space-y-6">
+                  {/* Success Banner */}
+                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-emerald-600 text-white rounded-xl shadow-xs">
+                        <Check className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-emerald-950 text-sm">
+                          {generatedLinks.length} Unique Links & QR Codes Created!
+                        </h4>
+                        <p className="text-xs text-emerald-700 font-medium">
+                          Campaign: <span className="font-bold font-mono">{createdCampaign.name}</span> ({createdCampaign.arm})
+                        </p>
+                      </div>
+                    </div>
 
+                    {/* Big Download CSV Button */}
                     <button
                       type="button"
-                      onClick={() => handleDownload(generatedLink, name)}
-                      className="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5"
+                      onClick={() =>
+                        exportLinksToCSV(generatedLinks, createdCampaign.name, createdCampaign.slug)
+                      }
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 active:scale-[0.98] text-white text-xs font-extrabold rounded-xl transition shadow-md cursor-pointer shrink-0"
                     >
-                      <Download className="w-4 h-4" />
-                      <span>Download Poster</span>
+                      <FileSpreadsheet className="w-4 h-4" />
+                      <span>Download CSV / Excel</span>
+                    </button>
+                  </div>
+
+                  {/* Action Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleCopyAllLinks(generatedLinks)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition cursor-pointer"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy All URLs</span>
+                      </button>
+                    </div>
+
+                    {/* Search inside generated batch */}
+                    <div className="relative w-48">
+                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                      <input
+                        type="text"
+                        value={batchSearchTerm}
+                        onChange={(e) => setBatchSearchTerm(e.target.value)}
+                        placeholder="Filter batch..."
+                        className="w-full pl-8 pr-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Generated Links Scrollable Table */}
+                  <div className="max-h-72 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100 bg-slate-50/50">
+                    {generatedLinks
+                      .filter(
+                        (item) =>
+                          !batchSearchTerm ||
+                          item.externalId.toLowerCase().includes(batchSearchTerm.toLowerCase()) ||
+                          item.token.toLowerCase().includes(batchSearchTerm.toLowerCase())
+                      )
+                      .map((item) => (
+                        <div
+                          key={item.participantId}
+                          className="p-3 bg-white hover:bg-slate-50 transition flex items-center justify-between gap-3 text-xs"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="w-6 h-6 rounded-full bg-slate-100 font-mono text-[10px] font-bold text-slate-600 flex items-center justify-center shrink-0">
+                              #{item.index}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-extrabold text-slate-900 font-mono">{item.externalId}</span>
+                                <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono px-1.5 py-0.2 rounded text-[10px] font-bold">
+                                  {item.token}
+                                </span>
+                              </div>
+                              <p className="text-[11px] font-mono text-slate-400 truncate max-w-xs sm:max-w-sm mt-0.5">
+                                {item.url}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {/* Copy Link */}
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(item.url, item.participantId)}
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition cursor-pointer"
+                              title="Copy URL"
+                            >
+                              {copiedId === item.participantId ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+
+                            {/* Open Direct */}
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition"
+                              title="Open link in new tab"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+
+                            {/* Preview QR */}
+                            <button
+                              type="button"
+                              onClick={() => handlePreviewQr(item, createdCampaign.name)}
+                              className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold border border-indigo-200 transition cursor-pointer"
+                            >
+                              <QrCode className="w-3 h-3" />
+                              <span>QR</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="pt-2 flex justify-between items-center">
+                    <button
+                      type="button"
+                      onClick={() => resetCreateForm()}
+                      className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition cursor-pointer"
+                    >
+                      + Create Another Batch
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsCreateModalOpen(false)}
+                      className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
+                    >
+                      Done & Close
                     </button>
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL 2: View & Manage Existing Campaign Links (With Add More & Export)
+          ========================================================================= */}
+      {isViewLinksModalOpen && activeCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-8">
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-black text-slate-900 text-base tracking-tight">
+                    {activeCampaign.name}
+                  </h3>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700">
+                    {activeCampaign.arm}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                  Slug: {activeCampaign.slug} &middot; Total Links: {activeCampaignLinks.length}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsViewLinksModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              {/* Action Toolbar */}
+              <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-2">
+                  {/* Export CSV Button */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      exportLinksToCSV(activeCampaignLinks, activeCampaign.name, activeCampaign.slug)
+                    }
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition shadow-xs cursor-pointer"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5" />
+                    <span>Download CSV / Excel</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleCopyAllLinks(activeCampaignLinks)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold rounded-lg transition cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy All URLs</span>
+                  </button>
+                </div>
+
+                {/* Add More Links Form */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500 font-medium">Add more:</span>
+                  <select
+                    value={addQuantity}
+                    onChange={(e) => setAddQuantity(Number(e.target.value))}
+                    className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none"
+                  >
+                    <option value={5}>+5 links</option>
+                    <option value={10}>+10 links</option>
+                    <option value={25}>+25 links</option>
+                    <option value={50}>+50 links</option>
+                    <option value={100}>+100 links</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={handleAddMoreLinks}
+                    disabled={addingMore}
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition cursor-pointer disabled:opacity-50"
+                  >
+                    {addingMore ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+                    <span>Generate</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Links Table */}
+              {linksLoading ? (
+                <div className="py-12 text-center text-slate-400 space-y-2">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-indigo-600" />
+                  <p className="text-xs">Loading campaign links and QR tokens...</p>
+                </div>
+              ) : activeCampaignLinks.length === 0 ? (
+                <div className="py-12 text-center text-slate-400">
+                  <p className="text-xs">No unique links generated for this campaign yet.</p>
+                  <button
+                    type="button"
+                    onClick={handleAddMoreLinks}
+                    className="mt-2 text-xs font-bold text-indigo-600 hover:underline cursor-pointer"
+                  >
+                    + Generate first batch of links now
+                  </button>
+                </div>
+              ) : (
+                <div className="max-h-80 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100 bg-white">
+                  {activeCampaignLinks.map((item) => (
+                    <div
+                      key={item.participantId}
+                      className="p-3 hover:bg-slate-50 transition flex items-center justify-between gap-3 text-xs"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="w-6 h-6 rounded-full bg-slate-100 font-mono text-[10px] font-bold text-slate-600 flex items-center justify-center shrink-0">
+                          #{item.index}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-extrabold text-slate-900 font-mono">{item.externalId}</span>
+                            <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono px-1.5 py-0.2 rounded text-[10px] font-bold">
+                              {item.token}
+                            </span>
+                            {item.useCount && item.useCount > 0 ? (
+                              <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded">
+                                Used {item.useCount}x
+                              </span>
+                            ) : (
+                              <span className="text-[10px] text-slate-400 font-medium bg-slate-100 px-1.5 py-0.2 rounded">
+                                Unused
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] font-mono text-slate-400 truncate max-w-xs sm:max-w-md mt-0.5">
+                            {item.url}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {/* Copy Link */}
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(item.url, item.participantId)}
+                          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition cursor-pointer"
+                          title="Copy URL"
+                        >
+                          {copiedId === item.participantId ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+
+                        {/* Open Direct */}
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition"
+                          title="Open link in new tab"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+
+                        {/* Preview QR */}
+                        <button
+                          type="button"
+                          onClick={() => handlePreviewQr(item, activeCampaign.name)}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold border border-indigo-200 transition cursor-pointer"
+                        >
+                          <QrCode className="w-3 h-3" />
+                          <span>QR</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL 3: Individual QR Code Preview & High-Res PNG Download
+          ========================================================================= */}
+      {isQrPreviewModalOpen && previewQrItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 text-center space-y-4">
+            <div className="flex justify-between items-start">
+              <div className="text-left">
+                <h4 className="font-extrabold text-slate-900 text-sm">{previewQrItem.title}</h4>
+                <p className="text-[11px] font-mono text-slate-500">{previewQrItem.subtitle}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsQrPreviewModalOpen(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* QR Image Card */}
+            <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-inner inline-block mx-auto">
+              <img
+                src={previewQrItem.qrDataUrl}
+                alt="Participant QR Code"
+                className="w-48 h-48 mx-auto object-contain"
+              />
+              <div className="mt-2 text-center">
+                <span className="font-mono text-xs font-black tracking-wider text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+                  {previewQrItem.token}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-[11px] font-mono text-slate-400 break-all px-2 bg-slate-50 py-1.5 rounded-lg border border-slate-100">
+              {previewQrItem.url}
+            </p>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => handleCopy(previewQrItem.url, 'preview')}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                <span>Copy URL</span>
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  handleDownloadQrPng(previewQrItem.qrDataUrl, `${previewQrItem.token}_Flyer`)
+                }
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Save PNG</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL 4: General Campaign Open Poster QR
+          ========================================================================= */}
+      {generalPosterQr && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 text-center space-y-4">
+            <div className="flex justify-between items-start">
+              <div className="text-left">
+                <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  Open Poster QR
+                </span>
+                <h4 className="font-extrabold text-slate-900 text-base mt-1">{generalPosterQr.campaign.name}</h4>
+                <p className="text-xs text-slate-500">Self-enrollment QR code for waiting room flyers & posters</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGeneralPosterQr(null)}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Poster QR Card */}
+            <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-2">
+              <img
+                src={generalPosterQr.qrDataUrl}
+                alt="Campaign Poster QR Code"
+                className="w-56 h-56 mx-auto object-contain bg-white p-3 rounded-xl border border-slate-200 shadow-sm"
+              />
+              <p className="text-xs font-bold text-slate-800">Scan to Participate in Study</p>
+              <p className="text-[10px] font-mono text-slate-400 break-all">{generalPosterQr.url}</p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => handleCopy(generalPosterQr.url, 'poster')}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                <span>Copy Link</span>
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  handleDownloadQrPng(generalPosterQr.qrDataUrl, `${generalPosterQr.campaign.slug}_Poster`)
+                }
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Poster PNG</span>
+              </button>
             </div>
           </div>
         </div>
