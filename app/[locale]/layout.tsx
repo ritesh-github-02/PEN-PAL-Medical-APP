@@ -48,6 +48,40 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className="overflow-x-hidden" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function isExtError(str) {
+                  if (!str) return false;
+                  var s = String(str);
+                  return s.indexOf('chrome-extension://') !== -1 ||
+                         s.indexOf('moz-extension://') !== -1 ||
+                         s.indexOf('chrome: call method') !== -1 ||
+                         s.indexOf('Extension context invalidated') !== -1 ||
+                         s.indexOf('message channel closed') !== -1;
+                }
+
+                window.addEventListener('unhandledrejection', function(e) {
+                  var reason = e && e.reason;
+                  var msg = (reason && (reason.message || reason.stack)) || String(reason);
+                  if (isExtError(msg)) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                  }
+                }, true);
+
+                window.addEventListener('error', function(e) {
+                  var msg = (e && (e.message || e.filename || (e.error && e.error.stack))) || '';
+                  if (isExtError(msg)) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                  }
+                }, true);
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans overflow-x-hidden" suppressHydrationWarning>
         {/* Shield to prevent Chrome extension runtime errors from crashing Next.js dev overlay */}

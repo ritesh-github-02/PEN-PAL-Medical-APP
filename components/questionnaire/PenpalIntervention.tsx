@@ -347,6 +347,9 @@ export default function PenpalIntervention() {
       console.warn("Server sync failed, continuing locally.", e);
     }
 
+    // Always sync React state with latest answer
+    setAnswers((prev) => ({ ...prev, [currentStep.id]: answer }));
+
     try {
       localStorage.setItem("penpal_progress", JSON.stringify({ ...answers, [currentStep.id]: answer }));
     } catch (e) {
@@ -989,14 +992,38 @@ function TestimonialScreen(props: BaseScreenProps) {
 }
 
 function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string[]; onSelect: (val: string[]) => void }) {
-  const [otherText, setOtherText] = useState<string>("");
+  const isSpanish = navProps.locale === "es";
+
+  // Extract initial otherText if already in selected
+  const existingOther = (selected || []).find((s: string) => typeof s === "string" && (s.startsWith("Other:") || s.startsWith("Otro:")));
+  const initialOther = existingOther
+    ? existingOther.replace(/^Other:\s*/i, "").replace(/^Otro:\s*/i, "")
+    : "";
+  const [otherText, setOtherText] = useState<string>(initialOther);
 
   const handleToggle = (value: string) => {
     if (value === "Unsure") {
-      onSelect(selected?.includes("Unsure") ? [] : ["Unsure"]);
+      onSelect((selected || []).includes("Unsure") ? [] : ["Unsure"]);
       return;
     }
-    const cleanList = selected?.filter((v: string) => v !== "Unsure") || [];
+    const cleanList = (selected || []).filter((v: string) => v !== "Unsure");
+
+    if (value === "Other") {
+      const alreadyOther = cleanList.some((s: string) => s === "Other" || s.startsWith("Other:") || s === "Otro" || s.startsWith("Otro:"));
+      if (alreadyOther) {
+        // Deselect Other
+        const updated = cleanList.filter((v: string) => v !== "Other" && !v.startsWith("Other:") && v !== "Otro" && !v.startsWith("Otro:"));
+        onSelect(updated);
+      } else {
+        // Select Other with current text
+        const customVal = otherText.trim()
+          ? (isSpanish ? "Otro: " + otherText.trim() : "Other: " + otherText.trim())
+          : "Other";
+        onSelect([...cleanList, customVal]);
+      }
+      return;
+    }
+
     const updated = cleanList.includes(value)
       ? cleanList.filter((v: string) => v !== value)
       : [...cleanList, value];
@@ -1034,7 +1061,9 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
               <div className="bg-[#8caeab] p-3.5 sm:p-4.5 rounded-2xl shadow-inner max-w-3xl">
                 <div className="flex flex-wrap gap-2.5 sm:gap-3">
                   {options.map((opt: any) => {
-                    const isSelected = selected?.includes(opt.value);
+                    const isSelected = opt.value === "Other"
+                      ? (selected || []).some((s: string) => s === "Other" || s.startsWith("Other:") || s === "Otro" || s.startsWith("Otro:"))
+                      : (selected || []).includes(opt.value);
                     const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
 
                     if (opt.value === "Other") {
@@ -1071,8 +1100,16 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
                               aria-label={navProps.locale === "es" ? "Describa otro síntoma" : "Describe other symptom"}
                               placeholder="..."
                               value={otherText}
-                              onChange={(e) => setOtherText(e.target.value)}
-                              className="bg-white/20 text-white placeholder-white/60 border-b border-white/80 px-2 py-0.5 text-xs font-semibold focus:outline-none max-w-[130px] rounded"
+                              onChange={(e) => {
+                                const newText = e.target.value;
+                                setOtherText(newText);
+                                const customVal = newText.trim()
+                                  ? (isSpanish ? "Otro: " + newText.trim() : "Other: " + newText.trim())
+                                  : "Other";
+                                const cleanList = (selected || []).filter((v: string) => v !== "Other" && !v.startsWith("Other:") && v !== "Otro" && !v.startsWith("Otro:"));
+                                onSelect([...cleanList, customVal]);
+                              }}
+                              className="bg-white/20 text-white placeholder-white/60 border-b border-white/80 px-2 py-0.5 text-xs font-semibold focus:outline-none max-w-[140px] rounded"
                             />
                           )}
                         </div>
@@ -1168,16 +1205,15 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
         <button
           type="button"
           onClick={() => {
-            const isSpanish = navProps.locale === "es";
-            // Merge custom otherText into the submitted array
-            const finalSelected = (selected || []).map((item: string) => {
-              if (item === "Other" || item.startsWith("Other") || item === "Otro" || item.startsWith("Otro")) {
-                return otherText.trim()
-                  ? (isSpanish ? "Otro: " + otherText.trim() : "Other: " + otherText.trim())
-                  : (isSpanish ? "Otro" : "Other");
-              }
-              return item;
-            });
+            const trimmedOther = otherText.trim();
+            const customVal = trimmedOther
+              ? (isSpanish ? "Otro: " + trimmedOther : "Other: " + trimmedOther)
+              : "Other";
+
+            const hasOther = (selected || []).some((s: string) => s === "Other" || s.startsWith("Other:") || s === "Otro" || s.startsWith("Otro:"));
+            const cleanList = (selected || []).filter((v: string) => v !== "Other" && !v.startsWith("Other:") && v !== "Otro" && !v.startsWith("Otro:"));
+            const finalSelected = hasOther ? [...cleanList, customVal] : cleanList;
+
             navProps.onNext(finalSelected);
           }}
           disabled={navProps.loading}
@@ -1487,11 +1523,27 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
       labelKey: "symptoms",
       defaultValue: "Reported Symptoms",
       getValue: () => {
-        const val = answers?.screen6_1_symptoms;
-        if (!val || (Array.isArray(val) && val.length === 0)) {
+        const rawVal = answers?.screen6_1_symptoms;
+        if (!rawVal) return locale === "es" ? "Ninguno reportado" : "None reported";
+
+        let symArray: string[] = [];
+        if (Array.isArray(rawVal)) {
+          symArray = rawVal;
+        } else if (typeof rawVal === "string") {
+          try {
+            const parsed = JSON.parse(rawVal);
+            symArray = Array.isArray(parsed) ? parsed : [rawVal];
+          } catch {
+            symArray = [rawVal];
+          }
+        } else {
+          symArray = [String(rawVal)];
+        }
+
+        if (symArray.length === 0) {
           return locale === "es" ? "Ninguno reportado" : "None reported";
         }
-        const symArray = Array.isArray(val) ? val : [val];
+
         const step = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
         return symArray
           .map((v: string) => {
@@ -1668,10 +1720,26 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
   // Formatted Symptoms
   const rawSymptoms = answers["screen6_1_symptoms"];
   const formatSymptoms = () => {
-    if (!rawSymptoms || (Array.isArray(rawSymptoms) && rawSymptoms.length === 0)) {
+    if (!rawSymptoms) return isEs ? "Ninguno reportado" : "None reported";
+
+    let symArray: string[] = [];
+    if (Array.isArray(rawSymptoms)) {
+      symArray = rawSymptoms;
+    } else if (typeof rawSymptoms === "string") {
+      try {
+        const parsed = JSON.parse(rawSymptoms);
+        symArray = Array.isArray(parsed) ? parsed : [rawSymptoms];
+      } catch {
+        symArray = [rawSymptoms];
+      }
+    } else {
+      symArray = [String(rawSymptoms)];
+    }
+
+    if (symArray.length === 0) {
       return isEs ? "Ninguno reportado" : "None reported";
     }
-    const symArray = Array.isArray(rawSymptoms) ? rawSymptoms : [rawSymptoms];
+
     const symptomsStep = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
     return symArray
       .map((v: string) => {
