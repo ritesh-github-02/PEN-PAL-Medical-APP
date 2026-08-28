@@ -1167,7 +1167,19 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
       <div className="flex justify-center pt-2 mt-3 border-t border-slate-300/40">
         <button
           type="button"
-          onClick={() => navProps.onNext(selected)}
+          onClick={() => {
+            const isSpanish = navProps.locale === "es";
+            // Merge custom otherText into the submitted array
+            const finalSelected = (selected || []).map((item: string) => {
+              if (item === "Other" || item.startsWith("Other") || item === "Otro" || item.startsWith("Otro")) {
+                return otherText.trim()
+                  ? (isSpanish ? "Otro: " + otherText.trim() : "Other: " + otherText.trim())
+                  : (isSpanish ? "Otro" : "Other");
+              }
+              return item;
+            });
+            navProps.onNext(finalSelected);
+          }}
           disabled={navProps.loading}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
@@ -1433,13 +1445,24 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
       defaultValue: "Reported Symptoms",
       getValue: () => {
         const val = answers?.screen6_1_symptoms;
-        if (!Array.isArray(val) || val.length === 0) return t("notProvided");
+        if (!val || (Array.isArray(val) && val.length === 0)) {
+          return locale === "es" ? "Ninguno reportado" : "None reported";
+        }
+        const symArray = Array.isArray(val) ? val : [val];
         const step = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
-        if (!step?.options) return val.join(", ");
-        return val.map((v: string) => {
-          const opt = step.options!.find((o: any) => o.value === v);
-          return locale === "es" ? opt?.labelEs || v : opt?.labelEn || v;
-        }).join(", ");
+        return symArray
+          .map((v: string) => {
+            if (v === "Other: Please describe" || v === "Other" || v === "Otro: por favor describa" || v === "Otro") {
+              return locale === "es" ? "Otro" : "Other";
+            }
+            if (v.startsWith("Other:") || v.startsWith("Otro:")) {
+              return v.replace(/_____+/g, "").trim();
+            }
+            const opt = step?.options?.find((o: any) => o.value === v || o.labelEn === v || o.labelEs === v);
+            return locale === "es" ? opt?.labelEs || v : opt?.labelEn || v;
+          })
+          .filter(Boolean)
+          .join(", ");
       },
     },
     {
@@ -1603,14 +1626,23 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
   const rawSymptoms = answers["screen6_1_symptoms"];
   const formatSymptoms = () => {
     if (!rawSymptoms || (Array.isArray(rawSymptoms) && rawSymptoms.length === 0)) {
-      return t("noneReported");
+      return isEs ? "Ninguno reportado" : "None reported";
     }
     const symArray = Array.isArray(rawSymptoms) ? rawSymptoms : [rawSymptoms];
     const symptomsStep = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
-    return symArray.map((v: string) => {
-      const opt = symptomsStep?.options?.find((o) => o.value === v || o.labelEn === v || o.labelEs === v);
-      return isEs ? (opt?.labelEs || v) : (opt?.labelEn || v);
-    }).join(", ");
+    return symArray
+      .map((v: string) => {
+        if (v === "Other: Please describe" || v === "Other" || v === "Otro: por favor describa" || v === "Otro") {
+          return isEs ? "Otro" : "Other";
+        }
+        if (v.startsWith("Other:") || v.startsWith("Otro:")) {
+          return v.replace(/_____+/g, "").trim();
+        }
+        const opt = symptomsStep?.options?.find((o: any) => o.value === v || o.labelEn === v || o.labelEs === v);
+        return isEs ? (opt?.labelEs || v) : (opt?.labelEn || v);
+      })
+      .filter(Boolean)
+      .join(", ");
   };
   const symptoms = formatSymptoms();
 
