@@ -102,22 +102,15 @@ export default function HomePage() {
             </div>
 
             {/* Right Column: How to Access */}
-            <div className="md:col-span-5 p-6 sm:p-8 md:p-9 bg-[#f8f6ef] flex flex-col justify-center">
-              <p className="text-[10px] font-bold text-[#12262a] uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-[#9c6b3f]" aria-hidden="true" />
+            <div className="md:col-span-5 p-6 sm:p-8 md:p-9 bg-[#f8f6ef] flex flex-col justify-center border-t md:border-t-0 md:border-l border-[#ece7d8]">
+              <p className="text-[10px] font-bold text-[#12262a] uppercase tracking-[0.15em] mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#9c6b3f]" aria-hidden="true" />
                 How to access
               </p>
 
-              <div className="space-y-4">
-                <div className="flex gap-3">
-                  <span className="shrink-0 w-5 h-5 rounded-full bg-white border border-[#e4e0d3] text-[#9c6b3f] text-[10px] font-bold flex items-center justify-center mt-0.5" aria-hidden="true">
-                    1
-                  </span>
-                  <p className="text-[13px] text-[#374544] leading-relaxed">
-                    <strong className="text-[#12262a] font-semibold">Participants</strong> &mdash; click the unique invitation link sent to you, or scan the QR code on your study flyer.
-                  </p>
-                </div>
-              </div>
+              <p className="text-[13px] sm:text-[14px] text-[#374544] leading-relaxed">
+                <strong className="text-[#12262a] font-semibold">Participants</strong> &mdash; click the unique invitation link sent to you, or scan the QR code on your study flyer.
+              </p>
             </div>
 
           </div>
