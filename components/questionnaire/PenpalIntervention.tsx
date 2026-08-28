@@ -891,42 +891,60 @@ const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: bool
 
 
 function TestingScreen(props: BaseScreenProps) {
-  // Parse bullets into semantic HTML list items (WCAG 1.3.1)
-  const rawLines = (props.content || "").split("\n").map(l => l.trim()).filter(Boolean);
+  const isSpanish = props.locale === "es";
 
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
+    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
       <div className="space-y-3 max-w-3xl pb-2">
         <h2 
           ref={props.headingRef}
           tabIndex={-1}
           className="text-lg sm:text-xl md:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
         >
-          {props.title}
+          {props.title || (isSpanish ? "¡Hable con el médico sobre la alergia de su hijo!" : "Talk to the doctor about your child's allergy!")}
         </h2>
         
-        {/* Semantic HTML List for Screen Readers */}
-        <ul className="space-y-2 text-[#2d221b] text-xs sm:text-sm font-medium leading-relaxed">
-          {rawLines.map((line, idx) => {
-            const cleanLine = line.replace(/^[•*\-\s]+/, "");
-            return (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="text-[#236f7a] font-bold shrink-0 mt-0.5">•</span>
-                <span>{cleanLine}</span>
-              </li>
-            );
-          })}
+        {/* Semantic 2-Item Bullet List (WCAG 1.3.1) */}
+        <ul className="space-y-2.5 text-[#2d221b] text-xs sm:text-sm font-medium leading-relaxed">
+          <li className="flex items-start gap-2">
+            <span className="text-[#236f7a] font-bold shrink-0 mt-0.5" aria-hidden="true">•</span>
+            <span>
+              {isSpanish
+                ? "Los médicos pueden comprobar si la reacción de su hijo fue solo un efecto secundario y no una alergia."
+                : "Doctors can check to see if your child's reaction was just a side-effect and not an allergy."}
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-[#236f7a] font-bold shrink-0 mt-0.5" aria-hidden="true">•</span>
+            <span>
+              {isSpanish
+                ? "También hay una prueba simple que puede saber si su hijo tiene una alergia."
+                : "There is also a simple test that can tell if your child has an allergy."}
+              <span className="block text-slate-700 text-[11px] sm:text-xs mt-0.5 font-normal">
+                {isSpanish
+                  ? "Para la prueba, los niños tragan medicamentos. A veces, los niños también toman medicamentos a través de un pinchazo en la piel."
+                  : "For the test, kids swallow medicine. Sometimes, kids also take medicine through a skin prick."}
+              </span>
+            </span>
+          </li>
         </ul>
+
+        {/* Distinct Bottom Paragraph (No Bullet) */}
+        <p className="text-xs sm:text-sm font-bold text-[#1f382f] pt-1">
+          {isSpanish
+            ? "Si su hijo puede tomar penicilina de manera segura, no es alérgico."
+            : "If your child can safely take penicillin, they are not allergic."}
+        </p>
       </div>
 
       {/* Nurse Anna Illustration */}
       <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
-          alt={props.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+          alt={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
           role="img"
-          aria-label={props.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
+          aria-label={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
         />
       </div>
 
@@ -936,7 +954,6 @@ function TestingScreen(props: BaseScreenProps) {
           type="button"
           onClick={() => props.onNext()}
           disabled={props.loading}
-          aria-label={props.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {props.loading ? "..." : props.t("next")}
@@ -1163,11 +1180,11 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 
 function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string; onSelect: (val: string) => void }) {
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
+    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
       <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
-        <fieldset className="border-0 p-0 m-0 space-y-4 flex-1 max-w-3xl pb-2">
-          <legend className="sr-only">{title}</legend>
-          <div>
+        <div className="flex-1 max-w-3xl pb-2">
+          {/* 1. Heading & Description Outside Fieldset (WCAG 2.4.3 Focus Target) */}
+          <div className="mb-3">
             {navProps.description && (
               <p className="text-base sm:text-lg font-semibold text-[#2d221b] mb-1">{navProps.description}</p>
             )}
@@ -1180,40 +1197,48 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
             </h2>
           </div>
 
-          {/* Teal Container Card with White Pill Buttons */}
-          <div className="bg-[#8caeab] p-4 sm:p-5 rounded-3xl shadow-inner max-w-3xl">
-            <div className="flex flex-wrap gap-2.5 sm:gap-3">
-              {options.map((opt: any) => {
-                const isSelected = selected === opt.value;
-                const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
-                return (
-                  <button
-                    type="button"
-                    key={opt.value}
-                    role="radio"
-                    aria-checked={isSelected}
-                    tabIndex={0}
-                    onClick={() => onSelect(opt.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === " " || e.key === "Enter") {
-                        e.preventDefault();
-                        onSelect(opt.value);
-                      }
-                    }}
-                    aria-label={`${label}, ${isSelected ? (navProps.locale === "es" ? 'seleccionado' : 'selected') : ''}`}
-                    className={`px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm border cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-                      isSelected
-                        ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
-                        : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
+          {/* 2. Semantic Fieldset for Radio Options Grouping (WCAG 1.3.1) */}
+          <fieldset className="border-0 p-0 m-0 space-y-4">
+            <legend className="sr-only">
+              {navProps.locale === "es" ? "Opciones de selección única" : "Single choice options"}
+            </legend>
+
+            {/* Teal Container Card with White Pill Buttons */}
+            <div className="bg-[#8caeab] p-4 sm:p-5 rounded-3xl shadow-inner max-w-3xl">
+              <div className="flex flex-wrap gap-2.5 sm:gap-3">
+                {options.map((opt: any) => {
+                  const isSelected = selected === opt.value;
+                  const label = navProps.locale === "es" ? opt.labelEs : opt.labelEn;
+                  return (
+                    <button
+                      type="button"
+                      key={opt.value}
+                      role="radio"
+                      aria-checked={isSelected}
+                      tabIndex={0}
+                      onClick={() => onSelect(opt.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === " " || e.key === "Enter") {
+                          e.preventDefault();
+                          onSelect(opt.value);
+                        }
+                      }}
+                      aria-label={label}
+                      className={`px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm border cursor-pointer inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                        isSelected
+                          ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                          : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
+                      }`}
+                    >
+                      {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </fieldset>
+          </fieldset>
+        </div>
 
         {/* Nurse Anna Illustration */}
         <div className="flex-shrink-0 self-end md:self-end mt-auto p-1 hidden sm:block">
@@ -1233,7 +1258,6 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
           type="button"
           onClick={() => navProps.onNext(selected)}
           disabled={navProps.loading}
-          aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navProps.loading ? "..." : navProps.t("next")}
@@ -1249,7 +1273,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
   const value = selected || 9;
 
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
+    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-3xl pb-2">
         <h2 
           ref={navProps.headingRef}
@@ -1272,9 +1296,9 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
             {/* Dynamic Yellow Badge floating above thumb */}
             <div 
               aria-hidden="true"
-              className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#1f382f] font-black text-xs px-2.5 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all"
+              className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#1f382f] font-black text-xs px-2.5 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all pointer-events-none"
               style={{
-                left: `${((value - minVal) / (maxVal - minVal)) * 100}%`
+                left: (((value - minVal) / (maxVal - minVal)) * 100) + "%"
               }}
             >
               {value}
@@ -1285,12 +1309,15 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
               min={minVal}
               max={maxVal}
               value={value}
-              role="slider"
               aria-valuemin={minVal}
               aria-valuemax={maxVal}
               aria-valuenow={value}
-              aria-valuetext={navProps.locale === "es" ? `${value} ${unit || "años de edad"}` : `${value} ${unit || "years old"}`}
-              aria-label={title || "Age of penicillin reaction"}
+              aria-valuetext={
+                navProps.locale === "es"
+                  ? value + " " + (unit || "años de edad")
+                  : value + " " + (unit || "years old")
+              }
+              aria-label={title || (navProps.locale === "es" ? "Edad de la reacción a la penicilina" : "Age of penicillin reaction")}
               onChange={(e) => onSelect(Number(e.target.value))}
               className="w-full h-3 bg-[#234b50] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
             />
@@ -1314,7 +1341,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
           alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
           role="img"
           aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
+          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
         />
       </div>
 
@@ -1324,7 +1351,6 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
           type="button"
           onClick={() => navProps.onNext(value)}
           disabled={navProps.loading}
-          aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navProps.loading ? "..." : navProps.t("next")}
@@ -1336,7 +1362,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   return (
-    <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
+    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="space-y-4 max-w-3xl pb-2 text-center md:text-left min-h-[12rem]">
         <h2 
           ref={navProps.headingRef}
@@ -1357,7 +1383,7 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
           alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
           role="img"
           aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none"
+          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
         />
       </div>
 
@@ -1367,7 +1393,6 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
           type="button"
           onClick={() => navProps.onNext()}
           disabled={navProps.loading}
-          aria-label={navProps.locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navProps.loading ? "..." : navProps.t("next")}
@@ -1384,9 +1409,10 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
       labelKey: "statisticsTitle",
       defaultValue: "Statistics: Understanding Penicillin Allergy Prevalence",
       getValue: () => {
-        const count = answers?.screen2_statistics;
-        if (count === undefined || count === null || count === "") return t("notProvided");
-        return t("allergyMessage", { count: Number(count) });
+        const count = answers?.screen2_statistics ?? 5;
+        return locale === "es"
+          ? "Solo " + count + " de 100 niños tienen alergia real."
+          : "Only " + count + " out of 100 kids have a true allergy.";
       },
     },
     {
@@ -1423,7 +1449,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
       getValue: () => {
         const val = answers?.screen6_2_timing;
         if (!val) return t("notProvided");
-        return locale === "es" ? `${val} años` : `${val} year${Number(val) === 1 ? "" : "s"} old`;
+        return locale === "es" ? (val + " años") : (val + " years old");
       },
     },
     {
@@ -1471,7 +1497,7 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
   const quoteParagraph = paragraphs.find(p => p.startsWith('"') || p.startsWith('“'));
 
   return (
-    <div className="print-container bg-white border border-slate-200/80 rounded-2xl shadow-md p-3.5 sm:p-5 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between">
+    <div id="slide-content" className="print-container bg-white border border-slate-200/80 rounded-2xl shadow-md p-3.5 sm:p-5 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between">
       <div className="print-section text-center">
         <h2 
           ref={headingRef}
@@ -1591,7 +1617,7 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
   // Formatted Timing / Age
   const rawTiming = answers["screen6_2_timing"];
   const formattedTiming = rawTiming
-    ? `${rawTiming} ${isEs ? "años" : "years old"}`
+    ? rawTiming + (isEs ? " años" : " years old")
     : t("notProvided");
 
   // Formatted Time to Onset
@@ -1605,7 +1631,7 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
   const onset = formatOnset();
 
   return (
-    <div className="bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between relative">
+    <div id="slide-content" className="bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between relative">
       <div>
         <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100 no-print">
           <div className="flex items-center gap-2">
@@ -1681,9 +1707,9 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
         <button
           type="button"
           onClick={() => window.print()}
-          className="flex items-center justify-center gap-2 px-5 py-2 border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all rounded-lg text-xs font-bold uppercase tracking-wider flex-1 sm:flex-none cursor-pointer active:scale-[0.98]"
+          className="flex items-center justify-center gap-2 px-5 py-2 min-h-[44px] border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all rounded-lg text-xs font-bold uppercase tracking-wider flex-1 sm:flex-none cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          <svg className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 9V2h12v7"></path>
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
             <rect x="6" y="14" width="12" height="8"></rect>
@@ -1694,7 +1720,7 @@ function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, local
           type="button"
           onClick={onProceedToSurvey}
           disabled={navigating}
-          className="flex items-center justify-center gap-1.5 px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-sm flex-1 sm:flex-none disabled:opacity-50 cursor-pointer active:scale-[0.98]"
+          className="flex items-center justify-center gap-1.5 px-6 py-2 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-sm flex-1 sm:flex-none disabled:opacity-50 cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {navigating ? (
             <>
