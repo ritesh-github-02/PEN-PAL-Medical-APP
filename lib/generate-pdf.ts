@@ -53,22 +53,28 @@ export function generateAssessmentPDF(data: AssessmentPdfData): void {
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('PEN-PAL CLINICAL ASSESSMENT REPORT', 20, y + 7.5);
+  doc.setFontSize(13);
+  doc.text(
+    isSpanish
+      ? 'PEN-PAL INFORME DE EVALUACIÓN CLÍNICA'
+      : 'PEN-PAL CLINICAL ASSESSMENT REPORT',
+    18,
+    y + 7.5
+  );
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
+  doc.setFontSize(7.8);
   doc.text(
     isSpanish
       ? 'Padres Involucrados en Alergias a la Penicilina — Apoyo a la Decisión Clínica'
       : 'Parents Engaged in Penicillin Allergies — Clinical Decision Support',
-    20,
+    18,
     y + 13.5
   );
 
   y += 22;
 
-  // ── 2. Patient Info Box (Fixed 2-Column Grid to prevent overlaps) ───────────
+  // ── 2. Patient Info Box (Optimized 2-Column Grid with Safe Bounds) ─────────
   const displayToken = cleanPdfToken(data.token || data.participantId);
   const infoBoxHeight = 18;
 
@@ -79,45 +85,51 @@ export function generateAssessmentPDF(data: AssessmentPdfData): void {
   // Column 1: Study ID & Date
   doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.text(isSpanish ? 'ID / TOKEN DE ESTUDIO:' : 'STUDY ID / ACCESS TOKEN:', 20, y + 6);
+  doc.setFontSize(7.2);
+  doc.text(isSpanish ? 'ID / TOKEN DE ESTUDIO:' : 'STUDY ID / ACCESS TOKEN:', 18, y + 6);
 
   doc.setFont('courier', 'bold');
-  doc.setFontSize(9.5);
+  doc.setFontSize(9);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  const tokenTruncated = doc.splitTextToSize(displayToken, 48);
-  doc.text(tokenTruncated[0] || displayToken, 68, y + 6);
+  const tokenTruncated = doc.splitTextToSize(displayToken, 42);
+  doc.text(tokenTruncated[0] || displayToken, 62, y + 6);
 
   doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.text(isSpanish ? 'FECHA DE GENERACIÓN:' : 'DATE GENERATED:', 20, y + 13);
+  doc.setFontSize(7.2);
+  doc.text(isSpanish ? 'FECHA DE GENERACIÓN:' : 'DATE GENERATED:', 18, y + 13);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
   doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text(data.dateStr || new Date().toLocaleDateString(isSpanish ? 'es-ES' : 'en-US'), 68, y + 13);
+  doc.text(data.dateStr || new Date().toLocaleDateString(isSpanish ? 'es-ES' : 'en-US'), 62, y + 13);
 
   // Column 2: Status & Protocol
   doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.text(isSpanish ? 'ESTADO:' : 'STATUS:', 125, y + 6);
+  doc.setFontSize(7.2);
+  doc.text(isSpanish ? 'ESTADO:' : 'STATUS:', 114, y + 6);
+
+  // Status Pill Badge (Fits safely within right border x <= 194)
+  const statusText = isSpanish ? 'COMPLETADO Y GUARDADO' : 'COMPLETED & SAVED';
+  doc.setFillColor(236, 253, 245); // emerald-50
+  doc.setDrawColor(167, 243, 208); // emerald-200
+  doc.roundedRect(130, y + 2.2, 60, 5.5, 1.2, 1.2, 'FD');
 
   doc.setTextColor(emeraldColor[0], emeraldColor[1], emeraldColor[2]);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.text(isSpanish ? '✓ COMPLETADO Y GUARDADO' : '✓ COMPLETED & SAVED', 145, y + 6);
+  doc.setFontSize(7.2);
+  doc.text(statusText, 133, y + 6);
 
   doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.text(isSpanish ? 'PROTOCOLO:' : 'PROTOCOL:', 125, y + 13);
+  doc.setFontSize(7.2);
+  doc.text(isSpanish ? 'PROTOCOLO:' : 'PROTOCOL:', 114, y + 13);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
   doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('PEN-PAL INTERVENTION', 145, y + 13);
+  doc.text('PEN-PAL INTERVENTION', 133, y + 13);
 
   y += infoBoxHeight + 5;
 
@@ -255,13 +267,15 @@ export function generateAssessmentPDF(data: AssessmentPdfData): void {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
   doc.text(
-    'PEN-PAL Study Clinical Decision Support Tool — Confidential Participant Report',
+    isSpanish
+      ? 'Herramienta de Apoyo a Decisiones Clínicas PEN-PAL — Informe Confidencial del Participante'
+      : 'PEN-PAL Study Clinical Decision Support Tool — Confidential Participant Report',
     14,
     286
   );
   doc.text(
-    `Generated: ${new Date().toISOString().slice(0, 19).replace('T', ' ')} UTC`,
-    148,
+    `${isSpanish ? 'Generado' : 'Generated'}: ${new Date().toISOString().slice(0, 19).replace('T', ' ')} UTC`,
+    146,
     286
   );
 
