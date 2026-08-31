@@ -8,14 +8,13 @@ import {
   Users, 
   Activity, 
   CheckCircle2, 
-  Key, 
   History, 
   Shield, 
   LogOut, 
   FileSpreadsheet, 
-  Clock, 
   AlertTriangle,
-  Download
+  Download,
+  Clock
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -286,57 +285,6 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
         {/* Study QR Codes & Campaign Manager Section */}
         <CampaignQRManager initialCampaigns={initialCampaigns} />
-
-        {/* Access Codes & Link Statistics Banner */}
-        {tokenStats && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Access Codes</span>
-                <Key className="w-3.5 h-3.5 text-slate-400" />
-              </div>
-              <p className="text-2xl font-bold font-mono text-slate-900">{tokenStats.totalTokens}</p>
-              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                <div className="bg-[#1d5c64] h-full rounded-full" style={{ width: '100%' }}></div>
-              </div>
-            </div>
-
-            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Active Links</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              </div>
-              <p className="text-2xl font-bold font-mono text-emerald-900">{tokenStats.validTokens}</p>
-              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${(tokenStats.validTokens / (tokenStats.totalTokens || 1)) * 100}%` }}></div>
-              </div>
-            </div>
-
-            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-teal-700 uppercase tracking-wider">Total Link Usage</span>
-                <span className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200 px-1 rounded font-mono">
-                  avg {tokenStats.avgUsage}
-                </span>
-              </div>
-              <p className="text-2xl font-bold font-mono text-teal-900">{tokenStats.totalUsage}</p>
-              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                <div className="bg-teal-600 h-full rounded-full" style={{ width: '100%' }}></div>
-              </div>
-            </div>
-
-            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">Used Today</span>
-                <Clock className="w-3.5 h-3.5 text-teal-600" />
-              </div>
-              <p className="text-2xl font-bold font-mono text-teal-900">{tokenStats.usedToday}</p>
-              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                <div className="bg-[#1d5c64] h-full rounded-full" style={{ width: tokenStats.totalUsage > 0 ? `${(tokenStats.usedToday / tokenStats.totalUsage) * 100}%` : '10%' }}></div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Real-time Activity Logs Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
