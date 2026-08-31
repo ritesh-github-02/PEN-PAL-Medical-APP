@@ -396,9 +396,8 @@ export default function PenpalIntervention() {
         console.warn("Complete sync failed, continuing.", e);
       }
 
-      // FIX: Ensure loading is set to false before showing the summary
       setLoading(false);
-      setShowSummary(true);
+      setShowSuccess(true);
       window.scrollTo(0, 0);
       return;
     }
@@ -466,20 +465,22 @@ export default function PenpalIntervention() {
         <div className="absolute top-6 right-6 z-20">
           <LanguageSwitcher locale={locale} onSwitch={handleLanguageSwitch} />
         </div>
-        <div className="max-w-xl w-full bg-white border border-slate-200 p-8 sm:p-12 text-center shadow-md rounded-3xl">
-          <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-6 rounded-full text-2xl font-bold shadow-sm">
+        <div className="max-w-md w-full bg-white border border-slate-200 p-8 sm:p-10 text-center shadow-lg rounded-3xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto rounded-full text-2xl font-bold shadow-xs">
             ✓
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">
-            {locale === "es" ? "¡Éxito!" : "Success"}
-          </h2>
-          <p className="text-sm text-slate-600 leading-relaxed mb-8">
-            {locale === "es"
-              ? "Sus respuestas han sido registradas y su informe en PDF ha sido descargado. Gracias por participar en el estudio PEN-PAL."
-              : "Your responses have been recorded and your PDF report has been downloaded. Thank you for participating in the PEN-PAL study."}
-          </p>
+          <div className="space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              {locale === "es" ? "¡Éxito!" : "Success"}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+              {locale === "es"
+                ? "Sus respuestas han sido registradas. Gracias por participar en el estudio PEN-PAL."
+                : "Your responses have been recorded. Thank you for participating in the PEN-PAL study."}
+            </p>
+          </div>
           
-          <div className="space-y-4 pt-6 border-t border-slate-100">
+          <div className="space-y-3 pt-6 border-t border-slate-100">
             <button 
               type="button"
               onClick={() => {
@@ -492,8 +493,8 @@ export default function PenpalIntervention() {
             >
               {locale === "es" ? "Cerrar esta Ventana" : "Close this Window"}
             </button>
-            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
-              {locale === "es" ? "Puede cerrar esta ventana o pestaña del navegador de forma segura" : "You may safely close this browser window or tab"}
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+              {locale === "es" ? "La sesión se cerrará • Puede cerrar esta ventana con seguridad" : "Session will be cleared • You may safely close this window"}
             </p>
           </div>
         </div>
@@ -551,11 +552,11 @@ export default function PenpalIntervention() {
             <span className="text-slate-300 text-xs" aria-hidden="true">|</span>
             <span 
               className="text-[11px] font-bold text-slate-700"
-              aria-label={locale === "es" ? `Progreso: Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}` : `Progress: Step ${currentStepIndex + 1} of ${questionnaireConfig.length}`}
+              aria-label={locale === "es" ? `Progreso: Paso ${Math.min(currentStepIndex + 1, 12)} de 12` : `Progress: Step ${Math.min(currentStepIndex + 1, 12)} of 12`}
             >
               {locale === "es"
-                ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}`
-                : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}`}
+                ? `Paso ${Math.min(currentStepIndex + 1, 12)} de 12`
+                : `Step ${Math.min(currentStepIndex + 1, 12)} of 12`}
             </span>
           </div>
 

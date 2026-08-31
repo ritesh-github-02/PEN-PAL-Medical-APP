@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from '@/routing';
 import { validateToken, requestToken } from './actions';
 
+import { RotateCcw } from 'lucide-react';
 import Loader from '@/components/common/Loader';
 
 export default function InterventionEntryPage() {
@@ -23,6 +24,25 @@ export default function InterventionEntryPage() {
   const [loading, setLoading] = useState<boolean>(Boolean(cleanToken));
   const [requestStatus, setRequestStatus] = useState<{ message: string; token: string } | null>(null);
   const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [inputVal, setInputVal] = useState('');
+  const [inputPrompt, setInputPrompt] = useState<string | null>(null);
+
+  const handleResume = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (inputVal.trim()) {
+      handleValidation(inputVal.trim());
+    } else {
+      const inputEl = document.getElementById('token-input') as HTMLInputElement | null;
+      if (inputEl) {
+        inputEl.focus();
+        setInputPrompt(
+          locale === 'es'
+            ? 'Por favor, ingrese su Token o ID para reanudar donde lo dejó'
+            : 'Please enter your Token or Research ID to resume where you left off'
+        );
+      }
+    }
+  };
 
   const handleValidation = useCallback(async (tokenToValidate: string) => {
     setLoading(true);
@@ -241,36 +261,54 @@ export default function InterventionEntryPage() {
 
           {/* Form to enter Research ID / Token if opening directly */}
           <div className="space-y-3 pt-1">
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const input = (e.currentTarget.elements.namedItem('token') as HTMLInputElement).value.trim();
-              if (input) handleValidation(input);
-            }} className="space-y-3">
+            <form onSubmit={handleResume} className="space-y-3">
               <label htmlFor="token-input" className="sr-only">
                 {locale === 'es' ? 'Token o ID de investigación' : 'Token or Research ID'}
               </label>
-              <input 
-                id="token-input"
-                name="token" 
-                type="text" 
-                placeholder={locale === 'es' ? "Ingrese su Token o ID (ej. PEN-4K9L2M)" : "Enter your Token or Research ID (e.g. PEN-4K9L2M)"} 
-                required
-                aria-required="true"
-                className="h-11 w-full px-3.5 border border-slate-300 focus:outline-none focus:border-[#1d5c64] font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl text-xs font-semibold"
-              />
+              <div className="space-y-1.5">
+                <input 
+                  id="token-input"
+                  name="token" 
+                  type="text" 
+                  value={inputVal}
+                  onChange={(e) => {
+                    setInputVal(e.target.value);
+                    if (inputPrompt) setInputPrompt(null);
+                  }}
+                  placeholder={locale === 'es' ? "Ingrese su Token o ID (ej. PEN-4K9L2M)" : "Enter your Token or Research ID (e.g. PEN-4K9L2M)"} 
+                  required
+                  aria-required="true"
+                  className={`h-11 w-full px-3.5 border font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl text-xs font-semibold transition-all ${
+                    inputPrompt 
+                      ? 'border-[#1d5c64] ring-2 ring-[#1d5c64]/20' 
+                      : 'border-slate-300 focus:outline-none focus:border-[#1d5c64] focus:ring-1 focus:ring-[#1d5c64]'
+                  }`}
+                />
+                {inputPrompt && (
+                  <p className="text-[11px] text-[#1d5c64] font-bold animate-in fade-in">
+                    {inputPrompt}
+                  </p>
+                )}
+              </div>
+
               <button 
                 type="submit" 
                 className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
               >
-                {locale === 'es' ? 'Acceder a la Evaluación →' : 'Access Assessment →'}
+                <span>{locale === 'es' ? 'Acceder a la Evaluación →' : 'Access Assessment →'}</span>
               </button>
             </form>
 
-            {/* Resume Assessment Bottom Section */}
-            <div className="pt-3 border-t border-slate-100">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest inline-block">
-                {locale === 'es' ? 'Reanudar Evaluación' : 'Resume Assessment'}
-              </span>
+            {/* Resume Assessment Bottom Action Button */}
+            <div className="pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => handleResume()}
+                className="w-full py-2.5 px-4 bg-slate-50 hover:bg-[#f4f8e8] text-[#1d5c64] hover:text-[#16484e] border border-slate-200 hover:border-[#1d5c64]/40 font-bold text-[11px] uppercase tracking-wider rounded-xl transition-all shadow-2xs active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-[#1d5c64] group-hover:-rotate-45 transition-transform duration-200" />
+                <span>{locale === 'es' ? 'Reanudar Evaluación' : 'Resume Assessment'}</span>
+              </button>
             </div>
           </div>
         </div>

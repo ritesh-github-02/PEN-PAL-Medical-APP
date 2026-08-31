@@ -21,7 +21,8 @@ import {
   HelpCircle,
   BarChart3,
   Check,
-  ChevronRight
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 import { getParticipantDetails } from './actions';
 
@@ -142,6 +143,22 @@ function formatDuration(totalSeconds: number): string {
   const mins = Math.floor(totalSeconds / 60);
   const secs = Math.round(totalSeconds % 60);
   return `${mins}m ${secs}s`;
+}
+
+function formatDisplayId(rawId?: string | null): string {
+  if (!rawId) return 'Unassigned';
+  if (rawId.includes('token=') || rawId.includes('TOKEN=')) {
+    const match = rawId.match(/[?&](?:token|TOKEN)=([^&#\s]+)/i);
+    if (match && match[1]) return decodeURIComponent(match[1]).trim();
+  }
+  if (rawId.startsWith('http://') || rawId.startsWith('https://')) {
+    try {
+      const url = new URL(rawId);
+      const t = url.searchParams.get('token') || url.searchParams.get('TOKEN');
+      if (t) return t.trim();
+    } catch {}
+  }
+  return rawId;
 }
 
 export function ParticipantCohortTable({ participants }: ParticipantCohortTableProps) {
@@ -387,7 +404,9 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     {/* Participant ID */}
                     <td className="px-5 py-3.5">
                       <div>
-                        <p className="font-mono font-bold text-slate-900 text-xs">{p.externalId || 'Unassigned'}</p>
+                        <p className="font-mono font-bold text-slate-900 text-xs">
+                          {formatDisplayId(p.externalId)}
+                        </p>
                         <p className="text-[10px] text-slate-400 font-mono">GUID: {p.id.slice(0, 10)}...</p>
                       </div>
                     </td>
@@ -494,17 +513,35 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
             
             {/* Soft Clinical Modal Header */}
             <div className="p-5 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white flex justify-between items-center shrink-0 border-b border-[#1d5c64]/30">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-teal-100 bg-white/20 px-2 py-0.5 rounded border border-white/25">
+              <div className="min-w-0 flex-1 pr-4">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-teal-100 bg-white/20 px-2.5 py-0.5 rounded-full border border-white/25">
                     Participant Clinical Record
                   </span>
-                  <h3 id="participant-modal-title" className="text-lg font-extrabold font-mono text-white">
-                    {modalDetails?.externalId || selectedParticipantId}
-                  </h3>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-teal-800/80 px-2.5 py-0.5 rounded-full border border-white/20">
+                    Arm: {modalDetails?.groupId || 'INTERVENTION'}
+                  </span>
                 </div>
-                <p className="text-xs text-teal-100 mt-0.5">
-                  Database GUID: <span className="font-mono">{selectedParticipantId}</span> &middot; Study Arm: <span className="text-white font-bold">{modalDetails?.groupId}</span>
+                <h3 id="participant-modal-title" className="text-xl font-extrabold font-mono text-white tracking-wide truncate">
+                  {formatDisplayId(modalDetails?.externalId || selectedParticipantId)}
+                </h3>
+                <p className="text-[11px] text-teal-100/90 mt-1 font-mono flex flex-wrap items-center gap-2 truncate">
+                  <span>GUID: {selectedParticipantId}</span>
+                  {modalDetails?.externalId && (modalDetails.externalId.startsWith('http') || modalDetails.externalId.includes('token=')) && (
+                    <>
+                      <span>&middot;</span>
+                      <a 
+                        href={modalDetails.externalId} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-white hover:underline inline-flex items-center gap-1 opacity-90 hover:opacity-100"
+                        title={modalDetails.externalId}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Open Participant Link</span>
+                      </a>
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -512,30 +549,30 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                 type="button"
                 onClick={() => setSelectedParticipantId(null)}
                 aria-label="Close participant details dialog"
-                className="p-1.5 bg-white/15 hover:bg-white/25 text-white rounded-lg transition-colors cursor-pointer"
+                className="p-2 bg-white/15 hover:bg-white/25 text-white rounded-xl transition-all cursor-pointer shrink-0 shadow-xs"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
             {/* Modal Navigation Tabs */}
-            <div className="flex border-b border-slate-200 bg-slate-100 px-5 pt-3 gap-2 shrink-0 overflow-x-auto">
+            <div className="flex border-b border-slate-200 bg-slate-100/80 px-5 pt-3 gap-2 shrink-0 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('metrics')}
-                className={`px-4 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   activeTab === 'metrics'
-                    ? 'border-teal-700 text-teal-900 bg-white rounded-t-lg shadow-2xs font-extrabold'
+                    ? 'border-[#1d5c64] text-[#1d5c64] bg-white rounded-t-xl shadow-xs font-extrabold'
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                <Timer className="w-3.5 h-3.5 text-teal-700" />
+                <Timer className="w-3.5 h-3.5 text-[#1d5c64]" />
                 ⏱️ Slide-by-Slide Timing (EST)
               </button>
               <button
                 onClick={() => setActiveTab('summary')}
-                className={`px-4 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   activeTab === 'summary'
-                    ? 'border-slate-900 text-slate-900 bg-white rounded-t-lg shadow-2xs font-extrabold'
+                    ? 'border-[#1d5c64] text-[#1d5c64] bg-white rounded-t-xl shadow-xs font-extrabold'
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -543,9 +580,9 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
               </button>
               <button
                 onClick={() => setActiveTab('responses')}
-                className={`px-4 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   activeTab === 'responses'
-                    ? 'border-slate-900 text-slate-900 bg-white rounded-t-lg shadow-2xs font-extrabold'
+                    ? 'border-[#1d5c64] text-[#1d5c64] bg-white rounded-t-xl shadow-xs font-extrabold'
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -553,13 +590,13 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
               </button>
               <button
                 onClick={() => setActiveTab('tokens')}
-                className={`px-4 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   activeTab === 'tokens'
-                    ? 'border-slate-900 text-slate-900 bg-white rounded-t-lg shadow-2xs font-extrabold'
+                    ? 'border-[#1d5c64] text-[#1d5c64] bg-white rounded-t-xl shadow-xs font-extrabold'
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                🔐 Tokens & Sessions
+                🔑 Access Codes & Sessions
               </button>
             </div>
 

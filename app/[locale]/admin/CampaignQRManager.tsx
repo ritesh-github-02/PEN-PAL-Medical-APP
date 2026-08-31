@@ -662,7 +662,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                       <button
                         type="button"
                         onClick={() => handleOpenCampaignLinks(item)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold rounded-lg border border-indigo-200 transition-colors shadow-2xs cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 text-[11px] font-bold rounded-lg border border-teal-200 transition-colors shadow-2xs cursor-pointer"
                         title="View and manage unique links & QR codes"
                       >
                         <Layers className="w-3.5 h-3.5" />
@@ -706,19 +706,19 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-8">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+            <div className="flex items-center justify-between p-5 border-b border-[#1d5c64]/20 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-white/20 rounded-xl text-white backdrop-blur-xs shadow-xs border border-white/25">
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <h3 className="font-black text-slate-900 text-base tracking-tight">
+                <h3 className="font-extrabold text-white text-base tracking-tight">
                   {createdCampaign ? 'Batch Links Generated Successfully' : 'Create Campaign & Generate Links'}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition cursor-pointer"
+                className="p-1.5 rounded-xl text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -747,7 +747,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                       placeholder="e.g. Children's Hospital Waiting Room A, Clinic B Flyer"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 font-medium transition"
+                      className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1d5c64] focus:bg-white focus:ring-1 focus:ring-[#1d5c64] font-medium transition"
                     />
                     <p className="text-[11px] text-slate-400">
                       A descriptive title to track where these links and QR codes will be distributed.
@@ -798,7 +798,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                         Number of Unique Links & QR Codes to Generate (N)
                       </label>
-                      <span className="text-xs font-bold font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                      <span className="text-xs font-bold font-mono text-[#1d5c64] bg-[#f4f8e8] border border-[#1d5c64]/30 px-2.5 py-0.5 rounded-full">
                         {quantity} links
                       </span>
                     </div>
@@ -814,7 +814,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                             setCustomQuantity(String(num));
                           }}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${quantity === num
-                              ? 'bg-indigo-600 text-white shadow-sm'
+                              ? 'bg-[#1d5c64] text-white shadow-sm'
                               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                             }`}
                         >
@@ -839,16 +839,16 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                             setQuantity(num);
                           }
                         }}
-                        className="w-24 px-2.5 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-indigo-500"
+                        className="w-24 px-2.5 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-bold focus:outline-none focus:border-[#1d5c64]"
                       />
                       <span className="text-[11px] text-slate-400">(Max 500 per batch)</span>
                     </div>
                   </div>
 
                   {/* Explanatory Note */}
-                  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-600 text-xs leading-relaxed space-y-1">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-600 text-xs leading-relaxed space-y-1">
                     <p className="font-bold text-slate-800 flex items-center gap-1.5">
-                      <QrCode className="w-3.5 h-3.5 text-indigo-600" />
+                      <QrCode className="w-3.5 h-3.5 text-[#1d5c64]" />
                       What will be generated:
                     </p>
                     <p className="text-[11px]">
@@ -868,7 +868,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     <button
                       type="submit"
                       disabled={loading || !name.trim()}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1d5c64] hover:bg-[#16484e] active:scale-[0.98] text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer disabled:opacity-50"
                     >
                       {loading ? (
                         <>
@@ -955,8 +955,8 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                         type="text"
                         value={batchSearchTerm}
                         onChange={(e) => setBatchSearchTerm(e.target.value)}
-                        placeholder="Search generated links by ID (e.g. PEN-CAMP-001 or #1), Token (e.g. PEN-4K9L2M), or URL..."
-                        className="w-full pl-10 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 font-medium transition"
+                        placeholder="Search generated links by ID (e.g. PEN-CAMP-001 or #1), Access Code (e.g. PEN-4K9L2M), or URL..."
+                        className="w-full pl-10 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1d5c64] focus:bg-white focus:ring-1 focus:ring-[#1d5c64] font-medium transition"
                       />
                       {batchSearchTerm && (
                         <button
@@ -991,7 +991,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                           <button
                             type="button"
                             onClick={() => setBatchSearchTerm('')}
-                            className="text-xs text-indigo-600 font-bold hover:underline cursor-pointer"
+                            className="text-xs text-[#1d5c64] font-bold hover:underline cursor-pointer"
                           >
                             Clear Search Filter
                           </button>
@@ -1013,7 +1013,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">
                                   <span className="font-extrabold text-slate-900 font-mono">{item.externalId}</span>
-                                  <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono px-1.5 py-0.2 rounded text-[10px] font-bold">
+                                  <span className="bg-[#f4f8e8] text-[#1d5c64] border border-[#1d5c64]/30 font-mono px-2 py-0.5 rounded-md text-[10px] font-bold">
                                     {item.token}
                                   </span>
                                 </div>
@@ -1053,7 +1053,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                               <button
                                 type="button"
                                 onClick={() => handlePreviewQr(item, createdCampaign.name)}
-                                className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold border border-indigo-200 transition cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg text-[10px] font-bold border border-teal-200 transition cursor-pointer"
                               >
                                 <QrCode className="w-3 h-3" />
                                 <span>QR</span>
@@ -1070,14 +1070,14 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     <button
                       type="button"
                       onClick={() => resetCreateForm()}
-                      className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition cursor-pointer"
+                      className="text-xs font-bold text-[#1d5c64] hover:text-[#236f7a] transition cursor-pointer"
                     >
                       + Create Another Batch
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsCreateModalOpen(false)}
-                      className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
+                      className="px-5 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer active:scale-[0.98]"
                     >
                       Done & Close
                     </button>
@@ -1096,24 +1096,24 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-8">
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50">
+            <div className="flex items-center justify-between p-5 border-b border-[#1d5c64]/20 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-black text-slate-900 text-base tracking-tight">
+                  <h3 className="font-extrabold text-white text-base tracking-tight">
                     {activeCampaign.name}
                   </h3>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white border border-white/25">
                     {activeCampaign.arm}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                <p className="text-xs text-teal-100 font-mono mt-0.5">
                   Campaign ID: {activeCampaign.slug} &middot; Total Links: {activeCampaignLinks.length}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsViewLinksModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition cursor-pointer"
+                className="p-1.5 rounded-xl text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1164,7 +1164,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     type="button"
                     onClick={handleAddMoreLinks}
                     disabled={addingMore}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-lg transition cursor-pointer disabled:opacity-50 active:scale-[0.98]"
                   >
                     {addingMore ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
                     <span>Generate</span>
@@ -1200,8 +1200,8 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     type="text"
                     value={activeLinksSearchTerm}
                     onChange={(e) => setActiveLinksSearchTerm(e.target.value)}
-                    placeholder="Search campaign links by ID (e.g. PEN-CAMP-001 or #1), Token (e.g. PEN-4K9L2M), or URL..."
-                    className="w-full pl-10 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 font-medium transition"
+                    placeholder="Search campaign links by ID (e.g. PEN-CAMP-001 or #1), Access Code (e.g. PEN-4K9L2M), or URL..."
+                    className="w-full pl-10 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1d5c64] focus:bg-white focus:ring-1 focus:ring-[#1d5c64] font-medium transition"
                   />
                   {activeLinksSearchTerm && (
                     <button
@@ -1218,7 +1218,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
               {/* Links Table */}
               {linksLoading ? (
                 <div className="py-12 text-center text-slate-400 space-y-2">
-                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-indigo-600" />
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#1d5c64]" />
                   <p className="text-xs">Loading campaign links and QR tokens...</p>
                 </div>
               ) : activeCampaignLinks.length === 0 ? (
@@ -1227,7 +1227,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                   <button
                     type="button"
                     onClick={handleAddMoreLinks}
-                    className="mt-2 text-xs font-bold text-indigo-600 hover:underline cursor-pointer"
+                    className="mt-2 text-xs font-bold text-[#1d5c64] hover:underline cursor-pointer"
                   >
                     + Generate first batch of links now
                   </button>
@@ -1252,7 +1252,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                       <button
                         type="button"
                         onClick={() => setActiveLinksSearchTerm('')}
-                        className="text-xs text-indigo-600 font-bold hover:underline cursor-pointer"
+                        className="text-xs text-[#1d5c64] font-bold hover:underline cursor-pointer"
                       >
                         Clear Search Filter
                       </button>
@@ -1274,7 +1274,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="font-extrabold text-slate-900 font-mono">{item.externalId}</span>
-                              <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono px-1.5 py-0.2 rounded text-[10px] font-bold">
+                              <span className="bg-[#f4f8e8] text-[#1d5c64] border border-[#1d5c64]/30 font-mono px-2 py-0.5 rounded-md text-[10px] font-bold">
                                 {item.token}
                               </span>
                               {item.useCount && item.useCount > 0 ? (
@@ -1323,7 +1323,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                           <button
                             type="button"
                             onClick={() => handlePreviewQr(item, activeCampaign.name)}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold border border-indigo-200 transition cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg text-[10px] font-bold border border-teal-200 transition cursor-pointer"
                           >
                             <QrCode className="w-3 h-3" />
                             <span>QR</span>
@@ -1367,13 +1367,13 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 className="w-48 h-48 mx-auto object-contain"
               />
               <div className="mt-2 text-center">
-                <span className="font-mono text-xs font-black tracking-wider text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+                <span className="font-mono text-xs font-black tracking-wider text-teal-950 bg-[#f4f8e8] border border-[#1d5c64]/30 px-2.5 py-0.5 rounded-full">
                   {previewQrItem.token}
                 </span>
               </div>
             </div>
 
-            <p className="text-[11px] font-mono text-slate-400 break-all px-2 bg-slate-50 py-1.5 rounded-lg border border-slate-100">
+            <p className="text-[11px] font-mono text-slate-500 break-all px-2 bg-slate-50 py-1.5 rounded-lg border border-slate-200">
               {previewQrItem.url}
             </p>
 
@@ -1382,7 +1382,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
               <button
                 type="button"
                 onClick={() => handleCopy(previewQrItem.url, 'preview')}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer active:scale-[0.98]"
               >
                 <Copy className="w-3.5 h-3.5" />
                 <span>Copy URL</span>
@@ -1392,7 +1392,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 onClick={() =>
                   handleDownloadQrPng(previewQrItem.qrDataUrl, `${previewQrItem.token}_Flyer`)
                 }
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer active:scale-[0.98]"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Save PNG</span>
@@ -1410,7 +1410,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 text-center space-y-4">
             <div className="flex justify-between items-start">
               <div className="text-left">
-                <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span className="px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-teal-50 text-teal-800 border border-teal-200">
                   Open Poster QR
                 </span>
                 <h4 className="font-extrabold text-slate-900 text-base mt-1">{generalPosterQr.campaign.name}</h4>
@@ -1441,7 +1441,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
               <button
                 type="button"
                 onClick={() => handleCopy(generalPosterQr.url, 'poster')}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer active:scale-[0.98]"
               >
                 <Copy className="w-3.5 h-3.5" />
                 <span>Copy Link</span>
@@ -1451,7 +1451,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 onClick={() =>
                   handleDownloadQrPng(generalPosterQr.qrDataUrl, `${generalPosterQr.campaign.slug}_Poster`)
                 }
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer active:scale-[0.98]"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Download Poster PNG</span>

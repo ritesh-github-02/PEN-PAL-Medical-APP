@@ -28,6 +28,22 @@ type OverviewItem =
   | { type: 'summary'; title: string; value: string }
   | { type: 'login'; login: any };
 
+function formatDisplayId(rawId?: string | null): string {
+  if (!rawId) return 'Unassigned';
+  if (rawId.includes('token=') || rawId.includes('TOKEN=')) {
+    const match = rawId.match(/[?&](?:token|TOKEN)=([^&#\s]+)/i);
+    if (match && match[1]) return decodeURIComponent(match[1]).trim();
+  }
+  if (rawId.startsWith('http://') || rawId.startsWith('https://')) {
+    try {
+      const url = new URL(rawId);
+      const t = url.searchParams.get('token') || url.searchParams.get('TOKEN');
+      if (t) return t.trim();
+    } catch {}
+  }
+  return rawId;
+}
+
 export default async function AdminPage({ searchParams }: PageProps) {
   const { q } = await searchParams;
   let participantCount = 0;
@@ -343,14 +359,14 @@ export default async function AdminPage({ searchParams }: PageProps) {
                     <div className={`w-2.5 h-2.5 rounded-full ${
                       event.eventType === 'TOKEN_VALIDATED' ? 'bg-emerald-600' :
                       event.eventType === 'TOKEN_INVALID' ? 'bg-rose-600' :
-                      event.eventType === 'TOKEN_CREATED' ? 'bg-indigo-600' : 'bg-amber-600'
+                      event.eventType === 'TOKEN_CREATED' ? 'bg-teal-600' : 'bg-amber-600'
                     }`}></div>
                     <div>
                       <p className="text-xs font-bold text-slate-800">
                         {event.eventType.replace('_', ' ')}
                         {event.participant?.externalId && (
-                          <span className="ml-2 text-slate-700 text-[11px] bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded font-mono font-bold">
-                            {event.participant.externalId}
+                          <span className="ml-2 text-teal-950 text-[11px] bg-[#f4f8e8] border border-[#1d5c64]/30 px-2 py-0.5 rounded-md font-mono font-bold">
+                            {formatDisplayId(event.participant.externalId)}
                           </span>
                         )}
                       </p>
@@ -379,7 +395,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
             <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-indigo-700" /> Participant Stream
+                  <Activity className="w-4 h-4 text-teal-700" /> Participant Stream
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-0.5">Session activity streaming from active study tablets</p>
               </div>
@@ -389,11 +405,13 @@ export default async function AdminPage({ searchParams }: PageProps) {
               {overviewItems.map((item, index) => (
                 <div key={index} className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg hover:bg-white transition-colors">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                    <div className="w-2 h-2 bg-teal-600 rounded-full"></div>
                     <div>
                       {item.type === 'login' ? (
                         <>
-                          <p className="text-xs font-bold text-slate-900 font-mono">{item.login.participant?.externalId || 'Anonymous Participant'}</p>
+                          <p className="text-xs font-bold text-slate-900 font-mono">
+                            {formatDisplayId(item.login.participant?.externalId)}
+                          </p>
                           <p className="text-[10px] text-slate-500 font-medium">Session Initialized</p>
                         </>
                       ) : (
@@ -410,7 +428,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
                         {new Date(item.login.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     ) : (
-                      <span className="text-xs font-bold text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 font-mono">
+                      <span className="text-xs font-bold text-teal-950 bg-[#f4f8e8] px-2 py-0.5 rounded-md border border-[#1d5c64]/30 font-mono">
                         {item.value}
                       </span>
                     )}
