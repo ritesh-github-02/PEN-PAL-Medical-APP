@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams, useParams } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from '@/routing';
-import { validateToken, requestToken } from './actions';
+import { validateToken } from './actions';
 
 import { RotateCcw } from 'lucide-react';
 import Loader from '@/components/common/Loader';
@@ -22,8 +22,6 @@ export default function InterventionEntryPage() {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(Boolean(cleanToken));
-  const [requestStatus, setRequestStatus] = useState<{ message: string; token: string } | null>(null);
-  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [inputVal, setInputVal] = useState('');
   const [inputPrompt, setInputPrompt] = useState<string | null>(null);
 
@@ -63,14 +61,6 @@ export default function InterventionEntryPage() {
 
       let result = await validateToken(raw, locale);
 
-      // If direct validation fails, check if input is a Research ID and retrieve token
-      if (result.success === false) {
-        const reqResult = await requestToken(raw, locale);
-        if (reqResult.success === true && reqResult.token) {
-          result = await validateToken(reqResult.token, locale);
-        }
-      }
-
       if (result.success === false) {
         setError(result.error);
         setLoading(false);
@@ -94,27 +84,7 @@ export default function InterventionEntryPage() {
     }
   }, [cleanToken, handleValidation]);
 
-  const handleRequestToken = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    const userId = (e.currentTarget.elements.namedItem('userId') as HTMLInputElement).value;
-    
-    try {
-      const result = await requestToken(userId, locale);
-      if (result.success === false) {
-        setError(result.error);
-        setLoading(false);
-      } else if (result.success === true) {
-        setRequestStatus({ message: result.message || '', token: result.token || '' });
-        setLoading(false);
-      }
-    } catch (err) {
-      setError('An unexpected error occurred.');
-      setLoading(false);
-    }
-  };
-
-  if (loading && !requestStatus) {
+  if (loading) {
     return <Loader fullScreen />;
   }
 
@@ -155,7 +125,7 @@ export default function InterventionEntryPage() {
 
             <button 
               type="button"
-              onClick={() => { setError(null); setRequestStatus(null); }}
+              onClick={() => setError(null)}
               className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.98] cursor-pointer"
             >
               {locale === 'es' ? 'Intentar escanear código QR nuevamente' : 'Try Scanning QR Code Again'}
@@ -163,56 +133,6 @@ export default function InterventionEntryPage() {
           </div>
         </div>
         
-        <div className="w-full max-w-xs text-center">
-          <p className="text-[9px] text-slate-600 leading-normal font-normal">
-            {locale === 'es'
-              ? 'Aviso de seguridad: Los tokens de acceso a la sesión son privados, están asegurados criptográficamente y tienen límite de intentos.'
-              : 'Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.'}
-          </p>
-        </div>
-      </main>
-    );
-  }
-
-  // --- TOKEN GENERATED SUCCESS SCREEN ---
-  if (requestStatus) {
-    return (
-      <main className="h-screen w-screen flex flex-col items-center justify-between py-6 px-4 font-sans bg-slate-50" role="main">
-        <div className="flex-1 flex flex-col justify-center max-w-sm w-full">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 sm:p-6 w-full text-center space-y-4" role="status" aria-live="polite">
-            <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto text-lg rounded-xl text-emerald-700 shadow-sm" aria-hidden="true">
-              ✓
-            </div>
-            <div className="space-y-1">
-              <h1 className="text-base font-bold text-slate-900">{locale === 'es' ? 'Token listo' : 'Token Ready'}</h1>
-              <p className="text-slate-600 text-xs font-medium leading-normal">{requestStatus.message}</p>
-            </div>
-            
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors select-all cursor-pointer" tabIndex={0} aria-label={`Generated token: ${requestStatus.token}. Click or press to select and copy`}>
-               <p className="text-xs font-mono tracking-wider text-slate-900 break-all font-bold">{requestStatus.token}</p>
-               <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500 mt-1.5">{locale === 'es' ? 'Haga clic para seleccionar y copiar' : 'Click to select and copy'}</p>
-            </div>
-
-            <div className="space-y-2 pt-1">
-              <button 
-                type="button"
-                onClick={() => handleValidation(requestStatus.token)}
-                className="w-full h-10 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-all shadow-md active:scale-[0.98] cursor-pointer flex justify-center items-center"
-              >
-                {locale === 'es' ? 'Usar token y comenzar' : 'Use Token & Start'}
-              </button>
-              
-              <button 
-                type="button"
-                onClick={() => { setRequestStatus(null); setMode('login'); }}
-                className="block w-full text-center text-[10px] font-bold text-slate-500 hover:text-slate-700 uppercase tracking-widest transition-colors cursor-pointer"
-              >
-                {locale === 'es' ? 'Cancelar' : 'Cancel'}
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div className="w-full max-w-xs text-center">
           <p className="text-[9px] text-slate-600 leading-normal font-normal">
             {locale === 'es'

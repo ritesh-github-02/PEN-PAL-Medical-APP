@@ -26,6 +26,9 @@ import {
   Link as LinkIcon,
   Layers,
   ChevronRight,
+  Pencil,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 
 export interface CampaignItem {
@@ -56,6 +59,17 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isViewLinksModalOpen, setIsViewLinksModalOpen] = useState(false);
   const [isQrPreviewModalOpen, setIsQrPreviewModalOpen] = useState(false);
+
+  // Edit Campaign State
+  const [editCampaign, setEditCampaign] = useState<CampaignItem | null>(null);
+  const [editName, setEditName] = useState('');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  // Delete Campaign State
+  const [deleteCampaign, setDeleteCampaign] = useState<CampaignItem | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [linksLoading, setLinksLoading] = useState(false);
@@ -171,6 +185,82 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
       showToast(err.message || 'Error updating status.', 'error');
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  // Open Edit Campaign Modal
+  const handleOpenEdit = (campaign: CampaignItem) => {
+    setEditCampaign(campaign);
+    setEditName(campaign.name);
+    setIsEditModalOpen(true);
+  };
+
+  // Submit Edit Campaign Name
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editCampaign) return;
+    if (!editName.trim() || editName.trim().length < 2) {
+      showToast('Campaign name must be at least 2 characters.', 'error');
+      return;
+    }
+
+    setIsSavingEdit(true);
+    try {
+      const res = await fetch('/api/campaigns', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editCampaign.id,
+          name: editName.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || 'Failed to rename campaign.', 'error');
+      } else {
+        setCampaigns((prev) =>
+          prev.map((c) => (c.id === editCampaign.id ? { ...c, name: editName.trim() } : c))
+        );
+        showToast(`Campaign renamed to "${editName.trim()}" successfully!`, 'success');
+        setIsEditModalOpen(false);
+        setEditCampaign(null);
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Error updating campaign name.', 'error');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  // Open Delete Campaign Confirmation Modal
+  const handleOpenDelete = (campaign: CampaignItem) => {
+    setDeleteCampaign(campaign);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Confirm Delete Campaign
+  const handleConfirmDelete = async () => {
+    if (!deleteCampaign) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/campaigns?id=${encodeURIComponent(deleteCampaign.id)}`, {
+        method: 'DELETE',
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || 'Failed to delete campaign.', 'error');
+      } else {
+        setCampaigns((prev) => prev.filter((c) => c.id !== deleteCampaign.id));
+        showToast(`Campaign "${deleteCampaign.name}" was permanently deleted.`, 'success');
+        setIsDeleteModalOpen(false);
+        setDeleteCampaign(null);
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Error deleting campaign.', 'error');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -446,7 +536,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 Study QR Codes & Campaign Manager
               </h2>
               <p className="text-xs text-teal-100 font-normal">
-                Create research campaigns, generate batches of unique participant links & QR codes, and export formatted CSV/Excel rosters.
+                Create research campaigns, generate batches of unique participant links & QR codes, and export formatted CSV/Excel lists.
               </p>
             </div>
           </div>
@@ -599,10 +689,18 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     {/* Name & ID */}
                     <td className="py-4 px-5">
                       <div className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                        {item.name}
+                        <span>{item.name}</span>
                         {isActive && (
                           <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Active"></span>
                         )}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(item)}
+                          className="opacity-60 hover:opacity-100 p-1 text-slate-400 hover:text-[#1d5c64] rounded transition cursor-pointer"
+                          title="Rename Campaign"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
                       </div>
                       <div className="text-[11px] font-mono text-slate-500 mt-0.5 flex items-center gap-1.5">
                         <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold">ID:</span>
@@ -642,7 +740,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                             : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
                           } ${isToggling ? 'opacity-50 cursor-wait' : 'active:scale-95'}`}
-                        title={isActive ? 'Click to deactivate campaign' : 'Click to activate campaign'}
+                        title={isActive ? 'Click to deactivate campaign (pause access)' : 'Click to activate campaign (enable access)'}
                       >
                         {isToggling ? (
                           <Loader2 className="w-3 h-3 animate-spin" />
@@ -689,6 +787,28 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                       >
                         <QrCode className="w-3.5 h-3.5" />
                         <span>Poster QR</span>
+                      </button>
+
+                      {/* Edit Campaign Name */}
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(item)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg border border-slate-300 transition-colors shadow-2xs cursor-pointer"
+                        title="Edit campaign name"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-slate-600" />
+                        <span>Edit</span>
+                      </button>
+
+                      {/* Delete Campaign */}
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDelete(item)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold rounded-lg border border-rose-200 transition-colors shadow-2xs cursor-pointer"
+                        title="Permanently delete campaign"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Delete</span>
                       </button>
                     </td>
                   </tr>
@@ -1455,6 +1575,158 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Download Poster PNG</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL 5: Edit Campaign Name
+          ========================================================================= */}
+      {isEditModalOpen && editCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-teal-50 text-teal-800 border border-teal-200">
+                  Campaign Settings
+                </span>
+                <h4 className="font-extrabold text-slate-900 text-base mt-1">Edit Campaign Name</h4>
+                <p className="text-xs text-slate-500 font-mono">ID: {editCampaign.slug}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditCampaign(null);
+                }}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Campaign Display Name <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="e.g. Campaign- Intervention-1"
+                  className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-[#1d5c64] focus:bg-white focus:ring-1 focus:ring-[#1d5c64] font-medium"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Changing the display name will update reports without altering unique URLs.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setEditCampaign(null);
+                  }}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingEdit || !editName.trim()}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingEdit ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <span>Save Changes</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL 6: Delete Campaign Confirmation Modal (Explicit Warning)
+          ========================================================================= */}
+      {isDeleteModalOpen && deleteCampaign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-rose-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 shrink-0">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <span className="px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-rose-50 text-rose-800 border border-rose-200">
+                  Irreversible Action
+                </span>
+                <h4 className="font-extrabold text-slate-900 text-base mt-1">
+                  Delete &ldquo;{deleteCampaign.name}&rdquo;?
+                </h4>
+                <p className="text-xs text-slate-500 font-mono">ID: {deleteCampaign.slug}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setDeleteCampaign(null);
+                }}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Warning Callout Box */}
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-left space-y-1.5">
+              <p className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>This campaign cannot be recovered once deleted</span>
+              </p>
+              <p className="text-[11px] text-rose-700 leading-relaxed font-normal">
+                Deleting this campaign will permanently remove all associated <strong>{deleteCampaign.totalScans || 0} participant access links</strong>, generated QR codes, and related records from the database.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setDeleteCampaign(null);
+                }}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleConfirmDelete}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting Permanently...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Yes, Delete Campaign</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

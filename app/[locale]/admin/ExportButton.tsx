@@ -16,7 +16,7 @@ export function ExportButton({ type, label }: { type: 'responses' | 'events' | '
     setTimeout(() => setLoading(false), 1200);
   };
 
-  const defaultLabel = type === 'participants' ? 'Export Roster CSV' : 'Export CSV';
+  const defaultLabel = type === 'participants' ? 'Export List CSV' : 'Export CSV';
 
   return (
     <button

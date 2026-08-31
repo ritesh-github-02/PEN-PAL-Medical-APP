@@ -229,7 +229,7 @@ export async function GET(request: Request) {
       filename = `penpal_${prefix}_slide_timings_EST.csv`;
     }
     // ─────────────────────────────────────────────────────────────────────────────
-    // 3. PARTICIPANTS COHORT ROSTER
+    // 3. PARTICIPANTS COHORT LIST
     // ─────────────────────────────────────────────────────────────────────────────
     else if (type === 'participants') {
       const participants = await prisma.participant.findMany({
@@ -290,7 +290,7 @@ export async function GET(request: Request) {
           EnrolledAt_UTC: p.createdAt.toISOString()
         };
       });
-      filename = 'penpal_clinical_cohort_roster_EST.csv';
+      filename = 'penpal_clinical_cohort_list_EST.csv';
     }
     // ─────────────────────────────────────────────────────────────────────────────
     // 4. CAMPAIGN BATCH LINKS & TOKENS

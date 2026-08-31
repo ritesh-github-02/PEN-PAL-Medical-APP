@@ -530,74 +530,87 @@ export async function validateAndConsumeToken(
     };
   }
 
-  // ── ② Structural + HMAC verification ─────────────────────────────────────
-  let parsed: ParsedToken;
-  try {
-    parsed = parseToken(rawToken);
-  } catch {
-    await logTokenSecurityEvent({
-      eventType: 'TOKEN_MALFORMED',
-      tokenHash: rawToken.trim().toUpperCase(),
-      resultStatus: 'FAIL',
-      ipAddress,
-      userAgent,
-      reason: 'Token structure is malformed — rejected before further processing.',
-    });
-    return { success: false, error: 'Invalid or expired access token.' };
+  const cleanInput = (rawToken || '').trim();
+  if (!cleanInput || cleanInput.length < 3) {
+    return {
+      success: false,
+      error: locale === 'es'
+        ? 'Por favor ingrese un Token o ID válido.'
+        : 'Please enter a valid Token or Research ID.',
+    };
   }
 
-  // Normalize token to uppercase representation to make validation case-insensitive
-  const normalizedToken = parsed.hmac
-    ? `${TOKEN_PREFIX}-${parsed.participantId}:${parsed.randomB32}-${parsed.hmac}`
-    : (parsed.raw ? parsed.raw.trim().toUpperCase() : `${TOKEN_PREFIX}-${parsed.randomB32}`);
-  const tokenHash = normalizedToken;
+  const normalized = cleanInput.toUpperCase();
+  const rawWithoutPrefix = normalized.replace(/^(?:PEN|P)-/i, '');
 
-  const secret = requireAdminSecret();
-
-  const hmacOk = verifyTokenCrypto(normalizedToken, secret);
-  if (!hmacOk) {
-    await logTokenSecurityEvent({
-      eventType: 'TOKEN_TAMPERED',
-      tokenHash,
-      resultStatus: 'FAIL',
-      ipAddress,
-      userAgent,
-      reason: 'HMAC verification failed — token may have been tampered with.',
-    });
-    return { success: false, error: 'Invalid or expired access token — tampering detected.' };
-  }
-
-  // ── Look up by hash ────────────────────────────────────────────────────────
-  // Use findFirst because tokenHash is not @unique after the legacy-fill migration
+  // ── ② Look up by pre-registered token or participant ID ─────────────────
   let tokenRecord;
   try {
     tokenRecord = await runWithRetry(() => prisma.participantToken.findFirst({
       where: {
         OR: [
-          { tokenHash },
-          { tokenHash: parsed.raw.toUpperCase() },
-          { tokenPayload: parsed.randomB32 },
-          { participant: { externalId: parsed.raw.trim().toUpperCase() } },
+          { tokenHash: { equals: normalized, mode: 'insensitive' } },
+          { tokenHash: { equals: cleanInput, mode: 'insensitive' } },
+          { tokenPayload: { equals: normalized, mode: 'insensitive' } },
+          { tokenPayload: { equals: rawWithoutPrefix, mode: 'insensitive' } },
+          { participant: { externalId: { equals: normalized, mode: 'insensitive' } } },
+          { participant: { externalId: { equals: cleanInput, mode: 'insensitive' } } },
+          { participant: { id: { equals: cleanInput } } },
         ],
       },
       orderBy: { createdAt: 'desc' }, // prefer the newest if duplicates exist
-      include: { participant: true },
+      include: {
+        participant: {
+          include: { campaign: true },
+        },
+      },
     }));
   } catch (err) {
     console.error('Database connection timed out or failed:', err);
-    return { success: false, error: 'Database server is currently waking up or unreachable. Please try again in a few seconds.' };
+    return {
+      success: false,
+      error: 'Database server is currently waking up or unreachable. Please try again in a few seconds.',
+    };
   }
 
+  // ── Strict Security Gate: If NOT found in pre-registered DB, REJECT immediately ──
   if (!tokenRecord) {
     await logTokenSecurityEvent({
       eventType: 'TOKEN_NOT_FOUND',
-      tokenHash,
+      tokenHash: normalized,
       resultStatus: 'FAIL',
       ipAddress,
       userAgent,
-      reason: 'Token not found in the database.',
+      reason: `Unauthorized entry attempt: "${cleanInput}" is not a pre-registered participant or token.`,
+      eventData: { attemptedInput: cleanInput },
     });
-    return { success: false, error: 'Invalid or expired access token.' };
+    return {
+      success: false,
+      error: locale === 'es'
+        ? 'Acceso denegado: El Token o ID no está registrado en el estudio. Solo los enlaces de invitación activos creados por el equipo de investigación tienen acceso.'
+        : 'Access Denied: Invalid Token or Research ID. Only active study links created in the admin portal are authorized to access this assessment.',
+    };
+  }
+
+  const tokenHash = tokenRecord.tokenHash || normalized;
+
+  // ── Campaign Deactivation Gate ───────────────────────────────────────────
+  if (tokenRecord.participant?.campaign?.status === 'DEACTIVATED') {
+    await logTokenSecurityEvent({
+      eventType: 'CAMPAIGN_DEACTIVATED',
+      tokenHash,
+      resultStatus: 'FAIL',
+      participantId: tokenRecord.participantId,
+      ipAddress,
+      userAgent,
+      reason: `Campaign '${tokenRecord.participant.campaign?.name || 'Unknown'}' is deactivated.`,
+    });
+    return {
+      success: false,
+      error: locale === 'es'
+        ? 'Esta campaña de estudio ha sido desactivada por el equipo de investigación.'
+        : 'This study campaign has been deactivated by the research study team.',
+    };
   }
 
   // ── ③ Status gate ──────────────────────────────────────────────────────────

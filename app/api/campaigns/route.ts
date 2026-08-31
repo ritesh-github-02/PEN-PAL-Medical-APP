@@ -296,30 +296,114 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PATCH: Toggle campaign active/deactivated status
+// PATCH: Update campaign name or toggle active/deactivated status
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, status } = body;
+    const { id, status, name } = body;
 
-    if (!id || (status !== 'ACTIVE' && status !== 'DEACTIVATED')) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: 'Invalid campaign ID or status.' },
+        { success: false, error: 'Campaign ID is required.' },
+        { status: 400 }
+      );
+    }
+
+    const dataToUpdate: any = {};
+
+    if (name !== undefined) {
+      if (typeof name !== 'string' || name.trim().length < 2) {
+        return NextResponse.json(
+          { success: false, error: 'Campaign name must be at least 2 characters.' },
+          { status: 400 }
+        );
+      }
+      dataToUpdate.name = name.trim();
+    }
+
+    if (status !== undefined) {
+      if (status !== 'ACTIVE' && status !== 'DEACTIVATED') {
+        return NextResponse.json(
+          { success: false, error: 'Invalid campaign status. Must be ACTIVE or DEACTIVATED.' },
+          { status: 400 }
+        );
+      }
+      dataToUpdate.status = status;
+    }
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'No valid fields provided to update.' },
         { status: 400 }
       );
     }
 
     const updated = await prisma.campaign.update({
       where: { id },
-      data: { status },
+      data: dataToUpdate,
     });
 
     revalidatePath('/[locale]/admin', 'page');
     return NextResponse.json({ success: true, campaign: updated });
   } catch (error: any) {
-    console.error('API Error updating campaign status:', error);
+    console.error('API Error updating campaign:', error);
     return NextResponse.json(
-      { success: false, error: error?.message || 'Failed to update campaign status' },
+      { success: false, error: error?.message || 'Failed to update campaign' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE: Permanently delete a campaign and all associated participant records
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: 'Campaign ID is required.' },
+        { status: 400 }
+      );
+    }
+
+    const campaign = await prisma.campaign.findUnique({
+      where: { id },
+      include: {
+        participants: { select: { id: true } },
+      },
+    });
+
+    if (!campaign) {
+      return NextResponse.json(
+        { success: false, error: 'Campaign not found.' },
+        { status: 404 }
+      );
+    }
+
+    const participantIds = campaign.participants.map((p) => p.id);
+
+    // Delete participants and cascade their tokens, responses, sessions, metrics
+    if (participantIds.length > 0) {
+      await prisma.participant.deleteMany({
+        where: { id: { in: participantIds } },
+      });
+    }
+
+    // Delete the campaign
+    await prisma.campaign.delete({
+      where: { id },
+    });
+
+    revalidatePath('/[locale]/admin', 'page');
+    return NextResponse.json({
+      success: true,
+      message: `Campaign "${campaign.name}" was permanently deleted.`,
+    });
+  } catch (error: any) {
+    console.error('API Error deleting campaign:', error);
+    return NextResponse.json(
+      { success: false, error: error?.message || 'Failed to delete campaign.' },
       { status: 500 }
     );
   }

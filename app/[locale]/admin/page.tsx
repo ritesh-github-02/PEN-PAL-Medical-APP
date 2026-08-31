@@ -472,15 +472,15 @@ export default async function AdminPage({ searchParams }: PageProps) {
               <ExportButton type="responses" />
             </div>
 
-            {/* Download Full Cohort Roster */}
+            {/* Download Full Cohort List */}
             <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-slate-50 border border-slate-200 rounded-lg gap-4">
               <div>
-                <h4 className="font-bold text-slate-900 text-xs">Clinical Cohort Registry Roster</h4>
+                <h4 className="font-bold text-slate-900 text-xs">Clinical Cohort Registry List</h4>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Export complete participant roster metadata including external IDs, cohort groups, status, token usage counts, and last active dates.
+                  Export complete participant list metadata including external IDs, cohort groups, status, token usage counts, and last active dates.
                 </p>
               </div>
-              <ExportButton type="participants" label="Export Roster CSV" />
+              <ExportButton type="participants" label="Export List CSV" />
             </div>
 
             {/* Download System Events */}

@@ -147,18 +147,27 @@ function formatDuration(totalSeconds: number): string {
 
 function formatDisplayId(rawId?: string | null): string {
   if (!rawId) return 'Unassigned';
-  if (rawId.includes('token=') || rawId.includes('TOKEN=')) {
-    const match = rawId.match(/[?&](?:token|TOKEN)=([^&#\s]+)/i);
-    if (match && match[1]) return decodeURIComponent(match[1]).trim();
+  const str = rawId.trim();
+
+  // 1. Check for token parameter in query string (case-insensitive)
+  const tokenMatch = str.match(/[?&](?:token|TOKEN|Token|t)=([^&#\s]+)/i);
+  if (tokenMatch && tokenMatch[1]) {
+    return decodeURIComponent(tokenMatch[1]).trim();
   }
-  if (rawId.startsWith('http://') || rawId.startsWith('https://')) {
+
+  // 2. URL parser fallback
+  if (/^https?:\/\//i.test(str)) {
     try {
-      const url = new URL(rawId);
-      const t = url.searchParams.get('token') || url.searchParams.get('TOKEN');
+      const parsedUrl = new URL(str);
+      const t = parsedUrl.searchParams.get('token') || parsedUrl.searchParams.get('TOKEN') || parsedUrl.searchParams.get('Token') || parsedUrl.searchParams.get('t');
       if (t) return t.trim();
+      const pathname = parsedUrl.pathname.replace(/\/$/, '');
+      const lastSeg = pathname.split('/').pop();
+      if (lastSeg && lastSeg.length > 2) return lastSeg;
     } catch {}
   }
-  return rawId;
+
+  return str;
 }
 
 export function ParticipantCohortTable({ participants }: ParticipantCohortTableProps) {
@@ -320,7 +329,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
             className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-slate-500" />
-            Cohort Roster (CSV)
+            Cohort List (CSV)
           </button>
         </div>
       </div>
@@ -379,18 +388,18 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
       </div>
 
       {/* Cohort Table */}
-      <div className="overflow-x-auto max-h-[550px] overflow-y-auto">
+      <div className="overflow-x-auto max-h-[580px] overflow-y-auto custom-scrollbar">
         {filteredParticipants.length > 0 ? (
           <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-100 border-b border-slate-200 sticky top-0 z-10">
+            <thead className="bg-slate-100/95 backdrop-blur-xs border-b border-slate-200 sticky top-0 z-10 text-slate-700">
               <tr>
-                <th className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">Participant ID / Email</th>
-                <th className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">Study Arm</th>
-                <th className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">Status</th>
-                <th className="px-4 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap text-center">Answers</th>
-                <th className="px-4 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap text-center">Sessions</th>
-                <th className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">Last Session (EST)</th>
-                <th className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap text-right">Study Data & Actions</th>
+                <th className="px-5 py-3 font-extrabold uppercase tracking-wider text-[11px] whitespace-nowrap min-w-[200px]">Participant ID</th>
+                <th className="px-4 py-3 font-extrabold uppercase tracking-wider text-[11px] whitespace-nowrap min-w-[130px]">Study Arm</th>
+                <th className="px-4 py-3 font-extrabold uppercase tracking-wider text-[11px] whitespace-nowrap min-w-[120px]">Status</th>
+                <th className="px-4 py-3 font-extrabold uppercase tracking-wider text-[11px] whitespace-nowrap text-center min-w-[130px]">Answers</th>
+                <th className="px-3 py-3 font-extrabold uppercase tracking-wider text-[11px] whitespace-nowrap text-center min-w-[80px]">Sessions</th>
+                <th className="px-5 py-3 font-extrabold uppercase tracking-wider text-[11px] whitespace-nowrap min-w-[200px]">Last Session (EST)</th>
+                <th className="px-5 py-3 font-extrabold uppercase tracking-wider text-[11px] whitespace-nowrap text-right min-w-[210px]">Study Data & Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 bg-white">
@@ -400,20 +409,20 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                 const isCompleted = p.status === 'COMPLETED';
 
                 return (
-                  <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={p.id} className="hover:bg-slate-50/90 transition-colors group">
                     {/* Participant ID */}
-                    <td className="px-5 py-3.5">
-                      <div>
-                        <p className="font-mono font-bold text-slate-900 text-xs">
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <div className="flex flex-col">
+                        <span className="font-mono font-bold text-slate-900 text-xs tracking-tight">
                           {formatDisplayId(p.externalId)}
-                        </p>
-                        <p className="text-[10px] text-slate-400 font-mono">GUID: {p.id.slice(0, 10)}...</p>
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono mt-0.5">GUID: {p.id.slice(0, 10)}...</span>
                       </div>
                     </td>
 
                     {/* Cohort Group */}
-                    <td className="px-5 py-3.5">
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-md border ${
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border whitespace-nowrap ${
                         p.groupId === 'INTERVENTION'
                           ? 'bg-teal-50 text-teal-800 border-teal-200'
                           : 'bg-amber-50 text-amber-800 border-amber-200'
@@ -424,8 +433,8 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     </td>
 
                     {/* Status */}
-                    <td className="px-5 py-3.5">
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-md border ${
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border whitespace-nowrap ${
                         isCompleted ? 'bg-teal-50 text-teal-800 border-teal-200' :
                         p.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
                         'bg-amber-50 text-amber-800 border-amber-200'
@@ -438,52 +447,56 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                       </span>
                     </td>
 
-                    {/* Responses Count */}
-                    <td className="px-4 py-3.5 text-center font-mono font-bold text-xs">
-                      <span className={`px-2.5 py-0.5 rounded font-bold ${hasResponses ? 'bg-teal-50 text-teal-800 border border-teal-200' : 'text-slate-400'}`}>
+                    {/* Responses Count (Fixed whitespace-nowrap single pill) */}
+                    <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                      <span className={`inline-flex items-center justify-center gap-1 px-3 py-1 rounded-full font-mono font-bold text-xs whitespace-nowrap border ${
+                        hasResponses 
+                          ? 'bg-teal-50 text-teal-900 border-teal-200 shadow-2xs' 
+                          : 'bg-slate-50 text-slate-400 border-slate-200'
+                      }`}>
                         {p._count.responses} answers
                       </span>
                     </td>
 
                     {/* Sessions Count */}
-                    <td className="px-4 py-3.5 text-center font-mono font-bold text-slate-700 text-xs">
+                    <td className="px-3 py-3.5 text-center whitespace-nowrap font-mono font-bold text-slate-800 text-xs">
                       {p._count.sessions}
                     </td>
 
                     {/* Last Session in EST */}
-                    <td className="px-5 py-3.5">
+                    <td className="px-5 py-3.5 whitespace-nowrap">
                       {p.sessions.length > 0 ? (
                         <div>
-                          <p className="font-semibold text-slate-800 text-xs font-mono" suppressHydrationWarning>
+                          <p className="font-semibold text-slate-800 text-xs font-mono whitespace-nowrap" suppressHydrationWarning>
                             {formatEST(p.sessions[0].createdAt)}
                           </p>
                         </div>
                       ) : (
-                        <p className="text-[11px] text-slate-400 italic">No sessions</p>
+                        <p className="text-[11px] text-slate-400 italic whitespace-nowrap">No sessions</p>
                       )}
                     </td>
 
                     {/* Actions Column */}
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center justify-end gap-2 whitespace-nowrap">
                         {/* Slide Timing Button */}
                         <button
                           onClick={() => handleOpenDetails(p.id, 'metrics')}
                           title="View time spent and open timestamps on each slide"
-                          className="flex items-center gap-1 px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 rounded-md font-bold text-[11px] transition-all cursor-pointer active:scale-95 shadow-2xs"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 rounded-lg font-bold text-[11px] transition-all cursor-pointer active:scale-95 shadow-2xs whitespace-nowrap"
                         >
-                          <Timer className="w-3 h-3 text-teal-700" />
-                          Slide Timings
+                          <Timer className="w-3.5 h-3.5 text-teal-700" />
+                          <span>Slide Timings</span>
                         </button>
 
                         {/* Export Slide Activity CSV Button */}
                         <button
                           onClick={(e) => handleDownloadSlideTelemetry(p.id, e)}
                           title="Download slide timing & activity CSV for this participant (EST)"
-                          className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-md font-bold text-[11px] transition-all cursor-pointer active:scale-95"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-lg font-bold text-[11px] transition-all cursor-pointer active:scale-95 whitespace-nowrap"
                         >
-                          <Download className="w-3 h-3 text-slate-600" />
-                          {isDownloading ? '...' : 'CSV'}
+                          <Download className="w-3.5 h-3.5 text-slate-600" />
+                          <span>{isDownloading ? '...' : 'CSV'}</span>
                         </button>
                       </div>
                     </td>
