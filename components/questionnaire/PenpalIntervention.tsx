@@ -527,18 +527,6 @@ export default function PenpalIntervention() {
                 ? `Paso ${currentStepIndex + 1} de ${questionnaireConfig.length}`
                 : `Step ${currentStepIndex + 1} of ${questionnaireConfig.length}`}
             </span>
-            {activeToken && (
-              <>
-                <span className="text-slate-300 text-xs hidden xs:inline" aria-hidden="true">|</span>
-                <span 
-                  role="region"
-                  aria-label={locale === "es" ? `ID de participante: ${activeToken}` : `Participant ID: ${activeToken}`}
-                  className="text-[10px] font-bold text-[#1f5c66] bg-[#f4f8e8] border border-[#35727f]/30 px-2.5 py-0.5 rounded-full font-mono flex items-center gap-1 shadow-2xs"
-                >
-                  <span aria-hidden="true">🔑</span> <span className="text-[9px] uppercase tracking-wider text-slate-600">ID:</span> {activeToken}
-                </span>
-              </>
-            )}
           </div>
 
           {/* Language Switcher Pill Button */}

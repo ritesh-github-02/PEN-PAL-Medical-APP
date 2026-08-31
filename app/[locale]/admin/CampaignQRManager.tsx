@@ -419,11 +419,10 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
       {/* Toast Alert Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl border text-xs font-bold animate-in fade-in slide-in-from-bottom-3 duration-200 ${
-            toastMessage.type === 'success'
+          className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl border text-xs font-bold animate-in fade-in slide-in-from-bottom-3 duration-200 ${toastMessage.type === 'success'
               ? 'bg-emerald-900 text-emerald-50 border-emerald-700'
               : 'bg-rose-900 text-rose-50 border-rose-700'
-          }`}
+            }`}
           role="alert"
         >
           {toastMessage.type === 'success' ? (
@@ -639,20 +638,18 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                         type="button"
                         disabled={isToggling}
                         onClick={() => handleToggle(item.id, item.status, item.name)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase transition-all shadow-2xs cursor-pointer border ${
-                          isActive
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase transition-all shadow-2xs cursor-pointer border ${isActive
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                             : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
-                        } ${isToggling ? 'opacity-50 cursor-wait' : 'active:scale-95'}`}
+                          } ${isToggling ? 'opacity-50 cursor-wait' : 'active:scale-95'}`}
                         title={isActive ? 'Click to deactivate campaign' : 'Click to activate campaign'}
                       >
                         {isToggling ? (
                           <Loader2 className="w-3 h-3 animate-spin" />
                         ) : (
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
-                            }`}
+                            className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                              }`}
                           />
                         )}
                         <span>{isActive ? 'Active' : 'Deactivated'}</span>
@@ -766,11 +763,10 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                       <button
                         type="button"
                         onClick={() => setArm('INTERVENTION')}
-                        className={`p-3.5 border rounded-xl flex items-center gap-3 text-left transition cursor-pointer ${
-                          arm === 'INTERVENTION'
+                        className={`p-3.5 border rounded-xl flex items-center gap-3 text-left transition cursor-pointer ${arm === 'INTERVENTION'
                             ? 'border-teal-500 bg-teal-50/60 ring-2 ring-teal-500/20 text-teal-900'
                             : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
-                        }`}
+                          }`}
                       >
                         <Smartphone className={`w-5 h-5 ${arm === 'INTERVENTION' ? 'text-teal-600' : 'text-slate-400'}`} />
                         <div>
@@ -782,11 +778,10 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                       <button
                         type="button"
                         onClick={() => setArm('CONTROL')}
-                        className={`p-3.5 border rounded-xl flex items-center gap-3 text-left transition cursor-pointer ${
-                          arm === 'CONTROL'
+                        className={`p-3.5 border rounded-xl flex items-center gap-3 text-left transition cursor-pointer ${arm === 'CONTROL'
                             ? 'border-amber-500 bg-amber-50/60 ring-2 ring-amber-500/20 text-amber-900'
                             : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
-                        }`}
+                          }`}
                       >
                         <BookOpen className={`w-5 h-5 ${arm === 'CONTROL' ? 'text-amber-600' : 'text-slate-400'}`} />
                         <div>
@@ -818,11 +813,10 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                             setQuantity(num);
                             setCustomQuantity(String(num));
                           }}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                            quantity === num
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${quantity === num
                               ? 'bg-indigo-600 text-white shadow-sm'
                               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                          }`}
+                            }`}
                         >
                           {num} links
                         </button>

@@ -15,11 +15,12 @@ export default function InterventionEntryPage() {
   const params = useParams();
   const router = useRouter();
 
-  const token = searchParams.get('token');
+  const token = searchParams.get('token') || searchParams.get('TOKEN') || searchParams.get('Token') || searchParams.get('t');
+  const cleanToken = token?.trim() || null;
   const locale = (params.locale as string) || 'en';
 
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(Boolean(token));
+  const [loading, setLoading] = useState<boolean>(Boolean(cleanToken));
   const [requestStatus, setRequestStatus] = useState<{ message: string; token: string } | null>(null);
   const [mode, setMode] = useState<'login' | 'register'>('login');
 
@@ -55,10 +56,10 @@ export default function InterventionEntryPage() {
   }, [locale, router]);
 
   useEffect(() => {
-    if (token) {
-      handleValidation(token);
+    if (cleanToken) {
+      handleValidation(cleanToken);
     }
-  }, [token, handleValidation]);
+  }, [cleanToken, handleValidation]);
 
   const handleRequestToken = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
