@@ -213,9 +213,22 @@ export default function PenpalIntervention() {
   const slideActiveMsRef = useRef<number>(0);
   const slideLastActiveRef = useRef<number>(Date.now());
   const isSlideVisibleRef = useRef<boolean>(true);
+  const recordedStepVisitsRef = useRef<Set<string>>(new Set());
+
+  // Record 1 unique visit when entering a step
+  useEffect(() => {
+    if (!currentStep || !initialized) return;
+
+    if (!recordedStepVisitsRef.current.has(currentStep.id)) {
+      recordedStepVisitsRef.current.add(currentStep.id);
+      recordSlideTiming(currentStep.id, currentStepIndex, 50, true).catch(() => {});
+    }
+  }, [currentStepIndex, initialized, currentStep]);
 
   // Active time tracker per slide with visibility change support
   useEffect(() => {
+    if (!initialized || !currentStep) return;
+
     slideActiveMsRef.current = 0;
     slideLastActiveRef.current = Date.now();
     isSlideVisibleRef.current = document.visibilityState === 'visible';
@@ -241,11 +254,12 @@ export default function PenpalIntervention() {
             stepId: activeStep.id,
             stepIndex: stepIdx,
             durationMs,
+            isNewVisit: false,
             path: '/intervention/flow',
           })], { type: 'application/json' });
           navigator.sendBeacon('/api/tracking', blob);
         } else {
-          recordSlideTiming(activeStep.id, stepIdx, durationMs).catch(() => {});
+          recordSlideTiming(activeStep.id, stepIdx, durationMs, false).catch(() => {});
         }
       }
     };
@@ -319,15 +333,9 @@ export default function PenpalIntervention() {
       setAnswers((prev) => ({ ...prev, [currentStep.id]: 9 }));
     }
 
-    // Default statistics to 5 if unadjusted
-    if (answer === undefined && currentStep.type === "statistics") {
-      answer = 5;
-      setAnswers((prev) => ({ ...prev, [currentStep.id]: 5 }));
-    }
-
     // For informational / non-question screens, record "acknowledged" instead of literal "undefined"
     if (answer === undefined || answer === null || answer === "undefined") {
-      if (["intro", "testing_info", "text", "summary"].includes(currentStep.type)) {
+      if (["intro", "statistics", "testing_info", "text", "summary"].includes(currentStep.type)) {
         answer = "acknowledged";
       } else {
         answer = "none_selected";
@@ -1501,10 +1509,9 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
       labelKey: "statisticsTitle",
       defaultValue: "Statistics: Understanding Penicillin Allergy Prevalence",
       getValue: () => {
-        const count = answers?.screen2_statistics ?? 5;
         return locale === "es"
-          ? "Solo " + count + " de 100 niños tienen alergia real."
-          : "Only " + count + " out of 100 kids have a true allergy.";
+          ? "Solo 5 de 100 niños tienen alergia real."
+          : "Only 5 out of 100 kids have a true allergy.";
       },
     },
     {

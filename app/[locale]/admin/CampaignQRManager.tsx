@@ -82,6 +82,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
   // Selected Campaign for "View Links & QR Codes" Drawer
   const [activeCampaign, setActiveCampaign] = useState<CampaignItem | null>(null);
   const [activeCampaignLinks, setActiveCampaignLinks] = useState<GeneratedLinkItem[]>([]);
+  const [activeLinksSearchTerm, setActiveLinksSearchTerm] = useState('');
   const [addQuantity, setAddQuantity] = useState<number>(10);
   const [addingMore, setAddingMore] = useState(false);
 
@@ -215,6 +216,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
     setActiveCampaign(campaign);
     setIsViewLinksModalOpen(true);
     setLinksLoading(true);
+    setActiveLinksSearchTerm('');
 
     try {
       const res = await fetch(`/api/campaigns?campaignId=${encodeURIComponent(campaign.id)}`, {
@@ -920,102 +922,154 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     </button>
                   </div>
 
-                  {/* Action Bar */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-b border-slate-100 pb-3">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleCopyAllLinks(generatedLinks)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition cursor-pointer"
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                        <span>Copy All URLs</span>
-                      </button>
+                  {/* Action Bar & Prominent Search Bar */}
+                  <div className="space-y-3 pt-1 border-b border-slate-100 pb-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCopyAllLinks(generatedLinks)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition cursor-pointer"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy All URLs</span>
+                        </button>
+                      </div>
+
+                      <span className="text-xs font-bold text-slate-500 font-mono">
+                        {(() => {
+                          const count = generatedLinks.filter((item) => {
+                            if (!batchSearchTerm.trim()) return true;
+                            const q = batchSearchTerm.toLowerCase().trim();
+                            return (
+                              item.externalId.toLowerCase().includes(q) ||
+                              item.token.toLowerCase().includes(q) ||
+                              item.url.toLowerCase().includes(q) ||
+                              `#${item.index}`.includes(q) ||
+                              String(item.index) === q
+                            );
+                          }).length;
+                          return `Showing ${count} of ${generatedLinks.length} links`;
+                        })()}
+                      </span>
                     </div>
 
-                    {/* Search inside generated batch */}
-                    <div className="relative w-48">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    {/* Dedicated Prominent Link Search Bar */}
+                    <div className="relative w-full">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type="text"
                         value={batchSearchTerm}
                         onChange={(e) => setBatchSearchTerm(e.target.value)}
-                        placeholder="Filter batch..."
-                        className="w-full pl-8 pr-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none"
+                        placeholder="Search generated links by ID (e.g. PEN-CAMP-001 or #1), Token (e.g. PEN-4K9L2M), or URL..."
+                        className="w-full pl-10 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 font-medium transition"
                       />
+                      {batchSearchTerm && (
+                        <button
+                          type="button"
+                          onClick={() => setBatchSearchTerm('')}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 font-bold text-xs cursor-pointer px-1 py-0.5"
+                        >
+                          Clear
+                        </button>
+                      )}
                     </div>
                   </div>
 
                   {/* Generated Links Scrollable Table */}
-                  <div className="max-h-72 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100 bg-slate-50/50">
-                    {generatedLinks
-                      .filter(
-                        (item) =>
-                          !batchSearchTerm ||
-                          item.externalId.toLowerCase().includes(batchSearchTerm.toLowerCase()) ||
-                          item.token.toLowerCase().includes(batchSearchTerm.toLowerCase())
-                      )
-                      .map((item) => (
-                        <div
-                          key={item.participantId}
-                          className="p-3 bg-white hover:bg-slate-50 transition flex items-center justify-between gap-3 text-xs"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <span className="w-6 h-6 rounded-full bg-slate-100 font-mono text-[10px] font-bold text-slate-600 flex items-center justify-center shrink-0">
-                              #{item.index}
-                            </span>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="font-extrabold text-slate-900 font-mono">{item.externalId}</span>
-                                <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono px-1.5 py-0.2 rounded text-[10px] font-bold">
-                                  {item.token}
-                                </span>
+                  {(() => {
+                    const filtered = generatedLinks.filter((item) => {
+                      if (!batchSearchTerm.trim()) return true;
+                      const q = batchSearchTerm.toLowerCase().trim();
+                      return (
+                        item.externalId.toLowerCase().includes(q) ||
+                        item.token.toLowerCase().includes(q) ||
+                        item.url.toLowerCase().includes(q) ||
+                        `#${item.index}`.includes(q) ||
+                        String(item.index) === q
+                      );
+                    });
+
+                    if (filtered.length === 0) {
+                      return (
+                        <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                          <p className="text-xs font-bold text-slate-700">No links found matching &quot;{batchSearchTerm}&quot;</p>
+                          <button
+                            type="button"
+                            onClick={() => setBatchSearchTerm('')}
+                            className="text-xs text-indigo-600 font-bold hover:underline cursor-pointer"
+                          >
+                            Clear Search Filter
+                          </button>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="max-h-72 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100 bg-slate-50/50">
+                        {filtered.map((item) => (
+                          <div
+                            key={item.participantId}
+                            className="p-3 bg-white hover:bg-slate-50 transition flex items-center justify-between gap-3 text-xs"
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="w-6 h-6 rounded-full bg-slate-100 font-mono text-[10px] font-bold text-slate-600 flex items-center justify-center shrink-0">
+                                #{item.index}
+                              </span>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-extrabold text-slate-900 font-mono">{item.externalId}</span>
+                                  <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono px-1.5 py-0.2 rounded text-[10px] font-bold">
+                                    {item.token}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] font-mono text-slate-400 truncate max-w-xs sm:max-w-sm mt-0.5">
+                                  {item.url}
+                                </p>
                               </div>
-                              <p className="text-[11px] font-mono text-slate-400 truncate max-w-xs sm:max-w-sm mt-0.5">
-                                {item.url}
-                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {/* Copy Link */}
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(item.url, item.participantId)}
+                                className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition cursor-pointer"
+                                title="Copy URL"
+                              >
+                                {copiedId === item.participantId ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+
+                              {/* Open Direct */}
+                              <a
+                                href={item.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition"
+                                title="Open link in new tab"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+
+                              {/* Preview QR */}
+                              <button
+                                type="button"
+                                onClick={() => handlePreviewQr(item, createdCampaign.name)}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold border border-indigo-200 transition cursor-pointer"
+                              >
+                                <QrCode className="w-3 h-3" />
+                                <span>QR</span>
+                              </button>
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            {/* Copy Link */}
-                            <button
-                              type="button"
-                              onClick={() => handleCopy(item.url, item.participantId)}
-                              className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition cursor-pointer"
-                              title="Copy URL"
-                            >
-                              {copiedId === item.participantId ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              ) : (
-                                <Copy className="w-3.5 h-3.5" />
-                              )}
-                            </button>
-
-                            {/* Open Direct */}
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition"
-                              title="Open link in new tab"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
-
-                            {/* Preview QR */}
-                            <button
-                              type="button"
-                              onClick={() => handlePreviewQr(item, createdCampaign.name)}
-                              className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold border border-indigo-200 transition cursor-pointer"
-                            >
-                              <QrCode className="w-3 h-3" />
-                              <span>QR</span>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
 
                   {/* Modal Footer */}
                   <div className="pt-2 flex justify-between items-center">
@@ -1124,6 +1178,49 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 </div>
               </div>
 
+              {/* Dedicated Search Bar for Existing Campaign Links */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs text-slate-500">
+                  <span className="font-bold uppercase tracking-wider text-[10px]">Filter Links in this Campaign</span>
+                  <span className="font-mono font-bold">
+                    {(() => {
+                      const count = activeCampaignLinks.filter((item) => {
+                        if (!activeLinksSearchTerm.trim()) return true;
+                        const q = activeLinksSearchTerm.toLowerCase().trim();
+                        return (
+                          item.externalId.toLowerCase().includes(q) ||
+                          item.token.toLowerCase().includes(q) ||
+                          item.url.toLowerCase().includes(q) ||
+                          `#${item.index}`.includes(q) ||
+                          String(item.index) === q
+                        );
+                      }).length;
+                      return `Showing ${count} of ${activeCampaignLinks.length} links`;
+                    })()}
+                  </span>
+                </div>
+
+                <div className="relative w-full">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={activeLinksSearchTerm}
+                    onChange={(e) => setActiveLinksSearchTerm(e.target.value)}
+                    placeholder="Search campaign links by ID (e.g. PEN-CAMP-001 or #1), Token (e.g. PEN-4K9L2M), or URL..."
+                    className="w-full pl-10 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 font-medium transition"
+                  />
+                  {activeLinksSearchTerm && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveLinksSearchTerm('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 font-bold text-xs cursor-pointer px-1 py-0.5"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+
               {/* Links Table */}
               {linksLoading ? (
                 <div className="py-12 text-center text-slate-400 space-y-2">
@@ -1141,79 +1238,108 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     + Generate first batch of links now
                   </button>
                 </div>
-              ) : (
-                <div className="max-h-80 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100 bg-white">
-                  {activeCampaignLinks.map((item) => (
-                    <div
-                      key={item.participantId}
-                      className="p-3 hover:bg-slate-50 transition flex items-center justify-between gap-3 text-xs"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="w-6 h-6 rounded-full bg-slate-100 font-mono text-[10px] font-bold text-slate-600 flex items-center justify-center shrink-0">
-                          #{item.index}
-                        </span>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-extrabold text-slate-900 font-mono">{item.externalId}</span>
-                            <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono px-1.5 py-0.2 rounded text-[10px] font-bold">
-                              {item.token}
-                            </span>
-                            {item.useCount && item.useCount > 0 ? (
-                              <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded">
-                                Used {item.useCount}x
+              ) : (() => {
+                const filtered = activeCampaignLinks.filter((item) => {
+                  if (!activeLinksSearchTerm.trim()) return true;
+                  const q = activeLinksSearchTerm.toLowerCase().trim();
+                  return (
+                    item.externalId.toLowerCase().includes(q) ||
+                    item.token.toLowerCase().includes(q) ||
+                    item.url.toLowerCase().includes(q) ||
+                    `#${item.index}`.includes(q) ||
+                    String(item.index) === q
+                  );
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                      <p className="text-xs font-bold text-slate-700">No links found matching &quot;{activeLinksSearchTerm}&quot;</p>
+                      <button
+                        type="button"
+                        onClick={() => setActiveLinksSearchTerm('')}
+                        className="text-xs text-indigo-600 font-bold hover:underline cursor-pointer"
+                      >
+                        Clear Search Filter
+                      </button>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="max-h-80 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100 bg-white">
+                    {filtered.map((item) => (
+                      <div
+                        key={item.participantId}
+                        className="p-3 hover:bg-slate-50 transition flex items-center justify-between gap-3 text-xs"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="w-6 h-6 rounded-full bg-slate-100 font-mono text-[10px] font-bold text-slate-600 flex items-center justify-center shrink-0">
+                            #{item.index}
+                          </span>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-slate-900 font-mono">{item.externalId}</span>
+                              <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono px-1.5 py-0.2 rounded text-[10px] font-bold">
+                                {item.token}
                               </span>
-                            ) : (
-                              <span className="text-[10px] text-slate-400 font-medium bg-slate-100 px-1.5 py-0.2 rounded">
-                                Unused
-                              </span>
-                            )}
+                              {item.useCount && item.useCount > 0 ? (
+                                <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded">
+                                  Used {item.useCount}x
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-slate-400 font-medium bg-slate-100 px-1.5 py-0.2 rounded">
+                                  Unused
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] font-mono text-slate-400 truncate max-w-xs sm:max-w-md mt-0.5">
+                              {item.url}
+                            </p>
                           </div>
-                          <p className="text-[11px] font-mono text-slate-400 truncate max-w-xs sm:max-w-md mt-0.5">
-                            {item.url}
-                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {/* Copy Link */}
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(item.url, item.participantId)}
+                            className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition cursor-pointer"
+                            title="Copy URL"
+                          >
+                            {copiedId === item.participantId ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+
+                          {/* Open Direct */}
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition"
+                            title="Open link in new tab"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+
+                          {/* Preview QR */}
+                          <button
+                            type="button"
+                            onClick={() => handlePreviewQr(item, activeCampaign.name)}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold border border-indigo-200 transition cursor-pointer"
+                          >
+                            <QrCode className="w-3 h-3" />
+                            <span>QR</span>
+                          </button>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {/* Copy Link */}
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(item.url, item.participantId)}
-                          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition cursor-pointer"
-                          title="Copy URL"
-                        >
-                          {copiedId === item.participantId ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-
-                        {/* Open Direct */}
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition"
-                          title="Open link in new tab"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-
-                        {/* Preview QR */}
-                        <button
-                          type="button"
-                          onClick={() => handlePreviewQr(item, activeCampaign.name)}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold border border-indigo-200 transition cursor-pointer"
-                        >
-                          <QrCode className="w-3 h-3" />
-                          <span>QR</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

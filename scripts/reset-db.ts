@@ -1,24 +1,44 @@
-import prisma from '../lib/prisma';
+import { PrismaClient } from '@prisma/client';
 
-async function resetDatabase() {
-  console.log('🧹 Clearing all data from PostgreSQL tables...');
+const prisma = new PrismaClient();
 
-  // Delete in reverse order of foreign key constraints
-  await prisma.eventLog.deleteMany();
-  await prisma.tokenSecurityEvent.deleteMany();
-  await prisma.questionnaireResponse.deleteMany();
-  await prisma.surveyResponse.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.participantToken.deleteMany();
-  await prisma.participant.deleteMany();
-  await prisma.campaign.deleteMany();
+async function main() {
+  console.log('🔄 Cleaning all study data from database...');
 
-  console.log('✨ Database cleared successfully! All tables are fresh and empty.');
+  // Delete all study records in safe dependency order
+  const delMetrics = await prisma.slideMetric.deleteMany();
+  console.log(`Deleted ${delMetrics.count} slide metrics.`);
+
+  const delResponses = await prisma.questionnaireResponse.deleteMany();
+  console.log(`Deleted ${delResponses.count} questionnaire responses.`);
+
+  const delSurveys = await prisma.surveyResponse.deleteMany();
+  console.log(`Deleted ${delSurveys.count} survey responses.`);
+
+  const delEvents = await prisma.eventLog.deleteMany();
+  console.log(`Deleted ${delEvents.count} event logs.`);
+
+  const delSecEvents = await prisma.tokenSecurityEvent.deleteMany();
+  console.log(`Deleted ${delSecEvents.count} token security events.`);
+
+  const delSessions = await prisma.session.deleteMany();
+  console.log(`Deleted ${delSessions.count} sessions.`);
+
+  const delTokens = await prisma.participantToken.deleteMany();
+  console.log(`Deleted ${delTokens.count} participant tokens.`);
+
+  const delParticipants = await prisma.participant.deleteMany();
+  console.log(`Deleted ${delParticipants.count} participants.`);
+
+  const delCampaigns = await prisma.campaign.deleteMany();
+  console.log(`Deleted ${delCampaigns.count} campaigns.`);
+
+  console.log('✨ Database successfully reset to clean, fresh state!');
 }
 
-resetDatabase()
-  .catch((error) => {
-    console.error('❌ Failed to clear database:', error);
+main()
+  .catch((e) => {
+    console.error('Error resetting database:', e);
     process.exit(1);
   })
   .finally(async () => {

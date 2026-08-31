@@ -118,8 +118,13 @@ export async function GET(request: Request) {
     // ─────────────────────────────────────────────────────────────────────────────
     if (type === 'responses' || type === 'participant_responses') {
       const whereClause = participantId ? { participantId } : {};
+      const questionIds = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'];
       const responses = await prisma.questionnaireResponse.findMany({
-        where: whereClause,
+        where: {
+          ...whereClause,
+          questionId: { in: questionIds },
+          answerValue: { notIn: ['acknowledged', ''] }
+        },
         include: {
           participant: {
             include: { campaign: true }
@@ -176,7 +181,10 @@ export async function GET(request: Request) {
       data = metrics.map((m, idx) => {
         const stepInfo = STEP_LABELS_MAP[m.stepId] || { slideNumber: m.stepIndex + 1, title: m.stepId, type: 'Slide' };
         const matchingResponse = m.participant?.responses?.find((r: any) => r.questionId === m.stepId);
-        const recordedAnswer = matchingResponse ? formatAnswerValue(m.stepId, matchingResponse.answerValue) : 'Viewed Only';
+        const isQuestionStep = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'].includes(m.stepId);
+        const recordedAnswer = (matchingResponse && isQuestionStep && matchingResponse.answerValue !== 'acknowledged')
+          ? formatAnswerValue(m.stepId, matchingResponse.answerValue)
+          : 'N/A (Informational Slide)';
         const durationSec = (m.durationMs / 1000).toFixed(2);
 
         return {
@@ -189,10 +197,7 @@ export async function GET(request: Request) {
           SlideTitle: stepInfo.title,
           SlideID: m.stepId,
           SlideOpenedAt_EST: formatEST(m.createdAt),
-          SlideLastActiveAt_EST: formatEST(m.updatedAt),
           TimeSpent_Seconds: durationSec,
-          TimeSpent_Formatted: formatDuration(m.durationMs / 1000),
-          TimeSpent_Milliseconds: m.durationMs,
           VisitsCount: m.visitCount,
           AnswerRecordedOnSlide: recordedAnswer,
           ParticipantStatus: m.participant?.status || 'ACTIVE',

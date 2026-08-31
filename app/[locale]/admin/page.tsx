@@ -469,25 +469,6 @@ export default async function AdminPage({ searchParams }: PageProps) {
               </div>
               <ExportButton type="events" />
             </div>
-
-            {/* Screen-by-Screen Machine Audio Export */}
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-slate-50 border border-slate-200 rounded-lg gap-4">
-              <div>
-                <h4 className="font-bold text-slate-900 text-xs">Screen-by-Screen Machine Audio Files (.MP3)</h4>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Export machine generated voiceover audio files for all 12 intervention screens in English (EN) and Spanish (ES).
-                </p>
-              </div>
-              <a
-                href="/api/export-audio"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-bold transition-all shadow-xs shrink-0"
-              >
-                <Download className="w-3.5 h-3.5" />
-                View Audio Files Manifest
-              </a>
-            </div>
             
           </div>
         </div>

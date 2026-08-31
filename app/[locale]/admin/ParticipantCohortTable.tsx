@@ -466,16 +466,6 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                           <Download className="w-3 h-3 text-slate-600" />
                           {isDownloading ? '...' : 'CSV'}
                         </button>
-
-                        {/* View Full Profile */}
-                        <button
-                          onClick={() => handleOpenDetails(p.id, 'summary')}
-                          title="View detailed participant profile"
-                          className="flex items-center gap-1 px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-md font-bold text-[11px] transition-all cursor-pointer active:scale-95 shadow-2xs"
-                        >
-                          <Eye className="w-3 h-3 text-teal-300" />
-                          Details
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -716,15 +706,19 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                                       </div>
                                     )}
 
-                                    {/* If an answer exists on this slide, render it right here */}
-                                    {response && (
-                                      <div className="mt-1 flex items-center gap-1.5">
-                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Answer:</span>
-                                        <span className="px-2.5 py-0.5 bg-teal-50 text-teal-950 font-bold text-xs rounded border border-teal-200">
-                                          {formatDisplayAnswer(slide.id, response.answerValue)}
-                                        </span>
-                                      </div>
-                                    )}
+                                    {/* If an answer exists on this slide and it is a question, render it right here */}
+                                    {(() => {
+                                      const isQuestionSlide = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'].includes(slide.id);
+                                      if (!response || !isQuestionSlide || response.answerValue === 'acknowledged') return null;
+                                      return (
+                                        <div className="mt-1 flex items-center gap-1.5">
+                                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Answer:</span>
+                                          <span className="px-2.5 py-0.5 bg-teal-50 text-teal-950 font-bold text-xs rounded border border-teal-200">
+                                            {formatDisplayAnswer(slide.id, response.answerValue)}
+                                          </span>
+                                        </div>
+                                      );
+                                    })()}
                                   </div>
                                 </div>
 
@@ -953,21 +947,33 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                         </button>
                       </div>
 
-                      {modalDetails.responses?.length > 0 ? (
-                        <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-                          <table className="w-full text-left text-xs border-collapse">
-                            <thead className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold">
-                              <tr>
-                                <th className="py-3 px-4">Question Step</th>
-                                <th className="py-3 px-4">Recorded Answer Value</th>
-                                <th className="py-3 px-4 text-center">Slide Dwell Time</th>
-                                <th className="py-3 px-4 text-right">Timestamp (EST)</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-200 bg-white">
-                              {modalDetails.responses.map((r: any) => {
-                                const stepInfo = STEP_LABELS_MAP[r.questionId] || { title: r.questionId, subtitle: '', type: 'Field', slideNumber: 0 };
-                                const dwellSec = r.timeSpentMs ? (r.timeSpentMs / 1000).toFixed(1) : '< 1';
+                      {(() => {
+                        const questionIds = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'];
+                        const visibleResponses = (modalDetails.responses || []).filter((r: any) => questionIds.includes(r.questionId) && r.answerValue !== 'acknowledged');
+
+                        if (visibleResponses.length === 0) {
+                          return (
+                            <p className="text-xs text-slate-500 italic p-8 text-center border border-slate-200 rounded-xl bg-slate-50">
+                              No questionnaire responses recorded for this participant yet.
+                            </p>
+                          );
+                        }
+
+                        return (
+                          <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                            <table className="w-full text-left text-xs border-collapse">
+                              <thead className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold">
+                                <tr>
+                                  <th className="py-3 px-4">Question Step</th>
+                                  <th className="py-3 px-4">Recorded Answer Value</th>
+                                  <th className="py-3 px-4 text-center">Slide Dwell Time</th>
+                                  <th className="py-3 px-4 text-right">Timestamp (EST)</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-200 bg-white">
+                                {visibleResponses.map((r: any) => {
+                                  const stepInfo = STEP_LABELS_MAP[r.questionId] || { title: r.questionId, subtitle: '', type: 'Field', slideNumber: 0 };
+                                  const dwellSec = r.timeSpentMs ? (r.timeSpentMs / 1000).toFixed(1) : '< 1';
 
                                 return (
                                   <tr key={r.id} className="hover:bg-slate-50 transition-colors">
@@ -991,14 +997,11 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                                   </tr>
                                 );
                               })}
-                            </tbody>
-                          </table>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-slate-500 italic p-8 text-center border border-slate-200 rounded-xl bg-slate-50">
-                          No questionnaire responses recorded for this participant yet.
-                        </p>
-                      )}
+                              </tbody>
+                            </table>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
 

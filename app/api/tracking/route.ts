@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       'unknown';
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
-    const { eventType, eventData, stepId, stepIndex, durationMs, path, isComplete } = body;
+    const { eventType, eventData, stepId, stepIndex, durationMs, isNewVisit, path, isComplete } = body;
 
     // 1. Log generic interaction event
     if (eventType) {
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Record duration metrics (for slides or control page)
     if (durationMs && durationMs > 50 && participantId && stepId) {
+      const isVisit = Boolean(isNewVisit);
       await prisma.slideMetric.upsert({
         where: {
           participantId_stepId: {
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
         },
         update: {
           durationMs: { increment: Math.round(durationMs) },
-          visitCount: { increment: 1 },
+          ...(isVisit ? { visitCount: { increment: 1 } } : {}),
         },
         create: {
           participantId,

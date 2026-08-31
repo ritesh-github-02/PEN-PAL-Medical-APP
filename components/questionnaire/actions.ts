@@ -48,7 +48,7 @@ export async function submitAnswer(questionId: string, answerValue: string, time
 // recordSlideTiming (Slide-by-slide 100% time metrics)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function recordSlideTiming(stepId: string, stepIndex: number, durationMs: number) {
+export async function recordSlideTiming(stepId: string, stepIndex: number, durationMs: number, isNewVisit: boolean = false) {
   const cookieStore = await cookies();
   const participantId = cookieStore.get('penpal_participant')?.value;
 
@@ -64,7 +64,7 @@ export async function recordSlideTiming(stepId: string, stepIndex: number, durat
       },
       update: {
         durationMs: { increment: Math.round(durationMs) },
-        visitCount: { increment: 1 },
+        ...(isNewVisit ? { visitCount: { increment: 1 } } : {}),
       },
       create: {
         participantId,
