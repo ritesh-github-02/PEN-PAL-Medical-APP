@@ -271,14 +271,14 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <Users className="w-4 h-4 text-slate-700" /> CLINICAL COHORT REGISTRY
+              <Users className="w-4 h-4 text-[#1d5c64]" /> CLINICAL COHORT REGISTRY
             </h3>
-            <span className="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full">
+            <span className="text-xs font-bold text-[#1d5c64] bg-[#f4f8e8] border border-[#1d5c64]/25 px-2.5 py-0.5 rounded-full">
               {filteredParticipants.length} Participants
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5 font-normal">
-            Real-time participant telemetry tracking slide-by-slide open timestamps (EST), dwell times, and submitted answers.
+            Real-time study data tracking slide-by-slide open timestamps (EST), dwell times, and submitted answers.
           </p>
         </div>
 
@@ -286,16 +286,16 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
         <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-start lg:justify-end">
           <button
             onClick={() => window.location.href = '/api/export?type=slide_metrics'}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#236f7a] hover:bg-[#1d5c64] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
-            <Activity className="w-3.5 h-3.5 text-teal-300" />
+            <Activity className="w-3.5 h-3.5 text-teal-200" />
             Slide Timings CSV (EST)
           </button>
           <button
             onClick={() => window.location.href = '/api/export?type=responses'}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-teal-400" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-teal-200" />
             All Answers (CSV)
           </button>
           <button
@@ -373,7 +373,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                 <th className="px-4 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap text-center">Answers</th>
                 <th className="px-4 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap text-center">Sessions</th>
                 <th className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">Last Session (EST)</th>
-                <th className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap text-right">Slide Telemetry & Actions</th>
+                <th className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap text-right">Study Data & Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 bg-white">
@@ -407,12 +407,12 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     {/* Status */}
                     <td className="px-5 py-3.5">
                       <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-md border ${
-                        isCompleted ? 'bg-indigo-50 text-indigo-800 border-indigo-200' :
+                        isCompleted ? 'bg-teal-50 text-teal-800 border-teal-200' :
                         p.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
                         'bg-amber-50 text-amber-800 border-amber-200'
                       }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${
-                          isCompleted ? 'bg-indigo-600' :
+                          isCompleted ? 'bg-teal-600' :
                           p.status === 'ACTIVE' ? 'bg-emerald-600' : 'bg-amber-600'
                         }`}></span>
                         {isCompleted ? 'Completed' : p.status}
@@ -457,10 +457,10 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                           Slide Timings
                         </button>
 
-                        {/* Export Slide Telemetry CSV Button */}
+                        {/* Export Slide Activity CSV Button */}
                         <button
                           onClick={(e) => handleDownloadSlideTelemetry(p.id, e)}
-                          title="Download slide timing telemetry CSV for this participant (EST)"
+                          title="Download slide timing & activity CSV for this participant (EST)"
                           className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-md font-bold text-[11px] transition-all cursor-pointer active:scale-95"
                         >
                           <Download className="w-3 h-3 text-slate-600" />
@@ -484,7 +484,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
       {/* Footer Info */}
       <div className="p-3 border-t border-slate-200 bg-slate-50 text-slate-500 text-[11px] flex justify-between items-center">
         <span>Showing {filteredParticipants.length} of {participants.length} registered study subjects</span>
-        <span className="font-semibold text-slate-700">Slide Telemetry Timestamps: Eastern Standard Time (EST)</span>
+        <span className="font-semibold text-slate-700">Study Activity Timestamps: Eastern Standard Time (EST)</span>
       </div>
 
       {/* ================= PARTICIPANT DETAILS MODAL ================= */}
@@ -492,19 +492,19 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="participant-modal-title">
           <div className="bg-white border border-slate-300 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             
-            {/* Modal Header */}
-            <div className="p-5 bg-slate-900 text-white flex justify-between items-center shrink-0 border-b border-slate-800">
+            {/* Soft Clinical Modal Header */}
+            <div className="p-5 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white flex justify-between items-center shrink-0 border-b border-[#1d5c64]/30">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-teal-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
-                    Participant Telemetry Record
+                  <span className="text-xs font-bold uppercase tracking-wider text-teal-100 bg-white/20 px-2 py-0.5 rounded border border-white/25">
+                    Participant Clinical Record
                   </span>
                   <h3 id="participant-modal-title" className="text-lg font-extrabold font-mono text-white">
                     {modalDetails?.externalId || selectedParticipantId}
                   </h3>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Database GUID: <span className="font-mono">{selectedParticipantId}</span> &middot; Study Arm: <span className="text-teal-400 font-bold">{modalDetails?.groupId}</span>
+                <p className="text-xs text-teal-100 mt-0.5">
+                  Database GUID: <span className="font-mono">{selectedParticipantId}</span> &middot; Study Arm: <span className="text-white font-bold">{modalDetails?.groupId}</span>
                 </p>
               </div>
 
@@ -512,7 +512,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                 type="button"
                 onClick={() => setSelectedParticipantId(null)}
                 aria-label="Close participant details dialog"
-                className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 bg-white/15 hover:bg-white/25 text-white rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
@@ -940,9 +940,9 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                         </div>
                         <button
                           onClick={() => handleDownloadResponses(modalDetails.id)}
-                          className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                          className="px-3.5 py-1.5 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-[0.98]"
                         >
-                          <Download className="w-3.5 h-3.5 text-teal-400" />
+                          <Download className="w-3.5 h-3.5 text-teal-200" />
                           Download Responses CSV (EST)
                         </button>
                       </div>
@@ -1005,11 +1005,11 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     </div>
                   )}
 
-                  {/* ================= TAB 4: TOKENS & SESSIONS ================= */}
+                  {/* ================= TAB 4: ACCESS CODES & SESSIONS ================= */}
                   {activeTab === 'tokens' && (
                     <div className="space-y-4">
                       <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
-                        Issued Tokens & Session Access History
+                        Issued Access Codes & Session History
                       </h4>
 
                       {modalDetails.tokens?.length > 0 ? (
@@ -1017,14 +1017,14 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                           {modalDetails.tokens.map((tok: any) => (
                             <div key={tok.id} className="p-4 border border-slate-200 rounded-xl bg-slate-50/70 flex justify-between items-center">
                               <div>
-                                <p className="font-mono font-black text-slate-900 text-sm tracking-wider">{tok.tokenHash || tok.token || 'PEN-TOKEN'}</p>
+                                <p className="font-mono font-black text-slate-900 text-sm tracking-wider">{tok.tokenHash || tok.token || 'PEN-CODE'}</p>
                                 <p className="text-[11px] text-slate-500 mt-1 font-mono" suppressHydrationWarning>
                                   Total Consumptions: <strong className="text-slate-800">{tok.useCount || tok.usageCount || 0}</strong> &middot; Last Validated (EST): {tok.lastUsedAt ? formatEST(tok.lastUsedAt) : 'Never'}
                                 </p>
                               </div>
                               <span className={`px-3 py-1 text-xs font-bold rounded-md border ${
                                 tok.status === 'VALID' || tok.status === 'PENDING' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
-                                tok.status === 'CONSUMED' ? 'bg-indigo-50 text-indigo-800 border-indigo-200' :
+                                tok.status === 'CONSUMED' ? 'bg-teal-50 text-teal-800 border-teal-200' :
                                 'bg-slate-200 text-slate-700 border-slate-300'
                               }`}>
                                 {tok.status}
@@ -1034,7 +1034,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                         </div>
                       ) : (
                         <p className="text-xs text-slate-500 italic p-4 border border-slate-200 rounded-lg">
-                          No token logs available.
+                          No access code logs available.
                         </p>
                       )}
                     </div>
@@ -1048,16 +1048,16 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleDownloadSlideTelemetry(selectedParticipantId)}
-                  className="px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  className="px-4 py-2 bg-[#236f7a] hover:bg-[#1d5c64] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
-                  <Activity className="w-3.5 h-3.5 text-teal-300" />
+                  <Activity className="w-3.5 h-3.5 text-teal-200" />
                   Download Slide Timings CSV (EST)
                 </button>
                 <button
                   onClick={() => handleDownloadResponses(selectedParticipantId)}
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  className="px-4 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
-                  <Download className="w-3.5 h-3.5 text-teal-400" />
+                  <Download className="w-3.5 h-3.5 text-teal-200" />
                   Download Answers CSV (EST)
                 </button>
               </div>

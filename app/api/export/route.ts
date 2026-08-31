@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import Papa from 'papaparse';
+import { parseUserAgent } from '@/lib/device-detector';
 
 const STUDY_SLIDES_CONFIG = [
   { id: 'screen1_intro', slideNumber: 1, title: 'Introduction & Consent Briefing', type: 'Intro' },
@@ -171,6 +172,16 @@ export async function GET(request: Request) {
               tokens: {
                 orderBy: { createdAt: 'desc' },
                 take: 1
+              },
+              events: {
+                where: {
+                  OR: [
+                    { eventType: 'ACCESSIBILITY_INTERACTION' },
+                    { eventData: { contains: 'Screen Reader' } },
+                    { eventData: { contains: 'Assistive' } }
+                  ]
+                },
+                take: 5
               }
             }
           }
@@ -187,6 +198,10 @@ export async function GET(request: Request) {
           : 'N/A (Informational Slide)';
         const durationSec = (m.durationMs / 1000).toFixed(2);
 
+        const ua = m.participant?.tokens?.[0]?.lastUsedAgent || 'unknown';
+        const devInfo = parseUserAgent(ua);
+        const hasA11y = (m.participant?.events && m.participant.events.length > 0);
+
         return {
           Index: idx + 1,
           ParticipantID: m.participant?.externalId || m.participantId,
@@ -200,6 +215,10 @@ export async function GET(request: Request) {
           TimeSpent_Seconds: durationSec,
           VisitsCount: m.visitCount,
           AnswerRecordedOnSlide: recordedAnswer,
+          DeviceType: devInfo.deviceType,
+          Browser: devInfo.browser,
+          OperatingSystem: devInfo.os,
+          ScreenReader_Accessibility: hasA11y ? 'Detected (NVDA / Assistive Navigation)' : 'None (Standard Interaction)',
           ParticipantStatus: m.participant?.status || 'ACTIVE',
           LastKnownIP: m.participant?.tokens?.[0]?.lastUsedIp || 'N/A',
           Timestamp_UTC: m.createdAt.toISOString()
@@ -220,6 +239,16 @@ export async function GET(request: Request) {
             orderBy: { createdAt: 'desc' },
             take: 1
           },
+          events: {
+            where: {
+              OR: [
+                { eventType: 'ACCESSIBILITY_INTERACTION' },
+                { eventData: { contains: 'Screen Reader' } },
+                { eventData: { contains: 'Assistive' } }
+              ]
+            },
+            take: 5
+          },
           _count: {
             select: {
               sessions: true,
@@ -236,21 +265,31 @@ export async function GET(request: Request) {
         orderBy: { createdAt: 'desc' }
       });
 
-      data = participants.map((p, idx) => ({
-        Index: idx + 1,
-        ParticipantID: p.externalId || p.id,
-        DatabaseGUID: p.id,
-        StudyArm: p.groupId,
-        CampaignName: p.campaign?.name || 'Unassigned',
-        Status: p.status,
-        AccessToken: p.tokens[0]?.tokenHash || 'N/A',
-        TotalSessions: p._count.sessions,
-        TotalAnswers: p._count.responses,
-        TotalSlideEvents: p._count.events,
-        LastSession_EST: p.sessions[0] ? formatEST(p.sessions[0].createdAt) : 'Never',
-        EnrolledAt_EST: formatEST(p.createdAt),
-        EnrolledAt_UTC: p.createdAt.toISOString()
-      }));
+      data = participants.map((p, idx) => {
+        const ua = p.tokens?.[0]?.lastUsedAgent || 'unknown';
+        const devInfo = parseUserAgent(ua);
+        const hasA11y = (p.events && p.events.length > 0);
+
+        return {
+          Index: idx + 1,
+          ParticipantID: p.externalId || p.id,
+          DatabaseGUID: p.id,
+          StudyArm: p.groupId,
+          CampaignName: p.campaign?.name || 'Unassigned',
+          Status: p.status,
+          DeviceType: devInfo.deviceType,
+          Browser: devInfo.browser,
+          OperatingSystem: devInfo.os,
+          ScreenReader_Accessibility: hasA11y ? 'Detected (NVDA / Assistive Navigation)' : 'None (Standard Interaction)',
+          AccessToken: p.tokens[0]?.tokenHash || 'N/A',
+          TotalSessions: p._count.sessions,
+          TotalAnswers: p._count.responses,
+          TotalSlideEvents: p._count.events,
+          LastSession_EST: p.sessions[0] ? formatEST(p.sessions[0].createdAt) : 'Never',
+          EnrolledAt_EST: formatEST(p.createdAt),
+          EnrolledAt_UTC: p.createdAt.toISOString()
+        };
+      });
       filename = 'penpal_clinical_cohort_roster_EST.csv';
     }
     // ─────────────────────────────────────────────────────────────────────────────

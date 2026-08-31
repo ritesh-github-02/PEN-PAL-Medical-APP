@@ -434,18 +434,18 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         </div>
       )}
 
-      {/* Main Header & Creation Trigger */}
-      <div className="p-6 border-b border-slate-100 bg-linear-to-r from-slate-900 via-slate-800 to-indigo-950 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      {/* Main Header & Creation Trigger - Clinical Sage/Teal Palette */}
+      <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2.5 bg-indigo-500/20 border border-indigo-400/30 rounded-xl text-indigo-300 shadow-inner">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-white/20 border border-white/25 rounded-xl text-white shadow-xs backdrop-blur-xs">
               <QrCode className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
                 Study QR Codes & Campaign Manager
               </h2>
-              <p className="text-xs text-slate-300 font-light">
+              <p className="text-xs text-teal-100 font-normal">
                 Create research campaigns, generate batches of unique participant links & QR codes, and export formatted CSV/Excel rosters.
               </p>
             </div>
@@ -458,7 +458,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
             resetCreateForm();
             setIsCreateModalOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 active:scale-[0.98] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer shrink-0"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#71ad9d] hover:bg-[#609c8d] active:scale-[0.98] text-[#132c27] text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" />
           Create New Campaign & Batch Links
@@ -501,12 +501,12 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         </div>
 
         <div className="p-4 flex items-center gap-3">
-          <div className="p-2 bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-700 shadow-2xs">
-            <Activity className="w-4 h-4 text-indigo-600" />
+          <div className="p-2 bg-teal-50 border border-teal-200 rounded-lg text-teal-700 shadow-2xs">
+            <Activity className="w-4 h-4 text-teal-600" />
           </div>
           <div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enrolled Participants</p>
-            <p className="text-lg font-extrabold font-mono text-indigo-900">{totalScans}</p>
+            <p className="text-lg font-extrabold font-mono text-teal-900">{totalScans}</p>
           </div>
         </div>
       </div>
@@ -520,8 +520,8 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search campaigns by name or slug (e.g. clinic_poster)..."
-            className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 transition-all"
+            placeholder="Search campaigns by name or ID (e.g. clinic_poster)..."
+            className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1d5c64] focus:bg-white focus:ring-1 focus:ring-[#1d5c64] transition-all"
           />
           {searchTerm && (
             <button
@@ -582,7 +582,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           <table className="w-full text-left text-xs text-slate-700 border-collapse">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-100/75 text-slate-500 font-mono uppercase text-[10px] tracking-wider">
-                <th className="py-3 px-5 font-bold">Campaign Name & Slug</th>
+                <th className="py-3 px-5 font-bold">Campaign Name & ID</th>
                 <th className="py-3 px-5 font-bold">Study Arm</th>
                 <th className="py-3 px-5 font-bold text-center">Participants</th>
                 <th className="py-3 px-5 font-bold text-center">Access Status</th>
@@ -596,7 +596,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
 
                 return (
                   <tr key={item.id} className="hover:bg-slate-50/90 transition-colors">
-                    {/* Name & Slug */}
+                    {/* Name & ID */}
                     <td className="py-4 px-5">
                       <div className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
                         {item.name}
@@ -604,8 +604,8 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                           <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Active"></span>
                         )}
                       </div>
-                      <div className="text-[11px] font-mono text-slate-400 mt-0.5 flex items-center gap-1.5">
-                        <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px]">slug</span>
+                      <div className="text-[11px] font-mono text-slate-500 mt-0.5 flex items-center gap-1.5">
+                        <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold">ID:</span>
                         <span>{item.slug}</span>
                       </div>
                     </td>
@@ -1107,7 +1107,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-mono mt-0.5">
-                  Slug: {activeCampaign.slug} &middot; Total Links: {activeCampaignLinks.length}
+                  Campaign ID: {activeCampaign.slug} &middot; Total Links: {activeCampaignLinks.length}
                 </p>
               </div>
               <button

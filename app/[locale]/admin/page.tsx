@@ -7,7 +7,7 @@ import { CampaignQRManager } from './CampaignQRManager';
 import { 
   Users, 
   Activity, 
-  Database, 
+  CheckCircle2, 
   Key, 
   History, 
   Shield, 
@@ -31,13 +31,13 @@ type OverviewItem =
 export default async function AdminPage({ searchParams }: PageProps) {
   const { q } = await searchParams;
   let participantCount = 0;
-  let sessionCount = 0;
-  let eventCount = 0;
+  let completedAssessmentsCount = 0;
+  let inProgressAssessmentsCount = 0;
   let dbError = false;
   let recentLogins: any[] = [];
   let activeNowCount = 0;
 
-  // Token tracking data
+  // Access codes / Link tracking data
   let tokenStats: any = null;
   let authTimeline: any[] = [];
   let initialCampaigns: any[] = [];
@@ -51,8 +51,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
     const [
       pCount,
-      sCount,
-      eCount,
+      completedPCount,
       logins,
       activeCount,
       tokenStatsResult,
@@ -62,8 +61,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
     ] = await withDbRetry(async () => {
       return await Promise.all([
         prisma.participant.count(),
-        prisma.session.count(),
-        prisma.eventLog.count(),
+        prisma.participant.count({ where: { status: 'COMPLETED' } }),
         prisma.session.findMany({
           where: { createdAt: { gte: yesterday } },
           include: { participant: { select: { externalId: true, id: true } } },
@@ -94,8 +92,8 @@ export default async function AdminPage({ searchParams }: PageProps) {
     });
 
     participantCount = pCount;
-    sessionCount = sCount;
-    eventCount = eCount;
+    completedAssessmentsCount = completedPCount;
+    inProgressAssessmentsCount = Math.max(0, pCount - completedPCount);
     recentLogins = logins;
     activeNowCount = activeCount;
 
@@ -117,7 +115,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
   }
 
   // If data was fetched successfully from PostgreSQL, database is online!
-  if (participantCount > 0 || allParticipants.length > 0 || sessionCount > 0) {
+  if (participantCount > 0 || allParticipants.length > 0) {
     dbError = false;
   }
 
@@ -140,29 +138,29 @@ export default async function AdminPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* Professional Header Navigation Bar */}
-        <header className="bg-[#0f172a] border border-slate-800 rounded-xl p-5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center shadow-xs">
+        {/* Soft Clinical Header Navigation Bar (Sage/Teal Medical Registry) */}
+        <header className="bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2d7d8a] border border-[#1d5c64]/30 rounded-2xl p-5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-xs rounded-xl flex items-center justify-center shadow-xs border border-white/25">
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold tracking-tight text-white font-mono flex items-center gap-2">
-                PEN-PAL <span className="text-slate-600 font-normal">|</span> <span className="text-slate-200 font-semibold">Clinical Admin Portal</span>
+              <h1 className="text-lg font-bold tracking-tight text-white font-sans flex items-center gap-2">
+                PEN-PAL <span className="text-teal-200 font-normal">|</span> <span className="text-white font-semibold">Clinical Admin Portal</span>
               </h1>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">Clinical Telemetry & Cohort Registry Dashboard</p>
+              <p className="text-xs text-teal-100 font-medium mt-0.5">Clinical Study Data & Cohort Registry Dashboard</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <span className="text-xs font-mono font-bold text-teal-400 bg-slate-800 border border-slate-700 rounded-md px-3 py-1 flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              Gateway Active
+            <span className="text-xs font-bold text-white bg-white/15 border border-white/25 rounded-lg px-3 py-1.5 flex items-center gap-2 backdrop-blur-xs">
+              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+              Enrollment Open
             </span>
             <form action={logout}>
               <button 
                 type="submit"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-800 hover:bg-rose-900/40 hover:text-rose-300 border border-slate-700 text-slate-200 rounded-md text-xs font-bold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/15 hover:bg-rose-600/80 hover:text-white border border-white/25 text-white rounded-lg text-xs font-bold transition-all cursor-pointer backdrop-blur-xs shadow-xs active:scale-[0.98]"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 Logout
@@ -180,43 +178,47 @@ export default async function AdminPage({ searchParams }: PageProps) {
               </div>
               <div>
                 <p className="font-bold text-sm text-rose-900">Database Connection Offline</p>
-                <p className="text-xs text-rose-700 mt-0.5">PostgreSQL is not responding. Showing cached telemetry data.</p>
+                <p className="text-xs text-rose-700 mt-0.5">PostgreSQL is not responding. Showing cached data.</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Key Metrics Overview Grid (Plain Professional Colors) */}
+        {/* Key Metrics Overview Grid - 4 Clinical KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          {/* Total Enrolled Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 text-white flex flex-col justify-between shadow-xs">
+          {/* 1. Total Enrolled Card */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-xs hover:border-[#1d5c64]/40 transition-all">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d5c64] bg-[#f4f8e8] border border-[#1d5c64]/25 px-2.5 py-0.5 rounded-md">
                 Active Cohort
               </span>
-              <Users className="w-5 h-5 text-teal-400" />
+              <div className="w-8 h-8 rounded-lg bg-[#f4f8e8] flex items-center justify-center text-[#1d5c64]">
+                <Users className="w-4 h-4" />
+              </div>
             </div>
             <div className="mt-4">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Enrolled Participants</p>
-              <p className="text-4xl font-extrabold text-white tracking-tight mt-1 font-mono">{participantCount}</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Enrolled</p>
+              <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono">{participantCount}</p>
             </div>
-            <p className="text-[11px] text-slate-400 mt-3 pt-3 border-t border-slate-800 font-medium">
+            <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
               Registered in PEN-PAL Registry
             </p>
           </div>
 
-          {/* Active Now Card */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+          {/* 2. Active Now Card */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-xs hover:border-emerald-300 transition-all">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md">
                 Live Status
               </span>
-              <Clock className="w-5 h-5 text-emerald-600" />
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <Clock className="w-4 h-4" />
+              </div>
             </div>
             <div className="mt-4">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Now</p>
-              <p className="text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono flex items-baseline gap-2">
+              <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono flex items-baseline gap-2">
                 {activeNowCount}
                 <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
               </p>
@@ -226,37 +228,41 @@ export default async function AdminPage({ searchParams }: PageProps) {
             </p>
           </div>
 
-          {/* Sessions Logged Card */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+          {/* 3. Assessments In-Progress Card */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-xs hover:border-amber-300 transition-all">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded">
-                Usage Metric
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-md">
+                Clinical Status
               </span>
-              <Activity className="w-5 h-5 text-indigo-600" />
+              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+                <Activity className="w-4 h-4" />
+              </div>
             </div>
             <div className="mt-4">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Sessions Logged</p>
-              <p className="text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono">{sessionCount}</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assessments In-Progress</p>
+              <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono">{inProgressAssessmentsCount}</p>
             </div>
             <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
-              Interactive clinical touchpoints
+              Ongoing participant evaluations
             </p>
           </div>
 
-          {/* Events Captured Card */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+          {/* 4. Completed Assessments Card */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-xs hover:border-teal-300 transition-all">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded">
-                Telemetry Logs
+              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-md">
+                Protocol Complete
               </span>
-              <Database className="w-5 h-5 text-slate-600" />
+              <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
             </div>
             <div className="mt-4">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Events Captured</p>
-              <p className="text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono">{eventCount}</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed Assessments</p>
+              <p className="text-3xl sm:text-4xl font-extrabold text-teal-900 tracking-tight mt-1 font-mono">{completedAssessmentsCount}</p>
             </div>
             <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
-              Behavioral analytical records
+              Fully finalized clinical evaluations
             </p>
           </div>
 
@@ -265,23 +271,23 @@ export default async function AdminPage({ searchParams }: PageProps) {
         {/* Study QR Codes & Campaign Manager Section */}
         <CampaignQRManager initialCampaigns={initialCampaigns} />
 
-        {/* Token Security Statistics Banner */}
+        {/* Access Codes & Link Statistics Banner */}
         {tokenStats && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Tokens</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Access Codes</span>
                 <Key className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <p className="text-2xl font-bold font-mono text-slate-900">{tokenStats.totalTokens}</p>
               <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                <div className="bg-slate-500 h-full rounded-full" style={{ width: '100%' }}></div>
+                <div className="bg-[#1d5c64] h-full rounded-full" style={{ width: '100%' }}></div>
               </div>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Active Tokens</span>
+                <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Active Links</span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
               </div>
               <p className="text-2xl font-bold font-mono text-emerald-900">{tokenStats.validTokens}</p>
@@ -292,7 +298,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-teal-700 uppercase tracking-wider">Total Usage</span>
+                <span className="text-[10px] font-bold text-teal-700 uppercase tracking-wider">Total Link Usage</span>
                 <span className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200 px-1 rounded font-mono">
                   avg {tokenStats.avgUsage}
                 </span>
@@ -305,28 +311,28 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">Used Today</span>
-                <Clock className="w-3.5 h-3.5 text-indigo-500" />
+                <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">Used Today</span>
+                <Clock className="w-3.5 h-3.5 text-teal-600" />
               </div>
-              <p className="text-2xl font-bold font-mono text-indigo-900">{tokenStats.usedToday}</p>
+              <p className="text-2xl font-bold font-mono text-teal-900">{tokenStats.usedToday}</p>
               <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                <div className="bg-indigo-600 h-full rounded-full" style={{ width: tokenStats.totalUsage > 0 ? `${(tokenStats.usedToday / tokenStats.totalUsage) * 100}%` : '10%' }}></div>
+                <div className="bg-[#1d5c64] h-full rounded-full" style={{ width: tokenStats.totalUsage > 0 ? `${(tokenStats.usedToday / tokenStats.totalUsage) * 100}%` : '10%' }}></div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Real-time Timelines and Activity Feed */}
+        {/* Real-time Activity Logs Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Authentication Activity timeline */}
+          {/* Access & Verification Activity Log */}
           <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between">
             <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <History className="w-4 h-4 text-teal-700" /> Authentication Activity Log
+                  <History className="w-4 h-4 text-teal-700" /> Activity Logs
                 </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Real-time token validation events from clinic access points</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Real-time study link verification events from clinic access points</p>
               </div>
             </div>
             

@@ -15,6 +15,7 @@ import {
 import { logout } from "@/app/[locale]/intervention/actions";
 import Loader from "@/components/common/Loader";
 import AudioPlayer from "./AudioPlayer";
+import { generateAssessmentPDF } from "@/lib/generate-pdf";
 
 function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (newLocale: string) => void }) {
   return (
@@ -214,6 +215,29 @@ export default function PenpalIntervention() {
   const slideLastActiveRef = useRef<number>(Date.now());
   const isSlideVisibleRef = useRef<boolean>(true);
   const recordedStepVisitsRef = useRef<Set<string>>(new Set());
+
+  // Detect Assistive Technology (NVDA, Screen Readers, Sequential Keyboard Navigation)
+  useEffect(() => {
+    let a11yLogged = false;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !a11yLogged) {
+        a11yLogged = true;
+        logInteraction(
+          'ACCESSIBILITY_INTERACTION',
+          {
+            type: 'Screen Reader / Keyboard Accessible Navigation',
+            key: e.key,
+            prefersReducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
+          },
+          '/intervention/flow'
+        ).catch(() => {});
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Record 1 unique visit when entering a step
   useEffect(() => {
@@ -451,19 +475,25 @@ export default function PenpalIntervention() {
           </h2>
           <p className="text-sm text-slate-600 leading-relaxed mb-8">
             {locale === "es"
-              ? "Sus respuestas han sido registradas. Gracias por participar en el estudio PEN-PAL."
-              : "Your responses have been recorded. Thank you for participating in the PEN-PAL study."}
+              ? "Sus respuestas han sido registradas y su informe en PDF ha sido descargado. Gracias por participar en el estudio PEN-PAL."
+              : "Your responses have been recorded and your PDF report has been downloaded. Thank you for participating in the PEN-PAL study."}
           </p>
           
           <div className="space-y-4 pt-6 border-t border-slate-100">
             <button 
-              onClick={() => logout()}
+              type="button"
+              onClick={() => {
+                try {
+                  window.close();
+                } catch {}
+                logout();
+              }}
               className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition shadow-sm active:scale-[0.98] cursor-pointer"
             >
-              {locale === "es" ? "Finalizar y Volver al Inicio" : "Finish & Return Home"}
+              {locale === "es" ? "Cerrar esta Ventana" : "Close this Window"}
             </button>
             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
-              {locale === "es" ? "La sesión se borrará" : "Session will be cleared"}
+              {locale === "es" ? "Puede cerrar esta ventana o pestaña del navegador de forma segura" : "You may safely close this browser window or tab"}
             </p>
           </div>
         </div>
@@ -561,24 +591,23 @@ export default function PenpalIntervention() {
                   </div>
                 </div>
               ) : showSummary ? (
-                <SummaryReportScreen
+                <SummaryScreen
+                  title={locale === "es" ? "Pasos de Acción para Padres" : "Action Steps for Parents"}
+                  content={
+                    locale === "es"
+                      ? questionnaireConfig.find((s) => s.type === "summary")?.contentEs
+                      : questionnaireConfig.find((s) => s.type === "summary")?.contentEn
+                  }
                   answers={answers}
                   activeToken={activeToken}
-                  onProceedToSurvey={async () => {
-                    try {
-                      setNavigating(true);
-                      await completeQuestionnaire();
-                      setShowSuccess(true);
-                    } catch (error) {
-                      console.error("Completion error:", error);
-                      setShowSuccess(true);
-                    } finally {
-                      setNavigating(false);
-                    }
+                  isFirstStep={false}
+                  loading={loading}
+                  onBack={() => {}}
+                  onNext={async () => {
+                    setShowSuccess(true);
                   }}
                   t={t}
                   locale={locale}
-                  navigating={navigating}
                 />
               ) : (
                 <>
@@ -615,7 +644,7 @@ export default function PenpalIntervention() {
                   )}
                   {currentStep.type === "text" && <TextScreen {...baseProps} />}
                   {currentStep.type === "summary" && (
-                    <SummaryScreen {...baseProps} answers={answers} />
+                    <SummaryScreen {...baseProps} answers={answers} activeToken={activeToken} />
                   )}
                 </>
               )}
@@ -715,7 +744,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 relative flex items-center justify-center p-2 self-end md:self-end mt-auto">
+        <div className="hidden sm:flex flex-shrink-0 relative items-center justify-center p-2 self-end md:self-end mt-auto">
           <img
             src="/images/nurse-anna.png"
             alt={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
@@ -894,58 +923,60 @@ function TestingScreen(props: BaseScreenProps) {
   const isSpanish = props.locale === "es";
 
   return (
-    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
-      <div className="space-y-3 max-w-3xl pb-2">
-        <h2 
-          ref={props.headingRef}
-          tabIndex={-1}
-          className="text-lg sm:text-xl md:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
-        >
-          {props.title || (isSpanish ? "¡Hable con el médico sobre la alergia de su hijo!" : "Talk to the doctor about your child's allergy!")}
-        </h2>
-        
-        {/* Semantic 2-Item Bullet List (WCAG 1.3.1) */}
-        <ul className="space-y-2.5 text-[#2d221b] text-xs sm:text-sm font-medium leading-relaxed">
-          <li className="flex items-start gap-2">
-            <span className="text-[#236f7a] font-bold shrink-0 mt-0.5" aria-hidden="true">•</span>
-            <span>
-              {isSpanish
-                ? "Los médicos pueden comprobar si la reacción de su hijo fue solo un efecto secundario y no una alergia."
-                : "Doctors can check to see if your child's reaction was just a side-effect and not an allergy."}
-            </span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-[#236f7a] font-bold shrink-0 mt-0.5" aria-hidden="true">•</span>
-            <span>
-              {isSpanish
-                ? "También hay una prueba simple que puede saber si su hijo tiene una alergia."
-                : "There is also a simple test that can tell if your child has an allergy."}
-              <span className="block text-slate-700 text-[11px] sm:text-xs mt-0.5 font-normal">
+    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+        <div className="space-y-3 flex-1 max-w-2xl pb-1">
+          <h2 
+            ref={props.headingRef}
+            tabIndex={-1}
+            className="text-lg sm:text-xl md:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+          >
+            {props.title || (isSpanish ? "¡Hable con el médico sobre la alergia de su hijo!" : "Talk to the doctor about your child's allergy!")}
+          </h2>
+          
+          {/* Semantic 2-Item Bullet List (WCAG 1.3.1) */}
+          <ul className="space-y-2.5 text-[#2d221b] text-xs sm:text-sm font-medium leading-relaxed">
+            <li className="flex items-start gap-2">
+              <span className="text-[#236f7a] font-bold shrink-0 mt-0.5" aria-hidden="true">•</span>
+              <span>
                 {isSpanish
-                  ? "Para la prueba, los niños tragan medicamentos. A veces, los niños también toman medicamentos a través de un pinchazo en la piel."
-                  : "For the test, kids swallow medicine. Sometimes, kids also take medicine through a skin prick."}
+                  ? "Los médicos pueden comprobar si la reacción de su hijo fue solo un efecto secundario y no una alergia."
+                  : "Doctors can check to see if your child's reaction was just a side-effect and not an allergy."}
               </span>
-            </span>
-          </li>
-        </ul>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#236f7a] font-bold shrink-0 mt-0.5" aria-hidden="true">•</span>
+              <span>
+                {isSpanish
+                  ? "También hay una prueba simple que puede saber si su hijo tiene una alergia."
+                  : "There is also a simple test that can tell if your child has an allergy."}
+                <span className="block text-slate-700 text-[11px] sm:text-xs mt-0.5 font-normal">
+                  {isSpanish
+                    ? "Para la prueba, los niños tragan medicamentos. A veces, los niños también toman medicamentos a través de un pinchazo en la piel."
+                    : "For the test, kids swallow medicine. Sometimes, kids also take medicine through a skin prick."}
+                </span>
+              </span>
+            </li>
+          </ul>
 
-        {/* Distinct Bottom Paragraph (No Bullet) */}
-        <p className="text-xs sm:text-sm font-bold text-[#1f382f] pt-1">
-          {isSpanish
-            ? "Si su hijo puede tomar penicilina de manera segura, no es alérgico."
-            : "If your child can safely take penicillin, they are not allergic."}
-        </p>
-      </div>
+          {/* Distinct Bottom Paragraph (No Bullet) */}
+          <p className="text-xs sm:text-sm font-bold text-[#1f382f] pt-1">
+            {isSpanish
+              ? "Si su hijo puede tomar penicilina de manera segura, no es alérgico."
+              : "If your child can safely take penicillin, they are not allergic."}
+          </p>
+        </div>
 
-      {/* Nurse Anna Illustration */}
-      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
-        <img
-          src="/images/nurse-anna.png"
-          alt={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          role="img"
-          aria-label={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-        />
+        {/* Nurse Anna Illustration - Safe Responsive Flex (Hidden on small mobile to prevent overlap, visible on tablet/desktop) */}
+        <div className="hidden sm:flex flex-shrink-0 self-end md:self-end mt-auto p-1">
+          <img
+            src="/images/nurse-anna.png"
+            alt={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            role="img"
+            aria-label={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            className="w-16 sm:w-20 md:w-22 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
+        </div>
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -954,7 +985,7 @@ function TestingScreen(props: BaseScreenProps) {
           type="button"
           onClick={() => props.onNext()}
           disabled={props.loading}
-          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {props.loading ? "..." : props.t("next")}
         </button>
@@ -1421,7 +1452,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
       </div>
 
       {/* Nurse Anna Illustration (Safe Positioned Outside Text Area) */}
-      <div className="absolute bottom-8 right-3 sm:bottom-10 sm:right-6 pointer-events-none z-10">
+      <div className="hidden sm:block absolute bottom-8 right-3 sm:bottom-10 sm:right-6 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
           alt={
@@ -1429,7 +1460,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
               ? "Ilustración de la enfermera Anna sonriendo"
               : "Illustration of Nurse Anna smiling in blue scrubs"
           }
-          className="w-20 sm:w-24 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          className="w-16 sm:w-20 md:w-24 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
         />
       </div>
 
@@ -1450,29 +1481,31 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   return (
-    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="space-y-4 max-w-3xl pb-2 text-center md:text-left min-h-[12rem]">
-        <h2 
-          ref={navProps.headingRef}
-          tabIndex={-1}
-          className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2d221b] max-w-3xl tracking-tight leading-relaxed outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
-        >
-          {title}
-        </h2>
-        {description && (
-          <p className="text-sm sm:text-base font-medium text-[#2d221b] max-w-3xl">{description}</p>
-        )}
-      </div>
+    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+        <div className="space-y-4 flex-1 max-w-2xl pb-2 text-center sm:text-left min-h-[10rem]">
+          <h2 
+            ref={navProps.headingRef}
+            tabIndex={-1}
+            className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#2d221b] max-w-3xl tracking-tight leading-relaxed outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+          >
+            {title}
+          </h2>
+          {description && (
+            <p className="text-sm sm:text-base font-medium text-[#2d221b] max-w-3xl">{description}</p>
+          )}
+        </div>
 
-      {/* Nurse Anna Illustration */}
-      <div className="absolute bottom-10 right-4 sm:bottom-12 sm:right-6 md:bottom-14 md:right-8 pointer-events-none z-10">
-        <img
-          src="/images/nurse-anna.png"
-          alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          role="img"
-          aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-          className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-        />
+        {/* Nurse Anna Illustration */}
+        <div className="hidden sm:flex flex-shrink-0 self-end mt-auto p-1">
+          <img
+            src="/images/nurse-anna.png"
+            alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            role="img"
+            aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            className="w-16 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          />
+        </div>
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -1490,7 +1523,7 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
   );
 }
 
-function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { answers: any }) {
+function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { answers: any; activeToken?: string | null }) {
   const summarySections = [
     {
       id: "screen2_statistics",
@@ -1697,7 +1730,32 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
         </button>
         <button
           type="button"
-          onClick={() => onNext()}
+          onClick={() => {
+            try {
+              generateAssessmentPDF({
+                participantId: activeToken || undefined,
+                token: activeToken || undefined,
+                locale,
+                answers,
+                summarySections: summarySections.map((s) => {
+                  let label = s.defaultValue;
+                  try {
+                    label = t(s.labelKey) || s.defaultValue;
+                  } catch {
+                    label = s.defaultValue;
+                  }
+                  return {
+                    label,
+                    value: s.getValue(),
+                  };
+                }),
+                steps: steps.map((s) => s.replace(/^#\d+\.\s*/, "")),
+              });
+            } catch (err) {
+              console.error("PDF generation error:", err);
+            }
+            onNext();
+          }}
           disabled={loading}
           className="px-6 py-2 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
@@ -1715,185 +1773,6 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               {t("completeSave")}
-            </>
-          )}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-
-function SummaryReportScreen({ answers, activeToken, onProceedToSurvey, t, locale, navigating }: { answers: any; activeToken?: string | null; onProceedToSurvey: () => void; t: any; locale: string; navigating?: boolean }) {
-  const isEs = locale === "es";
-
-  // Formatted Symptoms
-  const rawSymptoms = answers["screen6_1_symptoms"];
-  const formatSymptoms = () => {
-    if (!rawSymptoms) return isEs ? "Ninguno reportado" : "None reported";
-
-    let symArray: string[] = [];
-    if (Array.isArray(rawSymptoms)) {
-      symArray = rawSymptoms;
-    } else if (typeof rawSymptoms === "string") {
-      try {
-        const parsed = JSON.parse(rawSymptoms);
-        symArray = Array.isArray(parsed) ? parsed : [rawSymptoms];
-      } catch {
-        symArray = [rawSymptoms];
-      }
-    } else {
-      symArray = [String(rawSymptoms)];
-    }
-
-    if (symArray.length === 0) {
-      return isEs ? "Ninguno reportado" : "None reported";
-    }
-
-    const symptomsStep = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
-    return symArray
-      .map((v: string) => {
-        if (v === "Other: Please describe" || v === "Other" || v === "Otro: por favor describa" || v === "Otro") {
-          return isEs ? "Otro" : "Other";
-        }
-        if (v.startsWith("Other:") || v.startsWith("Otro:")) {
-          return v.replace(/_____+/g, "").trim();
-        }
-        const opt = symptomsStep?.options?.find((o: any) => o.value === v || o.labelEn === v || o.labelEs === v);
-        return isEs ? (opt?.labelEs || v) : (opt?.labelEn || v);
-      })
-      .filter(Boolean)
-      .join(", ");
-  };
-  const symptoms = formatSymptoms();
-
-  // Formatted Allergy
-  const rawAllergy = answers["screen2_allergy"];
-  const allergy = rawAllergy && rawAllergy !== "none_selected" && rawAllergy !== "undefined"
-    ? (isEs && (rawAllergy === "Not Specified" || rawAllergy === "No especificada") ? t("notSpecified") : rawAllergy)
-    : (isEs ? "Penicilina (Amoxicilina)" : "Penicillin (Amoxicillin)");
-
-  // Formatted Timing / Age
-  const rawTiming = answers["screen6_2_timing"];
-  const formattedTiming = rawTiming && rawTiming !== "none_selected" && rawTiming !== "undefined"
-    ? rawTiming + (isEs ? " años" : " years old")
-    : (isEs ? "No provisto" : "Not provided");
-
-  // Formatted Time to Onset
-  const rawOnset = answers["screen6_3_onset"];
-  const formatOnset = () => {
-    if (!rawOnset || rawOnset === "none_selected" || rawOnset === "undefined") {
-      return isEs ? "No provisto" : "Not provided";
-    }
-    const onsetStep = questionnaireConfig.find((s) => s.id === "screen6_3_onset");
-    const opt = onsetStep?.options?.find((o) => o.value === rawOnset || o.labelEn === rawOnset || o.labelEs === rawOnset);
-    return isEs ? (opt?.labelEs || rawOnset) : (opt?.labelEn || rawOnset);
-  };
-  const onset = formatOnset();
-
-  return (
-    <div id="slide-content" className="bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between relative">
-      <div>
-        <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100 no-print">
-          <div className="flex items-center gap-2">
-            <h1 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("assessmentReport")}</h1>
-            {activeToken && (
-              <span className="text-[10px] font-bold text-[#35727f] bg-[#f4f8e8] border border-[#35727f]/25 px-2.5 py-0.5 rounded-full font-mono shadow-2xs">
-                🔑 <span className="text-[9px] uppercase tracking-wider text-slate-500">ID:</span> {activeToken}
-              </span>
-            )}
-          </div>
-          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-            ✓ {t("completeSaved")}
-          </span>
-        </div>
-
-        <div className="space-y-4 mb-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 leading-none mb-1">PEN-PAL</h2>
-              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-500">{t("patientAllergyAssessment")}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("dateGenerated")}</p>
-              <p className="text-xs sm:text-sm font-semibold text-slate-700">{new Date().toLocaleDateString(isEs ? "es-ES" : "en-GB").split("/").join("-")}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            <div className="bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80 rounded-lg">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("primaryAllergy")}</p>
-              <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">{allergy}</p>
-            </div>
-            <div className="bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80 rounded-lg">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("reportedSymptoms")}</p>
-              <p className="text-xs font-semibold text-slate-700 leading-tight truncate sm:whitespace-normal">{symptoms}</p>
-            </div>
-            <div className="bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80 rounded-lg">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("timing")}</p>
-              <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">{formattedTiming}</p>
-            </div>
-            <div className="bg-slate-50 p-2.5 sm:p-3 border border-slate-200/80 rounded-lg">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{t("onset")}</p>
-              <p className="text-xs font-semibold text-slate-700 leading-tight truncate">{onset}</p>
-            </div>
-          </div>
-
-          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80 mt-3">
-            <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-800 mb-1 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-              {t("clinicalGuidance")}
-            </h3>
-            <p className="text-xs text-slate-600 leading-snug">
-              {isEs ? (
-                <>
-                  Según las respuestas proporcionadas, su hijo tiene un historial documentado de alergia a <strong className="font-semibold text-slate-900">{allergy}</strong>. Los síntomas reportados ({symptoms}) indican un perfil clínico que puede requerir una evaluación adicional por parte de un especialista.
-                </>
-              ) : (
-                <>
-                  Based on the responses provided, your child has a documented history of <strong className="font-semibold text-slate-900">{allergy}</strong> allergy. The symptoms reported ({symptoms}) indicate a clinical profile that may require further evaluation by a specialist.
-                </>
-              )}
-            </p>
-            <p className="text-xs text-slate-600 leading-snug mt-1.5">
-              {isEs
-                ? "Este informe es parte del estudio de investigación PEN-PAL y debe conversarse con su pediatra o un alergólogo."
-                : "This report is part of the PEN-PAL research study and should be discussed with your pediatrician or an allergist."}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-row gap-2 pt-3 border-t border-slate-100 no-print justify-end shrink-0">
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="flex items-center justify-center gap-2 px-5 py-2 min-h-[44px] border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 transition-all rounded-lg text-xs font-bold uppercase tracking-wider flex-1 sm:flex-none cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 9V2h12v7"></path>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-            <rect x="6" y="14" width="12" height="8"></rect>
-          </svg>
-          {t("print")}
-        </button>
-        <button
-          type="button"
-          onClick={onProceedToSurvey}
-          disabled={navigating}
-          className="flex items-center justify-center gap-1.5 px-6 py-2 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-sm flex-1 sm:flex-none disabled:opacity-50 cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {navigating ? (
-            <>
-              <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              {isEs ? "Redirigiendo..." : "Redirecting..."}
-            </>
-          ) : (
-            <>
-              <span>✓</span> {t("completeSave")}
             </>
           )}
         </button>

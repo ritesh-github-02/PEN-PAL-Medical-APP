@@ -28,11 +28,24 @@ export default function InterventionEntryPage() {
     setLoading(true);
     setError(null);
     try {
-      let result = await validateToken(tokenToValidate, locale);
+      let raw = tokenToValidate.trim();
+      // If user pasted a full URL or query string, extract the token parameter
+      if (raw.includes('token=') || raw.includes('TOKEN=') || raw.includes('Token=') || raw.includes('t=')) {
+        try {
+          const urlObj = new URL(raw.startsWith('http') ? raw : `http://localhost/${raw.replace(/^\//, '')}`);
+          const extractedParam = urlObj.searchParams.get('token') || urlObj.searchParams.get('TOKEN') || urlObj.searchParams.get('Token') || urlObj.searchParams.get('t');
+          if (extractedParam) raw = extractedParam.trim();
+        } catch {
+          const match = raw.match(/[?&](?:token|TOKEN|Token|t)=([^&]+)/i);
+          if (match && match[1]) raw = decodeURIComponent(match[1]).trim();
+        }
+      }
+
+      let result = await validateToken(raw, locale);
 
       // If direct validation fails, check if input is a Research ID and retrieve token
       if (result.success === false) {
-        const reqResult = await requestToken(tokenToValidate, locale);
+        const reqResult = await requestToken(raw, locale);
         if (reqResult.success === true && reqResult.token) {
           result = await validateToken(reqResult.token, locale);
         }
@@ -252,6 +265,13 @@ export default function InterventionEntryPage() {
                 {locale === 'es' ? 'Acceder a la Evaluación →' : 'Access Assessment →'}
               </button>
             </form>
+
+            {/* Resume Assessment Bottom Section */}
+            <div className="pt-3 border-t border-slate-100">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest inline-block">
+                {locale === 'es' ? 'Reanudar Evaluación' : 'Resume Assessment'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
