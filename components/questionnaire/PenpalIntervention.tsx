@@ -152,29 +152,24 @@ export default function PenpalIntervention() {
         return;
       }
 
-      // ── Fresh Participant / Session Cache Reset ─────────────────────────────────
+      // ── Participant ID tracking & Cache sync ─────────────────────────────────
       const currentParticipantId = progress.participantId;
       const storedParticipantId = localStorage.getItem("penpal_participant_id");
 
-      if (
-        (currentParticipantId && storedParticipantId !== currentParticipantId) ||
-        (Object.keys(progress.answers || {}).length === 0)
-      ) {
+      if (currentParticipantId && storedParticipantId !== currentParticipantId) {
         localStorage.removeItem("penpal_progress");
-        if (currentParticipantId) {
-          localStorage.setItem("penpal_participant_id", currentParticipantId);
-        }
-        progress.answers = {};
-        progress.lastStepId = null;
-        localAnswers = false;
-      } else if (!progress.lastStepId) {
+        localStorage.setItem("penpal_participant_id", currentParticipantId);
+      }
+
+      // Prioritize answers loaded from server database; fallback to local storage if empty
+      let finalAnswers = (progress.answers && Object.keys(progress.answers).length > 0) ? progress.answers : {};
+      if (Object.keys(finalAnswers).length === 0) {
         try {
           const cached = localStorage.getItem("penpal_progress");
           if (cached) {
             const parsed = JSON.parse(cached);
-            if (Object.keys(parsed).length > 0) {
-              progress.answers = parsed;
-              localAnswers = true;
+            if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+              finalAnswers = parsed;
             }
           }
         } catch (e) {
@@ -182,7 +177,7 @@ export default function PenpalIntervention() {
         }
       }
 
-      setAnswers(progress.answers || {});
+      setAnswers(finalAnswers);
 
       const searchParams = new URLSearchParams(window.location.search);
       const showReport = searchParams.get("report") === "true";
@@ -190,6 +185,7 @@ export default function PenpalIntervention() {
 
       if (progress.isAllCompleted || showReport) {
         setShowSummary(true);
+        setCurrentStepIndex(11);
         setInitialized(true);
         return;
       }
@@ -552,11 +548,11 @@ export default function PenpalIntervention() {
             <span className="text-slate-300 text-xs" aria-hidden="true">|</span>
             <span 
               className="text-[11px] font-bold text-slate-700"
-              aria-label={locale === "es" ? `Progreso: Paso ${Math.min(currentStepIndex + 1, 12)} de 12` : `Progress: Step ${Math.min(currentStepIndex + 1, 12)} of 12`}
+              aria-label={locale === "es" ? `Progreso: Paso ${showSummary ? 12 : Math.min(currentStepIndex + 1, 12)} de 12` : `Progress: Step ${showSummary ? 12 : Math.min(currentStepIndex + 1, 12)} of 12`}
             >
               {locale === "es"
-                ? `Paso ${Math.min(currentStepIndex + 1, 12)} de 12`
-                : `Step ${Math.min(currentStepIndex + 1, 12)} of 12`}
+                ? `Paso ${showSummary ? 12 : Math.min(currentStepIndex + 1, 12)} de 12`
+                : `Step ${showSummary ? 12 : Math.min(currentStepIndex + 1, 12)} of 12`}
             </span>
           </div>
 

@@ -1,14 +1,13 @@
 import prisma, { withDbRetry } from '@/lib/prisma';
 import { ExportButton } from './ExportButton';
 import { logout } from '../intervention/actions';
-import { getTokenStats, getAuthTimeline, getCampaigns } from './actions';
+import { getCampaigns } from './actions';
 import { ParticipantCohortTable } from './ParticipantCohortTable';
 import { CampaignQRManager } from './CampaignQRManager';
 import { 
   Users, 
   Activity, 
   CheckCircle2, 
-  History, 
   Shield, 
   LogOut, 
   FileSpreadsheet, 
@@ -23,69 +22,32 @@ interface PageProps {
   searchParams: Promise<{ q?: string }>;
 }
 
-type OverviewItem = 
-  | { type: 'summary'; title: string; value: string }
-  | { type: 'login'; login: any };
-
-function formatDisplayId(rawId?: string | null): string {
-  if (!rawId) return 'Unassigned';
-  if (rawId.includes('token=') || rawId.includes('TOKEN=')) {
-    const match = rawId.match(/[?&](?:token|TOKEN)=([^&#\s]+)/i);
-    if (match && match[1]) return decodeURIComponent(match[1]).trim();
-  }
-  if (rawId.startsWith('http://') || rawId.startsWith('https://')) {
-    try {
-      const url = new URL(rawId);
-      const t = url.searchParams.get('token') || url.searchParams.get('TOKEN');
-      if (t) return t.trim();
-    } catch {}
-  }
-  return rawId;
-}
-
 export default async function AdminPage({ searchParams }: PageProps) {
   const { q } = await searchParams;
   let participantCount = 0;
   let completedAssessmentsCount = 0;
   let inProgressAssessmentsCount = 0;
   let dbError = false;
-  let recentLogins: any[] = [];
   let activeNowCount = 0;
 
-  // Access codes / Link tracking data
-  let tokenStats: any = null;
-  let authTimeline: any[] = [];
   let initialCampaigns: any[] = [];
   let allParticipants: any[] = [];
 
   try {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
     const thirtyMinutesAgo = new Date();
     thirtyMinutesAgo.setMinutes(thirtyMinutesAgo.getMinutes() - 30);
 
     const [
       pCount,
       completedPCount,
-      logins,
       activeCount,
-      tokenStatsResult,
-      timelineResult,
       campaignsResult,
       baseParticipants,
     ] = await withDbRetry(async () => {
       return await Promise.all([
         prisma.participant.count(),
         prisma.participant.count({ where: { status: 'COMPLETED' } }),
-        prisma.session.findMany({
-          where: { createdAt: { gte: yesterday } },
-          include: { participant: { select: { externalId: true, id: true } } },
-          orderBy: { createdAt: 'desc' },
-          take: 20,
-        }),
         prisma.session.count({ where: { createdAt: { gte: thirtyMinutesAgo } } }),
-        getTokenStats(),
-        getAuthTimeline(10),
         getCampaigns(),
         prisma.participant.findMany({
           take: 100,
@@ -109,11 +71,8 @@ export default async function AdminPage({ searchParams }: PageProps) {
     participantCount = pCount;
     completedAssessmentsCount = completedPCount;
     inProgressAssessmentsCount = Math.max(0, pCount - completedPCount);
-    recentLogins = logins;
     activeNowCount = activeCount;
 
-    if (tokenStatsResult?.success) tokenStats = tokenStatsResult.stats;
-    if (timelineResult?.success) authTimeline = timelineResult.events;
     if (campaignsResult?.success && campaignsResult.campaigns) initialCampaigns = campaignsResult.campaigns;
 
     if (q && Array.isArray(baseParticipants)) {
@@ -133,21 +92,6 @@ export default async function AdminPage({ searchParams }: PageProps) {
   if (participantCount > 0 || allParticipants.length > 0) {
     dbError = false;
   }
-
-  // Create combined items for the participant overview grid
-  const overviewItems: OverviewItem[] = [];
-  overviewItems.push({
-    type: 'summary',
-    title: 'Total Enrolled Cohort',
-    value: `${participantCount} patients`
-  });
-  
-  recentLogins.forEach(login => {
-    overviewItems.push({
-      type: 'login',
-      login: login
-    });
-  });
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8">
@@ -285,112 +229,6 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
         {/* Study QR Codes & Campaign Manager Section */}
         <CampaignQRManager initialCampaigns={initialCampaigns} />
-
-        {/* Real-time Activity Logs Feed */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* Access & Verification Activity Log */}
-          <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between">
-            <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <History className="w-4 h-4 text-teal-700" /> Activity Logs
-                </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Real-time study link verification events from clinic access points</p>
-              </div>
-            </div>
-            
-            <div className="divide-y divide-slate-200 overflow-y-auto max-h-[300px]">
-              {authTimeline.map((event) => (
-                <div key={event.id} className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2.5 h-2.5 rounded-full ${
-                      event.eventType === 'TOKEN_VALIDATED' ? 'bg-emerald-600' :
-                      event.eventType === 'TOKEN_INVALID' ? 'bg-rose-600' :
-                      event.eventType === 'TOKEN_CREATED' ? 'bg-teal-600' : 'bg-amber-600'
-                    }`}></div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-800">
-                        {event.eventType.replace('_', ' ')}
-                        {event.participant?.externalId && (
-                          <span className="ml-2 text-teal-950 text-[11px] bg-[#f4f8e8] border border-[#1d5c64]/30 px-2 py-0.5 rounded-md font-mono font-bold">
-                            {formatDisplayId(event.participant.externalId)}
-                          </span>
-                        )}
-                      </p>
-                      <p className="text-[10px] text-slate-500 font-mono mt-0.5" suppressHydrationWarning>
-                        {new Date(event.timestamp).toLocaleTimeString('en-US')} • {new Date(event.timestamp).toLocaleDateString('en-US')}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded font-mono">
-                    {event.ipAddress || 'Secured Gateway'}
-                  </span>
-                </div>
-              ))}
-              {authTimeline.length === 0 && (
-                <div className="p-8 text-center text-slate-400 italic text-xs">No auth activity recorded yet.</div>
-              )}
-            </div>
-            
-            <div className="p-3 bg-slate-50 border-t border-slate-200 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-              Network Access Security Status: Normal
-            </div>
-          </div>
-
-          {/* Participant Activity Feed */}
-          <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between">
-            <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-teal-700" /> Participant Stream
-                </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Session activity streaming from active study tablets</p>
-              </div>
-            </div>
-            
-            <div className="divide-y divide-slate-200 overflow-y-auto max-h-[300px] p-2 space-y-1">
-              {overviewItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg hover:bg-white transition-colors">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-2 h-2 bg-teal-600 rounded-full"></div>
-                    <div>
-                      {item.type === 'login' ? (
-                        <>
-                          <p className="text-xs font-bold text-slate-900 font-mono">
-                            {formatDisplayId(item.login.participant?.externalId)}
-                          </p>
-                          <p className="text-[10px] text-slate-500 font-medium">Session Initialized</p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-xs font-bold text-slate-900">{item.title}</p>
-                          <p className="text-[10px] text-slate-500 font-medium">Study Metric Summary</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    {item.type === 'login' ? (
-                      <p className="text-[10px] font-mono font-bold text-slate-600" suppressHydrationWarning>
-                        {new Date(item.login.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    ) : (
-                      <span className="text-xs font-bold text-teal-950 bg-[#f4f8e8] px-2 py-0.5 rounded-md border border-[#1d5c64]/30 font-mono">
-                        {item.value}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="p-3 bg-slate-50 border-t border-slate-200 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-              24-Hour Interactive Activity Stream
-            </div>
-          </div>
-
-        </div>
 
         {/* CLINICAL COHORT REGISTRY TABLE SECTION (With Row-Level Download Responses & Details Modal) */}
         <section className="space-y-2">
