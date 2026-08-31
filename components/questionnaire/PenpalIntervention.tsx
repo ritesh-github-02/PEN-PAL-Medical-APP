@@ -689,8 +689,8 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
 
   return (
     <div id="slide-content" className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-        <div className="flex-1 space-y-4">
+      <div className="flex flex-row gap-3 sm:gap-6 items-center justify-between">
+        <div className="flex-1 min-w-0 space-y-4">
           <div className="space-y-1">
             <h1 
               ref={headingRef}
@@ -741,13 +741,13 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="hidden sm:flex flex-shrink-0 relative items-center justify-center p-2 self-end md:self-end mt-auto">
+        <div className="flex flex-shrink-0 relative items-center justify-center p-1 self-center md:self-center my-auto">
           <img
             src="/images/nurse-anna.png"
             alt={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-20 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-24 sm:w-32 md:w-40 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
@@ -921,8 +921,8 @@ function TestingScreen(props: BaseScreenProps) {
 
   return (
     <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
-        <div className="space-y-3 flex-1 max-w-2xl pb-1">
+      <div className="flex flex-row items-center justify-between gap-3 sm:gap-6">
+        <div className="space-y-3 flex-1 min-w-0 max-w-2xl pb-1">
           <h2 
             ref={props.headingRef}
             tabIndex={-1}
@@ -964,14 +964,14 @@ function TestingScreen(props: BaseScreenProps) {
           </p>
         </div>
 
-        {/* Nurse Anna Illustration - Safe Responsive Flex (Hidden on small mobile to prevent overlap, visible on tablet/desktop) */}
-        <div className="hidden sm:flex flex-shrink-0 self-end md:self-end mt-auto p-1">
+        {/* Nurse Anna Illustration */}
+        <div className="flex flex-shrink-0 self-center md:self-center my-auto p-1">
           <img
             src="/images/nurse-anna.png"
             alt={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-22 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-22 sm:w-28 md:w-36 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
@@ -1059,8 +1059,8 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 
   return (
     <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
-        <div className="flex-1 max-w-3xl pb-2">
+      <div className="flex flex-row gap-2 sm:gap-6 items-center justify-between">
+        <div className="flex-1 min-w-0 max-w-3xl pb-2">
           {/* 1. Heading & Subtitle Outside Fieldset (Eliminates Double Title Announcement) */}
           <div className="mb-3">
             {navProps.description && (
@@ -1214,13 +1214,13 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 self-end md:self-end mt-auto p-1 hidden sm:block">
+        <div className="flex flex-shrink-0 self-center md:self-center my-auto p-1">
           <img
             src="/images/nurse-anna.png"
             alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-22 sm:w-28 md:w-36 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
@@ -1254,8 +1254,8 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string; onSelect: (val: string) => void }) {
   return (
     <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
-        <div className="flex-1 max-w-3xl pb-2">
+      <div className="flex flex-row gap-2 sm:gap-6 items-center justify-between">
+        <div className="flex-1 min-w-0 max-w-3xl pb-2">
           {/* 1. Heading & Description Outside Fieldset (WCAG 2.4.3 Focus Target) */}
           <div className="mb-3">
             {navProps.description && (
@@ -1314,13 +1314,13 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="flex-shrink-0 self-end md:self-end mt-auto p-1 hidden sm:block">
+        <div className="flex flex-shrink-0 self-center md:self-center my-auto p-1">
           <img
             src="/images/nurse-anna.png"
             alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-22 sm:w-28 md:w-36 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
@@ -1449,7 +1449,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
       </div>
 
       {/* Nurse Anna Illustration (Safe Positioned Outside Text Area) */}
-      <div className="hidden sm:block absolute bottom-8 right-3 sm:bottom-10 sm:right-6 pointer-events-none z-10">
+      <div className="block absolute bottom-8 right-3 sm:bottom-12 sm:right-6 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
           alt={
@@ -1457,7 +1457,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
               ? "Ilustración de la enfermera Anna sonriendo"
               : "Illustration of Nurse Anna smiling in blue scrubs"
           }
-          className="w-16 sm:w-20 md:w-24 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          className="w-18 sm:w-26 md:w-32 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
         />
       </div>
 
@@ -1479,8 +1479,8 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   return (
     <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
-        <div className="space-y-4 flex-1 max-w-2xl pb-2 text-center sm:text-left min-h-[10rem]">
+      <div className="flex flex-row items-center justify-between gap-3 sm:gap-6">
+        <div className="space-y-4 flex-1 min-w-0 max-w-2xl pb-2 text-left min-h-[10rem]">
           <h2 
             ref={navProps.headingRef}
             tabIndex={-1}
@@ -1494,13 +1494,13 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
         </div>
 
         {/* Nurse Anna Illustration */}
-        <div className="hidden sm:flex flex-shrink-0 self-end mt-auto p-1">
+        <div className="flex flex-shrink-0 self-center my-auto p-1">
           <img
             src="/images/nurse-anna.png"
             alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-20 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-22 sm:w-28 md:w-36 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
