@@ -16,7 +16,7 @@ export default function InterventionEntryPage() {
   const router = useRouter();
 
   const token = searchParams.get('token') || searchParams.get('TOKEN') || searchParams.get('Token') || searchParams.get('t');
-  const cleanToken = token?.trim() || null;
+  const cleanToken = token?.trim() || null; 
   const locale = (params.locale as string) || 'en';
 
   const [error, setError] = useState<string | null>(null);
@@ -210,74 +210,48 @@ export default function InterventionEntryPage() {
           </p>
         </div>
 
-        {/* Single Form Card - Passwordless Gateway */}
+        {/* Single Form Card - Protected Gateway */}
         <div className="bg-white/90 border border-slate-200/80 rounded-3xl shadow-sm p-6 sm:p-7 w-full text-center space-y-5">
           <div className="space-y-2">
             <span className="text-[9px] font-bold uppercase tracking-widest text-[#1d5c64] bg-[#f4f8e8] border border-slate-200/60 px-3 py-1 rounded-full inline-block">
-              {locale === 'es' ? 'Acceso 100% Sin Contraseña' : '100% Passwordless Access'}
+              {locale === 'es' ? 'Acceso Exclusivo con Enlace de Estudio' : 'Invitation-Only Study Access'}
             </span>
-            <h2 className="text-base font-bold text-[#1f2937]">{locale === 'es' ? 'Escanee el QR del póster o use el enlace directo' : 'Scan Poster QR or Use Direct Link'}</h2>
+            <h2 className="text-base font-bold text-[#1f2937]">
+              {locale === 'es' ? 'Se Requiere Enlace Único o Código QR' : 'Unique Study Link or QR Code Required'}
+            </h2>
             <p className="text-xs text-slate-600 font-normal leading-relaxed">
               {locale === 'es'
-                ? 'Escanear el código QR de su póster de estudio lo conecta automáticamente. No se requiere contraseña ni escribir ID manualmente.'
-                : 'Scanning your study poster QR code automatically logs you in. No password or manual ID typing required.'}
+                ? 'Para acceder a esta evaluación clínica, debe utilizar el enlace único o escanear el código QR proporcionado por el equipo del estudio. Sin un enlace o ID válido, no es posible ingresar a la evaluación.'
+                : 'To access this clinical assessment, you must use the unique link or scan the QR code provided by the study team. Without a valid study link or ID, access cannot be granted.'}
             </p>
           </div>
 
-          {/* Instant Passwordless Access Button */}
-          <a
-            href={`/join?arm=intervention&locale=${locale}`}
-            onClick={() => setLoading(true)}
-            className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
-          >
-            {locale === 'es' ? '⚡ Acceso Instantáneo al Estudio (Un Clic)' : '⚡ Instant Study Access (One-Click)'}
-          </a>
-
-          {/* Optional Pre-assigned token toggle for research staff */}
-          <div className="pt-3 border-t border-slate-100">
-            {mode === 'login' ? (
-              <button
-                type="button"
-                onClick={() => setMode('register')}
-                className="text-[10px] font-bold text-slate-500 hover:text-[#1d5c64] transition-all cursor-pointer uppercase tracking-wider"
+          {/* Form to enter Research ID / Token if opening directly */}
+          <div className="space-y-3 pt-1">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const input = (e.currentTarget.elements.namedItem('token') as HTMLInputElement).value.trim();
+              if (input) handleValidation(input);
+            }} className="space-y-3">
+              <label htmlFor="token-input" className="sr-only">
+                {locale === 'es' ? 'Token o ID de investigación' : 'Token or Research ID'}
+              </label>
+              <input 
+                id="token-input"
+                name="token" 
+                type="text" 
+                placeholder={locale === 'es' ? "Ingrese su Token o ID (ej. PEN-4K9L2M)" : "Enter your Token or Research ID (e.g. PEN-4K9L2M)"} 
+                required
+                aria-required="true"
+                className="h-11 w-full px-3.5 border border-slate-300 focus:outline-none focus:border-[#1d5c64] font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl text-xs font-semibold"
+              />
+              <button 
+                type="submit" 
+                className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
               >
-                {locale === 'es' ? 'Reanudar Evaluación: Ingrese Token o ID ↓' : 'Resume Assessment'}
+                {locale === 'es' ? 'Acceder a la Evaluación →' : 'Access Assessment →'}
               </button>
-            ) : (
-              <div className="space-y-3">
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  const input = (e.currentTarget.elements.namedItem('token') as HTMLInputElement).value.trim();
-                  if (input) handleValidation(input);
-                }} className="space-y-2.5">
-                  <label htmlFor="token-input" className="sr-only">
-                    {locale === 'es' ? 'Token o ID de investigación' : 'Token or Research ID'}
-                  </label>
-                  <input 
-                    id="token-input"
-                    name="token" 
-                    type="text" 
-                    placeholder={locale === 'es' ? "Token o ID de investigación (ej. PEN-PXOVE2)" : "Token or Research ID (e.g. PEN-PXOVE2)"} 
-                    required
-                    aria-required="true"
-                    className="h-10 w-full px-3.5 border border-slate-300 focus:outline-none focus:border-[#1d5c64] font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl text-xs"
-                  />
-                  <button 
-                    type="submit" 
-                    className="h-10 w-full bg-slate-900 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all cursor-pointer"
-                  >
-                    {locale === 'es' ? 'Reanudar Evaluación →' : 'Resume Assessment →'}
-                  </button>
-                </form>
-                <button
-                  type="button"
-                  onClick={() => setMode('login')}
-                  className="text-[10px] font-bold text-slate-500 hover:text-slate-700 transition-all cursor-pointer uppercase tracking-wider"
-                >
-                  {locale === 'es' ? 'Ocultar entrada de token' : 'Hide Token Input'}
-                </button>
-              </div>
-            )}
+            </form>
           </div>
         </div>
       </div>
@@ -285,8 +259,8 @@ export default function InterventionEntryPage() {
       <div className="w-full max-w-xs text-center">
         <p className="text-[9px] text-slate-600 leading-normal font-normal">
           {locale === 'es'
-            ? 'Aviso de seguridad: Los tokens de acceso a la sesión son privados, están asegurados criptográficamente y tienen límite de intentos.'
-            : 'Security Notice: Session access tokens are private, cryptographically secured, and rate-limited.'}
+            ? 'Aviso de seguridad: Los enlaces y tokens de acceso son personales, están asegurados criptográficamente y protegen la integridad del estudio clínico.'
+            : 'Security Notice: Participant links and access tokens are private, cryptographically verified, and protected for clinical study integrity.'}
         </p>
       </div>
     </main>
