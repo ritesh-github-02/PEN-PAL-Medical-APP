@@ -128,7 +128,7 @@ export default function InterventionEntryPage() {
               onClick={() => setError(null)}
               className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.98] cursor-pointer"
             >
-              {locale === 'es' ? 'Intentar escanear código QR nuevamente' : 'Try Scanning QR Code Again'}
+              {locale === 'es' ? 'Intentar con otro enlace' : 'Try with another link'}
             </button>
           </div>
         </div>

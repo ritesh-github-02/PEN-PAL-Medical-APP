@@ -789,17 +789,6 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                         <span>Poster QR</span>
                       </button>
 
-                      {/* Edit Campaign Name */}
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(item)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg border border-slate-300 transition-colors shadow-2xs cursor-pointer"
-                        title="Edit campaign name"
-                      >
-                        <Pencil className="w-3.5 h-3.5 text-slate-600" />
-                        <span>Edit</span>
-                      </button>
-
                       {/* Delete Campaign */}
                       <button
                         type="button"
