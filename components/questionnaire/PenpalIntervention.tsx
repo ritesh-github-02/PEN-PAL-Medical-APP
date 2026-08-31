@@ -1670,14 +1670,22 @@ function SummaryScreen({ title, content, answers, onNext, onBack, loading, t, lo
 
       <div className="print-section border-t border-slate-100 pt-2.5 mb-2">
         <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-left">
-          {summarySections.map((section) => (
-            <div key={section.id} className="bg-slate-50/90 border border-slate-200/80 rounded-lg p-2 sm:p-2.5">
-              <p className="section-label text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate">
-                {t(section.labelKey) || section.defaultValue}
-              </p>
-              <p className="section-value text-xs text-slate-800 font-bold leading-tight truncate sm:whitespace-normal">{section.getValue()}</p>
-            </div>
-          ))}
+          {summarySections.map((section) => {
+            let label = section.defaultValue;
+            try {
+              label = t(section.labelKey) || section.defaultValue;
+            } catch {
+              label = section.defaultValue;
+            }
+            return (
+              <div key={section.id} className="bg-slate-50/90 border border-slate-200/80 rounded-lg p-2 sm:p-2.5">
+                <p className="section-label text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate">
+                  {label}
+                </p>
+                <p className="section-value text-xs text-slate-800 font-bold leading-tight truncate sm:whitespace-normal">{section.getValue()}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
 

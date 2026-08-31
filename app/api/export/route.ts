@@ -2,6 +2,56 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import Papa from 'papaparse';
 
+const STUDY_SLIDES_CONFIG = [
+  { id: 'screen1_intro', slideNumber: 1, title: 'Introduction & Consent Briefing', type: 'Intro' },
+  { id: 'screen2_statistics', slideNumber: 2, title: 'Safety Statistics (100 Kids)', type: 'Statistics' },
+  { id: 'screen3_5_knowledge_test', slideNumber: 3, title: 'Penicillin Knowledge Quiz', type: 'Quiz' },
+  { id: 'screen4_testing', slideNumber: 4, title: 'Allergy Testing Education', type: 'Education' },
+  { id: 'screen6_survey_intro', slideNumber: 5, title: 'Clinical Survey Overview', type: 'Info' },
+  { id: 'screen6_1_symptoms', slideNumber: 6, title: 'Reported Symptoms Assessment', type: 'Question' },
+  { id: 'screen6_2_timing', slideNumber: 7, title: 'Age at Reaction (Slider)', type: 'Question' },
+  { id: 'screen6_3_onset', slideNumber: 8, title: 'Time to Symptom Onset', type: 'Question' },
+  { id: 'screen6_4_resolution', slideNumber: 9, title: 'Medical Care Received', type: 'Question' },
+  { id: 'screen6_4b_resolution_type', slideNumber: 10, title: 'Reaction Resolution Method', type: 'Question' },
+  { id: 'screen6_5_yetagain', slideNumber: 11, title: 'Subsequent Penicillin Exposure', type: 'Question' },
+  { id: 'screen7_summary', slideNumber: 12, title: 'Action Steps & Clinical Summary', type: 'Summary' },
+  { id: 'screen_end', slideNumber: 13, title: 'Non-Participant End Screen', type: 'Exit' },
+];
+
+const STEP_LABELS_MAP: Record<string, { slideNumber: number; title: string; type: string }> = Object.fromEntries(
+  STUDY_SLIDES_CONFIG.map(s => [s.id, s])
+);
+
+// Format date into Eastern Standard Time (EST / EDT)
+function formatEST(date: Date | string | null | undefined): string {
+  if (!date) return 'N/A';
+  try {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(d.getTime())) return 'N/A';
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZoneName: 'short',
+    }).format(d);
+  } catch {
+    return String(date);
+  }
+}
+
+function formatDuration(totalSeconds: number): string {
+  if (isNaN(totalSeconds) || totalSeconds <= 0) return '< 1s';
+  if (totalSeconds < 60) return `${Math.round(totalSeconds * 10) / 10}s`;
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = Math.round(totalSeconds % 60);
+  return `${mins}m ${secs}s`;
+}
+
 function formatAnswerValue(questionId: string, rawVal: any): string {
   if (
     rawVal === undefined || 
@@ -13,6 +63,14 @@ function formatAnswerValue(questionId: string, rawVal: any): string {
       return 'Completed / Viewed';
     }
     return 'Not Specified';
+  }
+
+  if (rawVal === 'none_selected') {
+    return 'None Selected / Not Provided';
+  }
+
+  if (rawVal === 'acknowledged') {
+    return 'Viewed & Acknowledged';
   }
 
   if (rawVal === '[]' || (Array.isArray(rawVal) && rawVal.length === 0)) {
@@ -36,6 +94,10 @@ function formatAnswerValue(questionId: string, rawVal: any): string {
     return rawVal.map(item => String(item).replace(/_/g, ' ')).join(', ');
   }
 
+  if (questionId === 'screen6_2_timing') {
+    return `${rawVal} years old`;
+  }
+
   return String(rawVal).replace(/_/g, ' ');
 }
 
@@ -51,31 +113,108 @@ export async function GET(request: Request) {
     const participantId = searchParams.get('participantId');
     const campaignId = searchParams.get('campaignId');
 
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 1. RESPONSES EXPORT
+    // ─────────────────────────────────────────────────────────────────────────────
     if (type === 'responses' || type === 'participant_responses') {
       const whereClause = participantId ? { participantId } : {};
       const responses = await prisma.questionnaireResponse.findMany({
         where: whereClause,
-        include: { participant: true },
-        orderBy: { createdAt: 'desc' }
+        include: {
+          participant: {
+            include: { campaign: true }
+          }
+        },
+        orderBy: [{ participantId: 'asc' }, { createdAt: 'asc' }]
       });
 
-      data = responses.map(r => ({
-        ResponseID: r.id,
-        ParticipantID: r.participant?.externalId || r.participantId,
-        DatabaseID: r.participantId,
-        CohortGroup: r.participant?.groupId || 'N/A',
-        QuestionID: r.questionId,
-        AnswerValue: formatAnswerValue(r.questionId, r.answerValue),
-        SubmittedAt: r.createdAt.toISOString()
-      }));
+      data = responses.map((r, idx) => {
+        const stepInfo = STEP_LABELS_MAP[r.questionId] || { slideNumber: 0, title: r.questionId, type: 'Field' };
+        const dwellSeconds = r.timeSpentMs ? (r.timeSpentMs / 1000).toFixed(2) : '0.00';
+
+        return {
+          Index: idx + 1,
+          ParticipantID: r.participant?.externalId || r.participantId,
+          DatabaseGUID: r.participantId,
+          StudyArm: r.participant?.groupId || 'N/A',
+          CampaignName: r.participant?.campaign?.name || 'Unassigned',
+          SlideNumber: stepInfo.slideNumber || 'N/A',
+          QuestionTitle: stepInfo.title,
+          QuestionID: r.questionId,
+          AnswerValue: formatAnswerValue(r.questionId, r.answerValue),
+          DwellTime_Seconds: dwellSeconds,
+          SubmittedAt_EST: formatEST(r.createdAt),
+          Timestamp_UTC: r.createdAt.toISOString()
+        };
+      });
 
       const prefix = participantId ? `participant_${participantId}` : 'all_participants';
-      filename = `penpal_${prefix}_responses.csv`;
+      filename = `penpal_${prefix}_answers_EST.csv`;
     } 
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 2. SLIDE TELEMETRY & EXACT TIMING (EST)
+    // ─────────────────────────────────────────────────────────────────────────────
+    else if (type === 'slide_metrics' || type === 'participant_slide_telemetry') {
+      const whereClause = participantId ? { participantId } : {};
+      const metrics = await prisma.slideMetric.findMany({
+        where: whereClause,
+        include: {
+          participant: {
+            include: {
+              campaign: true,
+              responses: true,
+              tokens: {
+                orderBy: { createdAt: 'desc' },
+                take: 1
+              }
+            }
+          }
+        },
+        orderBy: [{ participantId: 'asc' }, { stepIndex: 'asc' }, { createdAt: 'asc' }],
+      });
+
+      data = metrics.map((m, idx) => {
+        const stepInfo = STEP_LABELS_MAP[m.stepId] || { slideNumber: m.stepIndex + 1, title: m.stepId, type: 'Slide' };
+        const matchingResponse = m.participant?.responses?.find((r: any) => r.questionId === m.stepId);
+        const recordedAnswer = matchingResponse ? formatAnswerValue(m.stepId, matchingResponse.answerValue) : 'Viewed Only';
+        const durationSec = (m.durationMs / 1000).toFixed(2);
+
+        return {
+          Index: idx + 1,
+          ParticipantID: m.participant?.externalId || m.participantId,
+          DatabaseGUID: m.participantId,
+          StudyArm: m.participant?.groupId || 'N/A',
+          CampaignName: m.participant?.campaign?.name || 'Unassigned',
+          SlideNumber: stepInfo.slideNumber,
+          SlideTitle: stepInfo.title,
+          SlideID: m.stepId,
+          SlideOpenedAt_EST: formatEST(m.createdAt),
+          SlideLastActiveAt_EST: formatEST(m.updatedAt),
+          TimeSpent_Seconds: durationSec,
+          TimeSpent_Formatted: formatDuration(m.durationMs / 1000),
+          TimeSpent_Milliseconds: m.durationMs,
+          VisitsCount: m.visitCount,
+          AnswerRecordedOnSlide: recordedAnswer,
+          ParticipantStatus: m.participant?.status || 'ACTIVE',
+          LastKnownIP: m.participant?.tokens?.[0]?.lastUsedIp || 'N/A',
+          Timestamp_UTC: m.createdAt.toISOString()
+        };
+      });
+
+      const prefix = participantId ? `participant_${participantId}` : 'all_participants';
+      filename = `penpal_${prefix}_slide_timings_EST.csv`;
+    }
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 3. PARTICIPANTS COHORT ROSTER
+    // ─────────────────────────────────────────────────────────────────────────────
     else if (type === 'participants') {
       const participants = await prisma.participant.findMany({
         include: {
           campaign: true,
+          tokens: {
+            orderBy: { createdAt: 'desc' },
+            take: 1
+          },
           _count: {
             select: {
               sessions: true,
@@ -92,21 +231,26 @@ export async function GET(request: Request) {
         orderBy: { createdAt: 'desc' }
       });
 
-      data = participants.map(p => ({
+      data = participants.map((p, idx) => ({
+        Index: idx + 1,
         ParticipantID: p.externalId || p.id,
-        DatabaseID: p.id,
-        CohortGroup: p.groupId,
-        Campaign: p.campaign?.name || 'Unassigned',
+        DatabaseGUID: p.id,
+        StudyArm: p.groupId,
+        CampaignName: p.campaign?.name || 'Unassigned',
         Status: p.status,
-        SessionsCount: p._count.sessions,
-        ResponsesCount: p._count.responses,
-        TokensCount: p._count.tokens,
-        EventsCount: p._count.events,
-        LastSessionAt: p.sessions[0] ? p.sessions[0].createdAt.toISOString() : 'None',
-        EnrolledAt: p.createdAt.toISOString()
+        AccessToken: p.tokens[0]?.tokenHash || 'N/A',
+        TotalSessions: p._count.sessions,
+        TotalAnswers: p._count.responses,
+        TotalSlideEvents: p._count.events,
+        LastSession_EST: p.sessions[0] ? formatEST(p.sessions[0].createdAt) : 'Never',
+        EnrolledAt_EST: formatEST(p.createdAt),
+        EnrolledAt_UTC: p.createdAt.toISOString()
       }));
-      filename = 'penpal_clinical_cohort_roster.csv';
+      filename = 'penpal_clinical_cohort_roster_EST.csv';
     }
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 4. CAMPAIGN BATCH LINKS & TOKENS
+    // ─────────────────────────────────────────────────────────────────────────────
     else if (type === 'campaign_links' || type === 'campaign_tokens') {
       const whereClause = campaignId ? { campaignId } : { campaignId: { not: null } };
       
@@ -142,13 +286,17 @@ export async function GET(request: Request) {
           CampaignSlug: p.campaign?.slug || 'none',
           Status: p.tokens[0]?.status || p.status,
           TimesUsed: p.tokens[0]?.useCount || 0,
-          CreatedAt: p.createdAt.toISOString()
+          CreatedAt_EST: formatEST(p.createdAt),
+          CreatedAt_UTC: p.createdAt.toISOString()
         };
       });
 
       const timestamp = new Date().toISOString().slice(0, 10);
-      filename = `penpal_campaign_${campaignSlug}_links_${timestamp}.csv`;
+      filename = `penpal_campaign_${campaignSlug}_links_${timestamp}_EST.csv`;
     }
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 5. EVENT LOGS
+    // ─────────────────────────────────────────────────────────────────────────────
     else if (type === 'events') {
       const events = await prisma.eventLog.findMany({
         orderBy: { timestamp: 'desc' },
@@ -161,33 +309,16 @@ export async function GET(request: Request) {
         EventType: e.eventType,
         EventData: e.eventData,
         Path: e.path,
-        Timestamp: e.timestamp.toISOString()
+        Timestamp_EST: formatEST(e.timestamp),
+        Timestamp_UTC: e.timestamp.toISOString()
       }));
-      filename = 'penpal_events.csv';
-    }
-    else if (type === 'slide_metrics') {
-      const metrics = await prisma.slideMetric.findMany({
-        include: { participant: true },
-        orderBy: [{ participantId: 'asc' }, { stepIndex: 'asc' }],
-      });
-      data = metrics.map(m => ({
-        MetricID: m.id,
-        ParticipantID: m.participant?.externalId || m.participantId,
-        CohortGroup: m.participant?.groupId || 'N/A',
-        StepID: m.stepId,
-        StepIndex: m.stepIndex,
-        DurationSeconds: (m.durationMs / 1000).toFixed(2),
-        DurationMs: m.durationMs,
-        VisitCount: m.visitCount,
-        UpdatedAt: m.updatedAt.toISOString(),
-      }));
-      filename = 'penpal_slide_telemetry_metrics.csv';
+      filename = 'penpal_audit_events_EST.csv';
     }
     else {
       return new NextResponse('Invalid export type', { status: 400 });
     }
 
-    // Include UTF-8 BOM for flawless Excel compatibility
+    // Include UTF-8 BOM for flawless Excel / Google Sheets compatibility
     const csvContent = '\uFEFF' + Papa.unparse(data);
 
     return new NextResponse(csvContent, {

@@ -329,15 +329,45 @@ export async function completeQuestionnaire() {
   if (!participantId || !sessionId) return;
 
   try {
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId },
+      select: { startTime: true },
+    });
+
+    const now = new Date();
+    let durationSeconds = 0;
+    if (session?.startTime) {
+      durationSeconds = Math.max(0, Math.round((now.getTime() - new Date(session.startTime).getTime()) / 1000));
+    }
+
     await prisma.session.update({
       where: { id: sessionId },
-      data: { status: 'COMPLETED', endTime: new Date() },
+      data: {
+        status: 'COMPLETED',
+        endTime: now,
+        durationSeconds: durationSeconds > 0 ? durationSeconds : undefined,
+      },
+    });
+
+    await prisma.participant.update({
+      where: { id: participantId },
+      data: { status: 'COMPLETED' },
     });
 
     await prisma.participantToken.updateMany({
       where: { participantId },
-      data: { status: 'CONSUMED' },
+      data: { status: 'CONSUMED', consumedAt: now },
     });
+
+    await prisma.eventLog.create({
+      data: {
+        participantId,
+        sessionId,
+        eventType: 'ASSESSMENT_COMPLETED',
+        eventData: JSON.stringify({ durationSeconds }),
+        path: '/intervention/flow',
+      },
+    }).catch(() => {});
   } catch (error) {
     if (error instanceof Error && error.message.includes("Can't reach database server")) {
       return; // Silenced in preview
