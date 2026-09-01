@@ -42,7 +42,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
   return (
     <main className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8" role="main" aria-label={isEs ? "Portal del Grupo de Control" : "Control Group Portal"}>
       {/* 100% Client Telemetry & Scroll Tracker */}
-      <ControlTracker locale={locale} />
+      <ControlTracker locale={locale} token={token} />
 
       <div className="max-w-6xl mx-auto space-y-6">
         

@@ -6,6 +6,7 @@ interface UseUserTrackingOptions {
   stepId: string;
   stepIndex?: number;
   path: string;
+  token?: string;
   autoHeartbeat?: boolean;
   heartbeatIntervalMs?: number;
   trackedSections?: string[]; // IDs of elements to track via IntersectionObserver
@@ -15,6 +16,7 @@ export function useUserTracking({
   stepId,
   stepIndex = 0,
   path,
+  token,
   autoHeartbeat = true,
   heartbeatIntervalMs = 25000,
   trackedSections = [],
@@ -29,6 +31,7 @@ export function useUserTracking({
   const sendTrackingData = useCallback((payload: Record<string, any>, useBeacon = false) => {
     try {
       const data = JSON.stringify({
+        token,
         ...payload,
         path,
       });

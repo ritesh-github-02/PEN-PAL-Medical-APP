@@ -233,6 +233,11 @@ async function activateTokenRecord(
         lastUsedAgent: userAgent,
       },
     }),
+    // Update participant status to ACTIVE
+    prisma.participant.update({
+      where: { id: tokenRecord.participantId },
+      data: { status: 'ACTIVE' },
+    }),
     // Create a new study session for the participant, sealed with the client's
     // initial IP fingerprint so subsequent calls from a different network can be flagged.
     prisma.session.create({

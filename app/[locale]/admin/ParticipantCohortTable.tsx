@@ -562,16 +562,18 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                 )}
               </button>
 
-              <button
-                onClick={() => setActiveTab('responses')}
-                className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                  activeTab === 'responses'
-                    ? 'border-[#1d5c64] text-[#1d5c64] bg-white rounded-t-xl shadow-xs font-extrabold'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                📝 All Submitted Answers ({modalDetails?.groupId === 'CONTROL' ? '0 - Handout Only' : (modalDetails?.responses?.length || 0)})
-              </button>
+              {modalDetails?.groupId !== 'CONTROL' && (
+                <button
+                  onClick={() => setActiveTab('responses')}
+                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    activeTab === 'responses'
+                      ? 'border-[#1d5c64] text-[#1d5c64] bg-white rounded-t-xl shadow-xs font-extrabold'
+                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  📝 All Submitted Answers ({modalDetails?.responses?.length || 0})
+                </button>
+              )}
               <button
                 onClick={() => setActiveTab('tokens')}
                 className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
@@ -989,8 +991,8 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     </div>
                   )}
 
-                  {/* ================= TAB 3: ALL SUBMITTED ANSWERS ================= */}
-                  {activeTab === 'responses' && (
+                  {/* ================= TAB 3: ALL SUBMITTED ANSWERS (INTERVENTION ONLY) ================= */}
+                  {activeTab === 'responses' && modalDetails.groupId !== 'CONTROL' && (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <div>
@@ -1008,16 +1010,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                         </button>
                       </div>
 
-                      {modalDetails.groupId === 'CONTROL' ? (
-                        <div className="p-8 text-center border border-slate-200 rounded-xl bg-slate-50 space-y-2">
-                          <BookOpen className="w-8 h-8 text-teal-700 mx-auto" />
-                          <h4 className="font-bold text-slate-900 text-sm">Control Arm — Educational Handout Protocol</h4>
-                          <p className="text-xs text-slate-500 max-w-md mx-auto">
-                            Participants in the Control group review the educational handout website directly and do not complete questionnaire survey prompts. Detailed reading duration and section scroll engagement are available in the Educational Handout Engagement tab.
-                          </p>
-                        </div>
-                      ) : (
-                        (() => {
+                      {(() => {
                           const questionIds = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'];
                           const visibleResponses = (modalDetails.responses || []).filter((r: any) => questionIds.includes(r.questionId) && r.answerValue !== 'acknowledged');
 
@@ -1071,8 +1064,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                               </table>
                             </div>
                           );
-                        })()
-                      )}
+                        })()}
                     </div>
                   )}
 
@@ -1121,16 +1113,18 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                   onClick={() => handleDownloadSlideTelemetry(selectedParticipantId)}
                   className="px-4 py-2 bg-[#236f7a] hover:bg-[#1d5c64] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
-                  <Activity className="w-3.5 h-3.5 text-teal-200" />
-                  Download Slide Timings CSV (EST)
+                  <CsvDownloadIcon className="w-3.5 h-3.5" />
+                  {modalDetails?.groupId === 'CONTROL' ? 'Download Handout Engagement CSV (EST)' : 'Download Slide Timings CSV (EST)'}
                 </button>
-                <button
-                  onClick={() => handleDownloadResponses(selectedParticipantId)}
-                  className="px-4 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <Download className="w-3.5 h-3.5 text-teal-200" />
-                  Download Answers CSV (EST)
-                </button>
+                {modalDetails?.groupId !== 'CONTROL' && (
+                  <button
+                    onClick={() => handleDownloadResponses(selectedParticipantId)}
+                    className="px-4 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <CsvDownloadIcon className="w-3.5 h-3.5" />
+                    Download Answers CSV (EST)
+                  </button>
+                )}
               </div>
 
               <button
