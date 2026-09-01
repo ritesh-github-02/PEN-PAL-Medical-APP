@@ -739,7 +739,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
             alt={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-24 sm:w-32 md:w-40 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
@@ -963,7 +963,7 @@ function TestingScreen(props: BaseScreenProps) {
             alt={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-22 sm:w-28 md:w-36 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
@@ -1212,7 +1212,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
             alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-22 sm:w-28 md:w-36 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
@@ -1312,7 +1312,7 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
             alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-22 sm:w-28 md:w-36 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>
@@ -1441,7 +1441,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
       </div>
 
       {/* Nurse Anna Illustration (Safe Positioned Outside Text Area) */}
-      <div className="block absolute bottom-8 right-3 sm:bottom-12 sm:right-6 pointer-events-none z-10">
+      <div className="block absolute bottom-6 right-2 sm:bottom-10 sm:right-5 pointer-events-none z-10">
         <img
           src="/images/nurse-anna.png"
           alt={
@@ -1449,7 +1449,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
               ? "Ilustración de la enfermera Anna sonriendo"
               : "Illustration of Nurse Anna smiling in blue scrubs"
           }
-          className="w-18 sm:w-26 md:w-32 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+          className="w-14 sm:w-18 md:w-22 max-h-[130px] sm:max-h-[160px] md:max-h-[180px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
         />
       </div>
 
@@ -1492,7 +1492,7 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
             alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
             role="img"
             aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-22 sm:w-28 md:w-36 h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
+            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
           />
         </div>
       </div>

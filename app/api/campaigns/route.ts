@@ -354,7 +354,7 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// DELETE: Permanently delete a campaign and all associated participant records
+// DELETE: Permanently delete a campaign and all associated participant records, metrics, sessions, tokens, and events
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -370,7 +370,7 @@ export async function DELETE(req: NextRequest) {
     const campaign = await prisma.campaign.findUnique({
       where: { id },
       include: {
-        participants: { select: { id: true } },
+        participants: { select: { id: true, externalId: true } },
       },
     });
 
@@ -381,24 +381,81 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const participantIds = campaign.participants.map((p) => p.id);
+    // Find all participants directly linked or linked via slug prefix
+    const relatedParticipants = await prisma.participant.findMany({
+      where: {
+        OR: [
+          { campaignId: id },
+          { externalId: { startsWith: `${campaign.slug.toUpperCase()}-` } },
+        ],
+      },
+      select: { id: true },
+    });
 
-    // Delete participants and cascade their tokens, responses, sessions, metrics
-    if (participantIds.length > 0) {
-      await prisma.participant.deleteMany({
-        where: { id: { in: participantIds } },
+    const participantIdSet = new Set<string>([
+      ...campaign.participants.map((p) => p.id),
+      ...relatedParticipants.map((p) => p.id),
+    ]);
+    const participantIds = Array.from(participantIdSet);
+
+    // Perform complete transactional cascade deletion
+    await prisma.$transaction(async (tx) => {
+      if (participantIds.length > 0) {
+        // 1. Delete Event Logs
+        await tx.eventLog.deleteMany({
+          where: { participantId: { in: participantIds } },
+        });
+
+        // 2. Delete Token Security Events
+        await tx.tokenSecurityEvent.deleteMany({
+          where: { participantId: { in: participantIds } },
+        });
+
+        // 3. Delete Slide Metrics (slide dwell times)
+        await tx.slideMetric.deleteMany({
+          where: { participantId: { in: participantIds } },
+        });
+
+        // 4. Delete Questionnaire Responses
+        await tx.questionnaireResponse.deleteMany({
+          where: { participantId: { in: participantIds } },
+        });
+
+        // 5. Delete Survey Responses
+        await tx.surveyResponse.deleteMany({
+          where: { participantId: { in: participantIds } },
+        });
+
+        // 6. Delete Participant Tokens
+        await tx.participantToken.deleteMany({
+          where: { participantId: { in: participantIds } },
+        });
+
+        // 7. Delete Sessions
+        await tx.session.deleteMany({
+          where: { participantId: { in: participantIds } },
+        });
+
+        // 8. Delete Participants
+        await tx.participant.deleteMany({
+          where: { id: { in: participantIds } },
+        });
+      }
+
+      // 9. Delete the Campaign itself
+      await tx.campaign.delete({
+        where: { id },
       });
-    }
-
-    // Delete the campaign
-    await prisma.campaign.delete({
-      where: { id },
     });
 
     revalidatePath('/[locale]/admin', 'page');
+    revalidatePath('/en/admin', 'page');
+    revalidatePath('/es/admin', 'page');
+
     return NextResponse.json({
       success: true,
-      message: `Campaign "${campaign.name}" was permanently deleted.`,
+      deletedParticipantCount: participantIds.length,
+      message: `Campaign "${campaign.name}" and all ${participantIds.length} participant records were permanently deleted.`,
     });
   } catch (error: any) {
     console.error('API Error deleting campaign:', error);

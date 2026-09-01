@@ -31,6 +31,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { CsvDownloadIcon } from '@/components/icons/CsvDownloadIcon';
+import { useRouter } from '@/routing';
 
 export interface CampaignItem {
   id: string;
@@ -56,6 +57,7 @@ export interface GeneratedLinkItem {
 }
 
 export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: CampaignItem[] }) {
+  const router = useRouter();
   const [campaigns, setCampaigns] = useState<CampaignItem[]>(initialCampaigns || []);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isViewLinksModalOpen, setIsViewLinksModalOpen] = useState(false);
@@ -254,9 +256,10 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         showToast(data.error || 'Failed to delete campaign.', 'error');
       } else {
         setCampaigns((prev) => prev.filter((c) => c.id !== deleteCampaign.id));
-        showToast(`Campaign "${deleteCampaign.name}" was permanently deleted.`, 'success');
+        showToast(`Campaign "${deleteCampaign.name}" and all associated registry entries were permanently deleted.`, 'success');
         setIsDeleteModalOpen(false);
         setDeleteCampaign(null);
+        router.refresh();
       }
     } catch (err: any) {
       showToast(err.message || 'Error deleting campaign.', 'error');
@@ -295,6 +298,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
       setGeneratedLinks(data.links || []);
       showToast(`🎉 Created "${data.campaign.name}" with ${data.totalGenerated} unique links!`, 'success');
       await refreshCampaigns();
+      router.refresh();
     } catch (err: any) {
       setError(err.message || 'An error occurred while generating campaign links.');
     } finally {

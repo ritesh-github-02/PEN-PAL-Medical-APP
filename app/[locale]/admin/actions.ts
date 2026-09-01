@@ -320,3 +320,25 @@ export async function getCampaigns() {
   }
 }
 
+// Permanently delete a single participant and all associated telemetry/sessions
+export async function deleteParticipant(participantId: string) {
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.eventLog.deleteMany({ where: { participantId } });
+      await tx.tokenSecurityEvent.deleteMany({ where: { participantId } });
+      await tx.slideMetric.deleteMany({ where: { participantId } });
+      await tx.questionnaireResponse.deleteMany({ where: { participantId } });
+      await tx.surveyResponse.deleteMany({ where: { participantId } });
+      await tx.participantToken.deleteMany({ where: { participantId } });
+      await tx.session.deleteMany({ where: { participantId } });
+      await tx.participant.delete({ where: { id: participantId } });
+    });
+
+    revalidatePath('/[locale]/admin', 'page');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete participant:', error);
+    return { success: false, error: 'Failed to delete participant record.' };
+  }
+}
+
