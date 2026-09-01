@@ -18,15 +18,6 @@ export default function ReportPage() {
   useEffect(() => {
     async function fetchData() {
       const progress = await loadQuestionnaireProgress();
-
-      if (progress.bindingError) {
-        // IP fingerprint mismatch — the session is tied to a different device/network.
-        // Show a re-auth prompt rather than rendering stale/incorrect data.
-        setData({ answers: {}, bindingError: progress.bindingError });
-        setLoading(false);
-        return;
-      }
-
       setData(progress);
       setLoading(false);
     }

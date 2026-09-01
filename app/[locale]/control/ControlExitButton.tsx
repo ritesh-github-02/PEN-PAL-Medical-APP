@@ -1,18 +1,26 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LogOut } from 'lucide-react';
+import { X } from 'lucide-react';
 import { logout } from '../intervention/actions';
 
 interface ControlExitButtonProps {
   locale: string;
+  className?: string;
+  label?: string;
 }
 
-export default function ControlExitButton({ locale }: ControlExitButtonProps) {
+export default function ControlExitButton({ 
+  locale, 
+  className,
+  label 
+}: ControlExitButtonProps) {
   const [closing, setClosing] = useState(false);
   const isEs = locale === 'es';
 
-  const handleExit = async () => {
+  const defaultLabel = label || (isEs ? 'Cerrar' : 'Close');
+
+  const handleClose = async () => {
     setClosing(true);
 
     try {
@@ -39,7 +47,7 @@ export default function ControlExitButton({ locale }: ControlExitButtonProps) {
       }
     } catch {}
 
-    // 2. Clear authentication cookies via server action
+    // 2. Clear authentication cookies in background
     try {
       logout().catch(() => {});
     } catch {}
@@ -49,7 +57,7 @@ export default function ControlExitButton({ locale }: ControlExitButtonProps) {
       window.open('', '_self', '');
       window.close();
 
-      // Fallback if browser security sandbox prevents closing top-level window
+      // Fallback if browser security sandbox prevents closing top-level tab
       setTimeout(() => {
         window.location.href = 'about:blank';
       }, 350);
@@ -59,13 +67,13 @@ export default function ControlExitButton({ locale }: ControlExitButtonProps) {
   return (
     <button
       type="button"
-      onClick={handleExit}
+      onClick={handleClose}
       disabled={closing}
-      aria-label={isEs ? "Finalizar y Salir" : "Finish and Exit"}
-      className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-2 active:scale-95"
+      aria-label={isEs ? 'Cerrar ventana del estudio' : 'Close study window'}
+      className={className || "flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-rose-900/50 hover:text-rose-200 border border-slate-700 text-slate-100 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95"}
     >
-      <LogOut className="w-4 h-4 text-teal-400" aria-hidden="true" />
-      <span>{closing ? (isEs ? "Cerrando..." : "Closing...") : (isEs ? "Finalizar y Salir" : "Finish and Exit")}</span>
+      <X className="w-3.5 h-3.5 text-teal-300" aria-hidden="true" />
+      <span>{closing ? (isEs ? 'Cerrando...' : 'Closing...') : defaultLabel}</span>
     </button>
   );
 }

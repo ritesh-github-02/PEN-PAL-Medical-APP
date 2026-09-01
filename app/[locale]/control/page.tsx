@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import ControlTracker from './ControlTracker';
+import ControlExitButton from './ControlExitButton';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -79,16 +80,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
               </Link>
             </div>
 
-            <form action={logout}>
-              <button 
-                type="submit"
-                aria-label={isEs ? "Salir del estudio y cerrar sesión" : "Exit study and logout"}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-rose-900/50 hover:text-rose-200 border border-slate-700 text-slate-100 rounded-lg text-xs font-bold transition-all cursor-pointer"
-              >
-                <LogOut className="w-3.5 h-3.5 text-teal-300" aria-hidden="true" />
-                {isEs ? "Salir" : "Exit"}
-              </button>
-            </form>
+            <ControlExitButton locale={locale} label={isEs ? "Cerrar" : "Close"} />
           </div>
         </header>
 

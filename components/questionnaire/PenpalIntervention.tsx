@@ -135,21 +135,14 @@ export default function PenpalIntervention() {
 
   useEffect(() => {
     async function init() {
-      let progress = await loadQuestionnaireProgress();
+      const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const tokenParam = searchParams ? (searchParams.get('token') || searchParams.get('TOKEN') || searchParams.get('t') || undefined) : undefined;
+
+      let progress = await loadQuestionnaireProgress(tokenParam, locale);
       let localAnswers = false;
 
       if (progress.tokenDisplay) {
         setActiveToken(progress.tokenDisplay);
-      }
-
-      // ── IP-fingerprint binding failure ────────────────────────────────────────
-      // The session's IP fingerprint (captured at first token validation) does
-      // not match the current request.  Treat this as a hard auth failure — the
-      // link may have been forwarded to an unauthorised device.
-      if (progress.bindingError) {
-        setBindingError(progress.bindingError);
-        setInitialized(true);
-        return;
       }
 
       // ── Participant ID tracking & Cache sync ─────────────────────────────────
@@ -179,9 +172,8 @@ export default function PenpalIntervention() {
 
       setAnswers(finalAnswers);
 
-      const searchParams = new URLSearchParams(window.location.search);
-      const showReport = searchParams.get("report") === "true";
-      const stepParam = searchParams.get("step");
+      const showReport = searchParams ? searchParams.get("report") === "true" : false;
+      const stepParam = searchParams ? searchParams.get("step") : null;
 
       if (progress.isAllCompleted || showReport) {
         setShowSummary(true);

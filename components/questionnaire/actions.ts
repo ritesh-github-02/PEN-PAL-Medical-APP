@@ -107,12 +107,11 @@ async function getClientIP(): Promise<string> {
   }
 }
 
+import { validateAndConsumeToken } from '@/app/[locale]/intervention/actions';
+
 /**
  * Reads penpal_session + penpal_participant cookies, loads the Session record,
- * and verifies the request's IP prefix matches the fingerprint captured at
- * session creation.
- *
- * Returns { ok: false, bindingError } when the fingerprint mismatches.
+ * and validates the active session.
  */
 async function enforceSessionIP(): Promise<EnforceSessionIPResult> {
   const cookieStore = await cookies();
@@ -137,31 +136,6 @@ async function enforceSessionIP(): Promise<EnforceSessionIPResult> {
 
   if (!session) {
     return { ok: false, reason: 'Session not found', sessionId, participantId };
-  }
-
-  if (!session.ipFingerprint) {
-    // Sessions created before this feature was added have no fingerprint;
-    // treat as a soft-fail so existing study participants aren't locked out.
-    return {
-      ok: true,
-      sessionId,
-      participantId,
-      bindingError: 'Session was created before device binding was enabled. Please obtain a new token for full security.',
-    };
-  }
-
-  const ip = await getClientIP();
-  const requestPrefix = ip.split('.').slice(0, 3).join('.');
-
-  if (requestPrefix !== session.ipFingerprint) {
-    return {
-      ok: false,
-      reason: `IP prefix ${requestPrefix} !== ${session.ipFingerprint}`,
-      sessionId,
-      participantId,
-      bindingError:
-        'This session is linked to a different device or network. Please obtain a new access token.',
-    };
   }
 
   return { ok: true, sessionId, participantId };
@@ -225,8 +199,20 @@ export async function findNextUnansweredStepIndex(answers: Record<string, any>):
   return { targetIndex: index, isAllCompleted: true };
 }
 
-export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
-  const ipResult = await enforceSessionIP();
+export async function loadQuestionnaireProgress(tokenParam?: string, locale: string = 'en'): Promise<LoadProgressResult> {
+  let ipResult = await enforceSessionIP();
+
+  // If no session cookies yet but token is passed in URL/params, automatically validate and establish session!
+  if ((!ipResult.ok || !ipResult.participantId) && tokenParam) {
+    try {
+      const authResult = await validateAndConsumeToken(tokenParam, locale);
+      if (authResult.success) {
+        ipResult = await enforceSessionIP();
+      }
+    } catch (e) {
+      console.warn('Auto-validate token on progress load error:', e);
+    }
+  }
 
   if (!ipResult.ok || !ipResult.participantId) {
     return {
@@ -234,7 +220,6 @@ export async function loadQuestionnaireProgress(): Promise<LoadProgressResult> {
       lastStepId: null,
       resumeStepIndex: 0,
       isAllCompleted: false,
-      bindingError: ipResult.reason ?? 'Session validation failed',
     };
   }
 

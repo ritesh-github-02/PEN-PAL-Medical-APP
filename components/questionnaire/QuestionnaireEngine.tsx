@@ -26,12 +26,6 @@ export default function QuestionnaireEngine() {
     async function init() {
       let progress = await loadQuestionnaireProgress();
 
-      if (progress.bindingError) {
-        setBindingError(progress.bindingError);
-        setInitialized(true);
-        return;
-      }
-
       // Fallback for preview environment via localStorage
       let localAnswers = false;
       if (!progress.lastStepId) {
