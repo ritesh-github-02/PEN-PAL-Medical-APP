@@ -1,19 +1,13 @@
 import { logout, validateAndConsumeToken } from '../intervention/actions';
-import { completeUserSession } from '@/lib/tracking';
 import { 
   ShieldCheck, 
-  BookOpen, 
   CheckCircle2, 
-  AlertCircle, 
   HelpCircle, 
   LogOut, 
-  FileCheck2,
-  PhoneCall,
   AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
 import ControlTracker from './ControlTracker';
-import ControlExitButton from './ControlExitButton';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -32,12 +26,6 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
     } catch {
       // Best-effort token consumption on landing
     }
-  }
-
-  async function handleFinishAndLogout() {
-    'use server';
-    await completeUserSession(`/${locale}/control`);
-    await logout();
   }
 
   return (
@@ -98,7 +86,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
                 className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-rose-900/50 hover:text-rose-200 border border-slate-700 text-slate-100 rounded-lg text-xs font-bold transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5 text-teal-300" aria-hidden="true" />
-                {isEs ? "Salir" : "Exit & Logout"}
+                {isEs ? "Salir" : "Exit"}
               </button>
             </form>
           </div>
@@ -249,11 +237,11 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
             </div>
             <div className="bg-white/90 border border-amber-200 rounded-lg p-3 text-xs font-bold text-slate-800 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-600" aria-hidden="true"></span>
-              {isEs ? "Sarpullido (por ejemplo, picazón, dolor en la piel o ampollas)" : "Rash (for example itching, painful skin, or skin blisters)"}
+              {isEs ? "Piel que se descama o se ampolla" : "Skin that is peeling or blistering"}
             </div>
             <div className="bg-white/90 border border-amber-200 rounded-lg p-3 text-xs font-bold text-slate-800 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-600" aria-hidden="true"></span>
-              {isEs ? "Fiebre alta" : "High fever"}
+              {isEs ? "Fiebre con una erupción que se propaga" : "Fever with a spreading rash"}
             </div>
           </div>
 
@@ -261,35 +249,6 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
             {isEs
               ? "Si tiene estos síntomas, debe llamar a su proveedor o acudir a una atención de urgencia. Si los síntomas son graves (como tener problemas para respirar), vaya al Departamento de Emergencias de inmediato."
               : "If you have these symptoms, you should call your provider or go to an urgent care. If the symptoms are severe (like having problems breathing), go to the Emergency Department right away."}
-          </div>
-        </div>
-
-        {/* Section: Participation Completion & Logout */}
-        <div id="section-completion" className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-6 sm:p-8 space-y-4 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center text-white shrink-0 shadow-xs" aria-hidden="true">
-              <FileCheck2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-emerald-950">
-                {isEs ? "Participación Completada" : "Participation Complete"}
-              </h3>
-              <p className="text-xs text-emerald-800 mt-0.5">
-                {isEs 
-                  ? "Gracias por revisar la información del Grupo de Control del estudio PEN-PAL."
-                  : "Thank you for reviewing the PEN-PAL Control Group research information."}
-              </p>
-            </div>
-          </div>
-
-          <p className="text-emerald-900 text-xs leading-relaxed border-t border-emerald-200/80 pt-3">
-            {isEs
-              ? "Su rol en este protocolo de estudio de investigación ha finalizado. Puede cerrar sesión o salir de la plataforma en cualquier momento."
-              : "Your role in this research study protocol is now complete. You may log out of the platform or return home at any time."}
-          </p>
-
-          <div className="pt-2 flex justify-end">
-            <ControlExitButton locale={locale} />
           </div>
         </div>
 

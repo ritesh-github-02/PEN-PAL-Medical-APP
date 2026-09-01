@@ -72,7 +72,6 @@ const CONTROL_HANDOUT_SECTIONS = [
   { id: 'section-infographic', sectionNumber: 3, title: 'Lose the Label Infographic', subtitle: '99 out of 100 Americans are not truly allergic to penicillin' },
   { id: 'section-take-challenge', sectionNumber: 4, title: 'Take the Challenge', subtitle: 'Safe 1-hour observed oral amoxicillin challenge at clinic' },
   { id: 'section-delayed-reactions', sectionNumber: 5, title: 'Delayed Medication Reactions Guide', subtitle: 'Safety symptoms to monitor: joint pain, rash, fever, and when to seek care' },
-  { id: 'section-completion', sectionNumber: 6, title: 'Participation Completion & Advice', subtitle: 'Confirmation of research review & advice to discuss with healthcare provider' },
 ];
 
 const STEP_LABELS_MAP: Record<string, { slideNumber: number; title: string; subtitle: string; type: string }> = Object.fromEntries(

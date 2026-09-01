@@ -32,7 +32,6 @@ export default function ControlTracker({ locale, token }: ControlTrackerProps) {
       'section-infographic',
       'section-take-challenge',
       'section-delayed-reactions',
-      'section-completion',
     ],
   });
 
