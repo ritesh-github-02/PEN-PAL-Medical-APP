@@ -307,7 +307,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by Participant ID (e.g. PEN-CAMP-001) or GUID..."
+            placeholder="Search by Participant ID (e.g. PEN-CAMP-001)..."
             className="w-full pl-10 pr-4 py-2 text-xs bg-slate-100 hover:bg-slate-200/70 focus:bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 font-medium transition-all shadow-2xs focus:outline-none focus:border-[#1d5c64] focus:ring-1 focus:ring-[#1d5c64]"
           />
           {searchTerm && (
@@ -381,7 +381,6 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                         <span className="font-mono font-bold text-slate-900 text-xs tracking-tight">
                           {formatDisplayId(p.externalId)}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono mt-0.5">GUID: {p.id.slice(0, 10)}...</span>
                       </div>
                     </td>
 

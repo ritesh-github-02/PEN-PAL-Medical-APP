@@ -142,7 +142,6 @@ export async function GET(request: Request) {
         return {
           Index: idx + 1,
           ParticipantID: r.participant?.externalId || r.participantId,
-          DatabaseGUID: r.participantId,
           StudyArm: r.participant?.groupId || 'N/A',
           CampaignName: r.participant?.campaign?.name || 'Unassigned',
           SlideNumber: stepInfo.slideNumber || 'N/A',
@@ -212,7 +211,6 @@ export async function GET(request: Request) {
         return {
           Index: idx + 1,
           ParticipantID: m.participant?.externalId || m.participantId,
-          DatabaseGUID: m.participantId,
           StudyArm: m.participant?.groupId || 'N/A',
           CampaignName: m.participant?.campaign?.name || 'Unassigned',
           SlideNumber: stepInfo.slideNumber,
@@ -280,7 +278,6 @@ export async function GET(request: Request) {
         return {
           Index: idx + 1,
           ParticipantID: p.externalId || p.id,
-          DatabaseGUID: p.id,
           StudyArm: p.groupId,
           CampaignName: p.campaign?.name || 'Unassigned',
           Status: p.status,

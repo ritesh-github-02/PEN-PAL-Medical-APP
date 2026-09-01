@@ -21,17 +21,32 @@ export async function logInteraction(eventType: string, eventData: any, path: st
       userAgent = h.get('user-agent') || 'unknown';
     } catch {}
 
-    await prisma.eventLog.create({
-      data: {
-        participantId: participantId || null,
-        sessionId: sessionId || null,
-        eventType: eventType,
-        eventData: eventData ? JSON.stringify(eventData) : null,
-        path: path || null,
-        ipAddress,
-        userAgent,
-      },
-    });
+    try {
+      await prisma.eventLog.create({
+        data: {
+          participantId: participantId || null,
+          sessionId: sessionId || null,
+          eventType: eventType,
+          eventData: eventData ? JSON.stringify(eventData) : null,
+          path: path || null,
+          ipAddress,
+          userAgent,
+        },
+      });
+    } catch (createErr: any) {
+      // If foreign key constraint failed (e.g. session was already deleted), safely fallback without foreign keys
+      if (createErr.code === 'P2003') {
+        await prisma.eventLog.create({
+          data: {
+            eventType: eventType,
+            eventData: eventData ? JSON.stringify(eventData) : null,
+            path: path || null,
+            ipAddress,
+            userAgent,
+          },
+        }).catch(() => {});
+      }
+    }
   } catch (error) {
     if (error instanceof Error && error.message.includes("Can't reach database server")) {
        return;

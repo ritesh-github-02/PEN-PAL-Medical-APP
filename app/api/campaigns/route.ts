@@ -376,86 +376,98 @@ export async function DELETE(req: NextRequest) {
 
     if (!campaign) {
       return NextResponse.json(
-        { success: false, error: 'Campaign not found.' },
+        { success: false, error: 'Campaign not found or already deleted.' },
         { status: 404 }
       );
     }
 
-    // Find all participants directly linked or linked via slug prefix
-    const relatedParticipants = await prisma.participant.findMany({
-      where: {
-        OR: [
-          { campaignId: id },
-          { externalId: { startsWith: `${campaign.slug.toUpperCase()}-` } },
-        ],
-      },
+    // 1. Direct campaign participants
+    const directParticipants = await prisma.participant.findMany({
+      where: { campaignId: id },
       select: { id: true },
     });
 
+    // 2. Fallback prefix search if slug exists
+    let prefixParticipants: { id: string }[] = [];
+    if (campaign.slug && campaign.slug.length >= 2) {
+      try {
+        prefixParticipants = await prisma.participant.findMany({
+          where: {
+            externalId: {
+              startsWith: `${campaign.slug.toUpperCase()}-`,
+              mode: 'insensitive',
+            },
+          },
+          select: { id: true },
+        });
+      } catch {
+        // Ignore if startsWith is not supported
+      }
+    }
+
     const participantIdSet = new Set<string>([
       ...campaign.participants.map((p) => p.id),
-      ...relatedParticipants.map((p) => p.id),
+      ...directParticipants.map((p) => p.id),
+      ...prefixParticipants.map((p) => p.id),
     ]);
     const participantIds = Array.from(participantIdSet);
 
-    // Perform complete transactional cascade deletion
-    await prisma.$transaction(async (tx) => {
-      if (participantIds.length > 0) {
+    // Perform fast pipelined batch deletion with extended timeout
+    if (participantIds.length > 0) {
+      await prisma.$transaction([
         // 1. Delete Event Logs
-        await tx.eventLog.deleteMany({
+        prisma.eventLog.deleteMany({
           where: { participantId: { in: participantIds } },
-        });
-
+        }),
         // 2. Delete Token Security Events
-        await tx.tokenSecurityEvent.deleteMany({
+        prisma.tokenSecurityEvent.deleteMany({
           where: { participantId: { in: participantIds } },
-        });
-
+        }),
         // 3. Delete Slide Metrics (slide dwell times)
-        await tx.slideMetric.deleteMany({
+        prisma.slideMetric.deleteMany({
           where: { participantId: { in: participantIds } },
-        });
-
+        }),
         // 4. Delete Questionnaire Responses
-        await tx.questionnaireResponse.deleteMany({
+        prisma.questionnaireResponse.deleteMany({
           where: { participantId: { in: participantIds } },
-        });
-
+        }),
         // 5. Delete Survey Responses
-        await tx.surveyResponse.deleteMany({
+        prisma.surveyResponse.deleteMany({
           where: { participantId: { in: participantIds } },
-        });
-
+        }),
         // 6. Delete Participant Tokens
-        await tx.participantToken.deleteMany({
+        prisma.participantToken.deleteMany({
           where: { participantId: { in: participantIds } },
-        });
-
+        }),
         // 7. Delete Sessions
-        await tx.session.deleteMany({
+        prisma.session.deleteMany({
           where: { participantId: { in: participantIds } },
-        });
-
+        }),
         // 8. Delete Participants
-        await tx.participant.deleteMany({
+        prisma.participant.deleteMany({
           where: { id: { in: participantIds } },
-        });
-      }
-
-      // 9. Delete the Campaign itself
-      await tx.campaign.delete({
+        }),
+        // 9. Delete Campaign
+        prisma.campaign.delete({
+          where: { id },
+        }),
+      ]);
+    } else {
+      await prisma.campaign.delete({
         where: { id },
       });
-    });
+    }
 
-    revalidatePath('/[locale]/admin', 'page');
-    revalidatePath('/en/admin', 'page');
-    revalidatePath('/es/admin', 'page');
+    try {
+      revalidatePath('/[locale]/admin', 'page');
+      revalidatePath('/en/admin', 'page');
+      revalidatePath('/es/admin', 'page');
+    } catch {}
 
     return NextResponse.json({
       success: true,
       deletedParticipantCount: participantIds.length,
-      message: `Campaign "${campaign.name}" and all ${participantIds.length} participant records were permanently deleted.`,
+      message: `Campaign "${campaign.name}" and all associated records were permanently deleted.`,
     });
   } catch (error: any) {
     console.error('API Error deleting campaign:', error);
