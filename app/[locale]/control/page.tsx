@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import ControlTracker from './ControlTracker';
+import ControlExitButton from './ControlExitButton';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -288,16 +289,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
           </p>
 
           <div className="pt-2 flex justify-end">
-            <form action={handleFinishAndLogout}>
-              <button 
-                type="submit"
-                aria-label={isEs ? "Finalizar y cerrar sesión" : "Finish and logout"}
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-2"
-              >
-                <LogOut className="w-3.5 h-3.5 text-teal-400" aria-hidden="true" />
-                {isEs ? "Finalizar y Salir" : "Finish & Logout"}
-              </button>
-            </form>
+            <ControlExitButton locale={locale} />
           </div>
         </div>
 
