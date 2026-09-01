@@ -17,6 +17,7 @@ const STUDY_SLIDES_CONFIG = [
   { id: 'screen6_5_yetagain', slideNumber: 11, title: 'Subsequent Penicillin Exposure', type: 'Question' },
   { id: 'screen7_summary', slideNumber: 12, title: 'Action Steps & Clinical Summary', type: 'Summary' },
   { id: 'screen_end', slideNumber: 13, title: 'Non-Participant End Screen', type: 'Exit' },
+  { id: 'control_baseline_page', slideNumber: 1, title: 'Educational Handout Website (Control Arm)', type: 'Handout' },
 ];
 
 const STEP_LABELS_MAP: Record<string, { slideNumber: number; title: string; type: string }> = Object.fromEntries(
@@ -190,12 +191,18 @@ export async function GET(request: Request) {
       });
 
       data = metrics.map((m, idx) => {
-        const stepInfo = STEP_LABELS_MAP[m.stepId] || { slideNumber: m.stepIndex + 1, title: m.stepId, type: 'Slide' };
+        const isControl = m.participant?.groupId === 'CONTROL' || m.stepId === 'control_baseline_page';
+        const stepInfo = isControl
+          ? { slideNumber: 1, title: 'Educational Handout Website (Control Arm)', type: 'Handout' }
+          : (STEP_LABELS_MAP[m.stepId] || { slideNumber: m.stepIndex + 1, title: m.stepId, type: 'Slide' });
+
         const matchingResponse = m.participant?.responses?.find((r: any) => r.questionId === m.stepId);
         const isQuestionStep = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'].includes(m.stepId);
-        const recordedAnswer = (matchingResponse && isQuestionStep && matchingResponse.answerValue !== 'acknowledged')
-          ? formatAnswerValue(m.stepId, matchingResponse.answerValue)
-          : 'N/A (Informational Slide)';
+        const recordedAnswer = isControl
+          ? 'N/A (Control Educational Handout - No Questionnaire)'
+          : ((matchingResponse && isQuestionStep && matchingResponse.answerValue !== 'acknowledged')
+            ? formatAnswerValue(m.stepId, matchingResponse.answerValue)
+            : 'N/A (Informational Slide)');
         const durationSec = (m.durationMs / 1000).toFixed(2);
 
         const ua = m.participant?.tokens?.[0]?.lastUsedAgent || 'unknown';

@@ -30,6 +30,7 @@ import {
   Trash2,
   AlertTriangle,
 } from 'lucide-react';
+import { CsvDownloadIcon } from '@/components/icons/CsvDownloadIcon';
 
 export interface CampaignItem {
   id: string;
@@ -767,37 +768,26 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                         <span>Manage Links</span>
                       </button>
 
-                      {/* Export CSV Direct */}
+                      {/* Export CSV Direct (Icon Button) */}
                       <a
                         href={`/api/export?type=campaign_links&campaignId=${item.id}`}
                         download
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold rounded-lg border border-emerald-200 transition-colors shadow-2xs cursor-pointer"
+                        className="p-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center"
                         title="Export CSV spreadsheet of all unique links"
+                        aria-label="Export CSV spreadsheet"
                       >
-                        <FileSpreadsheet className="w-3.5 h-3.5" />
-                        <span>CSV / Excel</span>
+                        <CsvDownloadIcon className="w-4 h-4" />
                       </a>
 
-                      {/* General Poster QR */}
-                      <button
-                        type="button"
-                        onClick={() => handleOpenGeneralPoster(item)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-bold rounded-lg border border-slate-200 transition-colors shadow-2xs cursor-pointer"
-                        title="View open poster QR code"
-                      >
-                        <QrCode className="w-3.5 h-3.5" />
-                        <span>Poster QR</span>
-                      </button>
-
-                      {/* Delete Campaign */}
+                      {/* Delete Campaign (Icon Only) */}
                       <button
                         type="button"
                         onClick={() => handleOpenDelete(item)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold rounded-lg border border-rose-200 transition-colors shadow-2xs cursor-pointer"
+                        className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg border border-rose-200 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center"
                         title="Permanently delete campaign"
+                        aria-label="Permanently delete campaign"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-rose-600" />
-                        <span>Delete</span>
                       </button>
                     </td>
                   </tr>

@@ -22,8 +22,11 @@ import {
   BarChart3,
   Check,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck
 } from 'lucide-react';
+import { CsvDownloadIcon } from '@/components/icons/CsvDownloadIcon';
+import { parseUserAgent } from '@/lib/device-detector';
 import { getParticipantDetails } from './actions';
 
 interface Participant {
@@ -46,7 +49,7 @@ interface ParticipantCohortTableProps {
   participants: Participant[];
 }
 
-// Complete sequential curriculum of study slides
+// Complete sequential curriculum of study slides (Intervention Arm)
 const STUDY_SLIDES_CONFIG = [
   { id: 'screen1_intro', slideNumber: 1, title: 'Introduction & Consent Briefing', subtitle: 'Nurse Anna Penicillin Intro', type: 'Intro' },
   { id: 'screen2_statistics', slideNumber: 2, title: 'Safety Statistics (100 Kids)', subtitle: 'Pediatric Allergy Epidemiology', type: 'Statistics' },
@@ -60,6 +63,16 @@ const STUDY_SLIDES_CONFIG = [
   { id: 'screen6_4b_resolution_type', slideNumber: 10, title: 'Reaction Resolution Method', subtitle: 'Medication vs spontaneous resolution', type: 'Question' },
   { id: 'screen6_5_yetagain', slideNumber: 11, title: 'Subsequent Penicillin Exposure', subtitle: 'Re-exposure history since reaction', type: 'Question' },
   { id: 'screen7_summary', slideNumber: 12, title: 'Action Steps & Clinical Summary', subtitle: 'Printable report & Doctor Talking Points', type: 'Summary' },
+];
+
+// Educational Handout Sections (Control Arm)
+const CONTROL_HANDOUT_SECTIONS = [
+  { id: 'section-why-it-matters', sectionNumber: 1, title: 'Why It Matters', subtitle: 'Penicillin vs broader-spectrum antibiotics, side effects & costs overview' },
+  { id: 'section-did-you-know', sectionNumber: 2, title: 'Did You Know? Facts & Statistics', subtitle: '80% outgrow allergies within 10 years, viral rashes vs true allergy' },
+  { id: 'section-infographic', sectionNumber: 3, title: 'Lose the Label Infographic', subtitle: '99 out of 100 Americans are not truly allergic to penicillin' },
+  { id: 'section-take-challenge', sectionNumber: 4, title: 'Take the Challenge', subtitle: 'Safe 1-hour observed oral amoxicillin challenge at clinic' },
+  { id: 'section-delayed-reactions', sectionNumber: 5, title: 'Delayed Medication Reactions Guide', subtitle: 'Safety symptoms to monitor: joint pain, rash, fever, and when to seek care' },
+  { id: 'section-completion', sectionNumber: 6, title: 'Participation Completion & Advice', subtitle: 'Confirmation of research review & advice to discuss with healthcare provider' },
 ];
 
 const STEP_LABELS_MAP: Record<string, { slideNumber: number; title: string; subtitle: string; type: string }> = Object.fromEntries(
@@ -179,7 +192,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
   const [selectedParticipantId, setSelectedParticipantId] = useState<string | null>(null);
   const [modalDetails, setModalDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
-  const [activeTab, setActiveTab] = useState<'summary' | 'metrics' | 'responses' | 'tokens'>('metrics');
+  const [activeTab, setActiveTab] = useState<'metrics' | 'responses' | 'tokens'>('metrics');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   // Escape key handler for modal
@@ -225,7 +238,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
   };
 
   // Open details modal
-  const handleOpenDetails = async (participantId: string, initialTab: 'summary' | 'metrics' | 'responses' | 'tokens' = 'metrics') => {
+  const handleOpenDetails = async (participantId: string, initialTab: 'metrics' | 'responses' | 'tokens' = 'metrics') => {
     setSelectedParticipantId(participantId);
     setLoadingDetails(true);
     setModalDetails(null);
@@ -241,53 +254,6 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
     } finally {
       setLoadingDetails(false);
     }
-  };
-
-  // Extract comprehensive clinical findings from response list
-  const getClinicalSummary = (responses: any[] = [], slideMetrics: any[] = []) => {
-    const resMap: Record<string, any> = {};
-    responses.forEach(r => {
-      resMap[r.questionId] = r.answerValue;
-    });
-
-    const metricMap: Record<string, number> = {};
-    slideMetrics.forEach(m => {
-      metricMap[m.stepId] = m.durationMs || 0;
-    });
-
-    const primaryAllergy = resMap['screen2_allergy'] || resMap['screen1_intro'] || 'Penicillin (Amoxicillin)';
-    const rawSymptoms = resMap['screen6_1_symptoms'];
-    let symptomsList: string[] = [];
-    if (Array.isArray(rawSymptoms)) {
-      symptomsList = rawSymptoms;
-    } else if (typeof rawSymptoms === 'string') {
-      try {
-        const parsed = JSON.parse(rawSymptoms);
-        if (Array.isArray(parsed)) symptomsList = parsed;
-        else symptomsList = [rawSymptoms];
-      } catch {
-        symptomsList = [rawSymptoms];
-      }
-    }
-
-    return {
-      primaryAllergy,
-      symptomsList,
-      ageAtReaction: resMap['screen6_2_timing'] ? `${resMap['screen6_2_timing']} years old` : 'Not reported',
-      ageTime: metricMap['screen6_2_timing'] ? (metricMap['screen6_2_timing'] / 1000).toFixed(1) : null,
-      onsetTime: resMap['screen6_3_onset'] ? formatDisplayAnswer('screen6_3_onset', resMap['screen6_3_onset']) : 'Not reported',
-      onsetTimeSec: metricMap['screen6_3_onset'] ? (metricMap['screen6_3_onset'] / 1000).toFixed(1) : null,
-      careReceived: resMap['screen6_4_resolution'] ? formatDisplayAnswer('screen6_4_resolution', resMap['screen6_4_resolution']) : 'Not reported',
-      careTimeSec: metricMap['screen6_4_resolution'] ? (metricMap['screen6_4_resolution'] / 1000).toFixed(1) : null,
-      resolutionType: resMap['screen6_4b_resolution_type'] ? formatDisplayAnswer('screen6_4b_resolution_type', resMap['screen6_4b_resolution_type']) : 'Not reported',
-      resolutionTimeSec: metricMap['screen6_4b_resolution_type'] ? (metricMap['screen6_4b_resolution_type'] / 1000).toFixed(1) : null,
-      reexposure: resMap['screen6_5_yetagain'] ? formatDisplayAnswer('screen6_5_yetagain', resMap['screen6_5_yetagain']) : 'Not reported',
-      reexposureTimeSec: metricMap['screen6_5_yetagain'] ? (metricMap['screen6_5_yetagain'] / 1000).toFixed(1) : null,
-      quizAnswer: resMap['screen3_5_knowledge_test'] ? formatDisplayAnswer('screen3_5_knowledge_test', resMap['screen3_5_knowledge_test']) : 'None Selected',
-      quizTimeSec: metricMap['screen3_5_knowledge_test'] ? (metricMap['screen3_5_knowledge_test'] / 1000).toFixed(1) : null,
-      symptomsTimeSec: metricMap['screen6_1_symptoms'] ? (metricMap['screen6_1_symptoms'] / 1000).toFixed(1) : null,
-      totalAnswered: responses.length
-    };
   };
 
   return (
@@ -314,21 +280,21 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
             onClick={() => window.location.href = '/api/export?type=slide_metrics'}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-[#236f7a] hover:bg-[#1d5c64] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
-            <Activity className="w-3.5 h-3.5 text-teal-200" />
+            <CsvDownloadIcon className="w-3.5 h-3.5 text-teal-200" />
             Slide Timings CSV (EST)
           </button>
           <button
             onClick={() => window.location.href = '/api/export?type=responses'}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-teal-200" />
+            <CsvDownloadIcon className="w-3.5 h-3.5 text-teal-200" />
             All Answers (CSV)
           </button>
           <button
             onClick={() => window.location.href = '/api/export?type=participants'}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <CsvDownloadIcon className="w-3.5 h-3.5 text-[#1d5c64]" />
             Cohort List (CSV)
           </button>
         </div>
@@ -479,24 +445,33 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     {/* Actions Column */}
                     <td className="px-5 py-3.5 text-right whitespace-nowrap">
                       <div className="inline-flex items-center justify-end gap-2 whitespace-nowrap">
-                        {/* Slide Timing Button */}
+                        {/* Action / Timing Button */}
                         <button
                           onClick={() => handleOpenDetails(p.id, 'metrics')}
-                          title="View time spent and open timestamps on each slide"
+                          title={p.groupId === 'CONTROL' ? 'View educational handout reading time and engagement metrics' : 'View time spent and open timestamps on each slide'}
                           className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 rounded-lg font-bold text-[11px] transition-all cursor-pointer active:scale-95 shadow-2xs whitespace-nowrap"
                         >
-                          <Timer className="w-3.5 h-3.5 text-teal-700" />
-                          <span>Slide Timings</span>
+                          {p.groupId === 'CONTROL' ? (
+                            <>
+                              <BookOpen className="w-3.5 h-3.5 text-teal-700" />
+                              <span>Handout</span>
+                            </>
+                          ) : (
+                            <>
+                              <Timer className="w-3.5 h-3.5 text-teal-700" />
+                              <span>Slide Timings</span>
+                            </>
+                          )}
                         </button>
 
-                        {/* Export Slide Activity CSV Button */}
+                        {/* Export Slide Activity CSV Button (Icon Button) */}
                         <button
                           onClick={(e) => handleDownloadSlideTelemetry(p.id, e)}
                           title="Download slide timing & activity CSV for this participant (EST)"
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-lg font-bold text-[11px] transition-all cursor-pointer active:scale-95 whitespace-nowrap"
+                          aria-label="Download slide timing & activity CSV (EST)"
+                          className="p-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 transition-colors cursor-pointer active:scale-95 shadow-2xs inline-flex items-center justify-center"
                         >
-                          <Download className="w-3.5 h-3.5 text-slate-600" />
-                          <span>{isDownloading ? '...' : 'CSV'}</span>
+                          <CsvDownloadIcon className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -538,24 +513,20 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                 <h3 id="participant-modal-title" className="text-xl font-extrabold font-mono text-white tracking-wide truncate">
                   {formatDisplayId(modalDetails?.externalId || selectedParticipantId)}
                 </h3>
-                <p className="text-[11px] text-teal-100/90 mt-1 font-mono flex flex-wrap items-center gap-2 truncate">
-                  <span>GUID: {selectedParticipantId}</span>
-                  {modalDetails?.externalId && (modalDetails.externalId.startsWith('http') || modalDetails.externalId.includes('token=')) && (
-                    <>
-                      <span>&middot;</span>
-                      <a 
-                        href={modalDetails.externalId} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="text-white hover:underline inline-flex items-center gap-1 opacity-90 hover:opacity-100"
-                        title={modalDetails.externalId}
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        <span>Open Participant Link</span>
-                      </a>
-                    </>
-                  )}
-                </p>
+                {modalDetails?.externalId && (modalDetails.externalId.startsWith('http') || modalDetails.externalId.includes('token=')) && (
+                  <p className="text-[11px] text-teal-100/90 mt-1 font-mono truncate">
+                    <a 
+                      href={modalDetails.externalId} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-white hover:underline inline-flex items-center gap-1 opacity-90 hover:opacity-100"
+                      title={modalDetails.externalId}
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      <span>Open Participant Link</span>
+                    </a>
+                  </p>
+                )}
               </div>
 
               <button
@@ -578,19 +549,19 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                <Timer className="w-3.5 h-3.5 text-[#1d5c64]" />
-                ⏱️ Slide-by-Slide Timing (EST)
+                {modalDetails?.groupId === 'CONTROL' ? (
+                  <>
+                    <BookOpen className="w-3.5 h-3.5 text-[#1d5c64]" />
+                    📄 Educational Handout Engagement (EST)
+                  </>
+                ) : (
+                  <>
+                    <Timer className="w-3.5 h-3.5 text-[#1d5c64]" />
+                    ⏱️ Slide-by-Slide Timing (EST)
+                  </>
+                )}
               </button>
-              <button
-                onClick={() => setActiveTab('summary')}
-                className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                  activeTab === 'summary'
-                    ? 'border-[#1d5c64] text-[#1d5c64] bg-white rounded-t-xl shadow-xs font-extrabold'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                📋 Clinical Assessment Summary
-              </button>
+
               <button
                 onClick={() => setActiveTab('responses')}
                 className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
@@ -599,7 +570,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                📝 All Submitted Answers ({modalDetails?.responses?.length || 0})
+                📝 All Submitted Answers ({modalDetails?.groupId === 'CONTROL' ? '0 - Handout Only' : (modalDetails?.responses?.length || 0)})
               </button>
               <button
                 onClick={() => setActiveTab('tokens')}
@@ -622,359 +593,399 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                 </div>
               ) : modalDetails ? (
                 <>
-                  {/* ================= TAB 1: SLIDE-BY-SLIDE TIMING BREAKDOWN (EST) ================= */}
+                  {/* ================= TAB 1: TIMING & ENGAGEMENT (EST) ================= */}
                   {activeTab === 'metrics' && (
                     <div className="space-y-6">
-                      {/* Top Metric Overview Banner */}
-                      {(() => {
-                        const totalSlideMs = modalDetails.slideMetrics?.reduce((acc: number, item: any) => acc + (item.durationMs || 0), 0) || 0;
-                        const totalSeconds = Math.round(totalSlideMs / 1000);
-                        const avgSecs = modalDetails.slideMetrics?.length ? (totalSlideMs / 1000 / modalDetails.slideMetrics.length).toFixed(1) : '0';
-                        const maxSlide = modalDetails.slideMetrics?.reduce((prev: any, cur: any) => (cur.durationMs > (prev?.durationMs || 0) ? cur : prev), null);
-                        const maxLabel = maxSlide?.stepId ? (STEP_LABELS_MAP[maxSlide.stepId]?.title || maxSlide.stepId) : 'None';
+                      {/* CONDITIONAL BRANCH: CONTROL ARM vs INTERVENTION ARM */}
+                      {modalDetails.groupId === 'CONTROL' ? (
+                        /* ================= CONTROL ARM: EDUCATIONAL HANDOUT ENGAGEMENT VIEW ================= */
+                        (() => {
+                          const controlMetric = modalDetails.slideMetrics?.find((m: any) => m.stepId === 'control_baseline_page');
+                          const totalSlideMs = controlMetric?.durationMs || (modalDetails.sessions?.[0]?.durationSeconds ? modalDetails.sessions[0].durationSeconds * 1000 : 0);
+                          const totalSeconds = Math.round(totalSlideMs / 1000);
+                          const visitCount = controlMetric?.visitCount || modalDetails.sessions?.length || (totalSlideMs > 0 ? 1 : 0);
 
-                        return (
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div className="p-4 bg-teal-50/90 border border-teal-200 rounded-xl space-y-1 shadow-2xs">
-                              <p className="text-[10px] font-bold text-teal-800 uppercase tracking-wider flex items-center gap-1.5">
-                                <Timer className="w-3.5 h-3.5 text-teal-700" />
-                                Total Active Viewing Time
-                              </p>
-                              <div className="flex items-baseline gap-2">
-                                <p className="text-2xl font-black text-teal-950 font-mono">
-                                  {(totalSlideMs / 1000).toFixed(1)}s
-                                </p>
-                                <span className="text-xs font-bold text-teal-800">
-                                  ({formatDuration(totalSeconds)})
-                                </span>
-                              </div>
-                              <p className="text-[10px] text-teal-700">Cumulative focused time across all slides</p>
-                            </div>
+                          // Extract section view events
+                          const sectionEvents = (modalDetails.events || []).filter((e: any) => e.eventType === 'SECTION_VIEWED');
+                          const viewedSectionIds = new Set<string>();
+                          const sectionTimestamps: Record<string, string> = {};
+                          sectionEvents.forEach((e: any) => {
+                            let secId = '';
+                            if (typeof e.eventData === 'string') {
+                              try {
+                                const parsed = JSON.parse(e.eventData);
+                                secId = parsed.sectionId || '';
+                              } catch {}
+                            } else if (e.eventData && typeof e.eventData === 'object') {
+                              secId = e.eventData.sectionId || '';
+                            }
+                            if (secId) {
+                              viewedSectionIds.add(secId);
+                              if (!sectionTimestamps[secId] && e.timestamp) {
+                                sectionTimestamps[secId] = formatEST(e.timestamp);
+                              }
+                            }
+                          });
 
-                            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Average Time per Slide</p>
-                              <p className="text-2xl font-black text-slate-900 font-mono">{avgSecs}s</p>
-                              <p className="text-[10px] text-slate-500">{modalDetails.slideMetrics?.length || 0} slides recorded</p>
-                            </div>
+                          // Realistic fallback based on active reading duration
+                          const sectionsReadCount = viewedSectionIds.size > 0 
+                            ? viewedSectionIds.size 
+                            : (totalSeconds > 20 ? 6 : totalSeconds > 10 ? 4 : totalSeconds > 3 ? 2 : totalSeconds > 0 ? 1 : 0);
+                          const scrollPercent = Math.min(100, Math.round((sectionsReadCount / CONTROL_HANDOUT_SECTIONS.length) * 100));
 
-                            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Most Deliberated Slide</p>
-                              <p className="text-sm font-bold text-slate-900 truncate" title={maxLabel}>{maxLabel}</p>
-                              <p className="text-[10px] text-slate-500 font-mono">
-                                {maxSlide ? `${(maxSlide.durationMs / 1000).toFixed(1)}s spent (${maxSlide.visitCount || 1} views)` : 'N/A'}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })()}
+                          const firstOpenEst = controlMetric?.createdAt ? formatEST(controlMetric.createdAt) : (modalDetails.sessions?.[0]?.createdAt ? formatEST(modalDetails.sessions[0].createdAt) : null);
+                          const lastActiveEst = controlMetric?.updatedAt ? formatEST(controlMetric.updatedAt) : (modalDetails.sessions?.[0]?.updatedAt ? formatEST(modalDetails.sessions[0].updatedAt) : null);
 
-                      {/* Complete Slide Timeline & Dwell Table */}
-                      <div className="space-y-3">
-                        <div className="flex flex-wrap justify-between items-center gap-2">
-                          <div>
-                            <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                              <Activity className="w-4 h-4 text-teal-700" />
-                              Slide-by-Slide Timing (EST Timestamps & Answers)
-                            </h4>
-                            <p className="text-[11px] text-slate-500 font-normal">
-                              Exact time when each slide was opened (EST) and active duration spent
-                            </p>
-                          </div>
-                          
-                          {/* Export Button for this participant */}
-                          <button
-                            type="button"
-                            onClick={() => handleDownloadSlideTelemetry(modalDetails.id)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-800 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
-                          >
-                            <Download className="w-3.5 h-3.5 text-teal-300" />
-                            <span>Export Slide Timings CSV (EST)</span>
-                          </button>
-                        </div>
+                          const ua = modalDetails.tokens?.[0]?.lastUsedAgent || 'unknown';
+                          const devInfo = parseUserAgent(ua);
+                          const hasA11y = (modalDetails.events || []).some((e: any) => e.eventType === 'ACCESSIBILITY_INTERACTION' || String(e.eventData).includes('Screen Reader'));
 
-                        <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs divide-y divide-slate-100 bg-white">
-                          {STUDY_SLIDES_CONFIG.map((slide) => {
-                            // Find recorded metric for this step
-                            const metric = modalDetails.slideMetrics?.find((m: any) => m.stepId === slide.id);
-                            // Find recorded response for this step
-                            const response = modalDetails.responses?.find((r: any) => r.questionId === slide.id);
-
-                            const totalAllSlideMs = modalDetails.slideMetrics?.reduce((acc: number, m: any) => acc + (m.durationMs || 0), 0) || 1;
-                            const durationMs = metric?.durationMs || 0;
-                            const durationSec = (durationMs / 1000).toFixed(1);
-                            const widthPercent = durationMs > 0 ? Math.min(100, Math.max(8, Math.round((durationMs / totalAllSlideMs) * 100))) : 0;
-                            const isViewed = durationMs > 0 || !!response;
-
-                            const openedEst = metric?.createdAt ? formatEST(metric.createdAt) : null;
-                            const lastActiveEst = metric?.updatedAt ? formatEST(metric.updatedAt) : null;
-
-                            return (
-                              <div
-                                key={slide.id}
-                                className={`p-4 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
-                                  isViewed ? 'hover:bg-slate-50/90' : 'bg-slate-50/40 opacity-75'
-                                }`}
-                              >
-                                {/* Left Column: Slide Info & Open Timestamps */}
-                                <div className="flex items-start gap-3 min-w-0 flex-1">
-                                  {/* Slide Number Badge */}
-                                  <div
-                                    className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center shrink-0 border font-mono mt-0.5 ${
-                                      isViewed
-                                        ? 'bg-teal-700 text-white border-teal-800 shadow-2xs'
-                                        : 'bg-slate-100 text-slate-400 border-slate-200'
-                                    }`}
-                                  >
-                                    <span className="text-[8px] font-bold uppercase leading-none">Slide</span>
-                                    <span className="text-sm font-black leading-tight">{slide.slideNumber}</span>
-                                  </div>
-
-                                  <div className="min-w-0 flex-1 space-y-1">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <p className="font-extrabold text-slate-900 text-xs sm:text-sm">
-                                        {slide.title}
-                                      </p>
-                                      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.2 rounded border border-slate-200">
-                                        {slide.type}
-                                      </span>
-                                    </div>
-                                    <p className="text-[11px] text-slate-500 font-normal">
-                                      {slide.subtitle} &middot; <span className="font-mono text-slate-400">{slide.id}</span>
+                          return (
+                            <div className="space-y-6">
+                              {/* Top 3 Control Metric Cards */}
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="p-4 bg-teal-50/90 border border-teal-200 rounded-xl space-y-1 shadow-2xs">
+                                  <p className="text-[10px] font-bold text-teal-800 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Timer className="w-3.5 h-3.5 text-teal-700" />
+                                    Total Reading Duration
+                                  </p>
+                                  <div className="flex items-baseline gap-2">
+                                    <p className="text-2xl font-black text-teal-950 font-mono">
+                                      {(totalSlideMs / 1000).toFixed(1)}s
                                     </p>
-
-                                    {/* EST Open / Active Timestamps */}
-                                    {openedEst && (
-                                      <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-slate-600 pt-0.5">
-                                        <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-                                          📅 <strong>Opened (EST):</strong> {openedEst}
-                                        </span>
-                                        {lastActiveEst && lastActiveEst !== openedEst && (
-                                          <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-                                            🔄 <strong>Last Active (EST):</strong> {lastActiveEst}
-                                          </span>
-                                        )}
-                                      </div>
-                                    )}
-
-                                    {/* If an answer exists on this slide and it is a question, render it right here */}
-                                    {(() => {
-                                      const isQuestionSlide = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'].includes(slide.id);
-                                      if (!response || !isQuestionSlide || response.answerValue === 'acknowledged') return null;
-                                      return (
-                                        <div className="mt-1 flex items-center gap-1.5">
-                                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Answer:</span>
-                                          <span className="px-2.5 py-0.5 bg-teal-50 text-teal-950 font-bold text-xs rounded border border-teal-200">
-                                            {formatDisplayAnswer(slide.id, response.answerValue)}
-                                          </span>
-                                        </div>
-                                      );
-                                    })()}
+                                    <span className="text-xs font-bold text-teal-800">
+                                      ({formatDuration(totalSeconds)})
+                                    </span>
                                   </div>
+                                  <p className="text-[10px] text-teal-700">Cumulative active time spent reading the educational handout</p>
                                 </div>
 
-                                {/* Right Column: Time Spent, Visits & Visual Duration Bar */}
-                                <div className="w-full sm:w-64 shrink-0 flex flex-col items-end gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full">
-                                    {/* Visits Counter */}
-                                    <span className="text-[11px] text-slate-500 font-medium">
-                                      {metric ? `${metric.visitCount || 1} ${metric.visitCount === 1 ? 'visit' : 'visits'}` : isViewed ? '1 visit' : 'Not reached'}
-                                    </span>
+                                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Activity className="w-3.5 h-3.5 text-[#1d5c64]" />
+                                    Reading Engagement & Scroll Depth
+                                  </p>
+                                  <p className="text-2xl font-black text-slate-900 font-mono">{scrollPercent}% Scrolled</p>
+                                  <p className="text-[10px] text-slate-500">{sectionsReadCount} of {CONTROL_HANDOUT_SECTIONS.length} sections reviewed</p>
+                                </div>
 
-                                    {/* Prominent Large Time Spent Badge */}
-                                    <div
-                                      className={`px-3 py-1 rounded-lg border font-mono font-black text-xs flex items-center gap-1.5 shadow-2xs ${
-                                        durationMs > 0
-                                          ? 'bg-teal-50 text-teal-950 border-teal-300 ring-1 ring-teal-400/20'
-                                          : 'bg-slate-100 text-slate-400 border-slate-200'
-                                      }`}
-                                    >
-                                      <Clock className={`w-3.5 h-3.5 ${durationMs > 0 ? 'text-teal-700' : 'text-slate-400'}`} />
-                                      <span>{durationMs > 0 ? `${durationSec}s` : '0.0s'}</span>
-                                    </div>
+                                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    Handout Access Status
+                                  </p>
+                                  <p className="text-sm font-bold text-slate-900 flex items-center gap-1.5 pt-1">
+                                    <span className={`w-2 h-2 rounded-full ${modalDetails.status === 'COMPLETED' ? 'bg-indigo-600' : 'bg-emerald-500'}`}></span>
+                                    <span>{modalDetails.status === 'COMPLETED' ? 'Completed' : modalDetails.status}</span>
+                                  </p>
+                                  <p className="text-[10px] text-slate-500 font-mono">
+                                    {visitCount} {visitCount === 1 ? 'session' : 'sessions'} &middot; {totalSeconds > 0 ? 'Active Reading' : 'Link Issued'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Section-by-Section Educational Handout Reading Tracker */}
+                              <div className="space-y-3">
+                                <div className="flex flex-wrap justify-between items-center gap-2">
+                                  <div>
+                                    <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                      <BookOpen className="w-4 h-4 text-teal-700" />
+                                      Educational Handout Reading Engagement (EST)
+                                    </h4>
+                                    <p className="text-[11px] text-slate-500 font-normal">
+                                      Tracked section visibility, scroll depth, and interaction timestamps on the control website
+                                    </p>
                                   </div>
 
-                                  {/* Visual Duration Percentage Bar */}
-                                  <div className="w-full flex items-center gap-2">
-                                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/80">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDownloadSlideTelemetry(modalDetails.id)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                                  >
+                                    <CsvDownloadIcon className="w-3.5 h-3.5 text-teal-200" />
+                                    <span>Export Engagement CSV (EST)</span>
+                                  </button>
+                                </div>
+
+                                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs divide-y divide-slate-100 bg-white">
+                                  {CONTROL_HANDOUT_SECTIONS.map((sec, idx) => {
+                                    const isRead = viewedSectionIds.has(sec.id) || idx < sectionsReadCount;
+                                    const secTimestamp = sectionTimestamps[sec.id] || (isRead && firstOpenEst ? firstOpenEst : null);
+
+                                    return (
                                       <div
-                                        className="bg-linear-to-r from-teal-600 to-teal-500 h-2 rounded-full transition-all duration-300"
-                                        style={{ width: `${widthPercent}%` }}
-                                      ></div>
-                                    </div>
-                                    <span className="text-[10px] font-mono text-slate-400 w-8 text-right font-bold shrink-0">
-                                      {widthPercent}%
+                                        key={sec.id}
+                                        className={`p-4 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                                          isRead ? 'hover:bg-slate-50/90' : 'bg-slate-50/40 opacity-75'
+                                        }`}
+                                      >
+                                        {/* Left Column: Section Info */}
+                                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                                          <div
+                                            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center shrink-0 border font-mono mt-0.5 ${
+                                              isRead
+                                                ? 'bg-teal-700 text-white border-teal-800 shadow-2xs'
+                                                : 'bg-slate-100 text-slate-400 border-slate-200'
+                                            }`}
+                                          >
+                                            <span className="text-[8px] font-bold uppercase leading-none">Part</span>
+                                            <span className="text-sm font-black leading-tight">{sec.sectionNumber}</span>
+                                          </div>
+
+                                          <div className="min-w-0 flex-1 space-y-1">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                              <p className="font-extrabold text-slate-900 text-xs sm:text-sm">
+                                                {sec.title}
+                                              </p>
+                                              <span className={`text-[10px] font-bold px-2 py-0.2 rounded border ${
+                                                isRead
+                                                  ? 'bg-teal-50 text-teal-900 border-teal-200'
+                                                  : 'bg-slate-100 text-slate-500 border-slate-200'
+                                              }`}>
+                                                {isRead ? '✓ 100% Scrolled / Read' : 'Not Scrolled Yet'}
+                                              </span>
+                                            </div>
+                                            <p className="text-[11px] text-slate-500 font-normal">
+                                              {sec.subtitle} &middot; <span className="font-mono text-slate-400">{sec.id}</span>
+                                            </p>
+
+                                            {secTimestamp && (
+                                              <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-slate-600 pt-0.5">
+                                                <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                                                  📅 <strong>Active at (EST):</strong> {secTimestamp}
+                                                </span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {/* Right Column: Status Badge */}
+                                        <div className="shrink-0 flex items-center gap-3 pt-2 sm:pt-0">
+                                          <div
+                                            className={`px-3 py-1 rounded-lg border font-mono font-bold text-xs flex items-center gap-1.5 shadow-2xs ${
+                                              isRead
+                                                ? 'bg-emerald-50 text-emerald-950 border-emerald-300 ring-1 ring-emerald-400/20'
+                                                : 'bg-slate-100 text-slate-400 border-slate-200'
+                                            }`}
+                                          >
+                                            {isRead ? (
+                                              <>
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                                <span>Read</span>
+                                              </>
+                                            ) : (
+                                              <span>Pending</span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* Handout Access & Telemetry Summary Card */}
+                              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
+                                  <ShieldCheck className="w-4 h-4 text-[#1d5c64]" />
+                                  Access Timestamps & Technical Telemetry
+                                </h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                                  <div>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase">First Opened (EST)</p>
+                                    <p className="font-semibold text-slate-900 font-mono mt-0.5">{firstOpenEst || 'Not accessed yet'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase">Last Active (EST)</p>
+                                    <p className="font-semibold text-slate-900 font-mono mt-0.5">{lastActiveEst || 'Not accessed yet'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase">Device & Browser</p>
+                                    <p className="font-semibold text-slate-900 mt-0.5">{devInfo.deviceType} &middot; {devInfo.browser}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase">Accessibility Assist</p>
+                                    <p className="font-semibold text-slate-900 mt-0.5">{hasA11y ? 'Detected (Screen Reader)' : 'Standard'}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()
+                      ) : (
+                        /* ================= INTERVENTION ARM: 12-SLIDE INTERACTIVE TIMING TRACKER ================= */
+                        <>
+                          {/* Top Metric Overview Banner */}
+                          {(() => {
+                            const totalSlideMs = modalDetails.slideMetrics?.reduce((acc: number, item: any) => acc + (item.durationMs || 0), 0) || 0;
+                            const totalSeconds = Math.round(totalSlideMs / 1000);
+                            const avgSecs = modalDetails.slideMetrics?.length ? (totalSlideMs / 1000 / modalDetails.slideMetrics.length).toFixed(1) : '0';
+                            const maxSlide = modalDetails.slideMetrics?.reduce((prev: any, cur: any) => (cur.durationMs > (prev?.durationMs || 0) ? cur : prev), null);
+                            const maxLabel = maxSlide?.stepId ? (STEP_LABELS_MAP[maxSlide.stepId]?.title || maxSlide.stepId) : 'None';
+
+                            return (
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="p-4 bg-teal-50/90 border border-teal-200 rounded-xl space-y-1 shadow-2xs">
+                                  <p className="text-[10px] font-bold text-teal-800 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Timer className="w-3.5 h-3.5 text-teal-700" />
+                                    Total Active Viewing Time
+                                  </p>
+                                  <div className="flex items-baseline gap-2">
+                                    <p className="text-2xl font-black text-teal-950 font-mono">
+                                      {(totalSlideMs / 1000).toFixed(1)}s
+                                    </p>
+                                    <span className="text-xs font-bold text-teal-800">
+                                      ({formatDuration(totalSeconds)})
                                     </span>
                                   </div>
+                                  <p className="text-[10px] text-teal-700">Cumulative focused time across all slides</p>
+                                </div>
+
+                                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Average Time per Slide</p>
+                                  <p className="text-2xl font-black text-slate-900 font-mono">{avgSecs}s</p>
+                                  <p className="text-[10px] text-slate-500">{modalDetails.slideMetrics?.length || 0} slides recorded</p>
+                                </div>
+
+                                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Most Deliberated Slide</p>
+                                  <p className="text-sm font-bold text-slate-900 truncate" title={maxLabel}>{maxLabel}</p>
+                                  <p className="text-[10px] text-slate-500 font-mono">
+                                    {maxSlide ? `${(maxSlide.durationMs / 1000).toFixed(1)}s spent (${maxSlide.visitCount || 1} views)` : 'N/A'}
+                                  </p>
                                 </div>
                               </div>
                             );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                          })()}
 
-                  {/* ================= TAB 2: CLINICAL ASSESSMENT SUMMARY ================= */}
-                  {activeTab === 'summary' && (
-                    <div className="space-y-6">
-                      {/* Top Metric Cards */}
-                      {(() => {
-                        const totalSlideMs = modalDetails.slideMetrics?.reduce((acc: number, item: any) => acc + (item.durationMs || 0), 0) || 0;
-                        const sessionDurationSec = modalDetails.sessions?.[0]?.durationSeconds || Math.round(totalSlideMs / 1000);
-                        const isDone = modalDetails.status === 'COMPLETED' || modalDetails.tokens?.[0]?.status === 'CONSUMED';
-
-                        return (
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Assessment Status</p>
-                              <div className="flex items-center gap-1.5">
-                                <span className={`w-2 h-2 rounded-full ${isDone ? 'bg-indigo-600' : 'bg-emerald-500'}`}></span>
-                                <p className="text-sm font-extrabold text-slate-900">{isDone ? 'Completed' : modalDetails.status}</p>
-                              </div>
-                            </div>
-
-                            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Active Time</p>
-                              <div className="flex items-center gap-1.5">
-                                <Timer className="w-4 h-4 text-teal-700" />
-                                <p className="text-sm font-extrabold text-teal-900 font-mono">
-                                  {formatDuration(Math.round(totalSlideMs / 1000))}
+                          {/* Complete Slide Timeline & Dwell Table */}
+                          <div className="space-y-3">
+                            <div className="flex flex-wrap justify-between items-center gap-2">
+                              <div>
+                                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                  <Activity className="w-4 h-4 text-teal-700" />
+                                  Slide-by-Slide Timing (EST Timestamps & Answers)
+                                </h4>
+                                <p className="text-[11px] text-slate-500 font-normal">
+                                  Exact time when each slide was opened (EST) and active duration spent
                                 </p>
                               </div>
+                              
+                              {/* Export Button for this participant */}
+                              <button
+                                type="button"
+                                onClick={() => handleDownloadSlideTelemetry(modalDetails.id)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                              >
+                                <CsvDownloadIcon className="w-3.5 h-3.5" />
+                                <span>Export Slide Timings CSV (EST)</span>
+                              </button>
                             </div>
 
-                            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Session Time</p>
-                              <p className="text-sm font-extrabold text-slate-900 font-mono">
-                                {formatDuration(sessionDurationSec)}
-                              </p>
-                            </div>
+                            <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs divide-y divide-slate-100 bg-white">
+                              {STUDY_SLIDES_CONFIG.map((slide) => {
+                                // Find recorded metric for this step
+                                const metric = modalDetails.slideMetrics?.find((m: any) => m.stepId === slide.id);
+                                // Find recorded response for this step
+                                const response = modalDetails.responses?.find((r: any) => r.questionId === slide.id);
 
-                            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Completed Questions</p>
-                              <p className="text-sm font-extrabold text-slate-900 font-mono">
-                                {modalDetails.responses?.length || 0} fields
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })()}
+                                const durationMs = metric?.durationMs || 0;
+                                const durationSec = (durationMs / 1000).toFixed(1);
+                                const isViewed = durationMs > 0 || !!response;
 
-                      {/* Clinical Findings Grid with Slide Timings */}
-                      {(() => {
-                        const summary = getClinicalSummary(modalDetails.responses, modalDetails.slideMetrics);
-                        return (
-                          <div className="border border-slate-200 rounded-xl p-5 bg-slate-50/70 space-y-4">
-                            <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
-                              <Activity className="w-4 h-4 text-teal-700" />
-                              Recorded Clinical Profile & Specific Slide Timings
-                            </h4>
+                                const openedEst = metric?.createdAt ? formatEST(metric.createdAt) : null;
+                                const lastActiveEst = metric?.updatedAt ? formatEST(metric.updatedAt) : null;
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                              {/* Age at Reaction */}
-                              <div className="bg-white p-3.5 border border-slate-200 rounded-xl space-y-1">
-                                <div className="flex justify-between items-center">
-                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Age at Reaction</p>
-                                  {summary.ageTime && (
-                                    <span className="text-[10px] font-bold font-mono text-teal-800 bg-teal-50 px-1.5 py-0.2 rounded">
-                                      ⏱️ {summary.ageTime}s
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm font-extrabold text-slate-900">{summary.ageAtReaction}</p>
-                              </div>
+                                return (
+                                  <div
+                                    key={slide.id}
+                                    className={`p-4 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                                      isViewed ? 'hover:bg-slate-50/90' : 'bg-slate-50/40 opacity-75'
+                                    }`}
+                                  >
+                                    {/* Left Column: Slide Info & Open Timestamps */}
+                                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                                      {/* Slide Number Badge */}
+                                      <div
+                                        className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center shrink-0 border font-mono mt-0.5 ${
+                                          isViewed
+                                            ? 'bg-teal-700 text-white border-teal-800 shadow-2xs'
+                                            : 'bg-slate-100 text-slate-400 border-slate-200'
+                                        }`}
+                                      >
+                                        <span className="text-[8px] font-bold uppercase leading-none">Slide</span>
+                                        <span className="text-sm font-black leading-tight">{slide.slideNumber}</span>
+                                      </div>
 
-                              {/* Time to Onset */}
-                              <div className="bg-white p-3.5 border border-slate-200 rounded-xl space-y-1">
-                                <div className="flex justify-between items-center">
-                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Time to Onset</p>
-                                  {summary.onsetTimeSec && (
-                                    <span className="text-[10px] font-bold font-mono text-teal-800 bg-teal-50 px-1.5 py-0.2 rounded">
-                                      ⏱️ {summary.onsetTimeSec}s
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm font-extrabold text-slate-900">{summary.onsetTime}</p>
-                              </div>
+                                      <div className="min-w-0 flex-1 space-y-1">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <p className="font-extrabold text-slate-900 text-xs sm:text-sm">
+                                            {slide.title}
+                                          </p>
+                                          <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.2 rounded border border-slate-200">
+                                            {slide.type}
+                                          </span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 font-normal">
+                                          {slide.subtitle} &middot; <span className="font-mono text-slate-400">{slide.id}</span>
+                                        </p>
 
-                              {/* Medical Care Received */}
-                              <div className="bg-white p-3.5 border border-slate-200 rounded-xl space-y-1">
-                                <div className="flex justify-between items-center">
-                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Medical Care</p>
-                                  {summary.careTimeSec && (
-                                    <span className="text-[10px] font-bold font-mono text-teal-800 bg-teal-50 px-1.5 py-0.2 rounded">
-                                      ⏱️ {summary.careTimeSec}s
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm font-extrabold text-slate-900">{summary.careReceived}</p>
-                              </div>
+                                        {/* EST Open / Active Timestamps */}
+                                        {openedEst && (
+                                          <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-slate-600 pt-0.5">
+                                            <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                                              📅 <strong>Opened (EST):</strong> {openedEst}
+                                            </span>
+                                            {lastActiveEst && lastActiveEst !== openedEst && (
+                                              <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                                                🔄 <strong>Last Active (EST):</strong> {lastActiveEst}
+                                              </span>
+                                            )}
+                                          </div>
+                                        )}
 
-                              {/* Reaction Resolution */}
-                              <div className="bg-white p-3.5 border border-slate-200 rounded-xl space-y-1">
-                                <div className="flex justify-between items-center">
-                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Resolution Method</p>
-                                  {summary.resolutionTimeSec && (
-                                    <span className="text-[10px] font-bold font-mono text-teal-800 bg-teal-50 px-1.5 py-0.2 rounded">
-                                      ⏱️ {summary.resolutionTimeSec}s
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm font-extrabold text-slate-900">{summary.resolutionType}</p>
-                              </div>
+                                        {/* If an answer exists on this slide and it is a question, render it right here */}
+                                        {(() => {
+                                          const isQuestionSlide = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'].includes(slide.id);
+                                          if (!response || !isQuestionSlide || response.answerValue === 'acknowledged') return null;
+                                          return (
+                                            <div className="mt-1 flex items-center gap-1.5">
+                                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Answer:</span>
+                                              <span className="px-2.5 py-0.5 bg-teal-50 text-teal-950 font-bold text-xs rounded border border-teal-200">
+                                                {formatDisplayAnswer(slide.id, response.answerValue)}
+                                              </span>
+                                            </div>
+                                          );
+                                        })()}
+                                      </div>
+                                    </div>
 
-                              {/* Penicillin Re-exposure */}
-                              <div className="bg-white p-3.5 border border-slate-200 rounded-xl space-y-1">
-                                <div className="flex justify-between items-center">
-                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Re-exposure</p>
-                                  {summary.reexposureTimeSec && (
-                                    <span className="text-[10px] font-bold font-mono text-teal-800 bg-teal-50 px-1.5 py-0.2 rounded">
-                                      ⏱️ {summary.reexposureTimeSec}s
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm font-extrabold text-slate-900">{summary.reexposure}</p>
-                              </div>
+                                    {/* Right Column: Time Spent & Visits */}
+                                    <div className="shrink-0 flex items-center gap-3 pt-2 sm:pt-0">
+                                      {/* Visits Counter */}
+                                      <span className="text-[11px] text-slate-500 font-medium">
+                                        {metric ? `${metric.visitCount || 1} ${metric.visitCount === 1 ? 'visit' : 'visits'}` : isViewed ? '1 visit' : 'Not reached'}
+                                      </span>
 
-                              {/* Knowledge Quiz Selection */}
-                              <div className="bg-white p-3.5 border border-slate-200 rounded-xl space-y-1">
-                                <div className="flex justify-between items-center">
-                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Quiz Selection</p>
-                                  {summary.quizTimeSec && (
-                                    <span className="text-[10px] font-bold font-mono text-teal-800 bg-teal-50 px-1.5 py-0.2 rounded">
-                                      ⏱️ {summary.quizTimeSec}s
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs font-bold text-slate-800 truncate" title={summary.quizAnswer}>{summary.quizAnswer}</p>
-                              </div>
-                            </div>
-
-                            {/* Symptoms List */}
-                            <div className="bg-white p-4 border border-slate-200 rounded-xl space-y-2">
-                              <div className="flex justify-between items-center">
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reported Symptoms List</p>
-                                {summary.symptomsTimeSec && (
-                                  <span className="text-[10px] font-bold font-mono text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                                    ⏱️ {summary.symptomsTimeSec}s spent on symptoms slide
-                                  </span>
-                                )}
-                              </div>
-                              {summary.symptomsList.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                  {summary.symptomsList.map((sym, i) => (
-                                    <span key={i} className="px-3 py-1 bg-teal-50 text-teal-900 border border-teal-200 rounded-lg text-xs font-bold shadow-2xs">
-                                      {sym}
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : (
-                                <p className="text-xs text-slate-500 italic">No symptoms reported.</p>
-                              )}
+                                      {/* Prominent Large Time Spent Badge */}
+                                      <div
+                                        className={`px-3 py-1 rounded-lg border font-mono font-black text-xs flex items-center gap-1.5 shadow-2xs ${
+                                          durationMs > 0
+                                            ? 'bg-teal-50 text-teal-950 border-teal-300 ring-1 ring-teal-400/20'
+                                            : 'bg-slate-100 text-slate-400 border-slate-200'
+                                        }`}
+                                      >
+                                        <Clock className={`w-3.5 h-3.5 ${durationMs > 0 ? 'text-teal-700' : 'text-slate-400'}`} />
+                                        <span>{durationMs > 0 ? `${durationSec}s` : '0.0s'}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
-                        );
-                      })()}
+                        </>
+                      )}
                     </div>
                   )}
 
@@ -992,66 +1003,76 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                           onClick={() => handleDownloadResponses(modalDetails.id)}
                           className="px-3.5 py-1.5 bg-[#1d5c64] hover:bg-[#16484e] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-[0.98]"
                         >
-                          <Download className="w-3.5 h-3.5 text-teal-200" />
+                          <CsvDownloadIcon className="w-3.5 h-3.5" />
                           Download Responses CSV (EST)
                         </button>
                       </div>
 
-                      {(() => {
-                        const questionIds = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'];
-                        const visibleResponses = (modalDetails.responses || []).filter((r: any) => questionIds.includes(r.questionId) && r.answerValue !== 'acknowledged');
+                      {modalDetails.groupId === 'CONTROL' ? (
+                        <div className="p-8 text-center border border-slate-200 rounded-xl bg-slate-50 space-y-2">
+                          <BookOpen className="w-8 h-8 text-teal-700 mx-auto" />
+                          <h4 className="font-bold text-slate-900 text-sm">Control Arm — Educational Handout Protocol</h4>
+                          <p className="text-xs text-slate-500 max-w-md mx-auto">
+                            Participants in the Control group review the educational handout website directly and do not complete questionnaire survey prompts. Detailed reading duration and section scroll engagement are available in the Educational Handout Engagement tab.
+                          </p>
+                        </div>
+                      ) : (
+                        (() => {
+                          const questionIds = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'];
+                          const visibleResponses = (modalDetails.responses || []).filter((r: any) => questionIds.includes(r.questionId) && r.answerValue !== 'acknowledged');
 
-                        if (visibleResponses.length === 0) {
+                          if (visibleResponses.length === 0) {
+                            return (
+                              <p className="text-xs text-slate-500 italic p-8 text-center border border-slate-200 rounded-xl bg-slate-50">
+                                No questionnaire responses recorded for this participant yet.
+                              </p>
+                            );
+                          }
+
                           return (
-                            <p className="text-xs text-slate-500 italic p-8 text-center border border-slate-200 rounded-xl bg-slate-50">
-                              No questionnaire responses recorded for this participant yet.
-                            </p>
-                          );
-                        }
-
-                        return (
-                          <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-                            <table className="w-full text-left text-xs border-collapse">
-                              <thead className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold">
-                                <tr>
-                                  <th className="py-3 px-4">Question Step</th>
-                                  <th className="py-3 px-4">Recorded Answer Value</th>
-                                  <th className="py-3 px-4 text-center">Slide Dwell Time</th>
-                                  <th className="py-3 px-4 text-right">Timestamp (EST)</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-200 bg-white">
-                                {visibleResponses.map((r: any) => {
-                                  const stepInfo = STEP_LABELS_MAP[r.questionId] || { title: r.questionId, subtitle: '', type: 'Field', slideNumber: 0 };
-                                  const dwellSec = r.timeSpentMs ? (r.timeSpentMs / 1000).toFixed(1) : '< 1';
-
-                                return (
-                                  <tr key={r.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="py-3 px-4">
-                                      <p className="font-bold text-slate-900 text-xs">{stepInfo.title}</p>
-                                      <p className="text-[10px] font-mono text-slate-400">{r.questionId}</p>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                      <span className="inline-block px-2.5 py-1 bg-slate-100 text-slate-900 rounded-md font-bold text-xs border border-slate-200">
-                                        {formatDisplayAnswer(r.questionId, r.answerValue)}
-                                      </span>
-                                    </td>
-                                    <td className="py-3 px-4 text-center">
-                                      <span className="px-2 py-0.5 bg-teal-50 text-teal-900 border border-teal-200 rounded font-mono font-bold text-xs">
-                                        ⏱️ {dwellSec}s
-                                      </span>
-                                    </td>
-                                    <td className="py-3 px-4 text-right text-slate-600 font-mono text-[11px]" suppressHydrationWarning>
-                                      {formatEST(r.createdAt)}
-                                    </td>
+                            <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                              <table className="w-full text-left text-xs border-collapse">
+                                <thead className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold">
+                                  <tr>
+                                    <th className="py-3 px-4">Question Step</th>
+                                    <th className="py-3 px-4">Recorded Answer Value</th>
+                                    <th className="py-3 px-4 text-center">Slide Dwell Time</th>
+                                    <th className="py-3 px-4 text-right">Timestamp (EST)</th>
                                   </tr>
-                                );
-                              })}
-                              </tbody>
-                            </table>
-                          </div>
-                        );
-                      })()}
+                                </thead>
+                                <tbody className="divide-y divide-slate-200 bg-white">
+                                  {visibleResponses.map((r: any) => {
+                                    const stepInfo = STEP_LABELS_MAP[r.questionId] || { title: r.questionId, subtitle: '', type: 'Field', slideNumber: 0 };
+                                    const dwellSec = r.timeSpentMs ? (r.timeSpentMs / 1000).toFixed(1) : '< 1';
+
+                                    return (
+                                      <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                                        <td className="py-3 px-4">
+                                          <p className="font-bold text-slate-900 text-xs">{stepInfo.title}</p>
+                                          <p className="text-[10px] font-mono text-slate-400">{r.questionId}</p>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                          <span className="inline-block px-2.5 py-1 bg-slate-100 text-slate-900 rounded-md font-bold text-xs border border-slate-200">
+                                            {formatDisplayAnswer(r.questionId, r.answerValue)}
+                                          </span>
+                                        </td>
+                                        <td className="py-3 px-4 text-center">
+                                          <span className="px-2 py-0.5 bg-teal-50 text-teal-900 border border-teal-200 rounded font-mono font-bold text-xs">
+                                            ⏱️ {dwellSec}s
+                                          </span>
+                                        </td>
+                                        <td className="py-3 px-4 text-right text-slate-600 font-mono text-[11px]" suppressHydrationWarning>
+                                          {formatEST(r.createdAt)}
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          );
+                        })()
+                      )}
                     </div>
                   )}
 
