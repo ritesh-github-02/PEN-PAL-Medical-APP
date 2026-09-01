@@ -322,7 +322,7 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
         </div>
 
         {/* Filter Dropdowns */}
-        <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full md:w-auto shrink-0">
           <div className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200/70 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 transition shadow-2xs">
             <Filter className="w-3.5 h-3.5 text-slate-500" />
             <span className="text-slate-500 font-medium">Group:</span>

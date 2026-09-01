@@ -858,7 +858,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                       Study Arm Destination
                     </label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <button
                         type="button"
                         onClick={() => setArm('INTERVENTION')}
