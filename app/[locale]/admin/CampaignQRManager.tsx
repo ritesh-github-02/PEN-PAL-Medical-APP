@@ -721,8 +721,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                           <BookOpen className="w-3 h-3" />
                           Control
                         </span>
-                      )}
-                    </td>
+                      )}                    </td>
 
                     {/* Participant / Link Count */}
                     <td className="py-4 px-5 text-center font-mono font-bold text-slate-800">
