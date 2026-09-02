@@ -34,7 +34,7 @@
     "notCompleted": "No completado",
     "notProvided": "No proporcionado",
     "print": "Imprimir Informe",
-    "completeSave": "Completar y Guardar (PDF)",
+    "completeSave": "Completar y Guardar como PDF",
     "allergyMessage": "{count, plural, one {# niño con alergia a la penicilina} other {# niños con alergia a la penicilina}}",
     "allergyMany": "{count, plural, one {# niño tiene una alergia real} other {# niños tienen una alergia real}}",
     "allergyFew": "solo {count, plural, one {# niño tiene una alergia real} other {# niños tienen una alergia real}}",
