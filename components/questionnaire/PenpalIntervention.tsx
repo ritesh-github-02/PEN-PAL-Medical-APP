@@ -16,6 +16,8 @@ import { logout } from "@/app/[locale]/intervention/actions";
 import Loader from "@/components/common/Loader";
 import AudioPlayer from "./AudioPlayer";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
+import esMessages from "@/messages/es.json";
+import enMessages from "@/messages/en.json";
 
 function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (newLocale: string) => void }) {
   return (
@@ -73,11 +75,25 @@ interface BaseScreenProps {
 }
 
 export default function PenpalIntervention() {
-  const t = useTranslations("Intervention");
+  const nextIntlT = useTranslations("Intervention");
   const params = useParams();
   const router = useRouter();
   const initialLocale = (params.locale as string) || "en";
   const [currentLocale, setCurrentLocale] = useState<string>(initialLocale);
+
+  const t = (key: string, values?: any): string => {
+    const isEs = currentLocale === "es";
+    const dict = isEs ? (esMessages as any).Intervention : (enMessages as any).Intervention;
+    let text = dict?.[key];
+    if (!text) {
+      try {
+        text = nextIntlT(key as any, values);
+      } catch {
+        text = key;
+      }
+    }
+    return text || key;
+  };
 
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const exitHeadingRef = useRef<HTMLHeadingElement | null>(null);
@@ -99,6 +115,12 @@ export default function PenpalIntervention() {
         }
         const targetUrl = `/${targetLocale}${currentPath}?${searchParams.toString()}`;
         window.history.replaceState(null, "", targetUrl);
+        // Cleanly update Next.js router locale
+        try {
+          router.replace(`${currentPath}?${searchParams.toString()}`, { locale: targetLocale });
+        } catch {
+          // fallback
+        }
       }
     } catch (e) {
       console.warn("URL update warning:", e);
@@ -652,6 +674,7 @@ export default function PenpalIntervention() {
 // ============ Shared Components ============
 
 function NavigationFooter({ onBack, onNext, loading, isFirstStep, t, locale }: Omit<BaseScreenProps, 'title' | 'content' | 'description'> & { locale?: string }) {
+  const isSpanish = locale === "es";
   return (
     <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center pt-4 mt-4 border-t border-slate-300/40 gap-3 sm:gap-0">
       <button
@@ -659,18 +682,18 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t, locale }: O
         className="px-5 py-2 text-xs font-bold uppercase tracking-widest text-[#2b3e34] hover:text-black disabled:opacity-0 transition-colors duration-250 no-print cursor-pointer"
         disabled={isFirstStep || loading}
         onClick={onBack}
-        aria-label={locale === "es" ? "Volver al paso anterior" : "Go back to previous step"}
+        aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
       >
-        ← {t("back")}
+        ← {isSpanish ? "Atrás" : t("back")}
       </button>
       <button
         type="button"
         onClick={() => onNext()}
         disabled={loading}
-        aria-label={locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
+        aria-label={isSpanish ? "Continuar al siguiente paso" : "Continue to next step"}
         className="px-8 py-2 text-xs font-bold uppercase tracking-widest transition-all duration-250 flex items-center justify-center bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] rounded-full hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-sm no-print font-sans border border-[#71ad9d]"
       >
-        {loading ? "..." : t("next")}
+        {loading ? "..." : (isSpanish ? "Siguiente" : t("next"))}
       </button>
     </div>
   );
@@ -679,9 +702,10 @@ function NavigationFooter({ onBack, onNext, loading, isFirstStep, t, locale }: O
 // ============ Screen Components ============
 
 function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale, headingRef, onNoBranching }: BaseScreenProps & { onAnswer: (val: string) => void; onNoBranching?: () => void }) {
-  const introSubtitle = description || (locale === "es" ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
-  const mainContent = content ? content.split('\n\n')[0] : (locale === "es" ? "Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños." : "This is nurse Anna. Anna is giving information about allergies to penicillin in kids.");
-  const questionPrompt = content && content.split('\n\n')[1] ? content.split('\n\n')[1] : (locale === "es" ? "¿Quieres saber más?" : "Do you want to know more?");
+  const isSpanish = locale === "es";
+  const introSubtitle = description || (isSpanish ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
+  const mainContent = content ? content.split('\n\n')[0] : (isSpanish ? "Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños." : "This is nurse Anna. Anna is giving information about allergies to penicillin in kids.");
+  const questionPrompt = isSpanish ? "¿Quieres saber más?" : "Do you want to know more?";
 
   return (
     <div id="slide-content" className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
@@ -713,10 +737,10 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
                   onNext("yes");
                 }}
                 disabled={loading}
-                aria-label={locale === "es" ? "Sí, quiero saber más sobre la alergia a la penicilina" : "Yes, I want to learn more about penicillin allergy"}
+                aria-label={isSpanish ? "Sí, quiero saber más sobre la alergia a la penicilina" : "Yes, I want to learn more about penicillin allergy"}
                 className="px-6 py-2.5 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-xl font-bold text-sm transition shadow-sm active:scale-[0.98] no-print cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
               >
-                {loading ? "..." : t("yes")}
+                {loading ? "..." : (isSpanish ? "Sí" : t("yes"))}
               </button>
               <button
                 type="button"
@@ -727,10 +751,10 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
                   }
                 }}
                 disabled={loading}
-                aria-label={locale === "es" ? "No, salir o finalizar" : "No, do not continue"}
+                aria-label={isSpanish ? "No, salir o finalizar" : "No, do not continue"}
                 className="px-6 py-2.5 min-h-[44px] bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] border border-[#71ad9d] rounded-xl font-bold text-sm transition active:scale-[0.98] no-print cursor-pointer shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
               >
-                {t("no")}
+                {isSpanish ? "No" : t("no")}
               </button>
             </div>
           </fieldset>
@@ -859,7 +883,7 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
           aria-label={locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {loading ? "..." : t("next")}
+          {loading ? "..." : (locale === "es" ? "Siguiente" : t("next"))}
         </button>
       </div>
     </div>
@@ -1025,7 +1049,7 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
           disabled={props.loading}
           className="px-10 py-2.5 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {props.loading ? "..." : props.t("next")}
+          {props.loading ? "..." : (isSpanish ? "Siguiente" : props.t("next"))}
         </button>
       </div>
     </div>
@@ -1100,7 +1124,7 @@ function TestingScreen(props: BaseScreenProps) {
           disabled={props.loading}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {props.loading ? "..." : props.t("next")}
+          {props.loading ? "..." : (isSpanish ? "Siguiente" : props.t("next"))}
         </button>
       </div>
     </div>
@@ -1360,7 +1384,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
           disabled={navProps.loading}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {navProps.loading ? "..." : navProps.t("next")}
+          {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
         </button>
       </div>
     </div>
@@ -1368,6 +1392,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 }
 
 function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string; onSelect: (val: string) => void }) {
+  const isSpanish = navProps.locale === "es";
   return (
     <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
       <div className="flex flex-row gap-2 sm:gap-6 items-center justify-between">
@@ -1449,7 +1474,7 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
           disabled={navProps.loading}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {navProps.loading ? "..." : navProps.t("next")}
+          {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
         </button>
       </div>
     </div>
@@ -1585,7 +1610,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
           disabled={navProps.loading}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {navProps.loading ? "..." : navProps.t("next")}
+          {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
         </button>
       </div>
     </div>
@@ -1593,6 +1618,7 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
 }
 
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
+  const isSpanish = navProps.locale === "es";
   return (
     <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
       <div className="flex flex-row items-center justify-between gap-3 sm:gap-6">
@@ -1629,7 +1655,7 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
           disabled={navProps.loading}
           className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {navProps.loading ? "..." : navProps.t("next")}
+          {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
         </button>
       </div>
     </div>
@@ -1637,14 +1663,17 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
 }
 
 function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { answers: any; activeToken?: string | null }) {
+  const isSpanish = locale === "es";
   const summarySections = [
     {
       id: "screen6_1_symptoms",
       labelKey: "symptoms",
-      defaultValue: "Reported Symptoms",
+      labelEn: "Reported Symptoms",
+      labelEs: "Síntomas Reportados",
+      defaultValue: isSpanish ? "Síntomas Reportados" : "Reported Symptoms",
       getValue: () => {
         const rawVal = answers?.screen6_1_symptoms;
-        if (!rawVal) return locale === "es" ? "Ninguno reportado" : "None reported";
+        if (!rawVal) return isSpanish ? "Ninguno reportado" : "None reported";
 
         let symArray: string[] = [];
         if (Array.isArray(rawVal)) {
@@ -1661,20 +1690,20 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
         }
 
         if (symArray.length === 0) {
-          return locale === "es" ? "Ninguno reportado" : "None reported";
+          return isSpanish ? "Ninguno reportado" : "None reported";
         }
 
         const step = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
         return symArray
           .map((v: string) => {
             if (v === "Other: Please describe" || v === "Other" || v === "Otro: por favor describa" || v === "Otro") {
-              return locale === "es" ? "Otro" : "Other";
+              return isSpanish ? "Otro" : "Other";
             }
             if (v.startsWith("Other:") || v.startsWith("Otro:")) {
               return v.replace(/_____+/g, "").trim();
             }
             const opt = step?.options?.find((o: any) => o.value === v || o.labelEn === v || o.labelEs === v);
-            return locale === "es" ? opt?.labelEs || v : opt?.labelEn || v;
+            return isSpanish ? opt?.labelEs || v : opt?.labelEn || v;
           })
           .filter(Boolean)
           .join(", ");
@@ -1683,59 +1712,69 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
     {
       id: "screen6_2_timing",
       labelKey: "timing",
-      defaultValue: "Age at Reaction",
+      labelEn: "Age at Reaction",
+      labelEs: "Edad en la Reacción",
+      defaultValue: isSpanish ? "Edad en la Reacción" : "Age at Reaction",
       getValue: () => {
         const val = answers?.screen6_2_timing;
-        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
-        return locale === "es" ? (val + " años") : (val + " years old");
+        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
+        return isSpanish ? (val + " años") : (val + " years old");
       },
     },
     {
       id: "screen6_3_onset",
       labelKey: "onset",
-      defaultValue: "Time to Onset",
+      labelEn: "Time to Onset",
+      labelEs: "Tiempo de Inicio",
+      defaultValue: isSpanish ? "Tiempo de Inicio" : "Time to Onset",
       getValue: () => {
         const val = answers?.screen6_3_onset;
-        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
+        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_3_onset");
         const opt = step?.options?.find((o: any) => o.value === val);
-        return locale === "es" ? opt?.labelEs || val : opt?.labelEn || val;
+        return isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
       },
     },
     {
       id: "screen6_4_resolution",
       labelKey: "resolution",
-      defaultValue: "Medical Care Received",
+      labelEn: "Medical Care Received",
+      labelEs: "Atención Médica Recibida",
+      defaultValue: isSpanish ? "Atención Médica Recibida" : "Medical Care Received",
       getValue: () => {
         const val = answers?.screen6_4_resolution;
-        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
+        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_4_resolution");
         const opt = step?.options?.find((o: any) => o.value === val);
-        return locale === "es" ? opt?.labelEs || val : opt?.labelEn || val;
+        return isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
       },
     },
     {
       id: "screen6_4b_resolution_type",
       labelKey: "resolutionType",
-      defaultValue: "Symptom Resolution",
+      labelEn: "Symptom Resolution",
+      labelEs: "Resolución de Síntomas",
+      defaultValue: isSpanish ? "Resolución de Síntomas" : "Symptom Resolution",
       getValue: () => {
         const val = answers?.screen6_4b_resolution_type;
-        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
+        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_4b_resolution_type");
         const opt = step?.options?.find((o: any) => o.value === val);
-        return locale === "es" ? opt?.labelEs || val : opt?.labelEn || val;
+        return isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
       },
     },
     {
       id: "screen6_5_yetagain",
       labelKey: "yetagain",
-      defaultValue: "Penicillin Since Reaction",
+      labelEn: "Penicillin Since Reaction",
+      labelEs: "Re-exposición Desde la Reacción",
+      defaultValue: isSpanish ? "Re-exposición Desde la Reacción" : "Penicillin Since Reaction",
       getValue: () => {
         const val = answers?.screen6_5_yetagain;
-        if (!val || val === "none_selected" || val === "undefined") return locale === "es" ? "No provisto" : "Not provided";
+        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_5_yetagain");
         const opt = step?.options?.find((o: any) => o.value === val);
-        return locale === "es" ? opt?.labelEs || val : opt?.labelEn || val;
+        return isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
       },
     },
   ];
@@ -1778,9 +1817,9 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
         {calloutParagraph && quoteParagraph && (
           <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-2 sm:p-2.5 max-w-xl mx-auto text-left shadow-2xs mb-3">
             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
-              {calloutParagraph}
+              {isSpanish ? "Lo que puede decirle al médico:" : "What you can say to the doctor:"}
             </p>
-            <p className="text-xs text-slate-700 italic font-medium leading-tight pl-2 border-l-2 border-slate-300">
+            <p className="text-xs text-slate-800 font-semibold italic leading-snug">
               {quoteParagraph}
             </p>
           </div>
@@ -1790,12 +1829,7 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       <div className="print-section border-t border-slate-100 pt-2.5 mb-2">
         <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-left">
           {summarySections.map((section) => {
-            let label = section.defaultValue;
-            try {
-              label = t(section.labelKey) || section.defaultValue;
-            } catch {
-              label = section.defaultValue;
-            }
+            const label = isSpanish ? section.labelEs : section.labelEn;
             return (
               <div key={section.id} className="bg-slate-50/90 border border-slate-200/80 rounded-lg p-2 sm:p-2.5">
                 <p className="section-label text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate">
@@ -1817,7 +1851,7 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
           </svg>
-          {t("print")}
+          {isSpanish ? "Imprimir Informe" : t("print")}
         </button>
         <button
           type="button"
@@ -1829,12 +1863,7 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
                 locale,
                 answers,
                 summarySections: summarySections.map((s) => {
-                  let label = s.defaultValue;
-                  try {
-                    label = t(s.labelKey) || s.defaultValue;
-                  } catch {
-                    label = s.defaultValue;
-                  }
+                  const label = isSpanish ? s.labelEs : s.labelEn;
                   return {
                     label,
                     value: s.getValue(),
@@ -1856,14 +1885,14 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {locale === "es" ? "Guardando..." : "Saving..."}
+              {isSpanish ? "Guardando..." : "Saving..."}
             </>
           ) : (
             <>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
-              {t("completeSave")}
+              {isSpanish ? "Completar y Guardar como PDF" : t("completeSave")}
             </>
           )}
         </button>

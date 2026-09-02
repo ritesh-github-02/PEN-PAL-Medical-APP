@@ -186,6 +186,33 @@ export function generateAssessmentPDF(data: AssessmentPdfData): void {
   const sections = data.summarySections || [];
   const colWidth = 88;
 
+  const SPANISH_CARD_LABELS: Record<string, string> = {
+    'REPORTED SYMPTOMS': 'SÍNTOMAS REPORTADOS',
+    'SYMPTOMS': 'SÍNTOMAS REPORTADOS',
+    'AGE AT REACTION': 'EDAD EN LA REACCIÓN',
+    'TIMING': 'EDAD EN LA REACCIÓN',
+    'TIME TO ONSET': 'TIEMPO DE INICIO',
+    'ONSET': 'TIEMPO DE INICIO',
+    'MEDICAL CARE RECEIVED': 'ATENCIÓN MÉDICA RECIBIDA',
+    'RESOLUTION': 'ATENCIÓN MÉDICA RECIBIDA',
+    'SYMPTOM RESOLUTION': 'RESOLUCIÓN DE SÍNTOMAS',
+    'RESOLUTION TYPE': 'RESOLUCIÓN DE SÍNTOMAS',
+    'RESOLUTIONTYPE': 'RESOLUCIÓN DE SÍNTOMAS',
+    'PENICILLIN SINCE REACTION': 'RE-EXPOSICIÓN DESDE LA REACCIÓN',
+    'RE-EXPOSURE SINCE REACTION': 'RE-EXPOSICIÓN DESDE LA REACCIÓN',
+    'YETAGAIN': 'RE-EXPOSICIÓN DESDE LA REACCIÓN',
+    'PRIMARY ALLERGY': 'ALERGIA PRIMARIA',
+  };
+
+  const formatCardHeader = (raw: string, spanish: boolean): string => {
+    if (!raw) return '';
+    const upper = raw.trim().toUpperCase();
+    if (spanish) {
+      return SPANISH_CARD_LABELS[upper] || upper;
+    }
+    return upper;
+  };
+
   for (let i = 0; i < sections.length; i += 2) {
     const sec1 = sections[i];
     const sec2 = sections[i + 1];
@@ -207,8 +234,9 @@ export function generateAssessmentPDF(data: AssessmentPdfData): void {
       doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.8);
-      const label1 = doc.splitTextToSize(sec1.label.toUpperCase(), colWidth - 8);
-      doc.text(label1[0] || sec1.label.toUpperCase(), 18, y + 4.2);
+      const label1Text = formatCardHeader(sec1.label, isSpanish);
+      const label1 = doc.splitTextToSize(label1Text, colWidth - 8);
+      doc.text(label1[0] || label1Text, 18, y + 4.2);
 
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
       doc.setFont('helvetica', 'bold');
@@ -225,8 +253,9 @@ export function generateAssessmentPDF(data: AssessmentPdfData): void {
       doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.8);
-      const label2 = doc.splitTextToSize(sec2.label.toUpperCase(), colWidth - 8);
-      doc.text(label2[0] || sec2.label.toUpperCase(), 112, y + 4.2);
+      const label2Text = formatCardHeader(sec2.label, isSpanish);
+      const label2 = doc.splitTextToSize(label2Text, colWidth - 8);
+      doc.text(label2[0] || label2Text, 112, y + 4.2);
 
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
       doc.setFont('helvetica', 'bold');
