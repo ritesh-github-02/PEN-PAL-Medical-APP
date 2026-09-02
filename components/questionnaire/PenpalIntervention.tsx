@@ -139,6 +139,7 @@ export default function PenpalIntervention() {
   const [navigating, setNavigating] = useState(false);
   const [bindingError, setBindingError] = useState<string | null>(null);
   const [isTerminated, setIsTerminated] = useState(false);
+  const [exitTabClosed, setExitTabClosed] = useState(false);
 
   const currentStep = questionnaireConfig[currentStepIndex];
 
@@ -593,23 +594,38 @@ export default function PenpalIntervention() {
                       ? "Actualmente este estudio está destinado a padres de niños con sospecha de alergia a la penicilina. Dado que su hijo no presenta alergia a la penicilina, no se requiere ninguna acción adicional."
                       : "This study is currently intended for parents of children who have a reported or suspected penicillin allergy. Since your child does not have a penicillin allergy, no further action is needed."}
                   </p>
-                  <div className="pt-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        logout().catch(() => {});
-                        if (typeof window !== "undefined") {
-                          window.close();
-                          setTimeout(() => {
-                            window.location.href = "/";
-                          }, 300);
-                        }
-                      }}
-                      className="inline-block bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] font-bold py-2.5 px-8 rounded-full text-xs sm:text-sm transition shadow-sm cursor-pointer border border-[#71ad9d] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] active:scale-[0.98]"
-                    >
-                      {locale === "es" ? "Cerrar esta Ventana" : "Close This Window"}
-                    </button>
-                  </div>
+                  {exitTabClosed ? (
+                    <div className="pt-3">
+                      <p className="text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 py-2.5 px-5 rounded-2xl inline-block shadow-2xs">
+                        {locale === "es"
+                          ? "✓ Sesión finalizada. Ya puede cerrar esta pestaña de su navegador."
+                          : "✓ Session closed. You may now close this browser tab."}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="pt-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          logout().catch(() => {});
+                          if (typeof window !== "undefined") {
+                            try {
+                              window.opener = null;
+                              window.open("", "_self");
+                              window.close();
+                            } catch {}
+                            try {
+                              window.close();
+                            } catch {}
+                            setExitTabClosed(true);
+                          }
+                        }}
+                        className="inline-block bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] font-bold py-2.5 px-8 rounded-full text-xs sm:text-sm transition shadow-sm cursor-pointer border border-[#71ad9d] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] active:scale-[0.98]"
+                      >
+                        {locale === "es" ? "Cerrar esta Ventana" : "Close This Window"}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : showSummary ? (
                 <SummaryScreen
