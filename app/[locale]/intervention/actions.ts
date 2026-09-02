@@ -840,20 +840,11 @@ export async function getSurveyResponse() {
   }
 }
 
-export async function logout(formDataOrRedirect?: FormData | boolean): Promise<void> {
+export async function logout() {
   const cookieStore = await cookies();
   cookieStore.delete('penpal_session');
   cookieStore.delete('penpal_participant');
-  if (formDataOrRedirect !== false) {
-    redirect('/');
-  }
-}
-
-export async function clearSessionCookies() {
-  const cookieStore = await cookies();
-  cookieStore.delete('penpal_session');
-  cookieStore.delete('penpal_participant');
-  return { success: true };
+  redirect('/');
 }
 
 // ── Admin helper (kept for admin actions import) ──────────────────────────────

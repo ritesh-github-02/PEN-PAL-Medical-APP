@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { clearSessionCookies } from '../intervention/actions';
+import { logout } from '../intervention/actions';
 
 interface ControlExitButtonProps {
   locale: string;
@@ -47,9 +47,9 @@ export default function ControlExitButton({
       }
     } catch {}
 
-    // 2. Clear authentication cookies in background without redirect
+    // 2. Clear authentication cookies in background
     try {
-      clearSessionCookies().catch(() => {});
+      logout().catch(() => {});
     } catch {}
 
     // 3. Close the browser window/tab
