@@ -805,10 +805,10 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           MODAL 1: Create New Campaign & Generate N Links
           ========================================================================= */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-8">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-5 border-b border-[#1d5c64]/20 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white">
+            <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-5 border-b border-[#1d5c64]/20 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-white/20 rounded-xl text-white backdrop-blur-xs shadow-xs border border-white/25">
                   <Sparkles className="w-4 h-4" />
@@ -827,7 +827,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
             </div>
 
             {/* Modal Body */}
-            <div className="p-6">
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1 custom-scrollbar">
               {!createdCampaign ? (
                 /* Step 1: Form to Create Campaign & Specify N Quantity */
                 <form onSubmit={handleCreate} className="space-y-5">
@@ -1195,10 +1195,10 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           MODAL 2: View & Manage Existing Campaign Links (With Add More & Export)
           ========================================================================= */}
       {isViewLinksModalOpen && activeCampaign && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-8">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-[#1d5c64]/20 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white">
+            <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-5 border-b border-[#1d5c64]/20 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white">
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-extrabold text-white text-base tracking-tight">
@@ -1222,7 +1222,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
             </div>
 
             {/* Body */}
-            <div className="p-6 space-y-5">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1 custom-scrollbar">
               {/* Action Toolbar */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-2">
@@ -1445,8 +1445,8 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           MODAL 3: Individual QR Code Preview & High-Res PNG Download
           ========================================================================= */}
       {isQrPreviewModalOpen && previewQrItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 text-center space-y-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm max-h-[92vh] flex flex-col overflow-y-auto animate-in fade-in zoom-in-95 duration-150 p-6 text-center space-y-4 my-auto">
             <div className="flex justify-between items-start">
               <div className="text-left">
                 <h4 className="font-extrabold text-slate-900 text-sm">{previewQrItem.title}</h4>
@@ -1508,8 +1508,8 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           MODAL 4: General Campaign Open Poster QR
           ========================================================================= */}
       {generalPosterQr && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 text-center space-y-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-y-auto animate-in fade-in zoom-in-95 duration-150 p-6 text-center space-y-4 my-auto">
             <div className="flex justify-between items-start">
               <div className="text-left">
                 <span className="px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-teal-50 text-teal-800 border border-teal-200">
@@ -1567,8 +1567,8 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           MODAL 5: Edit Campaign Name
           ========================================================================= */}
       {isEditModalOpen && editCampaign && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 space-y-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 space-y-4 my-auto">
             <div className="flex justify-between items-start">
               <div>
                 <span className="px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-teal-50 text-teal-800 border border-teal-200">
@@ -1642,8 +1642,8 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           MODAL 6: Delete Campaign Confirmation Modal (Explicit Warning)
           ========================================================================= */}
       {isDeleteModalOpen && deleteCampaign && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-rose-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 space-y-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl border border-rose-200 w-full max-w-md max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 space-y-4 my-auto">
             <div className="flex items-start gap-3">
               <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 shrink-0">
                 <AlertTriangle className="w-6 h-6" />

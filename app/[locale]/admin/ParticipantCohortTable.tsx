@@ -494,8 +494,8 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
 
       {/* ================= PARTICIPANT DETAILS MODAL ================= */}
       {selectedParticipantId && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="participant-modal-title">
-          <div className="bg-white border border-slate-300 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="participant-modal-title">
+          <div className="bg-white border border-slate-300 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             
             {/* Soft Clinical Modal Header */}
             <div className="p-5 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white flex justify-between items-center shrink-0 border-b border-[#1d5c64]/30">
