@@ -251,7 +251,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
             <img
               src="/images/connecticut-childrens-logo.png"
               alt="Connecticut Children's"
-              className="h-12 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-2xs"
+              className="h-16 sm:h-20 md:h-24 w-auto object-contain filter drop-shadow-2xs"
             />
           </div>
 

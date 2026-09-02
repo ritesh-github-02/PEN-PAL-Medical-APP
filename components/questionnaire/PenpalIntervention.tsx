@@ -532,7 +532,7 @@ export default function PenpalIntervention() {
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
-      <div className="w-full max-w-4xl relative z-10 my-auto space-y-2 py-0 transition-all duration-300 overflow-x-hidden">
+      <div className="w-full max-w-4xl relative z-10 my-auto space-y-2 py-0 transition-all duration-300 overflow-visible">
         {/* Header Bar with Logo and Language Selector */}
         <header className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
           <div className="flex items-center gap-2 flex-wrap">
@@ -554,9 +554,9 @@ export default function PenpalIntervention() {
         </header>
 
         <div className="w-full">
-          {/* Compact Tablet / iPad Device Frame */}
-          <div className="flex-1 w-full bg-zinc-900 border-[6px] sm:border-[10px] border-zinc-900 rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl relative p-0.5 ring-1 ring-white/10 overflow-hidden">
-            <div className="rounded-[1.2rem] sm:rounded-[1.6rem] overflow-hidden">
+          {/* Responsive Device Frame: Preserves Tablet/Mobile Bezel, Removes Border with Properly Visible Soft Shadow on Desktop */}
+          <div className="flex-1 w-full bg-zinc-900 lg:bg-transparent border-[6px] sm:border-[10px] lg:border-none border-zinc-900 rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-3xl shadow-2xl lg:shadow-[0_16px_40px_-8px_rgba(20,60,65,0.20),0_8px_20px_-4px_rgba(0,0,0,0.08)] relative p-0.5 lg:p-0 ring-1 lg:ring-0 ring-white/10 overflow-hidden">
+            <div className="rounded-[1.2rem] sm:rounded-[1.6rem] lg:rounded-3xl overflow-hidden">
               {isTerminated ? (
                 <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg text-center max-w-xl mx-auto space-y-4 my-2">
                   <h2
