@@ -12,7 +12,7 @@ import {
   loadQuestionnaireProgress,
   recordSlideTiming,
 } from "./actions";
-import { logout } from "@/app/[locale]/intervention/actions";
+import { clearSessionCookies } from "@/app/[locale]/intervention/actions";
 import Loader from "@/components/common/Loader";
 import AudioPlayer from "./AudioPlayer";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
@@ -496,10 +496,17 @@ export default function PenpalIntervention() {
             <button 
               type="button"
               onClick={() => {
-                try {
-                  window.close();
-                } catch {}
-                logout();
+                clearSessionCookies().catch(() => {});
+                if (typeof window !== "undefined") {
+                  try {
+                    window.opener = null;
+                    window.open("", "_self", "");
+                    window.close();
+                  } catch {}
+                  try {
+                    window.close();
+                  } catch {}
+                }
               }}
               className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition shadow-sm active:scale-[0.98] cursor-pointer"
             >
@@ -607,16 +614,21 @@ export default function PenpalIntervention() {
                       <button
                         type="button"
                         onClick={() => {
-                          logout().catch(() => {});
+                          clearSessionCookies().catch(() => {});
                           if (typeof window !== "undefined") {
                             try {
                               window.opener = null;
-                              window.open("", "_self");
+                              window.open("", "_self", "");
                               window.close();
                             } catch {}
                             try {
                               window.close();
                             } catch {}
+                            setTimeout(() => {
+                              try {
+                                window.close();
+                              } catch {}
+                            }, 100);
                             setExitTabClosed(true);
                           }
                         }}
