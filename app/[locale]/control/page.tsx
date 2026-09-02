@@ -31,7 +31,11 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8 print:p-0 print:bg-white" role="main" aria-label={isEs ? "Portal del Grupo de Control" : "Control Group Portal"}>
+    <main 
+      className="min-h-screen bg-slate-100/70 p-4 sm:p-6 lg:p-8 text-slate-900 font-sans antialiased"
+      role="main"
+      aria-label={isEs ? "Folleto Familiar del Grupo de Control" : "Control Group Family Handout"}
+    >
       {/* 100% Client Telemetry & Scroll Tracker */}
       <ControlTracker locale={locale} token={token} />
 
@@ -45,16 +49,8 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight text-white font-mono flex items-center gap-2">
-                PEN-PAL <span className="text-slate-500 font-normal" aria-hidden="true">|</span> <span className="text-slate-100 font-semibold">{isEs ? "Portal del Grupo de Control" : "Control Group Portal"}</span>
+                PEN-PAL <span className="text-slate-500 font-normal" aria-hidden="true">|</span> <span className="text-slate-100 font-semibold">{isEs ? "Folleto Familiar del Grupo de Control" : "Control Group Family Handout"}</span>
               </h1>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="bg-slate-800 border border-slate-700 text-teal-300 text-[10px] font-bold font-mono px-2.5 py-0.5 rounded">
-                  Protocol Version 2.1
-                </span>
-                <span className="text-[11px] font-semibold text-slate-300">
-                  {isEs ? "Sitio de Referencia de Investigación" : "Research Baseline Site"}
-                </span>
-              </div>
             </div>
           </div>
 
@@ -250,17 +246,17 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
 
         {/* Footer & Partner Center Branding */}
         <footer className="py-6 text-center border-t border-slate-200 space-y-3">
-          {/* Connecticut Children's Branding Logo representation */}
-          <div className="flex items-center justify-center gap-2">
-            <div className="flex items-center gap-1.5 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-2xs">
-              <span className="w-3.5 h-3.5 rounded-full bg-teal-500 inline-block" aria-hidden="true"></span>
-              <span className="w-3.5 h-3.5 rounded-full bg-purple-600 inline-block" aria-hidden="true"></span>
-              <span className="text-xs font-bold text-slate-800">Connecticut Children&apos;s</span>
-            </div>
+          {/* Official Connecticut Children's Branding Logo */}
+          <div className="flex items-center justify-center pt-2">
+            <img
+              src="/images/connecticut-childrens-logo.png"
+              alt="Connecticut Children's"
+              className="h-12 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-2xs"
+            />
           </div>
 
           <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-            &copy; {new Date().getFullYear()} PEN-PAL CLINICAL RESEARCH PROTOCOL • {isEs ? "PORTAL DEL GRUPO DE CONTROL" : "CONTROL GROUP PORTAL"}
+            &copy; {new Date().getFullYear()} PEN-PAL CLINICAL RESEARCH PROTOCOL • {isEs ? "FOLLETO FAMILIAR DEL GRUPO DE CONTROL" : "CONTROL GROUP FAMILY HANDOUT"}
           </p>
           <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500 font-mono">
             <span>Protocol ID: PENPAL-2026-CTL</span>
