@@ -1,4 +1,4 @@
-export type QuestionType = 'intro' | 'statistics' | 'education' | 'testing_info' | 'testimonial' | 'single_choice' | 'multiple_choice' | 'slider' | 'text' | 'boolean' | 'likert' | 'summary';
+export type QuestionType = 'intro' | 'statistics' | 'education' | 'testing_info' | 'testimonial' | 'single_choice' | 'multiple_choice' | 'slider' | 'text' | 'boolean' | 'likert' | 'summary' | 'knowledge_revelation';
 
 export interface QuestionnaireOption {
   value: string;
@@ -81,6 +81,25 @@ export const questionnaireConfig: QuestionnaireStep[] = [
       { value: 'cheaper_antibiotics', labelEn: 'It is cheaper than other antibiotics.', labelEs: 'Es más barata que otros antibióticos.' }
     ],
     required: false,
+    nextStepId: 'screen3_6_all_correct'
+  },
+  // Screen 3.6: All Correct Revelation
+  {
+    id: 'screen3_6_all_correct',
+    type: 'knowledge_revelation',
+    titleEn: 'All the statements about penicillin are correct!',
+    titleEs: '¡Todas las afirmaciones sobre la penicilina son correctas!',
+    descriptionEn: 'All 4 facts are true:',
+    descriptionEs: 'Los 4 datos son verdaderos:',
+    audioEn: '/audio/exported/screen3_5_knowledge_test_en.mp3',
+    audioEs: '/audio/exported/screen3_5_knowledge_test_es.mp3',
+    options: [
+      { value: 'curing_illnesses', labelEn: '1. It is the best at curing many illnesses in kids and adults.', labelEs: '1. Es lo mejor para curar muchas enfermedades en niños y adultos.' },
+      { value: 'less_side_effects', labelEn: '2. It has less side-effects than other antibiotics.', labelEs: '2. Tiene menos efectos secundarios que otros antibióticos.' },
+      { value: 'tastes_bubblegum', labelEn: '3. Kids tend to like the way it tastes, like bubblegum!', labelEs: '3. ¡A los niños les gusta cómo sabe, como el chicle!' },
+      { value: 'cheaper_antibiotics', labelEn: '4. It is cheaper than other antibiotics.', labelEs: '4. Es más barata que otros antibióticos.' }
+    ],
+    required: true,
     nextStepId: 'screen4_testing'
   },
   // Screen 4: Testing Info

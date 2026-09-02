@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, memo } from "react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { usePathname, useRouter } from "@/routing";
-import { questionnaireConfig, QuestionnaireStep } from "@/config/questionnaire";
+import { questionnaireConfig, QuestionnaireStep, QuestionnaireOption } from "@/config/questionnaire";
 import { logInteraction } from "@/lib/tracking";
 import {
   submitAnswer,
@@ -177,7 +177,8 @@ export default function PenpalIntervention() {
 
       if (progress.isAllCompleted || showReport) {
         setShowSummary(true);
-        setCurrentStepIndex(11);
+        const summaryIndex = questionnaireConfig.findIndex((s) => s.type === "summary");
+        setCurrentStepIndex(summaryIndex !== -1 ? summaryIndex : questionnaireConfig.length - 2);
         setInitialized(true);
         return;
       }
@@ -347,7 +348,7 @@ export default function PenpalIntervention() {
 
     // For informational / non-question screens, record "acknowledged" instead of literal "undefined"
     if (answer === undefined || answer === null || answer === "undefined") {
-      if (["intro", "statistics", "testing_info", "text", "summary"].includes(currentStep.type)) {
+      if (["intro", "statistics", "testing_info", "text", "summary", "knowledge_revelation"].includes(currentStep.type)) {
         answer = "acknowledged";
       } else {
         answer = "none_selected";
@@ -540,11 +541,11 @@ export default function PenpalIntervention() {
             <span className="text-slate-300 text-xs" aria-hidden="true">|</span>
             <span 
               className="text-[11px] font-bold text-slate-700"
-              aria-label={locale === "es" ? `Progreso: Paso ${showSummary ? 12 : Math.min(currentStepIndex + 1, 12)} de 12` : `Progress: Step ${showSummary ? 12 : Math.min(currentStepIndex + 1, 12)} of 12`}
+              aria-label={locale === "es" ? `Progreso: Paso ${showSummary ? 13 : Math.min(currentStepIndex + 1, 13)} de 13` : `Progress: Step ${showSummary ? 13 : Math.min(currentStepIndex + 1, 13)} of 13`}
             >
               {locale === "es"
-                ? `Paso ${showSummary ? 12 : Math.min(currentStepIndex + 1, 12)} de 12`
-                : `Step ${showSummary ? 12 : Math.min(currentStepIndex + 1, 12)} of 12`}
+                ? `Paso ${showSummary ? 13 : Math.min(currentStepIndex + 1, 13)} de 13`
+                : `Step ${showSummary ? 13 : Math.min(currentStepIndex + 1, 13)} of 13`}
             </span>
           </div>
 
@@ -620,6 +621,9 @@ export default function PenpalIntervention() {
                   )}
                   {currentStep.type === "statistics" && (
                     <StatisticsScreen {...baseProps} value={answers[currentStep.id]} onSelect={handleAnswer} />
+                  )}
+                  {currentStep.type === "knowledge_revelation" && (
+                    <KnowledgeRevelationScreen {...baseProps} options={currentStep.options} />
                   )}
                   {currentStep.type === "testing_info" && <TestingScreen {...baseProps} />}
                   {currentStep.type === "multiple_choice" && (
@@ -907,6 +911,126 @@ const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: bool
   );
 });
 
+
+function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: QuestionnaireOption[] }) {
+  const isSpanish = props.locale === "es";
+
+  const statements = [
+    {
+      num: "1",
+      textEn: "It is the best at curing many illnesses in kids and adults.",
+      textEs: "Es lo mejor para curar muchas enfermedades en niños y adultos.",
+    },
+    {
+      num: "2",
+      textEn: "It has less side-effects than other antibiotics.",
+      textEs: "Tiene menos efectos secundarios que otros antibióticos.",
+    },
+    {
+      num: "3",
+      textEn: "Kids tend to like the way it tastes, like bubblegum!",
+      textEs: "¡A los niños les gusta cómo sabe, como el chicle!",
+    },
+    {
+      num: "4",
+      textEn: "It is cheaper than other antibiotics.",
+      textEs: "Es más barata que otros antibióticos.",
+    },
+  ];
+
+  return (
+    <div 
+      id="slide-content" 
+      className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden"
+    >
+      {/* 1. Global Announcement for Screen Readers on Slide Load */}
+      <div 
+        role="status" 
+        aria-live="polite" 
+        className="sr-only"
+      >
+        {isSpanish 
+          ? "Aviso de accesibilidad: Todas las 4 afirmaciones ya están marcadas como correctas y verdaderas." 
+          : "Accessibility notice: All 4 statements are already checked as correct and true."}
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-between">
+        
+        {/* Main Content Column */}
+        <div className="flex-1 min-w-0 w-full max-w-3xl pb-2">
+          {/* Slide Heading */}
+          <div className="mb-3 sm:mb-4">
+            <h2
+              ref={props.headingRef}
+              tabIndex={-1}
+              className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+            >
+              {props.title || (isSpanish
+                ? "¡Todas las afirmaciones sobre la penicilina son correctas!"
+                : "All the statements about penicillin are correct!")}
+            </h2>
+            <p className="text-xs sm:text-sm font-semibold text-[#1f5c66] mt-1">
+              {isSpanish ? "Los 4 datos son verdaderos:" : "All 4 facts are true:"}
+            </p>
+          </div>
+
+          {/* Semantic List of Confirmed Statements */}
+          <ul role="list" className="space-y-3 pt-1">
+            {statements.map((stmt) => (
+              <li
+                key={stmt.num}
+                className="w-full text-left flex items-start gap-3 rounded-xl p-1 min-h-[44px]"
+              >
+                {/* Visual Toggle Track (Ignored by screen readers to prevent repetitive double-speaking) */}
+                <div 
+                  aria-hidden="true" 
+                  className="flex flex-col items-center shrink-0 pt-1 select-none"
+                >
+                  <div className="w-12 h-6 rounded-full p-0.5 bg-[#1f5c66] transition-colors">
+                    <div className="w-5 h-5 rounded-full bg-white border border-slate-300 shadow-sm transform translate-x-6" />
+                  </div>
+                  <div className="flex justify-between w-full px-1.5 text-[10px] font-extrabold text-[#2d221b] mt-0.5 leading-none">
+                    <span>×</span>
+                    <span>✓</span>
+                  </div>
+                </div>
+
+                {/* Unified Accessible Statement (Spoken once clearly by screen readers) */}
+                <div className="text-xs sm:text-sm font-semibold text-[#2d221b] leading-relaxed pt-0.5">
+                  <span className="sr-only">
+                    {isSpanish ? "Verificado como verdadero: " : "Verified as true: "}
+                  </span>
+                  <span>{stmt.num}. {isSpanish ? stmt.textEs : stmt.textEn}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Nurse Anna Illustration */}
+        <div className="flex flex-shrink-0 self-center sm:self-center my-auto p-1">
+          <img
+            src="/images/nurse-anna.png"
+            alt={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
+            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[140px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md pointer-events-none"
+          />
+        </div>
+      </div>
+
+      {/* Centered Yellow Next Button */}
+      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
+        <button
+          type="button"
+          onClick={() => props.onNext("all_statements_acknowledged")}
+          disabled={props.loading}
+          className="px-10 py-2.5 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          {props.loading ? "..." : props.t("next")}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function TestingScreen(props: BaseScreenProps) {
   const isSpanish = props.locale === "es";
@@ -1514,28 +1638,6 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
 
 function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { answers: any; activeToken?: string | null }) {
   const summarySections = [
-    {
-      id: "screen2_statistics",
-      labelKey: "statisticsTitle",
-      defaultValue: "Statistics: Understanding Penicillin Allergy Prevalence",
-      getValue: () => {
-        return locale === "es"
-          ? "Solo 5 de 100 niños tienen alergia real."
-          : "Only 5 out of 100 kids have a true allergy.";
-      },
-    },
-    {
-      id: "screen4_testing",
-      labelKey: "testingTitle",
-      defaultValue: "Testing Information",
-      getValue: () => (answers?.screen4_testing !== undefined ? t("completed") : t("notCompleted")),
-    },
-    {
-      id: "screen5_testimonial",
-      labelKey: "testimonialTitle",
-      defaultValue: "Parent Testimonials",
-      getValue: () => (answers?.screen5_testimonial !== undefined ? t("completed") : t("notCompleted")),
-    },
     {
       id: "screen6_1_symptoms",
       labelKey: "symptoms",

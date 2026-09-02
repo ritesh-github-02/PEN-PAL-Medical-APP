@@ -9,6 +9,7 @@ import {
 import Link from 'next/link';
 import ControlTracker from './ControlTracker';
 import ControlExitButton from './ControlExitButton';
+import ControlDownloadPdfButton from './ControlDownloadPdfButton';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -30,14 +31,14 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8" role="main" aria-label={isEs ? "Portal del Grupo de Control" : "Control Group Portal"}>
+    <main className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8 print:p-0 print:bg-white" role="main" aria-label={isEs ? "Portal del Grupo de Control" : "Control Group Portal"}>
       {/* 100% Client Telemetry & Scroll Tracker */}
       <ControlTracker locale={locale} token={token} />
 
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6 print:space-y-4 print:max-w-full">
         
         {/* Professional Header Navigation Bar */}
-        <header className="bg-[#0f172a] border border-slate-800 rounded-xl p-5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xs">
+        <header className="bg-[#0f172a] border border-slate-800 rounded-xl p-5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xs print:hidden">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-teal-700 rounded-lg flex items-center justify-center shadow-xs" aria-hidden="true">
               <ShieldCheck className="w-5 h-5 text-white" />
@@ -57,7 +58,10 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+          <div className="flex items-center flex-wrap gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+            {/* Download PDF Button */}
+            <ControlDownloadPdfButton locale={locale} />
+
             {/* Language Switcher */}
             <div className="flex items-center bg-slate-800 border border-slate-700 rounded-lg p-1" role="group" aria-label={isEs ? "Seleccionar idioma" : "Select language"}>
               <Link
