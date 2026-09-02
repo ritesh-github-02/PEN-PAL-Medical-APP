@@ -594,12 +594,21 @@ export default function PenpalIntervention() {
                       : "This study is currently intended for parents of children who have a reported or suspected penicillin allergy. Since your child does not have a penicillin allergy, no further action is needed."}
                   </p>
                   <div className="pt-3">
-                    <a
-                      href="/"
-                      className="inline-block bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] font-bold py-2.5 px-8 rounded-full text-xs sm:text-sm transition shadow-sm cursor-pointer border border-[#71ad9d] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logout().catch(() => {});
+                        if (typeof window !== "undefined") {
+                          window.close();
+                          setTimeout(() => {
+                            window.location.href = "/";
+                          }, 300);
+                        }
+                      }}
+                      className="inline-block bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] font-bold py-2.5 px-8 rounded-full text-xs sm:text-sm transition shadow-sm cursor-pointer border border-[#71ad9d] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] active:scale-[0.98]"
                     >
-                      {locale === "es" ? "Volver al inicio" : "Return to Start"}
-                    </a>
+                      {locale === "es" ? "Cerrar esta Ventana" : "Close This Window"}
+                    </button>
                   </div>
                 </div>
               ) : showSummary ? (
