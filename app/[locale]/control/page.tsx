@@ -24,7 +24,7 @@ export default async function ControlSitePage({ params, searchParams }: PageProp
   const { token } = await searchParams;
   if (token) {
     try {
-      await validateAndConsumeToken(token, locale);
+      await validateAndConsumeToken(token, locale, 'CONTROL');
     } catch {
       // Best-effort token consumption on landing
     }

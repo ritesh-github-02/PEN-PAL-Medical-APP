@@ -96,6 +96,9 @@ export interface TokenValidationSuccess {
 export interface TokenValidationFailure {
   success: false;
   error: string;
+  isWrongArm?: boolean;
+  assignedArm?: 'INTERVENTION' | 'CONTROL';
+  redirectUrl?: string;
 }
 
 export type TokenValidationResult = TokenValidationSuccess | TokenValidationFailure;
@@ -510,6 +513,7 @@ export async function generateSecureUrl(
 export async function validateAndConsumeToken(
   rawToken: string,
   locale: string,
+  expectedArm: 'INTERVENTION' | 'CONTROL' = 'INTERVENTION',
 ): Promise<TokenValidationResult> {
   const { ipAddress, userAgent } = await getClientContext();
 
@@ -598,6 +602,57 @@ export async function validateAndConsumeToken(
   }
 
   const tokenHash = tokenRecord.tokenHash || normalized;
+
+  // ── Study Cohort Arm Gate (INTERVENTION vs CONTROL) ───────────────────────
+  const participantArm = (tokenRecord.participant?.groupId || tokenRecord.participant?.campaign?.arm || 'INTERVENTION').toUpperCase();
+
+  if (expectedArm === 'INTERVENTION' && participantArm === 'CONTROL') {
+    await logTokenSecurityEvent({
+      eventType: 'TOKEN_ARM_MISMATCH',
+      tokenHash,
+      resultStatus: 'FAIL',
+      participantId: tokenRecord.participantId,
+      ipAddress,
+      userAgent,
+      reason: `Control participant attempted to access Intervention assessment: "${cleanInput}".`,
+      eventData: { attemptedInput: cleanInput, participantArm },
+    });
+
+    const targetToken = tokenRecord.tokenHash || cleanInput;
+    return {
+      success: false,
+      isWrongArm: true,
+      assignedArm: 'CONTROL',
+      redirectUrl: `/${locale}/control?token=${encodeURIComponent(targetToken)}`,
+      error: locale === 'es'
+        ? 'Acceso denegado: Este enlace o token está asignado al Grupo de Control (Folleto Familiar) y no se puede utilizar para acceder a la evaluación clínica de Intervención.'
+        : 'Access Denied: This link or token is assigned to the Control Group (Family Handout) and cannot be used to access the Intervention Clinical Assessment.',
+    };
+  }
+
+  if (expectedArm === 'CONTROL' && participantArm === 'INTERVENTION') {
+    await logTokenSecurityEvent({
+      eventType: 'TOKEN_ARM_MISMATCH',
+      tokenHash,
+      resultStatus: 'FAIL',
+      participantId: tokenRecord.participantId,
+      ipAddress,
+      userAgent,
+      reason: `Intervention participant attempted to access Control portal: "${cleanInput}".`,
+      eventData: { attemptedInput: cleanInput, participantArm },
+    });
+
+    const targetToken = tokenRecord.tokenHash || cleanInput;
+    return {
+      success: false,
+      isWrongArm: true,
+      assignedArm: 'INTERVENTION',
+      redirectUrl: `/${locale}/intervention?token=${encodeURIComponent(targetToken)}`,
+      error: locale === 'es'
+        ? 'Acceso denegado: Este enlace está asignado a la evaluación de Intervención.'
+        : 'Access Denied: This link is assigned to the Intervention Clinical Assessment.',
+    };
+  }
 
   // ── Campaign Deactivation Gate ───────────────────────────────────────────
   if (tokenRecord.participant?.campaign?.status === 'DEACTIVATED') {

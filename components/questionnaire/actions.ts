@@ -205,7 +205,7 @@ export async function loadQuestionnaireProgress(tokenParam?: string, locale: str
   // If no session cookies yet but token is passed in URL/params, automatically validate and establish session!
   if ((!ipResult.ok || !ipResult.participantId) && tokenParam) {
     try {
-      const authResult = await validateAndConsumeToken(tokenParam, locale);
+      const authResult = await validateAndConsumeToken(tokenParam, locale, 'INTERVENTION');
       if (authResult.success) {
         ipResult = await enforceSessionIP();
       }

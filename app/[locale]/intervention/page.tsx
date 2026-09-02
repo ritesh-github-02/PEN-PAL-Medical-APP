@@ -21,6 +21,7 @@ export default function InterventionEntryPage() {
   const locale = (params.locale as string) || 'en';
 
   const [error, setError] = useState<string | null>(null);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(Boolean(cleanToken));
   const [inputVal, setInputVal] = useState('');
   const [inputPrompt, setInputPrompt] = useState<string | null>(null);
@@ -45,6 +46,7 @@ export default function InterventionEntryPage() {
   const handleValidation = useCallback(async (tokenToValidate: string) => {
     setLoading(true);
     setError(null);
+    setRedirectUrl(null);
     try {
       let raw = tokenToValidate.trim();
       // If user pasted a full URL or query string, extract the token parameter
@@ -59,10 +61,11 @@ export default function InterventionEntryPage() {
         }
       }
 
-      let result = await validateToken(raw, locale);
+      let result = await validateToken(raw, locale, 'INTERVENTION');
 
       if (result.success === false) {
         setError(result.error);
+        setRedirectUrl(result.redirectUrl || null);
         setLoading(false);
       } else if (result.success === true) {
         if (result.isCompleted) {
@@ -123,10 +126,23 @@ export default function InterventionEntryPage() {
               </div>
             </div>
 
+            {redirectUrl && (
+              <a 
+                href={redirectUrl}
+                className="w-full h-11 bg-[#128a96] hover:bg-[#0e747e] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer no-underline"
+              >
+                <span>{locale === 'es' ? 'Abrir Folleto Familiar (Grupo de Control) →' : 'Open Family Handout (Control Group) →'}</span>
+              </a>
+            )}
+
             <button 
               type="button"
-              onClick={() => setError(null)}
-              className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.98] cursor-pointer"
+              onClick={() => {
+                setError(null);
+                setRedirectUrl(null);
+                setInputVal('');
+              }}
+              className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-[0.98] cursor-pointer"
             >
               {locale === 'es' ? 'Intentar con otro enlace' : 'Try with another link'}
             </button>

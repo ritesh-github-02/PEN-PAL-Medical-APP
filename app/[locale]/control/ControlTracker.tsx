@@ -43,7 +43,7 @@ export default function ControlTracker({ locale, token }: ControlTrackerProps) {
     async function initSession() {
       if (effectiveToken) {
         try {
-          await validateAndConsumeToken(effectiveToken, locale);
+          await validateAndConsumeToken(effectiveToken, locale, 'CONTROL');
         } catch (err) {
           console.warn('Control session token validation error:', err);
         }

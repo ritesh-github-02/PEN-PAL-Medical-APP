@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
-import { generateControlGroupPDF } from '@/lib/generate-control-pdf';
 
 export default function ControlDownloadPdfButton({ locale, label }: { locale?: string; label?: string }) {
   const isEs = locale === 'es';
@@ -13,11 +12,28 @@ export default function ControlDownloadPdfButton({ locale, label }: { locale?: s
     if (isGenerating) return;
     setIsGenerating(true);
     try {
-      await generateControlGroupPDF(locale || 'en');
+      const fileName = isEs
+        ? 'PEN-PAL_Folleto_Familiar_Grupo_Control.pdf'
+        : 'PEN-PAL_Control_Group_Family_Handout.pdf';
+      const fileUrl = `/documents/${fileName}`;
+
+      const response = await fetch(fileUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch PDF: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
-      console.error('Failed to generate control handout PDF:', err);
-      // Fallback to window.print if client PDF generation fails
-      window.print();
+      console.error('Failed to download control handout PDF:', err);
+      window.open(isEs ? '/documents/PEN-PAL_Folleto_Familiar_Grupo_Control.pdf' : '/documents/PEN-PAL_Control_Group_Family_Handout.pdf', '_blank');
     } finally {
       setIsGenerating(false);
     }
@@ -34,7 +50,7 @@ export default function ControlDownloadPdfButton({ locale, label }: { locale?: s
       {isGenerating ? (
         <>
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          <span>{isEs ? "Generando PDF..." : "Downloading PDF..."}</span>
+          <span>{isEs ? "Descargando..." : "Downloading..."}</span>
         </>
       ) : (
         <>
