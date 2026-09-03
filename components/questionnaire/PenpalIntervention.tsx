@@ -1651,7 +1651,7 @@ function SurveySingleChoice({
                     {medicineSelected && routeSelected && <span className="hidden sm:inline text-slate-400">•</span>}
                     {routeSelected && (
                       <span>
-                        {isSpanish ? "Vía: " : "Route: "}
+                        {isSpanish ? "Toma: " : "Intake: "}
                         <strong className="font-bold text-[#1f5c66]">
                           {isSpanish
                             ? (RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === routeSelected)?.labelEs || routeSelected)
