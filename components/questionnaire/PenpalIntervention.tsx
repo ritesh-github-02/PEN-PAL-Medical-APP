@@ -710,7 +710,44 @@ export default function PenpalIntervention() {
                   {currentStep.type === "multiple_choice" && (
                     <SurveyMultipleChoice {...baseProps} options={currentStep.options} selected={answers[currentStep.id]} onSelect={handleAnswer} />
                   )}
-                  {currentStep.type === "single_choice" && (
+                  {currentStep.id === "screen6_4_resolution" ? (
+                    <Slide10MedicalCareScreen
+                      isSpanish={locale === "es"}
+                      selected={answers[currentStep.id]}
+                      locationSelected={answers["screen6_4_location"]}
+                      onSelect={handleAnswer}
+                      onLocationSelect={(loc: string) => {
+                        setAnswers((prev) => ({ ...prev, screen6_4_location: loc }));
+                      }}
+                      navProps={baseProps}
+                    />
+                  ) : currentStep.id === "screen6_4b_resolution_type" ? (
+                    <Slide11MedicationScreen
+                      isSpanish={locale === "es"}
+                      selected={answers[currentStep.id]}
+                      medicineSelected={answers["screen6_4b_medicine"]}
+                      routeSelected={answers["screen6_4b_route"]}
+                      onSelect={handleAnswer}
+                      onMedicineSelect={(med: string) => {
+                        setAnswers((prev) => ({ ...prev, screen6_4b_medicine: med }));
+                      }}
+                      onRouteSelect={(route: string) => {
+                        setAnswers((prev) => ({ ...prev, screen6_4b_route: route }));
+                      }}
+                      navProps={baseProps}
+                    />
+                  ) : currentStep.id === "screen6_5_yetagain" ? (
+                    <Slide12RepeatUseScreen
+                      isSpanish={locale === "es"}
+                      selected={answers[currentStep.id]}
+                      reactionDetailSelected={answers["screen6_5_reaction_detail"]}
+                      onSelect={handleAnswer}
+                      onReactionDetailSelect={(detail: string) => {
+                        setAnswers((prev) => ({ ...prev, screen6_5_reaction_detail: detail }));
+                      }}
+                      navProps={baseProps}
+                    />
+                  ) : currentStep.type === "single_choice" ? (
                     <SurveySingleChoice
                       {...baseProps}
                       stepId={currentStep.id}
@@ -734,7 +771,7 @@ export default function PenpalIntervention() {
                         setAnswers((prev) => ({ ...prev, screen6_5_reaction_detail: detail }));
                       }}
                     />
-                  )}
+                  ) : null}
                   {currentStep.type === "slider" && (
                     <SurveySlider {...baseProps} min={currentStep.min} max={currentStep.max} unit={locale === "es" ? currentStep.unitEs : currentStep.unitEn} selected={answers[currentStep.id]} onSelect={handleAnswer} />
                   )}
@@ -1480,10 +1517,807 @@ const RESOLUTION_ROUTE_OPTIONS = [
 ];
 
 const YETAGAIN_REACTION_OPTIONS = [
-  { value: "Yes, and they did not have a reaction", labelEn: "Yes, and they did not have a reaction", labelEs: "Sí, y no tuvieron una reacción" },
-  { value: "Yes, and they had a reaction", labelEn: "Yes, and they had a reaction", labelEs: "Sí, y tuvieron una reacción" },
-  { value: "Unsure / I don't know", labelEn: "Unsure / I don't know", labelEs: "No estoy seguro/No sé" },
+  { 
+    value: "Yes, and they did not have a reaction", 
+    labelEn: "Yes, and they did not have a reaction", 
+    labelEs: "Sí, y no tuvieron una reacción" 
+  },
+  { 
+    value: "Yes, and they had a reaction", 
+    labelEn: "Yes, and they had a reaction", 
+    labelEs: "Sí, y tuvieron una reacción" 
+  },
+  { 
+    value: "Unsure / I don't know", 
+    labelEn: "Unsure / I don't know", 
+    labelEs: "No estoy seguro / No sé" 
+  },
 ];
+
+export function Slide10MedicalCareScreen(props: any) {
+  const { isSpanish, selected, onSelect, locationSelected, onLocationSelect, navProps } = props;
+  const [showBranchModal, setShowBranchModal] = useState(false);
+
+  // Focus management refs
+  const modalTitleRef = useRef<HTMLHeadingElement>(null);
+  const yesButtonRef = useRef<HTMLButtonElement>(null);
+  const changeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Move focus into modal when opened; announce dialog
+  useEffect(() => {
+    if (showBranchModal) {
+      setTimeout(() => {
+        modalTitleRef.current?.focus();
+      }, 50);
+    }
+  }, [showBranchModal]);
+
+  const handleCloseModal = () => {
+    setShowBranchModal(false);
+    // Return focus to appropriate trigger button
+    if (locationSelected && changeButtonRef.current) {
+      changeButtonRef.current.focus();
+    } else if (yesButtonRef.current) {
+      yesButtonRef.current.focus();
+    }
+  };
+
+  const handleMainSelect = (val: string) => {
+    onSelect(val);
+    if (val === "Yes" && !locationSelected) {
+      setShowBranchModal(true);
+    }
+  };
+
+  const mainOptions = [
+    { value: "Yes", labelEn: "Yes", labelEs: "Sí" },
+    { value: "No", labelEn: "No", labelEs: "No" },
+    { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+  ];
+
+  return (
+    <>
+      {/* =========================================================================
+          PART 1: PARENT SLIDE (aria-hidden while modal is open)
+          ========================================================================= */}
+      <div 
+        id="slide-content"
+        aria-hidden={showBranchModal}
+        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
+      >
+        <div className="mb-6">
+          <h2 
+            id="slide10-title"
+            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug"
+          >
+            {isSpanish
+              ? "¿Su hijo recibió atención médica por la reacción?"
+              : "Did your child receive medical care for their reaction?"}
+          </h2>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 my-auto">
+          <div className="flex-1 w-full max-w-xl">
+            {/* Parent Radiogroup */}
+            <div
+              role="radiogroup"
+              aria-labelledby="slide10-title"
+              className="bg-[#7da199]/60 p-3 sm:p-4 rounded-3xl flex flex-wrap items-center gap-3"
+            >
+              {mainOptions.map((opt) => {
+                const isSelected = selected === opt.value || (opt.value.startsWith("Unsure") && (selected === "Unsure" || selected === "Unsure/I don't know"));
+                const label = isSpanish ? opt.labelEs : opt.labelEn;
+                return (
+                  <button
+                    key={opt.value}
+                    ref={opt.value === "Yes" ? yesButtonRef : undefined}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => handleMainSelect(opt.value)}
+                    className={`px-6 py-3 min-h-[44px] rounded-2xl font-bold text-sm sm:text-base transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isSelected
+                        ? "bg-[#1f5c66] text-white shadow-md border-2 border-[#1f5c66]"
+                        : "bg-white text-[#132c27] hover:bg-slate-50 border-2 border-transparent"
+                    }`}
+                  >
+                    {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected Location Summary Chip */}
+            {selected === "Yes" && locationSelected && (
+              <div className="mt-3.5 flex items-center justify-between bg-white/60 backdrop-blur-xs rounded-xl px-4 py-2.5 text-xs font-semibold text-[#132c27] border border-slate-200 shadow-2xs">
+                <span>
+                  {isSpanish ? "Ubicación seleccionada: " : "Selected location: "}
+                  <strong className="font-bold text-[#1f5c66]">
+                    {isSpanish
+                      ? (MEDICAL_CARE_LOCATION_OPTIONS.find((o) => o.value === locationSelected)?.labelEs || locationSelected)
+                      : (MEDICAL_CARE_LOCATION_OPTIONS.find((o) => o.value === locationSelected)?.labelEn || locationSelected)}
+                  </strong>
+                </span>
+                <button
+                  ref={changeButtonRef}
+                  type="button"
+                  onClick={() => setShowBranchModal(true)}
+                  aria-label={isSpanish ? "Cambiar ubicación médica seleccionada" : "Change selected medical care location"}
+                  className="text-[#1f5c66] hover:underline font-bold ml-3 min-h-[44px] inline-flex items-center cursor-pointer"
+                >
+                  {isSpanish ? "Cambiar" : "Change"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="shrink-0 self-center">
+            <img
+              src="/images/nurse-anna.png"
+              alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
+              className="w-24 sm:w-28 md:w-32 h-auto object-contain pointer-events-none"
+            />
+          </div>
+        </div>
+
+        {/* Parent Next Button */}
+        <div className="flex justify-center pt-6 mt-4 border-t border-slate-200/60">
+          <button
+            type="button"
+            disabled={!selected || (selected === "Yes" && !locationSelected)}
+            onClick={() => navProps.onNext(selected)}
+            className={`px-12 py-3 min-h-[44px] font-bold text-sm sm:text-base rounded-full transition shadow-sm flex items-center justify-center ${
+              selected && (selected !== "Yes" || locationSelected)
+                ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
+            }`}
+          >
+            {isSpanish ? "Siguiente" : "Next"}
+          </button>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          PART 2: ACCESSIBLE BRANCH MODAL
+          ========================================================================= */}
+      {showBranchModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="branch-modal-title"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              handleCloseModal();
+            }
+          }}
+        >
+          <div className="bg-[#f4f8e8] border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-2xl max-w-lg w-full relative animate-in zoom-in-95 duration-200">
+            
+            {/* Modal Heading receives immediate programmatic focus on open */}
+            <h3
+              ref={modalTitleRef}
+              tabIndex={-1}
+              id="branch-modal-title"
+              className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
+            >
+              {isSpanish
+                ? "¿Dónde recibió atención médica su hijo por la reacción?"
+                : "Where did your child get medical care for the reaction?"}
+            </h3>
+
+            {/* Modal Radiogroup */}
+            <div 
+              role="radiogroup" 
+              aria-labelledby="branch-modal-title"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5"
+            >
+              {MEDICAL_CARE_LOCATION_OPTIONS.map((locOpt) => {
+                const isLocSelected = locationSelected === locOpt.value;
+                const label = isSpanish ? locOpt.labelEs : locOpt.labelEn;
+                return (
+                  <button
+                    type="button"
+                    key={locOpt.value}
+                    role="radio"
+                    aria-checked={isLocSelected}
+                    onClick={() => {
+                      if (onLocationSelect) {
+                        onLocationSelect(locOpt.value);
+                      }
+                    }}
+                    className={`px-4 py-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isLocSelected
+                        ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                        : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    {isLocSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Modal Action Controls (Cleaned symbols + 44px targets) */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/60">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                aria-label={isSpanish ? "Cerrar ventana" : "Close window"}
+                className="px-5 py-2.5 min-h-[44px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-full transition cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+              >
+                <span aria-hidden="true">✕</span>
+                <span>{isSpanish ? "Cerrar" : "Close"}</span>
+              </button>
+              <button
+                type="button"
+                disabled={!locationSelected}
+                onClick={handleCloseModal}
+                className={`px-8 py-2.5 min-h-[44px] font-bold text-xs sm:text-sm rounded-full transition shadow-xs flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                  locationSelected
+                    ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95"
+                    : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
+                }`}
+              >
+                {isSpanish ? "Aceptar" : "Confirm"}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function Slide11MedicationScreen(props: any) {
+  const { isSpanish, selected, onSelect, medicineSelected, onMedicineSelect, routeSelected, onRouteSelect, navProps } = props;
+  const [showModal, setShowModal] = useState(false);
+  const [modalStep, setModalStep] = useState<1 | 2>(1); // 1 = Medicine, 2 = Route
+
+  const modalTitleRef = useRef<HTMLHeadingElement>(null);
+  const changeButtonRef = useRef<HTMLButtonElement>(null);
+  const medTriggerButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Focus title on modal open or step transition
+  useEffect(() => {
+    if (showModal) {
+      setTimeout(() => {
+        modalTitleRef.current?.focus();
+      }, 50);
+    }
+  }, [showModal, modalStep]);
+
+  const handleClose = () => {
+    setShowModal(false);
+    setModalStep(1);
+    if (medicineSelected && changeButtonRef.current) {
+      changeButtonRef.current.focus();
+    } else if (medTriggerButtonRef.current) {
+      medTriggerButtonRef.current.focus();
+    }
+  };
+
+  const mainOptions = [
+    { value: "With medication", labelEn: "With medication", labelEs: "Con medicamentos" },
+    { value: "On its own", labelEn: "On its own", labelEs: "Por sí sola" },
+    { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+  ];
+
+  return (
+    <>
+      {/* =========================================================================
+          PART 1: PARENT SLIDE (aria-hidden while modal is open)
+          ========================================================================= */}
+      <div 
+        id="slide-content"
+        aria-hidden={showModal}
+        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
+      >
+        <div className="mb-6">
+          <h2 
+            id="slide11-title"
+            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug"
+          >
+            {isSpanish
+              ? "¿Cómo desapareció la reacción de su hijo?"
+              : "How did your child's reaction go away?"}
+          </h2>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 my-auto">
+          <div className="flex-1 w-full max-w-xl">
+            {/* Parent Radiogroup */}
+            <div
+              role="radiogroup"
+              aria-labelledby="slide11-title"
+              className="bg-[#7da199]/60 p-3 sm:p-4 rounded-3xl flex flex-wrap items-center gap-3"
+            >
+              {mainOptions.map((opt) => {
+                const isSelected = selected === opt.value;
+                const label = isSpanish ? opt.labelEs : opt.labelEn;
+                return (
+                  <button
+                    key={opt.value}
+                    ref={opt.value === "With medication" ? medTriggerButtonRef : undefined}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => {
+                      onSelect(opt.value);
+                      if (opt.value === "With medication" && !medicineSelected) {
+                        setModalStep(1);
+                        setShowModal(true);
+                      }
+                    }}
+                    className={`px-6 py-3 min-h-[44px] rounded-2xl font-bold text-sm sm:text-base transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isSelected
+                        ? "bg-[#1f5c66] text-white shadow-md border-2 border-[#1f5c66]"
+                        : "bg-white text-[#132c27] hover:bg-slate-50 border-2 border-transparent"
+                    }`}
+                  >
+                    {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected Summary Chip */}
+            {selected === "With medication" && (medicineSelected || routeSelected) && (
+              <div className="mt-3.5 flex items-center justify-between bg-white/60 backdrop-blur-xs rounded-xl px-4 py-2.5 text-xs font-semibold text-[#132c27] border border-slate-200 shadow-2xs">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  {medicineSelected && (
+                    <span>
+                      {isSpanish ? "Medicamento: " : "Medicine: "}
+                      <strong className="font-bold text-[#1f5c66]">
+                        {isSpanish
+                          ? (RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medicineSelected)?.labelEs || medicineSelected)
+                          : (RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medicineSelected)?.labelEn || medicineSelected)}
+                      </strong>
+                    </span>
+                  )}
+                  {medicineSelected && routeSelected && <span className="hidden sm:inline text-slate-400">•</span>}
+                  {routeSelected && (
+                    <span>
+                      {isSpanish ? "Toma: " : "Intake: "}
+                      <strong className="font-bold text-[#1f5c66]">
+                        {isSpanish
+                          ? (RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === routeSelected)?.labelEs || routeSelected)
+                          : (RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === routeSelected)?.labelEn || routeSelected)}
+                      </strong>
+                    </span>
+                  )}
+                </div>
+                <button
+                  ref={changeButtonRef}
+                  type="button"
+                  onClick={() => {
+                    setModalStep(1);
+                    setShowModal(true);
+                  }}
+                  aria-label={isSpanish ? "Cambiar detalles del medicamento" : "Change medication details"}
+                  className="text-[#1f5c66] hover:underline font-bold ml-3 min-h-[44px] inline-flex items-center cursor-pointer"
+                >
+                  {isSpanish ? "Cambiar" : "Change"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="shrink-0 self-center">
+            <img
+              src="/images/nurse-anna.png"
+              alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
+              className="w-24 sm:w-28 md:w-32 h-auto object-contain pointer-events-none"
+            />
+          </div>
+        </div>
+
+        {/* Parent Next Button */}
+        <div className="flex justify-center pt-6 mt-4 border-t border-slate-200/60">
+          <button
+            type="button"
+            disabled={!selected || (selected === "With medication" && (!medicineSelected || !routeSelected))}
+            onClick={() => navProps.onNext(selected)}
+            className={`px-12 py-3 min-h-[44px] font-bold text-sm sm:text-base rounded-full transition shadow-sm flex items-center justify-center ${
+              selected && (selected !== "With medication" || (medicineSelected && routeSelected))
+                ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
+            }`}
+          >
+            {isSpanish ? "Siguiente" : "Next"}
+          </button>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          PART 2: SINGLE 2-STEP MODAL (Eliminates Nested Dialog Bug)
+          ========================================================================= */}
+      {showModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="med-modal-title"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") handleClose();
+          }}
+        >
+          <div className="bg-[#f4f8e8] border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-2xl max-w-lg w-full relative animate-in zoom-in-95 duration-200">
+            {/* Step Indicator Header */}
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-xs font-bold text-[#1f5c66] uppercase tracking-wider">
+                {isSpanish ? `Paso ${modalStep} de 2` : `Step ${modalStep} of 2`}
+              </span>
+            </div>
+
+            {/* STEP 1: What Medicine Was Given? */}
+            {modalStep === 1 && (
+              <div>
+                <h3
+                  ref={modalTitleRef}
+                  tabIndex={-1}
+                  id="med-modal-title"
+                  className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
+                >
+                  {isSpanish
+                    ? "¿Qué medicamento se le dio a su hijo para la reacción?"
+                    : "What medicine was given to your child for the reaction?"}
+                </h3>
+
+                <div role="radiogroup" aria-labelledby="med-modal-title" className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5">
+                  {RESOLUTION_MEDICINE_OPTIONS.map((medOpt) => {
+                    const isSelected = medicineSelected === medOpt.value;
+                    const label = isSpanish ? medOpt.labelEs : medOpt.labelEn;
+                    return (
+                      <button
+                        key={medOpt.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={isSelected}
+                        onClick={() => onMedicineSelect && onMedicineSelect(medOpt.value)}
+                        className={`px-4 py-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                          isSelected
+                            ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                            : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                        }`}
+                      >
+                        {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                        <span>{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/60">
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="px-5 py-2.5 min-h-[44px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                  >
+                    <span aria-hidden="true">✕</span>
+                    <span>{isSpanish ? "Cerrar" : "Close"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!medicineSelected}
+                    onClick={() => setModalStep(2)}
+                    className={`px-8 py-2.5 min-h-[44px] font-bold text-xs sm:text-sm rounded-full transition shadow-xs flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      medicineSelected
+                        ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95"
+                        : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
+                    }`}
+                  >
+                    <span>{isSpanish ? "Siguiente" : "Next"}</span>
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: Did Your Child Receive the Medicine By? */}
+            {modalStep === 2 && (
+              <div>
+                <h3
+                  ref={modalTitleRef}
+                  tabIndex={-1}
+                  id="med-modal-title"
+                  className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
+                >
+                  {isSpanish
+                    ? "¿Su hijo recibió el medicamento por:"
+                    : "Did your child receive the medicine by:"}
+                </h3>
+
+                <div role="radiogroup" aria-labelledby="med-modal-title" className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5">
+                  {RESOLUTION_ROUTE_OPTIONS.map((routeOpt) => {
+                    const isSelected = routeSelected === routeOpt.value;
+                    const label = isSpanish ? routeOpt.labelEs : routeOpt.labelEn;
+                    return (
+                      <button
+                        key={routeOpt.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={isSelected}
+                        onClick={() => onRouteSelect && onRouteSelect(routeOpt.value)}
+                        className={`px-4 py-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                          isSelected
+                            ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                            : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                        }`}
+                      >
+                        {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                        <span>{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/60">
+                  <button
+                    type="button"
+                    onClick={() => setModalStep(1)}
+                    className="px-5 py-2.5 min-h-[44px] bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                  >
+                    <span aria-hidden="true">←</span>
+                    <span>{isSpanish ? "Atrás" : "Back"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!routeSelected}
+                    onClick={handleClose}
+                    className={`px-8 py-2.5 min-h-[44px] font-bold text-xs sm:text-sm rounded-full transition shadow-xs flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      routeSelected
+                        ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95"
+                        : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
+                    }`}
+                  >
+                    {isSpanish ? "Confirmar" : "Confirm"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function Slide12RepeatUseScreen(props: any) {
+  const { isSpanish, selected, onSelect, reactionDetailSelected, onReactionDetailSelect, navProps } = props;
+  const [showYetAgainModal, setShowYetAgainModal] = useState(false);
+
+  const modalTitleRef = useRef<HTMLHeadingElement>(null);
+  const yesButtonRef = useRef<HTMLButtonElement>(null);
+  const changeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (showYetAgainModal) {
+      setTimeout(() => {
+        modalTitleRef.current?.focus();
+      }, 50);
+    }
+  }, [showYetAgainModal]);
+
+  const handleCloseModal = () => {
+    setShowYetAgainModal(false);
+    if (reactionDetailSelected && changeButtonRef.current) {
+      changeButtonRef.current.focus();
+    } else if (yesButtonRef.current) {
+      yesButtonRef.current.focus();
+    }
+  };
+
+  const handleMainSelect = (val: string) => {
+    onSelect(val);
+    if (val === "Yes" && !reactionDetailSelected) {
+      setShowYetAgainModal(true);
+    }
+  };
+
+  const mainOptions = [
+    { value: "Yes", labelEn: "Yes", labelEs: "Sí" },
+    { value: "No", labelEn: "No", labelEs: "No" },
+    { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+  ];
+
+  return (
+    <>
+      {/* =========================================================================
+          PART 1: PARENT SLIDE (aria-hidden while modal is open)
+          ========================================================================= */}
+      <div 
+        id="slide-content"
+        aria-hidden={showYetAgainModal}
+        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
+      >
+        <div className="mb-6">
+          <h2 
+            id="slide12-title"
+            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug"
+          >
+            {isSpanish
+              ? "¿Su hijo ha recibido penicilina desde la reacción?"
+              : "Has your child received penicillin since the reaction?"}
+          </h2>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 my-auto">
+          <div className="flex-1 w-full max-w-xl">
+            {/* Parent Radiogroup */}
+            <div
+              role="radiogroup"
+              aria-labelledby="slide12-title"
+              className="bg-[#7da199]/60 p-3 sm:p-4 rounded-3xl flex flex-wrap items-center gap-3"
+            >
+              {mainOptions.map((opt) => {
+                const isSelected = selected === opt.value || (opt.value.startsWith("Unsure") && (selected === "Unsure" || selected === "Unsure/I don't know"));
+                const label = isSpanish ? opt.labelEs : opt.labelEn;
+                return (
+                  <button
+                    key={opt.value}
+                    ref={opt.value === "Yes" ? yesButtonRef : undefined}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => handleMainSelect(opt.value)}
+                    className={`px-6 py-3 min-h-[44px] rounded-2xl font-bold text-sm sm:text-base transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isSelected
+                        ? "bg-[#1f5c66] text-white shadow-md border-2 border-[#1f5c66]"
+                        : "bg-white text-[#132c27] hover:bg-slate-50 border-2 border-transparent"
+                    }`}
+                  >
+                    {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected Reaction Detail Summary Chip */}
+            {selected === "Yes" && reactionDetailSelected && (
+              <div className="mt-3.5 flex items-center justify-between bg-white/60 backdrop-blur-xs rounded-xl px-4 py-2.5 text-xs font-semibold text-[#132c27] border border-slate-200 shadow-2xs">
+                <span>
+                  {isSpanish ? "Detalle: " : "Detail: "}
+                  <strong className="font-bold text-[#1f5c66]">
+                    {isSpanish
+                      ? (YETAGAIN_REACTION_OPTIONS.find((o) => o.value === reactionDetailSelected)?.labelEs || reactionDetailSelected)
+                      : (YETAGAIN_REACTION_OPTIONS.find((o) => o.value === reactionDetailSelected)?.labelEn || reactionDetailSelected)}
+                  </strong>
+                </span>
+                <button
+                  ref={changeButtonRef}
+                  type="button"
+                  onClick={() => setShowYetAgainModal(true)}
+                  aria-label={isSpanish ? "Cambiar detalle de la reacción" : "Change reaction detail"}
+                  className="text-[#1f5c66] hover:underline font-bold ml-3 min-h-[44px] inline-flex items-center cursor-pointer"
+                >
+                  {isSpanish ? "Cambiar" : "Change"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="shrink-0 self-center">
+            <img
+              src="/images/nurse-anna.png"
+              alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
+              className="w-24 sm:w-28 md:w-32 h-auto object-contain pointer-events-none"
+            />
+          </div>
+        </div>
+
+        {/* Parent Next Button */}
+        <div className="flex justify-center pt-6 mt-4 border-t border-slate-200/60">
+          <button
+            type="button"
+            disabled={!selected || (selected === "Yes" && !reactionDetailSelected)}
+            onClick={() => navProps.onNext(selected)}
+            className={`px-12 py-3 min-h-[44px] font-bold text-sm sm:text-base rounded-full transition shadow-sm flex items-center justify-center ${
+              selected && (selected !== "Yes" || reactionDetailSelected)
+                ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
+            }`}
+          >
+            {isSpanish ? "Siguiente" : "Next"}
+          </button>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          PART 2: ACCESSIBLE MODAL DIALOG
+          ========================================================================= */}
+      {showYetAgainModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="yetagain-modal-title"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") handleCloseModal();
+          }}
+        >
+          <div className="bg-[#f4f8e8] border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-2xl max-w-lg w-full relative animate-in zoom-in-95 duration-200">
+            
+            <h3
+              ref={modalTitleRef}
+              tabIndex={-1}
+              id="yetagain-modal-title"
+              className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
+            >
+              {isSpanish
+                ? "¿Su hijo ha tomado penicilina (amoxicilina) nuevamente desde la reacción?"
+                : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
+            </h3>
+
+            {/* Semantic Radiogroup Wrapper */}
+            <div 
+              role="radiogroup" 
+              aria-labelledby="yetagain-modal-title"
+              className="space-y-3 mb-5"
+            >
+              {YETAGAIN_REACTION_OPTIONS.map((opt) => {
+                const isOptSelected = reactionDetailSelected === opt.value;
+                const label = isSpanish ? opt.labelEs : opt.labelEn;
+                return (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    role="radio"
+                    aria-checked={isOptSelected}
+                    onClick={() => {
+                      if (onReactionDetailSelect) {
+                        onReactionDetailSelect(opt.value);
+                      }
+                    }}
+                    className={`w-full px-5 py-3.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isOptSelected
+                        ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                        : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    {isOptSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Footer with 44px touch targets and Figma tag removed */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/60">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                aria-label={isSpanish ? "Cerrar ventana" : "Close window"}
+                className="px-5 py-2.5 min-h-[44px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-full transition cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+              >
+                <span aria-hidden="true">✕</span>
+                <span>{isSpanish ? "Cerrar" : "Close"}</span>
+              </button>
+              <button
+                type="button"
+                disabled={!reactionDetailSelected}
+                onClick={handleCloseModal}
+                className={`px-8 py-2.5 min-h-[44px] font-bold text-xs sm:text-sm rounded-full transition shadow-xs flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                  reactionDetailSelected
+                    ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95"
+                    : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
+                }`}
+              >
+                {isSpanish ? "Confirmar" : "Confirm"}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 function SurveySingleChoice({
   title,
