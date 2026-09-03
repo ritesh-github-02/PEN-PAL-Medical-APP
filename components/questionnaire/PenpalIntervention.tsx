@@ -3062,15 +3062,27 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
   );
 }
 
-function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { answers: any; activeToken?: string | null }) {
+function SummaryScreen({ 
+  title, 
+  content, 
+  answers, 
+  activeToken, 
+  onNext, 
+  onBack, 
+  loading, 
+  t, 
+  locale, 
+  isFirstStep, 
+  headingRef 
+}: BaseScreenProps & { answers: any; activeToken?: string | null }) {
   const isSpanish = locale === "es";
+
   const summarySections = [
     {
       id: "screen6_1_symptoms",
       labelKey: "symptoms",
       labelEn: "Reported Symptoms",
       labelEs: "Síntomas Reportados",
-      defaultValue: isSpanish ? "Síntomas Reportados" : "Reported Symptoms",
       getValue: () => {
         const rawVal = answers?.screen6_1_symptoms;
         if (!rawVal) return isSpanish ? "Ninguno reportado" : "None reported";
@@ -3089,9 +3101,7 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
           symArray = [String(rawVal)];
         }
 
-        if (symArray.length === 0) {
-          return isSpanish ? "Ninguno reportado" : "None reported";
-        }
+        if (symArray.length === 0) return isSpanish ? "Ninguno reportado" : "None reported";
 
         const step = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
         return symArray
@@ -3114,11 +3124,10 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       labelKey: "timing",
       labelEn: "Age at Reaction",
       labelEs: "Edad en la Reacción",
-      defaultValue: isSpanish ? "Edad en la Reacción" : "Age at Reaction",
       getValue: () => {
         const val = answers?.screen6_2_timing;
         if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
-        return isSpanish ? (val + " años") : (val + " years old");
+        return isSpanish ? `${val} años` : `${val} years old`;
       },
     },
     {
@@ -3126,7 +3135,6 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       labelKey: "onset",
       labelEn: "Time to Onset",
       labelEs: "Tiempo de Inicio",
-      defaultValue: isSpanish ? "Tiempo de Inicio" : "Time to Onset",
       getValue: () => {
         const val = answers?.screen6_3_onset;
         if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
@@ -3140,7 +3148,6 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       labelKey: "resolution",
       labelEn: "Medical Care Received",
       labelEs: "Atención Médica Recibida",
-      defaultValue: isSpanish ? "Atención Médica Recibida" : "Medical Care Received",
       getValue: () => {
         const val = answers?.screen6_4_resolution;
         const loc = answers?.screen6_4_location;
@@ -3161,7 +3168,6 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       labelKey: "resolutionType",
       labelEn: "Symptom Resolution",
       labelEs: "Resolución de Síntomas",
-      defaultValue: isSpanish ? "Resolución de Síntomas" : "Symptom Resolution",
       getValue: () => {
         const val = answers?.screen6_4b_resolution_type;
         const med = answers?.screen6_4b_medicine;
@@ -3192,7 +3198,6 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       labelKey: "yetagain",
       labelEn: "Penicillin Since Reaction",
       labelEs: "Re-exposición Desde la Reacción",
-      defaultValue: isSpanish ? "Re-exposición Desde la Reacción" : "Penicillin Since Reaction",
       getValue: () => {
         const val = answers?.screen6_5_yetagain;
         const detail = answers?.screen6_5_reaction_detail;
@@ -3210,125 +3215,141 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
     },
   ];
 
-  // Parse Action Steps content
-  const paragraphs = (content || '').split('\n\n');
-  const steps = paragraphs.filter(p => p.startsWith('#'));
-  const calloutParagraph = paragraphs.find(p => p.toLowerCase().includes("say:") || p.toLowerCase().includes("decir:"));
-  const quoteParagraph = paragraphs.find(p => p.startsWith('"') || p.startsWith('“'));
+  const paragraphs = (content || "").split("\n\n");
+  const steps = paragraphs.filter((p) => p.startsWith("#"));
+  const calloutParagraph = paragraphs.find((p) => p.toLowerCase().includes("say:") || p.toLowerCase().includes("decir:"));
+  const quoteParagraph = paragraphs.find((p) => p.startsWith('"') || p.startsWith('“'));
 
   return (
-    <div id="slide-content" className="print-container bg-white border border-slate-200/80 rounded-2xl shadow-md p-3.5 sm:p-5 max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col justify-between">
+    <div 
+      id="slide-content" 
+      className="print-container bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 w-full max-w-4xl mx-auto flex flex-col justify-between"
+    >
+      {/* 1. Polite Status Announcement for Screen Readers */}
+      <div role="status" aria-live="polite" className="sr-only">
+        {isSpanish 
+          ? "Paso 13: Pasos a seguir para los padres y resumen de respuestas para el médico." 
+          : "Step 13: Action Steps for Parents and summary of responses for the doctor."}
+      </div>
+
       <div className="print-section text-center">
+        {/* Heading without tabIndex (0 ANDI Alerts) */}
         <h2 
-          ref={headingRef}
-          tabIndex={-1}
-          className="text-base sm:text-lg font-black text-slate-900 mb-2 text-center tracking-tight leading-tight outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
+          className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 mb-3 text-center tracking-tight leading-tight outline-none"
         >
-          {title}
+          {title || (isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents")}
         </h2>
 
-        {/* Step-by-step numbered actions */}
-        <div className="space-y-1.5 max-w-xl mx-auto text-left mb-3">
+        {/* Semantic Ordered List for Screen Readers & WAVE */}
+        <ol className="space-y-2 max-w-xl mx-auto text-left mb-4 list-none p-0">
           {steps.map((step, idx) => {
             const cleanText = step.replace(/^#\d+\.\s*/, "");
             return (
-              <div key={idx} className="flex items-start gap-2">
-                <span className="flex-shrink-0 w-4 h-4 rounded-full bg-blue-50 border border-blue-200 text-blue-600 font-bold text-[10px] flex items-center justify-center mt-0.5">
+              <li key={idx} className="flex items-start gap-2.5">
+                <span 
+                  aria-hidden="true" 
+                  className="shrink-0 w-5 h-5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-bold text-xs flex items-center justify-center mt-0.5"
+                >
                   {idx + 1}
                 </span>
-                <p className="text-xs text-slate-700 leading-snug font-semibold">
+                <p className="text-xs sm:text-sm text-slate-800 leading-snug font-semibold">
+                  <span className="sr-only">{`Step ${idx + 1}: `}</span>
                   {cleanText}
                 </p>
-              </div>
+              </li>
             );
           })}
-        </div>
+        </ol>
 
-        {/* Callout box for patient verbal guidance */}
+        {/* Doctor Conversation Guidance Callout */}
         {calloutParagraph && quoteParagraph && (
-          <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-2 sm:p-2.5 max-w-xl mx-auto text-left shadow-2xs mb-3">
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 max-w-xl mx-auto text-left shadow-2xs mb-4">
+            <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
               {isSpanish ? "Lo que puede decirle al médico:" : "What you can say to the doctor:"}
             </p>
-            <p className="text-xs text-slate-800 font-semibold italic leading-snug">
+            <p className="text-xs sm:text-sm text-slate-900 font-semibold italic leading-snug">
               {quoteParagraph}
             </p>
           </div>
         )}
       </div>
 
-      <div className="print-section border-t border-slate-100 pt-2.5 mb-2">
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-left">
+      {/* Semantic Definition List for Assessment Summary Grid */}
+      <div className="print-section border-t border-slate-200 pt-3 mb-4">
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-left m-0">
           {summarySections.map((section) => {
             const label = isSpanish ? section.labelEs : section.labelEn;
             return (
-              <div key={section.id} className="bg-slate-50/90 border border-slate-200/80 rounded-lg p-2 sm:p-2.5">
-                <p className="section-label text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5 truncate">
+              <div 
+                key={section.id} 
+                className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 shadow-2xs"
+              >
+                {/* High Contrast Label (> 6.5:1 ratio, No Truncation) */}
+                <dt className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
                   {label}
-                </p>
-                <p className="section-value text-xs text-slate-800 font-bold leading-tight truncate sm:whitespace-normal">{section.getValue()}</p>
+                </dt>
+                <dd className="m-0 text-xs sm:text-sm text-slate-950 font-black leading-snug break-words">
+                  {section.getValue()}
+                </dd>
               </div>
             );
           })}
-        </div>
+        </dl>
       </div>
 
-      <div className="flex flex-row gap-2 justify-center pt-2 border-t border-slate-100 no-print shrink-0">
-        <div className="flex flex-row gap-2 items-center">
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="px-4 py-2 min-h-[44px] border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-            </svg>
-            {isSpanish ? "Imprimir Informe" : t("print")}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                generateAssessmentPDF({
-                  participantId: activeToken || undefined,
-                  token: activeToken || undefined,
-                  locale,
-                  answers,
-                  summarySections: summarySections.map((s) => {
-                    const label = isSpanish ? s.labelEs : s.labelEn;
-                    return {
-                      label,
-                      value: s.getValue(),
-                    };
-                  }),
-                  steps: steps.map((s) => s.replace(/^#\d+\.\s*/, "")),
-                });
-              } catch (err) {
-                console.error("PDF generation error:", err);
-              }
-              onNext();
-            }}
-            disabled={loading}
-            className="px-6 py-2 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {isSpanish ? "Guardando..." : "Saving..."}
-              </>
-            ) : (
-              <>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                {isSpanish ? "Completar y Guardar como PDF" : t("completeSave")}
-              </>
-            )}
-          </button>
-        </div>
+      {/* Action Buttons: 44px Minimum Touch Targets with AAA Contrast */}
+      <div className="flex flex-wrap gap-3 justify-center pt-3 border-t border-slate-200 no-print shrink-0">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="px-5 py-2.5 min-h-[44px] border border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-full text-xs sm:text-sm font-bold tracking-wide transition flex items-center justify-center gap-2 cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          <span>{isSpanish ? "Imprimir Informe" : t("print")}</span>
+        </button>
+
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => {
+            try {
+              generateAssessmentPDF({
+                participantId: activeToken || undefined,
+                token: activeToken || undefined,
+                locale,
+                answers,
+                summarySections: summarySections.map((s) => ({
+                  label: isSpanish ? s.labelEs : s.labelEn,
+                  value: s.getValue(),
+                })),
+                steps: steps.map((s) => s.replace(/^#\d+\.\s*/, "")),
+              });
+            } catch (err) {
+              console.error("PDF generation error:", err);
+            }
+            onNext();
+          }}
+          className="px-8 py-2.5 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-full font-bold text-xs sm:text-sm tracking-wide transition shadow-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>{isSpanish ? "Guardando..." : "Saving..."}</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{isSpanish ? "Completar y Guardar como PDF" : t("completeSave")}</span>
+            </>
+          )}
+        </button>
       </div>
 
       <style jsx global>{`
@@ -3338,20 +3359,6 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
           body { background: white !important; padding: 0 !important; margin: 0 !important; font-size: 11pt; }
           html { background: white !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-shadow: none !important; }
-          .rounded-xl { border-radius: 0 !important; }
-          .rounded-2xl { border-radius: 0 !important; }
-          .rounded-3xl { border-radius: 0 !important; }
-          .shadow-sm, .shadow-lg, .shadow-2xl { box-shadow: none !important; }
-          .bg-white { background: white !important; }
-          .bg-slate-50 { background-color: #f8fafc !important; }
-          .text-slate-400 { color: #94a3b8 !important; }
-          .text-slate-500 { color: #64748b !important; }
-          .text-slate-700 { color: #334155 !important; }
-          .text-slate-900 { color: #0f172a !important; }
-          .border-slate-200 { border-color: #e2e8f0 !important; }
-          .p-8, .p-6, .p-5 { padding: 0 !important; }
-          .sm\\:p-12 { padding: 0 !important; }
-          .space-y-8 > * + * { margin-top: 1rem !important; }
         }
       `}</style>
     </div>
