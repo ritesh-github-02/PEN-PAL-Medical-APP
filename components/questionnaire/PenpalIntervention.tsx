@@ -381,9 +381,31 @@ export default function PenpalIntervention() {
 
     try {
       await submitAnswer(currentStep.id, answerPayload, Math.round(currentSlideDwellMs));
+      if (currentStep.id === "screen6_4_resolution" && answers["screen6_4_location"]) {
+        await submitAnswer("screen6_4_location", String(answers["screen6_4_location"]), 0);
+      }
+      if (currentStep.id === "screen6_4b_resolution_type") {
+        if (answers["screen6_4b_medicine"]) {
+          await submitAnswer("screen6_4b_medicine", String(answers["screen6_4b_medicine"]), 0);
+        }
+        if (answers["screen6_4b_route"]) {
+          await submitAnswer("screen6_4b_route", String(answers["screen6_4b_route"]), 0);
+        }
+      }
+      if (currentStep.id === "screen6_5_yetagain" && answers["screen6_5_reaction_detail"]) {
+        await submitAnswer("screen6_5_reaction_detail", String(answers["screen6_5_reaction_detail"]), 0);
+      }
       await logInteraction(
         "QUESTION_ANSWER",
-        { stepId: currentStep.id, answer, dwellMs: Math.round(currentSlideDwellMs) },
+        {
+          stepId: currentStep.id,
+          answer,
+          location: answers["screen6_4_location"] || undefined,
+          medicine: answers["screen6_4b_medicine"] || undefined,
+          route: answers["screen6_4b_route"] || undefined,
+          reactionDetail: answers["screen6_5_reaction_detail"] || undefined,
+          dwellMs: Math.round(currentSlideDwellMs),
+        },
         `/intervention/flow`
       );
     } catch (e) {
@@ -421,23 +443,47 @@ export default function PenpalIntervention() {
       }
     }
 
+    setLoading(false);
+
     if (nextId) {
       const nextIndex = questionnaireConfig.findIndex((s) => s.id === nextId);
       if (nextIndex !== -1) {
         setCurrentStepIndex(nextIndex);
+        if (typeof window !== "undefined") {
+          const searchParams = new URLSearchParams(window.location.search);
+          searchParams.set("step", String(nextIndex));
+          window.history.replaceState(null, "", `${window.location.pathname}?${searchParams.toString()}`);
+        }
         window.scrollTo(0, 0);
         return;
       }
     }
-
-    setLoading(false);
   };
 
   const handleBack = () => {
-    if (!currentStep || currentStepIndex === 0 || loading) return;
+    if (loading) return;
+    if (showSummary) {
+      setShowSummary(false);               
+      const prevIdx = questionnaireConfig.length - 2;
+      setCurrentStepIndex(prevIdx);
+      if (typeof window !== "undefined") {
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set("step", String(prevIdx));
+        searchParams.delete("report");
+        window.history.replaceState(null, "", `${window.location.pathname}?${searchParams.toString()}`);
+      }
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (!currentStep || currentStepIndex === 0) return;
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
       setCurrentStepIndex(prevIndex);
+      if (typeof window !== "undefined") {
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set("step", String(prevIndex));
+        window.history.replaceState(null, "", `${window.location.pathname}?${searchParams.toString()}`);
+      }
       window.scrollTo(0, 0);
     }
   };
@@ -555,9 +601,23 @@ export default function PenpalIntervention() {
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
       <div className="w-full max-w-4xl relative z-10 my-auto space-y-2 py-0 transition-all duration-300 overflow-visible">
-        {/* Header Bar with Logo and Language Selector */}
+        {/* Header Bar with Global Back Button, Logo, and Language Selector */}
         <header className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
           <div className="flex items-center gap-2 flex-wrap">
+            {((currentStepIndex > 0 || showSummary) && !isTerminated && !showSuccess) && (
+              <button
+                type="button"
+                onClick={handleBack}
+                disabled={loading}
+                aria-label={locale === "es" ? "Volver al paso anterior" : "Go back to previous step"}
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-[#1f5c66] font-bold text-xs rounded-full transition cursor-pointer border border-slate-200/80 shadow-2xs active:scale-95 mr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>{locale === "es" ? "Atrás" : "Back"}</span>
+              </button>
+            )}
             <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]" aria-hidden="true"></span>
             <span className="font-black text-xs tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
             <span className="text-slate-300 text-xs" aria-hidden="true">|</span>
@@ -613,7 +673,7 @@ export default function PenpalIntervention() {
                   activeToken={activeToken}
                   isFirstStep={false}
                   loading={loading}
-                  onBack={() => {}}
+                  onBack={handleBack}
                   onNext={async () => {
                     setShowSuccess(true);
                   }}
@@ -651,7 +711,29 @@ export default function PenpalIntervention() {
                     <SurveyMultipleChoice {...baseProps} options={currentStep.options} selected={answers[currentStep.id]} onSelect={handleAnswer} />
                   )}
                   {currentStep.type === "single_choice" && (
-                    <SurveySingleChoice {...baseProps} options={currentStep.options} selected={answers[currentStep.id]} onSelect={handleAnswer} />
+                    <SurveySingleChoice
+                      {...baseProps}
+                      stepId={currentStep.id}
+                      options={currentStep.options}
+                      selected={answers[currentStep.id]}
+                      locationSelected={answers["screen6_4_location"]}
+                      medicineSelected={answers["screen6_4b_medicine"]}
+                      routeSelected={answers["screen6_4b_route"]}
+                      reactionDetailSelected={answers["screen6_5_reaction_detail"]}
+                      onSelect={handleAnswer}
+                      onLocationSelect={(loc) => {
+                        setAnswers((prev) => ({ ...prev, screen6_4_location: loc }));
+                      }}
+                      onMedicineSelect={(med) => {
+                        setAnswers((prev) => ({ ...prev, screen6_4b_medicine: med }));
+                      }}
+                      onRouteSelect={(route) => {
+                        setAnswers((prev) => ({ ...prev, screen6_4b_route: route }));
+                      }}
+                      onReactionDetailSelect={(detail) => {
+                        setAnswers((prev) => ({ ...prev, screen6_5_reaction_detail: detail }));
+                      }}
+                    />
                   )}
                   {currentStep.type === "slider" && (
                     <SurveySlider {...baseProps} min={currentStep.min} max={currentStep.max} unit={locale === "es" ? currentStep.unitEs : currentStep.unitEn} selected={answers[currentStep.id]} onSelect={handleAnswer} />
@@ -873,8 +955,17 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
         </div>
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-1 border-t border-slate-300/40">
+      {/* Footer Navigation Buttons: Back and Next */}
+      <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-300/40">
+        <button
+          type="button"
+          onClick={onBack}
+          disabled={loading}
+          aria-label={locale === "es" ? "Volver al paso anterior" : "Go back to previous step"}
+          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          ← {locale === "es" ? "Atrás" : "Back"}
+        </button>
         <button
           type="button"
           onClick={() => onNext(5)}
@@ -992,9 +1083,6 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
                 ? "¡Todas las afirmaciones sobre la penicilina son correctas!"
                 : "All the statements about penicillin are correct!")}
             </h2>
-            <p className="text-xs sm:text-sm font-semibold text-[#1f5c66] mt-1">
-              {isSpanish ? "Los 4 datos son verdaderos:" : "All 4 facts are true:"}
-            </p>
           </div>
 
           {/* Semantic List of Confirmed Statements */}
@@ -1040,8 +1128,17 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
         </div>
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
+      {/* Footer Navigation Buttons: Back and Next */}
+      <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-300/40">
+        <button
+          type="button"
+          onClick={props.onBack}
+          disabled={props.loading}
+          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
+          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          ← {isSpanish ? "Atrás" : "Back"}
+        </button>
         <button
           type="button"
           onClick={() => props.onNext("all_statements_acknowledged")}
@@ -1115,8 +1212,17 @@ function TestingScreen(props: BaseScreenProps) {
         </div>
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-2 mt-3 border-t border-slate-300/40">
+      {/* Footer Navigation Buttons: Back and Next */}
+      <div className="flex items-center justify-between pt-2 mt-3 border-t border-slate-300/40">
+        <button
+          type="button"
+          onClick={props.onBack}
+          disabled={props.loading}
+          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
+          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          ← {isSpanish ? "Atrás" : "Back"}
+        </button>
         <button
           type="button"
           onClick={() => props.onNext()}
@@ -1364,8 +1470,17 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
         </div>
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-2 mt-3 border-t border-slate-300/40">
+      {/* Footer Navigation Buttons: Back and Next */}
+      <div className="flex items-center justify-between pt-2 mt-3 border-t border-slate-300/40">
+        <button
+          type="button"
+          onClick={navProps.onBack}
+          disabled={navProps.loading}
+          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
+          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          ← {isSpanish ? "Atrás" : "Back"}
+        </button>
         <button
           type="button"
           onClick={() => {
@@ -1390,8 +1505,101 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
   );
 }
 
-function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string; onSelect: (val: string) => void }) {
+const MEDICAL_CARE_LOCATION_OPTIONS = [
+  { value: "Emergency room (ER)", labelEn: "Emergency room (ER)", labelEs: "Sala de emergencias (ER)" },
+  { value: "Urgent care", labelEn: "Urgent care", labelEs: "Centro de atención de urgencias" },
+  { value: "Primary care doctor", labelEn: "Primary care doctor", labelEs: "Médico de cabecera" },
+  { value: "Hospital", labelEn: "Hospital", labelEs: "Hospital" },
+  { value: "Phone call with doctor", labelEn: "Phone call with doctor", labelEs: "Llamada telefónica con el médico" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+];
+
+const RESOLUTION_MEDICINE_OPTIONS = [
+  { value: "Allergy medicine (Benadryl, Zyrtec)", labelEn: "Allergy medicine (Benadryl, Zyrtec)", labelEs: "Medicamento para la alergia (Benadryl, Zyrtec)" },
+  { value: "Steroid medicine (Prednisone)", labelEn: "Steroid medicine (Prednisone)", labelEs: "Medicamento con esteroides (Prednisona)" },
+  { value: "Epinephrine (EpiPen)", labelEn: "Epinephrine (EpiPen)", labelEs: "Epinefrina (EpiPen)" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+];
+
+const RESOLUTION_ROUTE_OPTIONS = [
+  { value: "Mouth", labelEn: "Mouth", labelEs: "Boca" },
+  { value: "IV", labelEn: "IV", labelEs: "IV" },
+  { value: "Shot", labelEn: "Shot", labelEs: "Inyección" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+];
+
+const YETAGAIN_REACTION_OPTIONS = [
+  { value: "Yes, and they did not have a reaction", labelEn: "Yes, and they did not have a reaction", labelEs: "Sí, y no tuvieron una reacción" },
+  { value: "Yes, and they had a reaction", labelEn: "Yes, and they had a reaction", labelEs: "Sí, y tuvieron una reacción" },
+  { value: "Unsure / I don't know", labelEn: "Unsure / I don't know", labelEs: "No estoy seguro/No sé" },
+];
+
+function SurveySingleChoice({
+  title,
+  options,
+  selected,
+  onSelect,
+  stepId,
+  locationSelected,
+  onLocationSelect,
+  medicineSelected,
+  routeSelected,
+  onMedicineSelect,
+  onRouteSelect,
+  reactionDetailSelected,
+  onReactionDetailSelect,
+  ...navProps
+}: BaseScreenProps & {
+  options: any;
+  selected: string;
+  onSelect: (val: string) => void;
+  stepId?: string;
+  locationSelected?: string;
+  onLocationSelect?: (loc: string) => void;
+  medicineSelected?: string;
+  routeSelected?: string;
+  onMedicineSelect?: (med: string) => void;
+  onRouteSelect?: (route: string) => void;
+  reactionDetailSelected?: string;
+  onReactionDetailSelect?: (detail: string) => void;
+}) {
   const isSpanish = navProps.locale === "es";
+  const [showBranchModal, setShowBranchModal] = useState<boolean>(false);
+  const [showMedicineModal, setShowMedicineModal] = useState<boolean>(false);
+  const [showRouteModal, setShowRouteModal] = useState<boolean>(false);
+  const [showYetAgainModal, setShowYetAgainModal] = useState<boolean>(false);
+
+  const handleOptionClick = (val: string) => {
+    onSelect(val);
+    if (stepId === "screen6_4_resolution") {
+      if (val === "Yes") {
+        setShowBranchModal(true);
+      } else {
+        setShowBranchModal(false);
+        if (onLocationSelect) {
+          onLocationSelect("");
+        }
+      }
+    } else if (stepId === "screen6_4b_resolution_type") {
+      if (val === "With medication") {
+        setShowMedicineModal(true);
+        setShowRouteModal(false);
+      } else {
+        setShowMedicineModal(false);
+        setShowRouteModal(false);
+        if (onMedicineSelect) onMedicineSelect("");
+        if (onRouteSelect) onRouteSelect("");
+      }
+    } else if (stepId === "screen6_5_yetagain") {
+      if (val === "Yes") {
+        setShowYetAgainModal(true);
+      } else {
+        setShowYetAgainModal(false);
+        if (onReactionDetailSelect) onReactionDetailSelect("");
+      }
+    }
+  };
+
   return (
     <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-5 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
       <div className="flex flex-row gap-2 sm:gap-6 items-center justify-between">
@@ -1429,11 +1637,11 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
                       role="radio"
                       aria-checked={isSelected}
                       tabIndex={0}
-                      onClick={() => onSelect(opt.value)}
+                      onClick={() => handleOptionClick(opt.value)}
                       onKeyDown={(e) => {
                         if (e.key === " " || e.key === "Enter") {
                           e.preventDefault();
-                          onSelect(opt.value);
+                          handleOptionClick(opt.value);
                         }
                       }}
                       aria-label={label}
@@ -1449,6 +1657,87 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
                   );
                 })}
               </div>
+
+              {/* Branch summary badge for Slide 10 if Yes & location chosen */}
+              {stepId === "screen6_4_resolution" && selected === "Yes" && locationSelected && (
+                <div className="mt-3 flex items-center justify-between bg-white/40 backdrop-blur-xs rounded-xl px-3.5 py-2 text-xs font-semibold text-[#132c27] border border-white/60">
+                  <span>
+                    {isSpanish ? "Ubicación seleccionada: " : "Selected location: "}
+                    <strong className="font-bold text-[#1f5c66]">
+                      {isSpanish
+                        ? (MEDICAL_CARE_LOCATION_OPTIONS.find((o) => o.value === locationSelected)?.labelEs || locationSelected)
+                        : (MEDICAL_CARE_LOCATION_OPTIONS.find((o) => o.value === locationSelected)?.labelEn || locationSelected)}
+                    </strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowBranchModal(true)}
+                    className="text-[#1f5c66] hover:underline font-bold ml-2 cursor-pointer"
+                  >
+                    {isSpanish ? "Cambiar" : "Change"}
+                  </button>
+                </div>
+              )}
+
+              {/* Branch summary badge for Slide 11 if With medication & medicine/route chosen */}
+              {stepId === "screen6_4b_resolution_type" && selected === "With medication" && (medicineSelected || routeSelected) && (
+                <div className="mt-3 flex items-center justify-between bg-white/40 backdrop-blur-xs rounded-xl px-3.5 py-2 text-xs font-semibold text-[#132c27] border border-white/60">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                    {medicineSelected && (
+                      <span>
+                        {isSpanish ? "Medicamento: " : "Medicine: "}
+                        <strong className="font-bold text-[#1f5c66]">
+                          {isSpanish
+                            ? (RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medicineSelected)?.labelEs || medicineSelected)
+                            : (RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medicineSelected)?.labelEn || medicineSelected)}
+                        </strong>
+                      </span>
+                    )}
+                    {medicineSelected && routeSelected && <span className="hidden sm:inline text-slate-400">•</span>}
+                    {routeSelected && (
+                      <span>
+                        {isSpanish ? "Vía: " : "Route: "}
+                        <strong className="font-bold text-[#1f5c66]">
+                          {isSpanish
+                            ? (RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === routeSelected)?.labelEs || routeSelected)
+                            : (RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === routeSelected)?.labelEn || routeSelected)}
+                        </strong>
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMedicineModal(true);
+                      setShowRouteModal(false);
+                    }}
+                    className="text-[#1f5c66] hover:underline font-bold ml-2 cursor-pointer shrink-0"
+                  >
+                    {isSpanish ? "Cambiar" : "Change"}
+                  </button>
+                </div>
+              )}
+
+              {/* Branch summary badge for Slide 12 if Yes & reaction detail chosen */}
+              {stepId === "screen6_5_yetagain" && selected === "Yes" && reactionDetailSelected && (
+                <div className="mt-3 flex items-center justify-between bg-white/40 backdrop-blur-xs rounded-xl px-3.5 py-2 text-xs font-semibold text-[#132c27] border border-white/60">
+                  <span>
+                    {isSpanish ? "Detalle: " : "Detail: "}
+                    <strong className="font-bold text-[#1f5c66]">
+                      {isSpanish
+                        ? (YETAGAIN_REACTION_OPTIONS.find((o) => o.value === reactionDetailSelected)?.labelEs || reactionDetailSelected)
+                        : (YETAGAIN_REACTION_OPTIONS.find((o) => o.value === reactionDetailSelected)?.labelEn || reactionDetailSelected)}
+                    </strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowYetAgainModal(true)}
+                    className="text-[#1f5c66] hover:underline font-bold ml-2 cursor-pointer shrink-0"
+                  >
+                    {isSpanish ? "Cambiar" : "Change"}
+                  </button>
+                </div>
+              )}
             </div>
           </fieldset>
         </div>
@@ -1465,8 +1754,17 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
         </div>
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
+      {/* Footer Navigation Buttons: Back and Next */}
+      <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-300/40">
+        <button
+          type="button"
+          onClick={navProps.onBack}
+          disabled={navProps.loading}
+          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
+          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          ← {isSpanish ? "Atrás" : "Back"}
+        </button>
         <button
           type="button"
           onClick={() => navProps.onNext(selected)}
@@ -1476,6 +1774,333 @@ function SurveySingleChoice({ title, options, selected, onSelect, ...navProps }:
           {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
         </button>
       </div>
+
+      {/* Branch Modal for Slide 10: Where did your child get medical care? */}
+      {showBranchModal && stepId === "screen6_4_resolution" && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="branch-modal-title"
+        >
+          <div className="bg-[#f4f8e8] border border-slate-300/80 rounded-2xl p-5 sm:p-6 shadow-2xl max-w-lg w-full relative animate-in zoom-in-95 duration-200">
+            <h3
+              id="branch-modal-title"
+              className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug"
+            >
+              {isSpanish
+                ? "¿Dónde recibió atención médica su hijo por la reacción?"
+                : "Where did your child get medical care for the reaction?"}
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 mb-4">
+              {MEDICAL_CARE_LOCATION_OPTIONS.map((locOpt) => {
+                const isLocSelected = locationSelected === locOpt.value;
+                const label = isSpanish ? locOpt.labelEs : locOpt.labelEn;
+                return (
+                  <button
+                    type="button"
+                    key={locOpt.value}
+                    role="radio"
+                    aria-checked={isLocSelected}
+                    tabIndex={0}
+                    onClick={() => {
+                      if (onLocationSelect) {
+                        onLocationSelect(locOpt.value);
+                      }
+                    }}
+                    className={`px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isLocSelected
+                        ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                        : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    {isLocSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Modal Footer with 7-4-2 Tag and Close / Continue Action */}
+            <div className="flex items-center justify-between pt-3 border-t border-slate-300/60">
+              <span className="text-[11px] font-mono font-bold text-slate-400 select-none">7-4-2</span>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowBranchModal(false)}
+                  aria-label={isSpanish ? "Cerrar ventana" : "Close window"}
+                  className="px-4 py-1.5 min-h-[36px] bg-slate-200/80 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-full transition cursor-pointer flex items-center gap-1"
+                >
+                  <span>✕</span>
+                  <span>{isSpanish ? "Cerrar" : "Close"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowBranchModal(false);
+                    navProps.onNext(selected);
+                  }}
+                  className="px-5 py-1.5 min-h-[36px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] font-bold text-xs rounded-full transition shadow-xs cursor-pointer active:scale-95"
+                >
+                  {isSpanish ? "Siguiente" : navProps.t("next")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Branch Modal for Slide 11: What medicine was given to your child? (7-4-1) */}
+      {showMedicineModal && stepId === "screen6_4b_resolution_type" && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="medicine-modal-title"
+        >
+          <div className="bg-[#f4f8e8] border border-slate-300/80 rounded-2xl p-5 sm:p-6 shadow-2xl max-w-lg w-full relative animate-in zoom-in-95 duration-200">
+            {/* Modal 7-4-1 Heading */}
+            <h3
+              id="medicine-modal-title"
+              className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug"
+            >
+              {isSpanish
+                ? "¿Qué medicamento se le dio a su hijo para la reacción?"
+                : "What medicine was given to your child for the reaction?"}
+            </h3>
+
+            {/* 4 Options Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 mb-4">
+              {RESOLUTION_MEDICINE_OPTIONS.map((medOpt) => {
+                const isMedSelected = medicineSelected === medOpt.value;
+                const label = isSpanish ? medOpt.labelEs : medOpt.labelEn;
+                return (
+                  <button
+                    type="button"
+                    key={medOpt.value}
+                    role="radio"
+                    aria-checked={isMedSelected}
+                    tabIndex={0}
+                    onClick={() => {
+                      if (onMedicineSelect) {
+                        onMedicineSelect(medOpt.value);
+                      }
+                    }}
+                    className={`px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isMedSelected
+                        ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                        : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    {isMedSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Footer with More Questions >> button, 7-4-1 tag, Close, and Next */}
+            <div className="flex flex-col gap-3 pt-3 border-t border-slate-300/60">
+              <div className="flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowRouteModal(true)}
+                  className="px-4 py-1.5 min-h-[36px] bg-white hover:bg-slate-50 text-[#1f5c66] border-2 border-[#1f5c66] rounded-full font-bold text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+                >
+                  <span>{isSpanish ? "Más preguntas" : "More Questions"}</span>
+                  <span className="text-[#1f5c66] font-black tracking-tighter text-sm">»</span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold text-slate-400 select-none">7-4-1</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMedicineModal(false);
+                      setShowRouteModal(false);
+                    }}
+                    aria-label={isSpanish ? "Cerrar ventana" : "Close window"}
+                    className="px-4 py-1.5 min-h-[36px] bg-slate-200/80 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-full transition cursor-pointer flex items-center gap-1"
+                  >
+                    <span>✕</span>
+                    <span>{isSpanish ? "Cerrar" : "Close"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMedicineModal(false);
+                      setShowRouteModal(false);
+                      navProps.onNext(selected);
+                    }}
+                    className="px-5 py-1.5 min-h-[36px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] font-bold text-xs rounded-full transition shadow-xs cursor-pointer active:scale-95"
+                  >
+                    {isSpanish ? "Siguiente" : navProps.t("next")}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Nested Sub-Modal 7-4-1-1: Did your child receive the medicine by: */}
+            {showRouteModal && (
+              <div
+                className="absolute inset-0 bg-black/40 backdrop-blur-2xs rounded-2xl flex items-center justify-center p-3 animate-in fade-in zoom-in-95 duration-200 z-20"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="route-modal-title"
+              >
+                <div className="bg-[#8caeab] border border-white/60 rounded-2xl p-4 sm:p-5 shadow-2xl max-w-sm w-full text-center relative">
+                  <h4
+                    id="route-modal-title"
+                    className="text-sm sm:text-base font-bold text-[#132c27] mb-3 leading-snug"
+                  >
+                    {isSpanish
+                      ? "¿Su hijo recibió el medicamento por:"
+                      : "Did your child receive the medicine by:"}
+                  </h4>
+
+                  <div className="flex flex-wrap gap-2 justify-center mb-4">
+                    {RESOLUTION_ROUTE_OPTIONS.map((routeOpt) => {
+                      const isRouteSelected = routeSelected === routeOpt.value;
+                      const label = isSpanish ? routeOpt.labelEs : routeOpt.labelEn;
+                      return (
+                        <button
+                          type="button"
+                          key={routeOpt.value}
+                          role="radio"
+                          aria-checked={isRouteSelected}
+                          tabIndex={0}
+                          onClick={() => {
+                            if (onRouteSelect) {
+                              onRouteSelect(routeOpt.value);
+                            }
+                          }}
+                          className={`px-3 py-2 min-h-[40px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                            isRouteSelected
+                              ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                              : "bg-white text-[#132c27] border-white/80 hover:bg-slate-50"
+                          }`}
+                        >
+                          {isRouteSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                          <span>{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Sub-modal Footer with 7-4-1-1 Tag, Back and Done */}
+                  <div className="flex items-center justify-between pt-2.5 border-t border-white/40">
+                    <span className="text-[11px] font-mono font-bold text-[#193d38] select-none">7-4-1-1</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowRouteModal(false)}
+                        aria-label={isSpanish ? "Volver" : "Back"}
+                        className="px-3.5 py-1.5 min-h-[32px] bg-white/70 hover:bg-white text-[#193d38] font-bold text-xs rounded-full transition cursor-pointer flex items-center gap-1"
+                      >
+                        <span>←</span>
+                        <span>{isSpanish ? "Atrás" : "Back"}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowRouteModal(false);
+                          setShowMedicineModal(false);
+                          navProps.onNext(selected);
+                        }}
+                        className="px-4 py-1.5 min-h-[32px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] font-bold text-xs rounded-full transition shadow-xs cursor-pointer active:scale-95"
+                      >
+                        {isSpanish ? "Listo" : "Done"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Branch Modal for Slide 12: Has your child taken penicillin (amoxicillin) again since the reaction? (7-5-1) */}
+      {showYetAgainModal && stepId === "screen6_5_yetagain" && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="yetagain-modal-title"
+        >
+          <div className="bg-[#f4f8e8] border border-slate-300/80 rounded-2xl p-5 sm:p-6 shadow-2xl max-w-lg w-full relative animate-in zoom-in-95 duration-200">
+            {/* Modal 7-5-1 Heading */}
+            <h3
+              id="yetagain-modal-title"
+              className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug"
+            >
+              {isSpanish
+                ? "¿Su hijo ha tomado penicilina (amoxicilina) nuevamente desde la reacción?"
+                : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
+            </h3>
+
+            {/* 3 Options */}
+            <div className="space-y-2.5 mb-4">
+              {YETAGAIN_REACTION_OPTIONS.map((opt) => {
+                const isOptSelected = reactionDetailSelected === opt.value;
+                const label = isSpanish ? opt.labelEs : opt.labelEn;
+                return (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    role="radio"
+                    aria-checked={isOptSelected}
+                    tabIndex={0}
+                    onClick={() => {
+                      if (onReactionDetailSelect) {
+                        onReactionDetailSelect(opt.value);
+                      }
+                    }}
+                    className={`w-full px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                      isOptSelected
+                        ? "bg-[#f0d411] text-[#1f382f] border-[#e0c406] shadow-sm font-bold ring-2 ring-[#e0c406]/60"
+                        : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    {isOptSelected && <span aria-hidden="true" className="font-black text-[#1f382f]">✓</span>}
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Footer with 7-5-1 Tag, Close, and Next */}
+            <div className="flex items-center justify-between pt-3 border-t border-slate-300/60">
+              <span className="text-[11px] font-mono font-bold text-slate-400 select-none">7-5-1</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowYetAgainModal(false)}
+                  aria-label={isSpanish ? "Cerrar ventana" : "Close window"}
+                  className="px-4 py-1.5 min-h-[36px] bg-slate-200/80 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-full transition cursor-pointer flex items-center gap-1"
+                >
+                  <span>✕</span>
+                  <span>{isSpanish ? "Cerrar" : "Close"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowYetAgainModal(false);
+                    navProps.onNext(selected);
+                  }}
+                  className="px-5 py-1.5 min-h-[36px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] font-bold text-xs rounded-full transition shadow-xs cursor-pointer active:scale-95"
+                >
+                  {isSpanish ? "Siguiente" : navProps.t("next")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1601,8 +2226,17 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
         />
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
+      {/* Footer Navigation Buttons: Back and Next */}
+      <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-300/40">
+        <button
+          type="button"
+          onClick={navProps.onBack}
+          disabled={navProps.loading}
+          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
+          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          ← {isSpanish ? "Atrás" : "Back"}
+        </button>
         <button
           type="button"
           onClick={() => navProps.onNext(value)}
@@ -1646,8 +2280,17 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
         </div>
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
+      {/* Footer Navigation Buttons: Back and Next */}
+      <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-300/40">
+        <button
+          type="button"
+          onClick={navProps.onBack}
+          disabled={navProps.loading}
+          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
+          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          ← {isSpanish ? "Atrás" : "Back"}
+        </button>
         <button
           type="button"
           onClick={() => navProps.onNext()}
@@ -1742,10 +2385,17 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       defaultValue: isSpanish ? "Atención Médica Recibida" : "Medical Care Received",
       getValue: () => {
         const val = answers?.screen6_4_resolution;
+        const loc = answers?.screen6_4_location;
         if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_4_resolution");
         const opt = step?.options?.find((o: any) => o.value === val);
-        return isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
+        const mainText = isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
+        if (val === "Yes" && loc) {
+          const locOpt = MEDICAL_CARE_LOCATION_OPTIONS.find((o) => o.value === loc);
+          const locText = isSpanish ? locOpt?.labelEs || loc : locOpt?.labelEn || loc;
+          return `${mainText} (${locText})`;
+        }
+        return mainText;
       },
     },
     {
@@ -1756,10 +2406,27 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       defaultValue: isSpanish ? "Resolución de Síntomas" : "Symptom Resolution",
       getValue: () => {
         const val = answers?.screen6_4b_resolution_type;
+        const med = answers?.screen6_4b_medicine;
+        const route = answers?.screen6_4b_route;
         if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_4b_resolution_type");
         const opt = step?.options?.find((o: any) => o.value === val);
-        return isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
+        const mainText = isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
+        if (val === "With medication" && (med || route)) {
+          const medOpt = RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === med);
+          const medText = isSpanish ? medOpt?.labelEs || med : medOpt?.labelEn || med;
+          const routeOpt = RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === route);
+          const routeText = isSpanish ? routeOpt?.labelEs || route : routeOpt?.labelEn || route;
+
+          if (med && route) {
+            return `${mainText} (${medText} - ${routeText})`;
+          } else if (med) {
+            return `${mainText} (${medText})`;
+          } else if (route) {
+            return `${mainText} (${routeText})`;
+          }
+        }
+        return mainText;
       },
     },
     {
@@ -1770,10 +2437,17 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
       defaultValue: isSpanish ? "Re-exposición Desde la Reacción" : "Penicillin Since Reaction",
       getValue: () => {
         const val = answers?.screen6_5_yetagain;
+        const detail = answers?.screen6_5_reaction_detail;
         if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
         const step = questionnaireConfig.find((s) => s.id === "screen6_5_yetagain");
         const opt = step?.options?.find((o: any) => o.value === val);
-        return isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
+        const mainText = isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
+        if (val === "Yes" && detail) {
+          const detailOpt = YETAGAIN_REACTION_OPTIONS.find((o) => o.value === detail);
+          const detailText = isSpanish ? detailOpt?.labelEs || detail : detailOpt?.labelEn || detail;
+          return `${mainText} (${detailText})`;
+        }
+        return mainText;
       },
     },
   ];
@@ -1841,60 +2515,72 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
         </div>
       </div>
 
-      <div className="flex flex-row gap-2 justify-center pt-2 border-t border-slate-100 no-print shrink-0">
+      <div className="flex flex-row items-center justify-between pt-2 border-t border-slate-100 no-print shrink-0">
         <button
           type="button"
-          onClick={() => window.print()}
-          className="px-4 py-2 min-h-[44px] border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          {isSpanish ? "Imprimir Informe" : t("print")}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            try {
-              generateAssessmentPDF({
-                participantId: activeToken || undefined,
-                token: activeToken || undefined,
-                locale,
-                answers,
-                summarySections: summarySections.map((s) => {
-                  const label = isSpanish ? s.labelEs : s.labelEn;
-                  return {
-                    label,
-                    value: s.getValue(),
-                  };
-                }),
-                steps: steps.map((s) => s.replace(/^#\d+\.\s*/, "")),
-              });
-            } catch (err) {
-              console.error("PDF generation error:", err);
-            }
-            onNext();
-          }}
+          onClick={onBack}
           disabled={loading}
-          className="px-6 py-2 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
+          className="px-4 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-lg transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {loading ? (
-            <>
-              <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              {isSpanish ? "Guardando..." : "Saving..."}
-            </>
-          ) : (
-            <>
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              {isSpanish ? "Completar y Guardar como PDF" : t("completeSave")}
-            </>
-          )}
+          ← {isSpanish ? "Atrás" : "Back"}
         </button>
+
+        <div className="flex flex-row gap-2 items-center">
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="px-4 py-2 min-h-[44px] border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            {isSpanish ? "Imprimir Informe" : t("print")}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                generateAssessmentPDF({
+                  participantId: activeToken || undefined,
+                  token: activeToken || undefined,
+                  locale,
+                  answers,
+                  summarySections: summarySections.map((s) => {
+                    const label = isSpanish ? s.labelEs : s.labelEn;
+                    return {
+                      label,
+                      value: s.getValue(),
+                    };
+                  }),
+                  steps: steps.map((s) => s.replace(/^#\d+\.\s*/, "")),
+                });
+              } catch (err) {
+                console.error("PDF generation error:", err);
+              }
+              onNext();
+            }}
+            disabled={loading}
+            className="px-6 py-2 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          >
+            {loading ? (
+              <>
+                <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {isSpanish ? "Guardando..." : "Saving..."}
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                {isSpanish ? "Completar y Guardar como PDF" : t("completeSave")}
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       <style jsx global>{`

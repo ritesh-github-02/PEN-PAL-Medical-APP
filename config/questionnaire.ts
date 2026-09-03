@@ -89,8 +89,6 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'knowledge_revelation',
     titleEn: 'All the statements about penicillin are correct!',
     titleEs: '¡Todas las afirmaciones sobre la penicilina son correctas!',
-    descriptionEn: 'All 4 facts are true:',
-    descriptionEs: 'Los 4 datos son verdaderos:',
     audioEn: '/audio/exported/screen3_5_knowledge_test_en.mp3',
     audioEs: '/audio/exported/screen3_5_knowledge_test_es.mp3',
     options: [
