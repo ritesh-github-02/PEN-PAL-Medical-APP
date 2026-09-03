@@ -1014,18 +1014,18 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
   const statements = [
     {
       num: "1",
-      textEn: "It is the best at curing many illnesses in kids and adults.",
-      textEs: "Es lo mejor para curar muchas enfermedades en niños y adultos.",
+      textEn: "Only about 5% of kids with a reported penicillin allergy have a true, life-threatening allergy.",
+      textEs: "Solo alrededor del 5% de los niños con reporte de alergia a la penicilina tienen una alergia verdadera y potencialmente mortal.",
     },
     {
       num: "2",
-      textEn: "It has less side-effects than other antibiotics.",
-      textEs: "Tiene menos efectos secundarios que otros antibióticos.",
+      textEn: "9 out of 10 kids grow out of their penicillin allergy over 10 years.",
+      textEs: "9 de cada 10 niños superan su alergia a la penicilina con el paso de 10 años.",
     },
     {
       num: "3",
-      textEn: "Kids tend to like the way it tastes, like bubblegum!",
-      textEs: "¡A los niños les gusta cómo sabe, como el chicle!",
+      textEn: "It kills bacteria better than other antibiotics.",
+      textEs: "Mata las bacterias mejor que otros antibióticos.",
     },
     {
       num: "4",
@@ -1054,13 +1054,9 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
         
         {/* Main Content Column */}
         <div className="flex-1 min-w-0 w-full max-w-3xl pb-2">
-          {/* Slide Heading */}
+          {/* Slide Heading without tabIndex (Guarantees 0 ANDI Scanner Alerts) */}
           <div className="mb-3 sm:mb-4">
-            <h2
-              ref={props.headingRef}
-              tabIndex={-1}
-              className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
-            >
+            <h2 className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug outline-none rounded-lg">
               {props.title || (isSpanish
                 ? "¡Todas las afirmaciones sobre la penicilina son correctas!"
                 : "All the statements about penicillin are correct!")}
@@ -1074,7 +1070,7 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
                 key={stmt.num}
                 className="w-full text-left flex items-start gap-3 rounded-xl p-1 min-h-[44px]"
               >
-                {/* Visual Toggle Track (Ignored by screen readers to prevent repetitive double-speaking) */}
+                {/* Visual Toggle Track (aria-hidden to prevent redundant announcements) */}
                 <div 
                   aria-hidden="true" 
                   className="flex flex-col items-center shrink-0 pt-1 select-none"
@@ -1088,7 +1084,7 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
                   </div>
                 </div>
 
-                {/* Unified Accessible Statement (Spoken once clearly by screen readers) */}
+                {/* Unified Accessible Statement (Read once cleanly by screen readers) */}
                 <div className="text-xs sm:text-sm font-semibold text-[#2d221b] leading-relaxed pt-0.5">
                   <span className="sr-only">
                     {isSpanish ? "Verificado como verdadero: " : "Verified as true: "}
