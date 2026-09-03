@@ -754,19 +754,10 @@ export default function PenpalIntervention() {
 
 // ============ Shared Components ============
 
-function NavigationFooter({ onBack, onNext, loading, isFirstStep, t, locale }: Omit<BaseScreenProps, 'title' | 'content' | 'description'> & { locale?: string }) {
+function NavigationFooter({ onNext, loading, t, locale }: Omit<BaseScreenProps, 'title' | 'content' | 'description' | 'onBack'> & { locale?: string; onBack?: () => void }) {
   const isSpanish = locale === "es";
   return (
-    <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center pt-4 mt-4 border-t border-slate-300/40 gap-3 sm:gap-0">
-      <button
-        type="button"
-        className="px-5 py-2 text-xs font-bold uppercase tracking-widest text-[#2b3e34] hover:text-black disabled:opacity-0 transition-colors duration-250 no-print cursor-pointer"
-        disabled={isFirstStep || loading}
-        onClick={onBack}
-        aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-      >
-        ← {isSpanish ? "Atrás" : t("back")}
-      </button>
+    <div className="flex justify-center items-center pt-4 mt-4 border-t border-slate-300/40">
       <button
         type="button"
         onClick={() => onNext()}
@@ -955,17 +946,8 @@ function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loa
         </div>
       </div>
 
-      {/* Footer Navigation Buttons: Back and Next */}
-      <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={loading}
-          aria-label={locale === "es" ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          ← {locale === "es" ? "Atrás" : "Back"}
-        </button>
+      {/* Centered Yellow Next Button */}
+      <div className="flex justify-center pt-2 mt-2 border-t border-slate-300/40">
         <button
           type="button"
           onClick={() => onNext(5)}
@@ -1128,17 +1110,8 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
         </div>
       </div>
 
-      {/* Footer Navigation Buttons: Back and Next */}
-      <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={props.onBack}
-          disabled={props.loading}
-          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          ← {isSpanish ? "Atrás" : "Back"}
-        </button>
+      {/* Centered Yellow Next Button */}
+      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
         <button
           type="button"
           onClick={() => props.onNext("all_statements_acknowledged")}
@@ -1212,17 +1185,8 @@ function TestingScreen(props: BaseScreenProps) {
         </div>
       </div>
 
-      {/* Footer Navigation Buttons: Back and Next */}
-      <div className="flex items-center justify-between pt-2 mt-3 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={props.onBack}
-          disabled={props.loading}
-          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          ← {isSpanish ? "Atrás" : "Back"}
-        </button>
+      {/* Centered Yellow Next Button */}
+      <div className="flex justify-center pt-2 mt-3 border-t border-slate-300/40">
         <button
           type="button"
           onClick={() => props.onNext()}
@@ -1470,17 +1434,8 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
         </div>
       </div>
 
-      {/* Footer Navigation Buttons: Back and Next */}
-      <div className="flex items-center justify-between pt-2 mt-3 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={navProps.onBack}
-          disabled={navProps.loading}
-          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          ← {isSpanish ? "Atrás" : "Back"}
-        </button>
+      {/* Centered Yellow Next Button */}
+      <div className="flex justify-center pt-2 mt-3 border-t border-slate-300/40">
         <button
           type="button"
           onClick={() => {
@@ -1754,17 +1709,8 @@ function SurveySingleChoice({
         </div>
       </div>
 
-      {/* Footer Navigation Buttons: Back and Next */}
-      <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={navProps.onBack}
-          disabled={navProps.loading}
-          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          ← {isSpanish ? "Atrás" : "Back"}
-        </button>
+      {/* Centered Yellow Next Button */}
+      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
         <button
           type="button"
           onClick={() => navProps.onNext(selected)}
@@ -2226,17 +2172,8 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
         />
       </div>
 
-      {/* Footer Navigation Buttons: Back and Next */}
-      <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={navProps.onBack}
-          disabled={navProps.loading}
-          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          ← {isSpanish ? "Atrás" : "Back"}
-        </button>
+      {/* Centered Yellow Next Button */}
+      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
         <button
           type="button"
           onClick={() => navProps.onNext(value)}
@@ -2280,17 +2217,8 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
         </div>
       </div>
 
-      {/* Footer Navigation Buttons: Back and Next */}
-      <div className="flex items-center justify-between pt-3 mt-4 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={navProps.onBack}
-          disabled={navProps.loading}
-          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-5 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          ← {isSpanish ? "Atrás" : "Back"}
-        </button>
+      {/* Centered Yellow Next Button */}
+      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
         <button
           type="button"
           onClick={() => navProps.onNext()}
@@ -2515,17 +2443,7 @@ function SummaryScreen({ title, content, answers, activeToken, onNext, onBack, l
         </div>
       </div>
 
-      <div className="flex flex-row items-center justify-between pt-2 border-t border-slate-100 no-print shrink-0">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={loading}
-          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-4 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-[#1f5c66] hover:text-[#133b41] hover:bg-[#1f5c66]/10 rounded-lg transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          ← {isSpanish ? "Atrás" : "Back"}
-        </button>
-
+      <div className="flex flex-row gap-2 justify-center pt-2 border-t border-slate-100 no-print shrink-0">
         <div className="flex flex-row gap-2 items-center">
           <button
             type="button"
