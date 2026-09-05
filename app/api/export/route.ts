@@ -14,8 +14,12 @@ const STUDY_SLIDES_CONFIG = [
   { id: 'screen6_2_timing', slideNumber: 8, title: 'Age at Reaction (Slider)', type: 'Question' },
   { id: 'screen6_3_onset', slideNumber: 9, title: 'Time to Symptom Onset', type: 'Question' },
   { id: 'screen6_4_resolution', slideNumber: 10, title: 'Medical Care Received', type: 'Question' },
+  { id: 'screen6_4_location', slideNumber: 10, title: 'Medical Care Location (Modal)', type: 'Question' },
   { id: 'screen6_4b_resolution_type', slideNumber: 11, title: 'Reaction Resolution Method', type: 'Question' },
+  { id: 'screen6_4b_medicine', slideNumber: 11, title: 'Resolution Medication (Modal Step 1)', type: 'Question' },
+  { id: 'screen6_4b_route', slideNumber: 11, title: 'Medication Intake Route (Modal Step 2)', type: 'Question' },
   { id: 'screen6_5_yetagain', slideNumber: 12, title: 'Subsequent Penicillin Exposure', type: 'Question' },
+  { id: 'screen6_5_reaction_detail', slideNumber: 12, title: 'Subsequent Reaction History (Modal)', type: 'Question' },
   { id: 'screen7_summary', slideNumber: 13, title: 'Action Steps & Clinical Summary', type: 'Summary' },
   { id: 'screen_end', slideNumber: 14, title: 'Non-Participant End Screen', type: 'Exit' },
   { id: 'control_baseline_page', slideNumber: 1, title: 'Educational Handout Website (Control Arm)', type: 'Handout' },
@@ -55,7 +59,7 @@ function formatDuration(totalSeconds: number): string {
   return `${mins}m ${secs}s`;
 }
 
-function formatAnswerValue(questionId: string, rawVal: any): string {
+function formatAnswerValue(questionId: string, rawVal: any, allResponses?: any[]): string {
   if (
     rawVal === undefined || 
     rawVal === null || 
@@ -101,6 +105,37 @@ function formatAnswerValue(questionId: string, rawVal: any): string {
     return `${rawVal} years old`;
   }
 
+  // Handle compound formatting if allResponses is provided
+  if (allResponses && allResponses.length > 0) {
+    if (questionId === 'screen6_4_resolution' && (rawVal === 'Yes' || String(rawVal).toLowerCase().startsWith('yes'))) {
+      const locResp = allResponses.find((r: any) => r.questionId === 'screen6_4_location');
+      if (locResp?.answerValue && locResp.answerValue !== 'none_selected' && locResp.answerValue !== 'undefined') {
+        return `Yes — ${locResp.answerValue}`;
+      }
+    }
+
+    if (questionId === 'screen6_4b_resolution_type' && (rawVal === 'With medication' || String(rawVal).toLowerCase().includes('medication'))) {
+      const medResp = allResponses.find((r: any) => r.questionId === 'screen6_4b_medicine');
+      const routeResp = allResponses.find((r: any) => r.questionId === 'screen6_4b_route');
+      const med = medResp?.answerValue;
+      const route = routeResp?.answerValue;
+      if (med && route) {
+        return `With medication — ${med} (${route})`;
+      } else if (med) {
+        return `With medication — ${med}`;
+      } else if (route) {
+        return `With medication — (${route})`;
+      }
+    }
+
+    if (questionId === 'screen6_5_yetagain' && (rawVal === 'Yes' || String(rawVal).toLowerCase().startsWith('yes'))) {
+      const detailResp = allResponses.find((r: any) => r.questionId === 'screen6_5_reaction_detail');
+      if (detailResp?.answerValue && detailResp.answerValue !== 'none_selected' && detailResp.answerValue !== 'undefined') {
+        return `Yes — ${detailResp.answerValue}`;
+      }
+    }
+  }
+
   return String(rawVal).replace(/_/g, ' ');
 }
 
@@ -121,7 +156,20 @@ export async function GET(request: Request) {
     // ─────────────────────────────────────────────────────────────────────────────
     if (type === 'responses' || type === 'participant_responses') {
       const whereClause = participantId ? { participantId } : {};
-      const questionIds = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'];
+      const questionIds = [
+        'screen1_intro',
+        'screen3_5_knowledge_test',
+        'screen6_1_symptoms',
+        'screen6_2_timing',
+        'screen6_3_onset',
+        'screen6_4_resolution',
+        'screen6_4_location',
+        'screen6_4b_resolution_type',
+        'screen6_4b_medicine',
+        'screen6_4b_route',
+        'screen6_5_yetagain',
+        'screen6_5_reaction_detail'
+      ];
       const responses = await prisma.questionnaireResponse.findMany({
         where: {
           ...whereClause,
@@ -134,6 +182,14 @@ export async function GET(request: Request) {
           }
         },
         orderBy: [{ participantId: 'asc' }, { createdAt: 'asc' }]
+      });
+
+      // Sort responses in clinical study order
+      responses.sort((a, b) => {
+        if (a.participantId !== b.participantId) return 0;
+        const idxA = questionIds.indexOf(a.questionId);
+        const idxB = questionIds.indexOf(b.questionId);
+        return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
       });
 
       data = responses.map((r, idx) => {
@@ -197,11 +253,25 @@ export async function GET(request: Request) {
           : (STEP_LABELS_MAP[m.stepId] || { slideNumber: m.stepIndex + 1, title: m.stepId, type: 'Slide' });
 
         const matchingResponse = m.participant?.responses?.find((r: any) => r.questionId === m.stepId);
+        const locResp = m.participant?.responses?.find((r: any) => r.questionId === 'screen6_4_location');
+        const medResp = m.participant?.responses?.find((r: any) => r.questionId === 'screen6_4b_medicine');
+        const routeResp = m.participant?.responses?.find((r: any) => r.questionId === 'screen6_4b_route');
+        const detailResp = m.participant?.responses?.find((r: any) => r.questionId === 'screen6_5_reaction_detail');
+
+        let effectiveAnswerValue = matchingResponse?.answerValue;
+        if (!effectiveAnswerValue && m.stepId === 'screen6_4_resolution' && locResp?.answerValue) {
+          effectiveAnswerValue = 'Yes';
+        } else if (!effectiveAnswerValue && m.stepId === 'screen6_4b_resolution_type' && (medResp?.answerValue || routeResp?.answerValue)) {
+          effectiveAnswerValue = 'With medication';
+        } else if (!effectiveAnswerValue && m.stepId === 'screen6_5_yetagain' && detailResp?.answerValue) {
+          effectiveAnswerValue = 'Yes';
+        }
+
         const isQuestionStep = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'].includes(m.stepId);
         const recordedAnswer = isControl
           ? 'N/A (Control Educational Handout - No Questionnaire)'
-          : ((matchingResponse && isQuestionStep && matchingResponse.answerValue !== 'acknowledged')
-            ? formatAnswerValue(m.stepId, matchingResponse.answerValue)
+          : ((effectiveAnswerValue && isQuestionStep && effectiveAnswerValue !== 'acknowledged')
+            ? formatAnswerValue(m.stepId, effectiveAnswerValue, m.participant?.responses)
             : 'N/A (Informational Slide)');
         const durationSec = (m.durationMs / 1000).toFixed(2);
 

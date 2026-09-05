@@ -197,7 +197,7 @@ export default function PenpalIntervention() {
       const showReport = searchParams ? searchParams.get("report") === "true" : false;
       const stepParam = searchParams ? searchParams.get("step") : null;
 
-      if (progress.isAllCompleted || showReport) {
+      if (showReport || (progress.isAllCompleted && stepParam === null)) {
         setShowSummary(true);
         const summaryIndex = questionnaireConfig.findIndex((s) => s.type === "summary");
         setCurrentStepIndex(summaryIndex !== -1 ? summaryIndex : questionnaireConfig.length - 2);
@@ -380,20 +380,33 @@ export default function PenpalIntervention() {
     const answerPayload = typeof answer === "object" ? JSON.stringify(answer) : String(answer);
 
     try {
-      await submitAnswer(currentStep.id, answerPayload, Math.round(currentSlideDwellMs));
+      // Build compound metadata for slides with modal branching
+      let metadata: string | undefined = undefined;
       if (currentStep.id === "screen6_4_resolution" && answers["screen6_4_location"]) {
-        await submitAnswer("screen6_4_location", String(answers["screen6_4_location"]), 0);
+        metadata = JSON.stringify({ locaton: answers["screen6_4_location"] });
+      } else if (currentStep.id === "screen6_4b_resolution_type") {
+        metadata = JSON.stringify({ 
+          medicine: answers["screen6_4b_medicine"] || null, 
+          route: answers["screen6_4b_route"] || null 
+        });
+      } else if (currentStep.id === "screen6_5_yetagain" && answers["screen6_5_reaction_detail"]) {
+        metadata = JSON.stringify({ reactionDetail: answers["screen6_5_reaction_detail"] });
+      }
+
+      await submitAnswer(currentStep.id, answerPayload, Math.round(currentSlideDwellMs), metadata);
+      if (currentStep.id === "screen6_4_resolution" && answers["screen6_4_location"]) {
+        await submitAnswer("screen6_4_location", String(answers["screen6_4_location"]), Math.round(currentSlideDwellMs));
       }
       if (currentStep.id === "screen6_4b_resolution_type") {
         if (answers["screen6_4b_medicine"]) {
-          await submitAnswer("screen6_4b_medicine", String(answers["screen6_4b_medicine"]), 0);
+          await submitAnswer("screen6_4b_medicine", String(answers["screen6_4b_medicine"]), Math.round(currentSlideDwellMs));
         }
         if (answers["screen6_4b_route"]) {
-          await submitAnswer("screen6_4b_route", String(answers["screen6_4b_route"]), 0);
+          await submitAnswer("screen6_4b_route", String(answers["screen6_4b_route"]), Math.round(currentSlideDwellMs));
         }
       }
       if (currentStep.id === "screen6_5_yetagain" && answers["screen6_5_reaction_detail"]) {
-        await submitAnswer("screen6_5_reaction_detail", String(answers["screen6_5_reaction_detail"]), 0);
+        await submitAnswer("screen6_5_reaction_detail", String(answers["screen6_5_reaction_detail"]), Math.round(currentSlideDwellMs));
       }
       await logInteraction(
         "QUESTION_ANSWER",
@@ -715,9 +728,23 @@ export default function PenpalIntervention() {
                       isSpanish={locale === "es"}
                       selected={answers[currentStep.id]}
                       locationSelected={answers["screen6_4_location"]}
-                      onSelect={handleAnswer}
+                      onSelect={(val: string) => {
+                        handleAnswer(val);
+                        submitAnswer("screen6_4_resolution", val, 0).catch(() => {});
+                        try {
+                          localStorage.setItem("penpal_progress", JSON.stringify({ ...answers, screen6_4_resolution: val }));
+                        } catch {}
+                      }}
                       onLocationSelect={(loc: string) => {
-                        setAnswers((prev) => ({ ...prev, screen6_4_location: loc }));
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_4_location: loc };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("screen6_4_location", loc, 0).catch(() => {});
+                        logInteraction("MODAL_ANSWER", { modal: "screen6_4_location", location: loc, stepId: "screen6_4_resolution" }, "/intervention/flow").catch(() => {});
                       }}
                       navProps={baseProps}
                     />
@@ -727,12 +754,34 @@ export default function PenpalIntervention() {
                       selected={answers[currentStep.id]}
                       medicineSelected={answers["screen6_4b_medicine"]}
                       routeSelected={answers["screen6_4b_route"]}
-                      onSelect={handleAnswer}
+                      onSelect={(val: string) => {
+                        handleAnswer(val);
+                        submitAnswer("screen6_4b_resolution_type", val, 0).catch(() => {});
+                        try {
+                          localStorage.setItem("penpal_progress", JSON.stringify({ ...answers, screen6_4b_resolution_type: val }));
+                        } catch {}
+                      }}
                       onMedicineSelect={(med: string) => {
-                        setAnswers((prev) => ({ ...prev, screen6_4b_medicine: med }));
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_4b_medicine: med };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("screen6_4b_medicine", med, 0).catch(() => {});
+                        logInteraction("MODAL_ANSWER", { modal: "screen6_4b_medicine", medicine: med, stepId: "screen6_4b_resolution_type" }, "/intervention/flow").catch(() => {});
                       }}
                       onRouteSelect={(route: string) => {
-                        setAnswers((prev) => ({ ...prev, screen6_4b_route: route }));
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_4b_route: route };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("screen6_4b_route", route, 0).catch(() => {});
+                        logInteraction("MODAL_ANSWER", { modal: "screen6_4b_route", route, stepId: "screen6_4b_resolution_type" }, "/intervention/flow").catch(() => {});
                       }}
                       navProps={baseProps}
                     />
@@ -741,9 +790,23 @@ export default function PenpalIntervention() {
                       isSpanish={locale === "es"}
                       selected={answers[currentStep.id]}
                       reactionDetailSelected={answers["screen6_5_reaction_detail"]}
-                      onSelect={handleAnswer}
+                      onSelect={(val: string) => {
+                        handleAnswer(val);
+                        submitAnswer("screen6_5_yetagain", val, 0).catch(() => {});
+                        try {
+                          localStorage.setItem("penpal_progress", JSON.stringify({ ...answers, screen6_5_yetagain: val }));
+                        } catch {}
+                      }}
                       onReactionDetailSelect={(detail: string) => {
-                        setAnswers((prev) => ({ ...prev, screen6_5_reaction_detail: detail }));
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_5_reaction_detail: detail };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("screen6_5_reaction_detail", detail, 0).catch(() => {});
+                        logInteraction("MODAL_ANSWER", { modal: "screen6_5_reaction_detail", reactionDetail: detail, stepId: "screen6_5_yetagain" }, "/intervention/flow").catch(() => {});
                       }}
                       navProps={baseProps}
                     />
@@ -1546,6 +1609,7 @@ export function Slide10MedicalCareScreen(props: any) {
   // Move focus into modal when opened; announce dialog
   useEffect(() => {
     if (showBranchModal) {
+      logInteraction("MODAL_VIEW", { modal: "screen6_4_location", slideId: "screen6_4_resolution" }, "/intervention/flow").catch(() => {});
       setTimeout(() => {
         modalTitleRef.current?.focus();
       }, 50);
@@ -1784,6 +1848,7 @@ export function Slide11MedicationScreen(props: any) {
   // Focus title on modal open or step transition
   useEffect(() => {
     if (showModal) {
+      logInteraction("MODAL_VIEW", { modal: "screen6_4b_resolution", step: modalStep, slideId: "screen6_4b_resolution_type" }, "/intervention/flow").catch(() => {});
       setTimeout(() => {
         modalTitleRef.current?.focus();
       }, 50);
@@ -2097,6 +2162,7 @@ export function Slide12RepeatUseScreen(props: any) {
 
   useEffect(() => {
     if (showYetAgainModal) {
+      logInteraction("MODAL_VIEW", { modal: "screen6_5_reaction_detail", slideId: "screen6_5_yetagain" }, "/intervention/flow").catch(() => {});
       setTimeout(() => {
         modalTitleRef.current?.focus();
       }, 50);

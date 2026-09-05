@@ -3,11 +3,21 @@
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useParams } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from '@/routing';
+import { useRouter, Link } from '@/routing';
 import { validateToken } from './actions';
 
 import { RotateCcw } from 'lucide-react';
 import Loader from '@/components/common/Loader';
+
+interface InProgressInfo {
+  cleanToken: string;
+  resumeStepIndex: number;
+  responseCount: number;
+}
+
+interface NewAssessmentInfo {
+  cleanToken: string;
+}
 
 export default function InterventionEntryPage() {
   const t = useTranslations('Intervention');
@@ -25,28 +35,19 @@ export default function InterventionEntryPage() {
   const [loading, setLoading] = useState<boolean>(Boolean(cleanToken));
   const [inputVal, setInputVal] = useState('');
   const [inputPrompt, setInputPrompt] = useState<string | null>(null);
+  const [inProgressData, setInProgressData] = useState<InProgressInfo | null>(null);
+  const [newAssessmentData, setNewAssessmentData] = useState<NewAssessmentInfo | null>(null);
 
-  const handleResume = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (inputVal.trim()) {
-      handleValidation(inputVal.trim());
-    } else {
-      const inputEl = document.getElementById('token-input') as HTMLInputElement | null;
-      if (inputEl) {
-        inputEl.focus();
-        setInputPrompt(
-          locale === 'es'
-            ? 'Por favor, ingrese su Token o ID para reanudar donde lo dejó'
-            : 'Please enter your Token or Research ID to resume where you left off'
-        );
-      }
-    }
-  };
-
-  const handleValidation = useCallback(async (tokenToValidate: string) => {
+  const handleValidation = useCallback(async (
+    tokenToValidate: string,
+    actionIntent: 'access' | 'resume' | 'auto' = 'auto'
+  ) => {
     setLoading(true);
     setError(null);
     setRedirectUrl(null);
+    setInProgressData(null);
+    setNewAssessmentData(null);
+
     try {
       let raw = tokenToValidate.trim();
       // If user pasted a full URL or query string, extract the token parameter
@@ -67,12 +68,52 @@ export default function InterventionEntryPage() {
         setError(result.error);
         setRedirectUrl(result.redirectUrl || null);
         setLoading(false);
-      } else if (result.success === true) {
-        if (result.isCompleted) {
-          router.push('/intervention/flow?report=true');
+        return;
+      }
+
+      // If assessment is already completed, go straight to the summary report
+      if (result.isCompleted) {
+        router.push(`/intervention/flow?report=true&token=${encodeURIComponent(result.cleanToken)}`);
+        return;
+      }
+
+      // Intent 1: "access" clicked (Access Assessment button)
+      if (actionIntent === 'access') {
+        if (!result.hasStarted) {
+          // Token is fresh / unused -> Access assessment from the very beginning (Step 0)
+          router.push(`/intervention/flow?step=0&token=${encodeURIComponent(result.cleanToken)}`);
         } else {
-          router.push('/intervention/flow');
+          // Token already has steps done -> Provide choice to Resume or Start Over
+          setInProgressData({
+            cleanToken: result.cleanToken,
+            resumeStepIndex: result.resumeStepIndex,
+            responseCount: result.responseCount,
+          });
+          setLoading(false);
         }
+        return;
+      }
+
+      // Intent 2: "resume" clicked (Resume Assessment button)
+      if (actionIntent === 'resume') {
+        if (result.hasStarted) {
+          // Token has progress -> Resume directly from the step where they left off
+          router.push(`/intervention/flow?step=${result.resumeStepIndex}&token=${encodeURIComponent(result.cleanToken)}`);
+        } else {
+          // Token is fresh with no responses saved yet -> Inform user with 1-click start
+          setNewAssessmentData({
+            cleanToken: result.cleanToken,
+          });
+          setLoading(false);
+        }
+        return;
+      }
+
+      // Intent 3: "auto" (opened directly via URL link or QR code)
+      if (result.hasStarted) {
+        router.push(`/intervention/flow?step=${result.resumeStepIndex}&token=${encodeURIComponent(result.cleanToken)}`);
+      } else {
+        router.push(`/intervention/flow?step=0&token=${encodeURIComponent(result.cleanToken)}`);
       }
     } catch (e) {
       console.error(e);
@@ -81,9 +122,43 @@ export default function InterventionEntryPage() {
     }
   }, [locale, router]);
 
+  const handleAccessClick = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (inputVal.trim()) {
+      handleValidation(inputVal.trim(), 'access');
+    } else {
+      const inputEl = document.getElementById('token-input') as HTMLInputElement | null;
+      if (inputEl) {
+        inputEl.focus();
+        setInputPrompt(
+          locale === 'es'
+            ? 'Por favor, ingrese su Token o ID para acceder a la evaluación'
+            : 'Please enter your Token or Research ID to access the assessment'
+        );
+      }
+    }
+  };
+
+  const handleResumeClick = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (inputVal.trim()) {
+      handleValidation(inputVal.trim(), 'resume');
+    } else {
+      const inputEl = document.getElementById('token-input') as HTMLInputElement | null;
+      if (inputEl) {
+        inputEl.focus();
+        setInputPrompt(
+          locale === 'es'
+            ? 'Por favor, ingrese su Token o ID para reanudar donde lo dejó'
+            : 'Please enter your Token or Research ID to resume where you left off'
+        );
+      }
+    }
+  };
+
   useEffect(() => {
     if (cleanToken) {
-      handleValidation(cleanToken);
+      handleValidation(cleanToken, 'auto');
     }
   }, [cleanToken, handleValidation]);
 
@@ -141,6 +216,8 @@ export default function InterventionEntryPage() {
                 setError(null);
                 setRedirectUrl(null);
                 setInputVal('');
+                setInProgressData(null);
+                setNewAssessmentData(null);
               }}
               className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-[0.98] cursor-pointer"
             >
@@ -160,7 +237,7 @@ export default function InterventionEntryPage() {
     );
   }
 
-  // --- MAIN COMPACT PORTAL ENTRY FORM ---
+  // --- MAIN PORTAL ENTRY FORM ---
   return (
     <main className="h-screen w-screen flex flex-col items-center justify-between py-6 px-4 font-sans text-[#2d3748] bg-[#f4f8e8]" role="main">
       <div className="flex-1 flex flex-col justify-center max-w-sm w-full space-y-5">
@@ -179,83 +256,185 @@ export default function InterventionEntryPage() {
           </p>
         </div>
 
-        {/* Single Form Card - Protected Gateway */}
+        {/* Form Card */}
         <div className="bg-white/90 border border-slate-200/80 rounded-3xl shadow-sm p-6 sm:p-7 w-full text-center space-y-5">
-          <div className="space-y-2">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-[#1d5c64] bg-[#f4f8e8] border border-slate-200/60 px-3 py-1 rounded-full inline-block">
-              {locale === 'es' ? 'Acceso Exclusivo con Enlace de Estudio' : 'Invitation-Only Study Access'}
-            </span>
-            <h2 className="text-base font-bold text-[#1f2937]">
-              {locale === 'es' ? 'Se Requiere Enlace Único o Código QR' : 'Unique Study Link or QR Code Required'}
-            </h2>
-            <p className="text-xs text-slate-600 font-normal leading-relaxed">
-              {locale === 'es'
-                ? 'Para acceder a esta evaluación clínica, debe utilizar el enlace único o escanear el código QR proporcionado por el equipo del estudio. Sin un enlace o ID válido, no es posible ingresar a la evaluación.'
-                : 'To access this clinical assessment, you must use the unique link or scan the QR code provided by the study team. Without a valid study link or ID, access cannot be granted.'}
-            </p>
-          </div>
-
-          {/* Form to enter Research ID / Token if opening directly */}
-          <div className="space-y-3 pt-1">
-            <form onSubmit={handleResume} className="space-y-3">
-              <label htmlFor="token-input" className="sr-only">
-                {locale === 'es' ? 'Token o ID de investigación' : 'Token or Research ID'}
-              </label>
-              <div className="space-y-1.5">
-                <input 
-                  id="token-input"
-                  name="token" 
-                  type="text" 
-                  value={inputVal}
-                  onChange={(e) => {
-                    setInputVal(e.target.value);
-                    if (inputPrompt) setInputPrompt(null);
-                  }}
-                  placeholder={locale === 'es' ? "Ingrese su Token o ID (ej. PEN-4K9L2M)" : "Enter your Token or Research ID (e.g. PEN-4K9L2M)"} 
-                  required
-                  aria-required="true"
-                  className={`h-11 w-full px-3.5 border font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl text-xs font-semibold transition-all ${
-                    inputPrompt 
-                      ? 'border-[#1d5c64] ring-2 ring-[#1d5c64]/20' 
-                      : 'border-slate-300 focus:outline-none focus:border-[#1d5c64] focus:ring-1 focus:ring-[#1d5c64]'
-                  }`}
-                />
-                {inputPrompt && (
-                  <p className="text-[11px] text-[#1d5c64] font-bold animate-in fade-in">
-                    {inputPrompt}
-                  </p>
-                )}
+          {inProgressData ? (
+            /* Card state when assessment is in progress and user clicked Access Assessment */
+            <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200 text-center">
+              <div className="space-y-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#1d5c64] bg-[#f4f8e8] border border-slate-200/60 px-3 py-1 rounded-full inline-block">
+                  {locale === 'es' ? 'Evaluación en Curso' : 'Assessment In Progress'}
+                </span>
+                <h2 className="text-base font-bold text-[#1f2937]">
+                  {locale === 'es' 
+                    ? `Progreso guardado: Paso ${inProgressData.resumeStepIndex + 1} de 13`
+                    : `Saved Progress: Step ${inProgressData.resumeStepIndex + 1} of 13`}
+                </h2>
+                <p className="text-xs text-slate-600 font-normal leading-relaxed">
+                  {locale === 'es'
+                    ? `Ya tiene respuestas guardadas en este token (${inProgressData.responseCount} completadas). Puede reanudar directamente donde lo dejó.`
+                    : `You already have saved responses on this token (${inProgressData.responseCount} answered). You can resume directly where you left off.`}
+                </p>
               </div>
 
-              <button 
-                type="submit" 
-                className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
-              >
-                <span>{locale === 'es' ? 'Acceder a la Evaluación →' : 'Access Assessment →'}</span>
-              </button>
-            </form>
+              <div className="space-y-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoading(true);
+                    router.push(`/intervention/flow?step=${inProgressData.resumeStepIndex}&token=${encodeURIComponent(inProgressData.cleanToken)}`);
+                  }}
+                  className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
+                >
+                  <RotateCcw className="w-4 h-4 text-[#132c27]" />
+                  <span>
+                    {locale === 'es' 
+                      ? `Reanudar en el Paso ${inProgressData.resumeStepIndex + 1} →` 
+                      : `Resume from Step ${inProgressData.resumeStepIndex + 1} →`}
+                  </span>
+                </button>
 
-            {/* Resume Assessment Bottom Action Button */}
-            <div className="pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => handleResume()}
-                className="w-full py-2.5 px-4 bg-slate-50 hover:bg-[#f4f8e8] text-[#1d5c64] hover:text-[#16484e] border border-slate-200 hover:border-[#1d5c64]/40 font-bold text-[11px] uppercase tracking-wider rounded-xl transition-all shadow-2xs active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-[#1d5c64] group-hover:-rotate-45 transition-transform duration-200" />
-                <span>{locale === 'es' ? 'Reanudar Evaluación' : 'Resume Assessment'}</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInProgressData(null);
+                    setInputVal('');
+                  }}
+                  className="text-[11px] text-slate-500 hover:text-slate-800 font-medium underline cursor-pointer pt-1 block mx-auto"
+                >
+                  {locale === 'es' ? 'Ingresar otro token' : 'Use another token'}
+                </button>
+              </div>
             </div>
-          </div>
+          ) : newAssessmentData ? (
+            /* Card state when token is new and user clicked Resume Assessment */
+            <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200 text-center">
+              <div className="space-y-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#1d5c64] bg-[#f4f8e8] border border-slate-200/60 px-3 py-1 rounded-full inline-block">
+                  {locale === 'es' ? 'Token Nuevo' : 'New Token'}
+                </span>
+                <h2 className="text-base font-bold text-[#1f2937]">
+                  {locale === 'es' ? 'Sin Respuestas Guardadas' : 'No Saved Responses Yet'}
+                </h2>
+                <p className="text-xs text-slate-600 font-normal leading-relaxed">
+                  {locale === 'es'
+                    ? 'Este token aún no se ha iniciado. Haga clic a continuación para comenzar la evaluación clínica desde el principio.'
+                    : 'This token has not been started yet. Click below to begin the clinical assessment from the beginning.'}
+                </p>
+              </div>
+
+              <div className="space-y-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoading(true);
+                    router.push(`/intervention/flow?step=0&token=${encodeURIComponent(newAssessmentData.cleanToken)}`);
+                  }}
+                  className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
+                >
+                  <span>{locale === 'es' ? 'Comenzar Evaluación (Paso 1) →' : 'Start Assessment (Step 1) →'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewAssessmentData(null);
+                  }}
+                  className="text-[11px] text-slate-500 hover:text-slate-800 font-medium underline cursor-pointer pt-1 block mx-auto"
+                >
+                  {locale === 'es' ? 'Volver' : 'Back'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Standard Token Input with both ACCESS ASSESSMENT and RESUME ASSESSMENT */
+            <>
+              <div className="space-y-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#1d5c64] bg-[#f4f8e8] border border-slate-200/60 px-3 py-1 rounded-full inline-block">
+                  {locale === 'es' ? 'Acceso Exclusivo con Enlace de Estudio' : 'Invitation-Only Study Access'}
+                </span>
+                <h2 className="text-base font-bold text-[#1f2937]">
+                  {locale === 'es' ? 'Se Requiere Enlace Único o Código QR' : 'Unique Study Link or QR Code Required'}
+                </h2>
+                <p className="text-xs text-slate-600 font-normal leading-relaxed">
+                  {locale === 'es'
+                    ? 'Para acceder a esta evaluación clínica, debe utilizar el enlace único o escanear el código QR proporcionado por el equipo del estudio. Sin un enlace o ID válido, no es posible ingresar a la evaluación.'
+                    : 'To access this clinical assessment, you must use the unique link or scan the QR code provided by the study team. Without a valid study link or ID, access cannot be granted.'}
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <form onSubmit={handleAccessClick} className="space-y-3">
+                  <label htmlFor="token-input" className="sr-only">
+                    {locale === 'es' ? 'Token o ID de investigación' : 'Token or Research ID'}
+                  </label>
+                  <div className="space-y-1.5">
+                    <input 
+                      id="token-input"
+                      name="token" 
+                      type="text" 
+                      value={inputVal}
+                      onChange={(e) => {
+                        setInputVal(e.target.value);
+                        if (inputPrompt) setInputPrompt(null);
+                      }}
+                      placeholder={locale === 'es' ? "Ingrese su Token o ID (ej. PEN-4K9L2M)" : "Enter your Token or Research ID (e.g. PEN-4K9L2M)"} 
+                      required
+                      aria-required="true"
+                      className={`h-11 w-full px-3.5 border font-mono text-center tracking-wider text-slate-900 bg-white placeholder-slate-400 rounded-xl text-xs font-semibold transition-all ${
+                        inputPrompt 
+                          ? 'border-[#1d5c64] ring-2 ring-[#1d5c64]/20' 
+                          : 'border-slate-300 focus:outline-none focus:border-[#1d5c64] focus:ring-1 focus:ring-[#1d5c64]'
+                      }`}
+                    />
+                    {inputPrompt && (
+                      <p className="text-[11px] text-[#1d5c64] font-bold animate-in fade-in">
+                        {inputPrompt}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Primary Button: Access Assessment (Start fresh for new tokens) */}
+                  <button 
+                    type="submit" 
+                    className="w-full h-11 bg-[#71ad9d] hover:bg-[#609c8d] text-[#132c27] font-bold text-xs uppercase tracking-widest rounded-full transition-all shadow-sm active:scale-[0.99] flex justify-center items-center cursor-pointer gap-2"
+                  >
+                    <span>{locale === 'es' ? 'Acceder a la Evaluación →' : 'Access Assessment →'}</span>
+                  </button>
+                </form>
+
+                {/* Secondary Button: Resume Assessment (Resume from where you left off) */}
+                <div className="pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={handleResumeClick}
+                    className="w-full py-2.5 px-4 bg-slate-50 hover:bg-[#f4f8e8] text-[#1d5c64] hover:text-[#16484e] border border-slate-200 hover:border-[#1d5c64]/40 font-bold text-[11px] uppercase tracking-wider rounded-xl transition-all shadow-2xs active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-[#1d5c64] group-hover:-rotate-45 transition-transform duration-200" />
+                    <span>{locale === 'es' ? 'Reanudar Evaluación' : 'Resume Assessment'}</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="w-full max-w-xs text-center">
+      <div className="w-full max-w-xs text-center space-y-2">
         <p className="text-[9px] text-slate-600 leading-normal font-normal">
           {locale === 'es'
             ? 'Aviso de seguridad: Los enlaces y tokens de acceso son personales, están asegurados criptográficamente y protegen la integridad del estudio clínico.'
             : 'Security Notice: Participant links and access tokens are private, cryptographically verified, and protected for clinical study integrity.'}
         </p>
+        <div className="pt-1">
+          <Link
+            href="/admin"
+            className="text-[11px] font-semibold text-slate-500 hover:text-[#1d5c64] transition-colors inline-flex items-center gap-1 hover:underline"
+          >
+            <span>{locale === 'es' ? 'Portal de Administración' : 'Admin Portal'}</span>
+            <span aria-hidden="true">&rarr;</span>
+          </Link>
+        </div>
       </div>
     </main>
   );

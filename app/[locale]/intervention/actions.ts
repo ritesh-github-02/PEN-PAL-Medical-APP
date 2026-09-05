@@ -31,6 +31,7 @@ import {
 } from '@/lib/security';
 
 import { checkRateLimit } from '@/lib/rate-limit';
+import { findNextUnansweredStepIndex } from '@/lib/questionnaire-progress';
 
 /** Clamped lookup of ADMIN_SECRET; throws if missing so devs cannot run without it. */
 function requireAdminSecret(): string {
@@ -91,6 +92,10 @@ const VALIDATE_RATE_LIMIT_WINDOW_MS = 60_000;
 export interface TokenValidationSuccess {
   success: true;
   isCompleted: boolean;
+  hasStarted: boolean;
+  responseCount: number;
+  resumeStepIndex: number;
+  cleanToken: string;
 }
 
 export interface TokenValidationFailure {
@@ -766,9 +771,45 @@ export async function validateAndConsumeToken(
     eventData: { useCount: tokenRecord.useCount + 1 },
   });
 
+  // Calculate questionnaire responses and determine resume step
+  const responses = await runWithRetry(() => prisma.questionnaireResponse.findMany({
+    where: { participantId: tokenRecord.participantId },
+    orderBy: { updatedAt: 'asc' },
+  })).catch(() => []);
+
+  const answers: Record<string, any> = {};
+  for (const r of responses) {
+    if (!r.answerValue) continue;
+    try {
+      if (r.answerValue.startsWith('[') && r.answerValue.endsWith(']')) {
+        answers[r.questionId] = JSON.parse(r.answerValue);
+      } else if (r.answerValue === 'true') {
+        answers[r.questionId] = true;
+      } else if (r.answerValue === 'false') {
+        answers[r.questionId] = false;
+      } else {
+        answers[r.questionId] = r.answerValue;
+      }
+    } catch {
+      answers[r.questionId] = r.answerValue;
+    }
+  }
+
+  const { targetIndex, isAllCompleted } = findNextUnansweredStepIndex(answers);
+  const isFinished = 
+    tokenRecord.participant.status === 'COMPLETED' || 
+    tokenRecord.status === 'COMPLETED' || 
+    isAllCompleted;
+
+  const hasStarted = responses.length > 0;
+
   return {
     success: true,
-    isCompleted: tokenRecord.status === 'CONSUMED' || tokenRecord.status === 'EXPIRED' || tokenRecord.status === 'COMPLETED' || tokenRecord.participant.status === 'COMPLETED',
+    isCompleted: isFinished,
+    hasStarted,
+    responseCount: responses.length,
+    resumeStepIndex: targetIndex,
+    cleanToken: tokenRecord.tokenHash || cleanInput,
   };
 }
 

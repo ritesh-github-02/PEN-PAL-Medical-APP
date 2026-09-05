@@ -75,9 +75,33 @@ const CONTROL_HANDOUT_SECTIONS = [
   { id: 'section-delayed-reactions', sectionNumber: 5, title: 'Delayed Medication Reactions Guide', subtitle: 'Safety symptoms to monitor: joint pain, rash, fever, and when to seek care' },
 ];
 
-const STEP_LABELS_MAP: Record<string, { slideNumber: number; title: string; subtitle: string; type: string }> = Object.fromEntries(
-  STUDY_SLIDES_CONFIG.map(s => [s.id, s])
-);
+const STEP_LABELS_MAP: Record<string, { slideNumber: number; title: string; subtitle: string; type: string }> = {
+  ...Object.fromEntries(STUDY_SLIDES_CONFIG.map(s => [s.id, s])),
+  'screen6_4_location': {
+    slideNumber: 10,
+    title: 'Medical Care Location (Modal)',
+    subtitle: 'Slide 10 Sub-Step · Care Location Received',
+    type: 'Question',
+  },
+  'screen6_4b_medicine': {
+    slideNumber: 11,
+    title: 'Resolution Medication (Modal Step 1)',
+    subtitle: 'Slide 11 Sub-Step · Medicine Administered',
+    type: 'Question',
+  },
+  'screen6_4b_route': {
+    slideNumber: 11,
+    title: 'Medication Intake Route (Modal Step 2)',
+    subtitle: 'Slide 11 Sub-Step · Administration Route',
+    type: 'Question',
+  },
+  'screen6_5_reaction_detail': {
+    slideNumber: 12,
+    title: 'Subsequent Reaction History (Modal)',
+    subtitle: 'Slide 12 Sub-Step · Repeat Exposure Reaction Detail',
+    type: 'Question',
+  },
+};
 
 // Format date into Eastern Standard Time (EST / EDT)
 function formatEST(date: Date | string | null | undefined): string {
@@ -101,7 +125,7 @@ function formatEST(date: Date | string | null | undefined): string {
   }
 }
 
-function formatDisplayAnswer(questionId: string, rawVal: any): string {
+function formatDisplayAnswer(questionId: string, rawVal: any, allResponses?: any[]): string {
   if (
     rawVal === undefined || 
     rawVal === null || 
@@ -145,6 +169,37 @@ function formatDisplayAnswer(questionId: string, rawVal: any): string {
 
   if (questionId === 'screen6_2_timing') {
     return `${rawVal} years old`;
+  }
+
+  // Handle compound formatting if allResponses is provided
+  if (allResponses && allResponses.length > 0) {
+    if (questionId === 'screen6_4_resolution' && (rawVal === 'Yes' || String(rawVal).toLowerCase().startsWith('yes'))) {
+      const locResp = allResponses.find((r: any) => r.questionId === 'screen6_4_location');
+      if (locResp?.answerValue && locResp.answerValue !== 'none_selected' && locResp.answerValue !== 'undefined') {
+        return `Yes — ${locResp.answerValue}`;
+      }
+    }
+
+    if (questionId === 'screen6_4b_resolution_type' && (rawVal === 'With medication' || String(rawVal).toLowerCase().includes('medication'))) {
+      const medResp = allResponses.find((r: any) => r.questionId === 'screen6_4b_medicine');
+      const routeResp = allResponses.find((r: any) => r.questionId === 'screen6_4b_route');
+      const med = medResp?.answerValue;
+      const route = routeResp?.answerValue;
+      if (med && route) {
+        return `With medication — ${med} (${route})`;
+      } else if (med) {
+        return `With medication — ${med}`;
+      } else if (route) {
+        return `With medication — (${route})`;
+      }
+    }
+
+    if (questionId === 'screen6_5_yetagain' && (rawVal === 'Yes' || String(rawVal).toLowerCase().startsWith('yes'))) {
+      const detailResp = allResponses.find((r: any) => r.questionId === 'screen6_5_reaction_detail');
+      if (detailResp?.answerValue && detailResp.answerValue !== 'none_selected' && detailResp.answerValue !== 'undefined') {
+        return `Yes — ${detailResp.answerValue}`;
+      }
+    }
   }
 
   return String(rawVal).replace(/_/g, ' ');
@@ -948,13 +1003,64 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                                         {/* If an answer exists on this slide and it is a question, render it right here */}
                                         {(() => {
                                           const isQuestionSlide = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'].includes(slide.id);
-                                          if (!response || !isQuestionSlide || response.answerValue === 'acknowledged') return null;
+                                          
+                                          // Look up matching sub-responses from modal branches
+                                          const locResp = modalDetails.responses?.find((r: any) => r.questionId === 'screen6_4_location');
+                                          const medResp = modalDetails.responses?.find((r: any) => r.questionId === 'screen6_4b_medicine');
+                                          const routeResp = modalDetails.responses?.find((r: any) => r.questionId === 'screen6_4b_route');
+                                          const detailResp = modalDetails.responses?.find((r: any) => r.questionId === 'screen6_5_reaction_detail');
+
+                                          let effectiveAnswerValue = response?.answerValue;
+                                          if (!effectiveAnswerValue && slide.id === 'screen6_4_resolution' && locResp?.answerValue) {
+                                            effectiveAnswerValue = 'Yes';
+                                          } else if (!effectiveAnswerValue && slide.id === 'screen6_4b_resolution_type' && (medResp?.answerValue || routeResp?.answerValue)) {
+                                            effectiveAnswerValue = 'With medication';
+                                          } else if (!effectiveAnswerValue && slide.id === 'screen6_5_yetagain' && detailResp?.answerValue) {
+                                            effectiveAnswerValue = 'Yes';
+                                          }
+
+                                          if (!effectiveAnswerValue || !isQuestionSlide || effectiveAnswerValue === 'acknowledged') return null;
+
                                           return (
-                                            <div className="mt-1 flex items-center gap-1.5">
-                                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Answer:</span>
-                                              <span className="px-2.5 py-0.5 bg-teal-50 text-teal-950 font-bold text-xs rounded border border-teal-200">
-                                                {formatDisplayAnswer(slide.id, response.answerValue)}
-                                              </span>
+                                            <div className="mt-1 space-y-1">
+                                              <div className="flex items-center gap-1.5 flex-wrap">
+                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Answer:</span>
+                                                <span className="px-2.5 py-0.5 bg-teal-50 text-teal-950 font-bold text-xs rounded border border-teal-200 shadow-2xs">
+                                                  {formatDisplayAnswer(slide.id, effectiveAnswerValue, modalDetails.responses)}
+                                                </span>
+                                              </div>
+
+                                              {/* Dedicated modal detail tags */}
+                                              {slide.id === 'screen6_4_resolution' && locResp?.answerValue && (
+                                                <div className="flex items-center gap-1 text-[11px] pt-0.5">
+                                                  <span className="px-2 py-0.5 bg-blue-50 text-blue-900 border border-blue-200 rounded font-semibold flex items-center gap-1 shadow-2xs">
+                                                    📍 <strong>Care Location:</strong> {locResp.answerValue}
+                                                  </span>
+                                                </div>
+                                              )}
+
+                                              {slide.id === 'screen6_4b_resolution_type' && (medResp?.answerValue || routeResp?.answerValue) && (
+                                                <div className="flex items-center gap-1.5 flex-wrap text-[11px] pt-0.5">
+                                                  {medResp?.answerValue && (
+                                                    <span className="px-2 py-0.5 bg-indigo-50 text-indigo-900 border border-indigo-200 rounded font-semibold flex items-center gap-1 shadow-2xs">
+                                                      💊 <strong>Medication:</strong> {medResp.answerValue}
+                                                    </span>
+                                                  )}
+                                                  {routeResp?.answerValue && (
+                                                    <span className="px-2 py-0.5 bg-purple-50 text-purple-900 border border-purple-200 rounded font-semibold flex items-center gap-1 shadow-2xs">
+                                                      💉 <strong>Intake Route:</strong> {routeResp.answerValue}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                              )}
+
+                                              {slide.id === 'screen6_5_yetagain' && detailResp?.answerValue && (
+                                                <div className="flex items-center gap-1 text-[11px] pt-0.5">
+                                                  <span className="px-2 py-0.5 bg-amber-50 text-amber-950 border border-amber-200 rounded font-semibold flex items-center gap-1 shadow-2xs">
+                                                    ⚠️ <strong>Re-exposure Reaction:</strong> {detailResp.answerValue}
+                                                  </span>
+                                                </div>
+                                              )}
                                             </div>
                                           );
                                         })()}
@@ -1010,8 +1116,27 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                       </div>
 
                       {(() => {
-                          const questionIds = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'];
-                          const visibleResponses = (modalDetails.responses || []).filter((r: any) => questionIds.includes(r.questionId) && r.answerValue !== 'acknowledged');
+                          const questionIds = [
+                            'screen1_intro',
+                            'screen3_5_knowledge_test',
+                            'screen6_1_symptoms',
+                            'screen6_2_timing',
+                            'screen6_3_onset',
+                            'screen6_4_resolution',
+                            'screen6_4_location',
+                            'screen6_4b_resolution_type',
+                            'screen6_4b_medicine',
+                            'screen6_4b_route',
+                            'screen6_5_yetagain',
+                            'screen6_5_reaction_detail',
+                          ];
+                          const visibleResponses = (modalDetails.responses || [])
+                            .filter((r: any) => questionIds.includes(r.questionId) && r.answerValue !== 'acknowledged' && r.answerValue !== '')
+                            .sort((a: any, b: any) => {
+                              const idxA = questionIds.indexOf(a.questionId);
+                              const idxB = questionIds.indexOf(b.questionId);
+                              return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+                            });
 
                           if (visibleResponses.length === 0) {
                             return (
@@ -1035,12 +1160,24 @@ export function ParticipantCohortTable({ participants }: ParticipantCohortTableP
                                 <tbody className="divide-y divide-slate-200 bg-white">
                                   {visibleResponses.map((r: any) => {
                                     const stepInfo = STEP_LABELS_MAP[r.questionId] || { title: r.questionId, subtitle: '', type: 'Field', slideNumber: 0 };
+                                    const isSubStep = ['screen6_4_location', 'screen6_4b_medicine', 'screen6_4b_route', 'screen6_5_reaction_detail'].includes(r.questionId);
                                     const dwellSec = r.timeSpentMs ? (r.timeSpentMs / 1000).toFixed(1) : '< 1';
 
                                     return (
-                                      <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                                      <tr key={r.id} className={`transition-colors ${isSubStep ? 'bg-slate-50/50 hover:bg-slate-100/70' : 'hover:bg-slate-50'}`}>
                                         <td className="py-3 px-4">
-                                          <p className="font-bold text-slate-900 text-xs">{stepInfo.title}</p>
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <p className="font-bold text-slate-900 text-xs">{stepInfo.title}</p>
+                                            {isSubStep ? (
+                                              <span className="text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.2 bg-blue-100 text-blue-800 border border-blue-200 rounded">
+                                                Modal Sub-Step
+                                              </span>
+                                            ) : stepInfo.slideNumber > 0 ? (
+                                              <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
+                                                Slide {stepInfo.slideNumber}
+                                              </span>
+                                            ) : null}
+                                          </div>
                                           <p className="text-[10px] font-mono text-slate-400">{r.questionId}</p>
                                         </td>
                                         <td className="py-3 px-4">

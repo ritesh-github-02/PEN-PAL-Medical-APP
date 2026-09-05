@@ -8,7 +8,7 @@ import { questionnaireConfig } from '@/config/questionnaire';
 // submitAnswer
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function submitAnswer(questionId: string, answerValue: string, timeSpentMs?: number) {
+export async function submitAnswer(questionId: string, answerValue: string, timeSpentMs?: number, metadata?: string) {
   const cookieStore = await cookies();
   const participantId = cookieStore.get('penpal_participant')?.value;
 
@@ -28,12 +28,14 @@ export async function submitAnswer(questionId: string, answerValue: string, time
       update: {
         answerValue: answerValue,
         timeSpentMs: timeSpentMs ? { increment: timeSpentMs } : undefined,
+        ...(metadata !== undefined ? { metadata } : {}),
       },
       create: {
         participantId: participantId,
         questionId: questionId,
         answerValue: answerValue,
         timeSpentMs: timeSpentMs || 0,
+        metadata: metadata || null,
       },
     });
   } catch (error) {
@@ -155,48 +157,10 @@ export interface LoadProgressResult {
   bindingError?: string;
 }
 
-export async function findNextUnansweredStepIndex(answers: Record<string, any>): Promise<{
-  targetIndex: number;
-  isAllCompleted: boolean;
-}> {
-  let index = 0;
-  const visitedIds = new Set<string>();
+import { findNextUnansweredStepIndex as findNextSync } from '@/lib/questionnaire-progress';
 
-  while (index >= 0 && index < questionnaireConfig.length) {
-    const step = questionnaireConfig[index];
-    if (visitedIds.has(step.id)) break;
-    visitedIds.add(step.id);
-
-    const ans = answers[step.id];
-
-    if (step.isTerminal) {
-      return { targetIndex: index, isAllCompleted: true };
-    }
-
-    const isAnswered =
-      ans !== undefined &&
-      ans !== null &&
-      ans !== 'undefined' &&
-      (Array.isArray(ans) ? ans.length > 0 : true);
-
-    if (!isAnswered) {
-      return { targetIndex: index, isAllCompleted: false };
-    }
-
-    let nextId = step.nextStepId;
-    if (step.branchLogic && ans !== undefined) {
-      const match = step.branchLogic.find((b: any) => b.value === String(ans));
-      if (match) nextId = match.targetStepId;
-    }
-
-    if (!nextId) break;
-
-    const nextIdx = questionnaireConfig.findIndex((s) => s.id === nextId);
-    if (nextIdx === -1) break;
-    index = nextIdx;
-  }
-
-  return { targetIndex: index, isAllCompleted: true };
+export async function findNextUnansweredStepIndex(answers: Record<string, any>) {
+  return findNextSync(answers);
 }
 
 export async function loadQuestionnaireProgress(tokenParam?: string, locale: string = 'en'): Promise<LoadProgressResult> {
@@ -244,7 +208,6 @@ export async function loadQuestionnaireProgress(tokenParam?: string, locale: str
     tokenDisplay = participant?.externalId || participant?.tokens[0]?.tokenHash || null;
     isParticipantCompleted =
       participant?.status === 'COMPLETED' ||
-      participant?.tokens[0]?.status === 'CONSUMED' ||
       participant?.tokens[0]?.status === 'COMPLETED';
 
     const responses = await prisma.questionnaireResponse.findMany({
