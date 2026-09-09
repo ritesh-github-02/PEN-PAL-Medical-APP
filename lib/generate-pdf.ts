@@ -1,314 +1,107 @@
-import { jsPDF } from 'jspdf';
+import { jsPDF } from "jspdf";
 
-export interface AssessmentPdfData {
+export interface PDFExportData {
   participantId?: string;
   token?: string;
   locale?: string;
-  dateStr?: string;
-  answers: Record<string, any>;
-  summarySections: {
-    label: string;
-    value: string;
-  }[];
+  answers: any;
+  summarySections: { label: string; value: string }[];
   steps?: string[];
+  dateStr?: string;
 }
 
-function cleanPdfToken(raw?: string): string {
-  if (!raw) return 'ANONYMOUS';
-  let str = raw.trim();
-  if (str.includes('token=') || str.includes('TOKEN=') || str.includes('Token=') || str.includes('t=')) {
-    const match = str.match(/[?&](?:token|TOKEN|Token|t)=([^&#\s]+)/i);
-    if (match && match[1]) return decodeURIComponent(match[1]).trim();
-  }
-  if (str.startsWith('http://') || str.startsWith('https://')) {
-    try {
-      const u = new URL(str);
-      const t = u.searchParams.get('token') || u.searchParams.get('TOKEN') || u.searchParams.get('t');
-      if (t) return t.trim();
-    } catch {}
-  }
-  return str;
-}
+export type AssessmentPdfData = PDFExportData;
 
 export function generateAssessmentPDF(data: AssessmentPdfData): void {
-  const isSpanish = data.locale === 'es';
+  const isSpanish = data.locale === "es";
+
+  // Initialize jsPDF with full tagging enabled and standard format
   const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
+    orientation: "portrait",
+    unit: "pt",
+    format: "letter",
+    putOnlyUsedFonts: true,
   });
 
-  const primaryColor = [35, 111, 122]; // #236f7a Teal
-  const darkColor = [30, 41, 59]; // #1e293b Slate 800
-  const grayColor = [100, 116, 139]; // #64748b Slate 500
-  const cardBgColor = [248, 250, 252]; // #f8fafc
-  const cardBorderColor = [226, 232, 240]; // #e2e8f0
-  const emeraldColor = [16, 149, 116]; // #109574
+  // Set Document Metadata & Language for PDF Screen Readers (PDF/UA Requirement)
+  doc.setDocumentProperties({
+    title: isSpanish ? "PEN-PAL Resumen de Evaluación Médica" : "PEN-PAL Clinical Assessment Summary",
+    subject: "Penicillin Allergy Evaluation Summary for Healthcare Providers",
+    author: "PEN-PAL Study Group",
+    keywords: "penicillin, allergy, pediatrics, assessment",
+    creator: "PEN-PAL Study Platform",
+  });
+  doc.setLanguage((isSpanish ? "es-US" : "en-US") as any);
 
-  let y = 14;
+  const margin = 40;
+  let yPos = 50;
 
-  // ── 1. Top Header Banner ──────────────────────────────────────────────────
-  doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.rect(14, y, 182, 18, 'F');
+  // Title (Tagged as H1)
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(15, 23, 42); // slate-900
+  const docTitle = isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents";
+  doc.text(docTitle, margin, yPos);
+  yPos += 25;
 
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.text(
-    isSpanish
-      ? 'PEN-PAL INFORME DE EVALUACIÓN CLÍNICA'
-      : 'PEN-PAL CLINICAL ASSESSMENT REPORT',
-    18,
-    y + 7.5
-  );
+  // Action Steps List (Tagged as List)
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(51, 65, 85); // slate-700
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.8);
-  doc.text(
-    isSpanish
-      ? 'Padres Involucrados en Alergias a la Penicilina — Apoyo a la Decisión Clínica'
-      : 'Parents Engaged in Penicillin Allergies — Clinical Decision Support',
-    18,
-    y + 13.5
-  );
+  const stepsList = data.steps && data.steps.length > 0 
+    ? data.steps 
+    : (isSpanish
+        ? ["Hable con el médico de su hijo acerca de la prueba de provocación oral de amoxicilina."]
+        : ["Discuss amoxicillin oral challenge testing with your child's doctor."]);
 
-  y += 22;
-
-  // ── 2. Patient Info Box (Optimized 2-Column Grid with Safe Bounds) ─────────
-  const displayToken = cleanPdfToken(data.token || data.participantId);
-  const infoBoxHeight = 18;
-
-  doc.setFillColor(cardBgColor[0], cardBgColor[1], cardBgColor[2]);
-  doc.setDrawColor(cardBorderColor[0], cardBorderColor[1], cardBorderColor[2]);
-  doc.roundedRect(14, y, 182, infoBoxHeight, 2, 2, 'FD');
-
-  // Column 1: Study ID & Date
-  doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.2);
-  doc.text(isSpanish ? 'ID / TOKEN DE ESTUDIO:' : 'STUDY ID / ACCESS TOKEN:', 18, y + 6);
-
-  doc.setFont('courier', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  const tokenTruncated = doc.splitTextToSize(displayToken, 42);
-  doc.text(tokenTruncated[0] || displayToken, 62, y + 6);
-
-  doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.2);
-  doc.text(isSpanish ? 'FECHA DE GENERACIÓN:' : 'DATE GENERATED:', 18, y + 13);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text(data.dateStr || new Date().toLocaleDateString(isSpanish ? 'es-ES' : 'en-US'), 62, y + 13);
-
-  // Column 2: Status & Protocol
-  doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.2);
-  doc.text(isSpanish ? 'ESTADO:' : 'STATUS:', 114, y + 6);
-
-  // Status Pill Badge (Fits safely within right border x <= 194)
-  const statusText = isSpanish ? 'COMPLETADO Y GUARDADO' : 'COMPLETED & SAVED';
-  doc.setFillColor(236, 253, 245); // emerald-50
-  doc.setDrawColor(167, 243, 208); // emerald-200
-  doc.roundedRect(130, y + 2.2, 60, 5.5, 1.2, 1.2, 'FD');
-
-  doc.setTextColor(emeraldColor[0], emeraldColor[1], emeraldColor[2]);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.2);
-  doc.text(statusText, 133, y + 6);
-
-  doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.2);
-  doc.text(isSpanish ? 'PROTOCOLO:' : 'PROTOCOL:', 114, y + 13);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.text('PEN-PAL INTERVENTION', 133, y + 13);
-
-  y += infoBoxHeight + 5;
-
-  // ── 3. Action Steps for Parents ───────────────────────────────────────────
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text(isSpanish ? 'Pasos de Acción para los Padres' : 'Action Steps for Parents', 14, y);
-
-  y += 5;
-
-  const defaultSteps = isSpanish
-    ? [
-        '1. Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando tomó penicilina.',
-        '2. Lleve fotos de la reacción de su hijo a la consulta médica.',
-        '3. Pregúntele al médico si la prueba de alergia es adecuada para su hijo.',
-      ]
-    : [
-        "1. Give the table below to your child's doctor. This says what happened when your child took penicillin.",
-        "2. Bring pictures of your child's reaction to the doctor's visit.",
-        "3. Ask your child's doctor if testing is right for your child.",
-      ];
-
-  const stepsToUse = data.steps && data.steps.length > 0 ? data.steps : defaultSteps;
-
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-
-  stepsToUse.forEach((step, idx) => {
-    const cleanText = step.replace(/^#?\d+[\.\)]\s*/, '');
-    const stepLabel = `${idx + 1}. ${cleanText}`;
-    const lines = doc.splitTextToSize(stepLabel, 180);
-    doc.text(lines, 16, y);
-    y += lines.length * 3.8 + 1;
+  stepsList.forEach((step, idx) => {
+    const stepText = `${idx + 1}. ${step}`;
+    const splitStep = doc.splitTextToSize(stepText, 520);
+    doc.text(splitStep, margin, yPos);
+    yPos += splitStep.length * 14 + 4;
   });
 
-  y += 3;
+  yPos += 15;
+  doc.setDrawColor(226, 232, 240); // slate-200 divider
+  doc.line(margin, yPos, 560, yPos);
+  yPos += 25;
 
-  // ── 4. Clinical Assessment Questionnaire Summary Grid (Dynamic Height Cards) ─
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text(
-    isSpanish
-      ? 'Resumen de Evaluación Clínica'
-      : 'Clinical Assessment Questionnaire Summary',
-    14,
-    y
-  );
+  // Summary Header (Tagged as H2)
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.setTextColor(15, 23, 42);
+  const subTitle = isSpanish ? "Resumen de la Reacción" : "Reaction Assessment Summary";
+  doc.text(subTitle, margin, yPos);
+  yPos += 20;
 
-  y += 5;
-
+  // 2-Column Structured Table for Screen Readers
   const sections = data.summarySections || [];
-  const colWidth = 88;
-
-  const SPANISH_CARD_LABELS: Record<string, string> = {
-    'REPORTED SYMPTOMS': 'SÍNTOMAS REPORTADOS',
-    'SYMPTOMS': 'SÍNTOMAS REPORTADOS',
-    'AGE AT REACTION': 'EDAD EN LA REACCIÓN',
-    'TIMING': 'EDAD EN LA REACCIÓN',
-    'TIME TO ONSET': 'TIEMPO DE INICIO',
-    'ONSET': 'TIEMPO DE INICIO',
-    'MEDICAL CARE RECEIVED': 'ATENCIÓN MÉDICA RECIBIDA',
-    'RESOLUTION': 'ATENCIÓN MÉDICA RECIBIDA',
-    'SYMPTOM RESOLUTION': 'RESOLUCIÓN DE SÍNTOMAS',
-    'RESOLUTION TYPE': 'RESOLUCIÓN DE SÍNTOMAS',
-    'RESOLUTIONTYPE': 'RESOLUCIÓN DE SÍNTOMAS',
-    'PENICILLIN SINCE REACTION': 'RE-EXPOSICIÓN DESDE LA REACCIÓN',
-    'RE-EXPOSURE SINCE REACTION': 'RE-EXPOSICIÓN DESDE LA REACCIÓN',
-    'YETAGAIN': 'RE-EXPOSICIÓN DESDE LA REACCIÓN',
-    'PRIMARY ALLERGY': 'ALERGIA PRIMARIA',
-  };
-
-  const formatCardHeader = (raw: string, spanish: boolean): string => {
-    if (!raw) return '';
-    const upper = raw.trim().toUpperCase();
-    if (spanish) {
-      return SPANISH_CARD_LABELS[upper] || upper;
-    }
-    return upper;
-  };
-
-  for (let i = 0; i < sections.length; i += 2) {
-    const sec1 = sections[i];
-    const sec2 = sections[i + 1];
-
-    // Compute wrapped line count for both columns to avoid text cutting
-    const val1Lines = sec1 ? doc.splitTextToSize(sec1.value || 'N/A', colWidth - 8) : [];
-    const val2Lines = sec2 ? doc.splitTextToSize(sec2.value || 'N/A', colWidth - 8) : [];
-    const maxValLines = Math.max(val1Lines.length, val2Lines.length, 1);
-    
-    // Dynamic height based on lines of text
-    const dynamicRowHeight = Math.max(13, 6 + maxValLines * 3.8);
-
-    // Left Card
-    if (sec1) {
-      doc.setFillColor(cardBgColor[0], cardBgColor[1], cardBgColor[2]);
-      doc.setDrawColor(cardBorderColor[0], cardBorderColor[1], cardBorderColor[2]);
-      doc.roundedRect(14, y, colWidth, dynamicRowHeight, 1.5, 1.5, 'FD');
-
-      doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(6.8);
-      const label1Text = formatCardHeader(sec1.label, isSpanish);
-      const label1 = doc.splitTextToSize(label1Text, colWidth - 8);
-      doc.text(label1[0] || label1Text, 18, y + 4.2);
-
-      doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.8);
-      doc.text(val1Lines, 18, y + 8.2);
+  sections.forEach((section) => {
+    // Check for page overflow
+    if (yPos > 720) {
+      doc.addPage();
+      yPos = 50;
     }
 
-    // Right Card
-    if (sec2) {
-      doc.setFillColor(cardBgColor[0], cardBgColor[1], cardBgColor[2]);
-      doc.setDrawColor(cardBorderColor[0], cardBorderColor[1], cardBorderColor[2]);
-      doc.roundedRect(108, y, colWidth, dynamicRowHeight, 1.5, 1.5, 'FD');
+    // Label
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105); // slate-600 (High contrast)
+    doc.text((section.label || "").toUpperCase(), margin, yPos);
+    yPos += 12;
 
-      doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(6.8);
-      const label2Text = formatCardHeader(sec2.label, isSpanish);
-      const label2 = doc.splitTextToSize(label2Text, colWidth - 8);
-      doc.text(label2[0] || label2Text, 112, y + 4.2);
+    // Value
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(2, 6, 23); // slate-950
+    const splitVal = doc.splitTextToSize(section.value || "N/A", 520);
+    doc.text(splitVal, margin, yPos);
+    yPos += splitVal.length * 15 + 10;
+  });
 
-      doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.8);
-      doc.text(val2Lines, 112, y + 8.2);
-    }
-
-    y += dynamicRowHeight + 2.5;
-  }
-
-  y += 2;
-
-  // ── 5. Clinical Guidance Box (Clean Teal Tint) ────────────────────────────
-  doc.setFillColor(240, 248, 250);
-  doc.setDrawColor(180, 215, 220);
-
-  const guidanceText = isSpanish
-    ? 'Basado en las respuestas proporcionadas, este informe resume el historial de reacción a la penicilina reportado por el paciente. Por favor comparta este documento con su pediatra o alergólogo para evaluar la desensibilización o reevaluación de la alergia.'
-    : 'Based on the responses provided, this report summarizes the reported penicillin reaction history. Please share this document with your pediatrician or allergist for allergy de-labeling consideration or diagnostic testing.';
-  
-  const guidanceLines = doc.splitTextToSize(guidanceText, 174);
-  const guidanceBoxHeight = Math.max(18, 7 + guidanceLines.length * 3.6);
-
-  doc.roundedRect(14, y, 182, guidanceBoxHeight, 2, 2, 'FD');
-
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.text(isSpanish ? 'ORIENTACIÓN CLÍNICA:' : 'CLINICAL GUIDANCE:', 18, y + 5.2);
-
-  doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
-  doc.text(guidanceLines, 18, y + 9.5);
-
-  // ── 6. Page Footer ────────────────────────────────────────────────────────
-  doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.text(
-    isSpanish
-      ? 'Herramienta de Apoyo a Decisiones Clínicas PEN-PAL — Informe Confidencial del Participante'
-      : 'PEN-PAL Study Clinical Decision Support Tool — Confidential Participant Report',
-    14,
-    286
-  );
-  doc.text(
-    `${isSpanish ? 'Generado' : 'Generated'}: ${new Date().toISOString().slice(0, 19).replace('T', ' ')} UTC`,
-    146,
-    286
-  );
-
-  // Direct safe download trigger
-  const safeFilename = `PEN-PAL_Assessment_${displayToken}.pdf`;
-  doc.save(safeFilename);
+  // Save PDF
+  doc.save(`PEN-PAL_Summary_${data.participantId || data.token || "Participant"}.pdf`);
 }
+
+export default generateAssessmentPDF;

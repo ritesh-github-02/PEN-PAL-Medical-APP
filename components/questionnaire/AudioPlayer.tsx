@@ -84,10 +84,9 @@ export default function AudioPlayer({
       />
 
       {/* Floating Audio Player Controls for Recorded Narration */}
-      <div 
-        className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5 no-print" 
-        role="region" 
-        aria-label={locale === 'es' ? 'Controles de reproducción de audio' : 'Audio playback controls'}
+      <aside 
+        className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2.5 no-print" 
+        aria-label={locale === 'es' ? 'Controles de narración de audio y subtítulos' : 'Audio Narration and Caption Controls'}
       >
         {/* Captions / Transcript Modal */}
         {showTranscript && (
@@ -108,7 +107,7 @@ export default function AudioPlayer({
               <button
                 type="button"
                 onClick={() => setShowTranscript(false)}
-                className="text-slate-400 hover:text-slate-700 text-xs font-bold px-1.5 py-0.5 rounded cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 text-xs font-bold px-1.5 py-0.5 rounded cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
                 aria-label={locale === 'es' ? 'Cerrar transcripción' : 'Close transcript'}
               >
                 ✕
@@ -127,15 +126,15 @@ export default function AudioPlayer({
             onClick={() => setShowTranscript(!showTranscript)}
             aria-expanded={showTranscript}
             aria-controls="audio-transcript-dialog"
-            className={`group relative w-11 h-11 flex items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 border cursor-pointer ${
+            className={`group relative w-11 h-11 flex items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 border cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
               showTranscript 
                 ? 'bg-[#236f7a] text-white border-[#236f7a]' 
-                : 'bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700/50'
+                : 'bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs border-slate-700/50'
             }`}
-            title={locale === 'es' ? 'Ver transcripción de texto' : 'Toggle audio transcript & captions'}
-            aria-label={locale === 'es' ? (showTranscript ? 'Ocultar transcripción de texto' : 'Mostrar transcripción de texto') : (showTranscript ? 'Hide audio transcript' : 'Show audio transcript')}
+            title={locale === 'es' ? 'Ver subtítulos y transcripción' : 'Toggle Closed Captions'}
+            aria-label={locale === 'es' ? (showTranscript ? 'Ocultar subtítulos' : 'Mostrar subtítulos') : 'Toggle Closed Captions'}
           >
-            <span className="text-sm font-bold">CC</span>
+            <span className="text-xs font-bold">CC</span>
           </button>
 
           {/* Main Play/Pause Button */}
@@ -143,11 +142,11 @@ export default function AudioPlayer({
             type="button"
             onClick={togglePlayPause}
             aria-pressed={isPlaying}
-            className="relative w-14 h-14 flex items-center justify-center bg-zinc-900 text-white rounded-full shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+            className="relative w-11 h-11 flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white rounded-full shadow-lg transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
             aria-label={
               isPlaying 
-                ? (locale === 'es' ? 'Pausar audio grabado' : 'Pause recorded audio') 
-                : (locale === 'es' ? 'Reproducir audio grabado' : 'Play recorded audio')
+                ? (locale === 'es' ? 'Pausar narración de audio' : 'Pause audio narration') 
+                : (locale === 'es' ? 'Reproducir narración de audio' : 'Play audio narration')
             }
           >
             {isPlaying ? (
@@ -162,34 +161,39 @@ export default function AudioPlayer({
             )}
 
             {/* Progress indicator ring */}
-            {isPlaying && (
-              <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" aria-hidden="true">
+            {(isPlaying || progress > 0) && (
+              <svg
+                className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none"
+                viewBox="0 0 44 44"
+                aria-hidden="true"
+              >
                 <circle
-                  cx="28"
-                  cy="28"
-                  r="26"
+                  cx="22"
+                  cy="22"
+                  r="20"
                   fill="none"
-                  stroke="rgba(255,255,255,0.2)"
-                  strokeWidth="3"
+                  stroke="rgba(255, 255, 255, 0.25)"
+                  strokeWidth="2.5"
                 />
                 <circle
-                  cx="28"
-                  cy="28"
-                  r="26"
+                  cx="22"
+                  cy="22"
+                  r="20"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="3"
-                  strokeDasharray={`${(progress / (duration || 1)) * 163.36} 163.36`}
-                  className="text-white transition-all"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeDasharray={`${(duration > 0 ? Math.min(Math.max(progress / duration, 0), 1) : 0) * 125.66} 125.66`}
+                  className="text-white transition-all duration-150"
                 />
               </svg>
             )}
           </button>
         </div>
 
-        {/* Time display when playing */}
-        {isPlaying && (
-          <div className="bg-zinc-800 text-white text-xs font-mono px-2 py-1 rounded-md shadow-md whitespace-nowrap" aria-live="off">
+        {/* Time display when playing or paused midway */}
+        {(isPlaying || progress > 0) && (
+          <div className="bg-slate-900/95 backdrop-blur-xs text-white text-xs font-mono px-2.5 py-1 rounded-lg shadow-md whitespace-nowrap border border-slate-700/50" aria-live="off">
             {formatTime(progress)} / {formatTime(duration)}
           </div>
         )}
@@ -200,7 +204,7 @@ export default function AudioPlayer({
             ? (locale === 'es' ? 'Reproduciendo audio de la enfermera Anna' : 'Playing Nurse Anna audio narration')
             : (locale === 'es' ? 'Audio en pausa' : 'Audio narration paused')}
         </div>
-      </div>
+      </aside>
     </>
   );
 }

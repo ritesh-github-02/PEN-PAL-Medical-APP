@@ -15,6 +15,7 @@ import {
 import { logout } from "@/app/[locale]/intervention/actions";
 import Loader from "@/components/common/Loader";
 import AudioPlayer from "./AudioPlayer";
+import { NurseAnna } from "./NurseAnna";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
 import esMessages from "@/messages/es.json";
 import enMessages from "@/messages/en.json";
@@ -141,23 +142,43 @@ export default function PenpalIntervention() {
   const [isTerminated, setIsTerminated] = useState(false);
 
   const currentStep = questionnaireConfig[currentStepIndex];
+  const isInitialMount = useRef(true);
 
-  // Programmatic Focus Reset: Focus slide heading or exit heading when step changes (WCAG 2.4.3)
+  // 1. Session Reset for Testers via ?reset=true
   useEffect(() => {
-    if (initialized) {
-      setTimeout(() => {
-        if (isTerminated && exitHeadingRef.current) {
-          exitHeadingRef.current.focus();
-        } else if (headingRef.current) {
-          headingRef.current.focus();
-        }
-      }, 50);
+    if (typeof window !== "undefined" && window.location.search.includes("reset=true")) {
+      localStorage.removeItem("penpal_progress");
+      localStorage.removeItem("penpal_answers");
+      sessionStorage.clear();
     }
+  }, []);
+
+  // 2. Focus Management: Do NOT steal focus on initial page load (Slide 1)
+  useEffect(() => {
+    if (!initialized) return;
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return; // Leave focus at top of page so Language Switcher is encountered first
+    }
+    // Only auto-focus heading when moving between subsequent steps
+    setTimeout(() => {
+      if (isTerminated && exitHeadingRef.current) {
+        exitHeadingRef.current.focus();
+      } else if (headingRef.current) {
+        headingRef.current.focus();
+      }
+    }, 50);
   }, [currentStepIndex, showSummary, isTerminated, initialized]);
 
   useEffect(() => {
     async function init() {
       const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const isResetParam = searchParams ? searchParams.get('reset') === 'true' : false;
+      if (isResetParam) {
+        localStorage.removeItem("penpal_progress");
+        localStorage.removeItem("penpal_answers");
+        sessionStorage.clear();
+      }
       const tokenParam = searchParams ? (searchParams.get('token') || searchParams.get('TOKEN') || searchParams.get('t') || undefined) : undefined;
 
       let progress = await loadQuestionnaireProgress(tokenParam, locale);
@@ -269,7 +290,7 @@ export default function PenpalIntervention() {
     isSlideVisibleRef.current = document.visibilityState === 'visible';
 
     const activeStep = currentStep;
-    const stepIdx = currentStepIndex;
+    const stepIdx = currentStepIndex; 
 
     const flushDuration = (useBeacon = false) => {
       const now = Date.now();
@@ -695,17 +716,6 @@ export default function PenpalIntervention() {
                 />
               ) : (
                 <>
-                  <AudioPlayer
-                    audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
-                    stepId={currentStep.id}
-                    locale={locale}
-                    transcriptText={
-                      locale === "es"
-                        ? `${currentStep.titleEs || ""}. ${currentStep.descriptionEs || ""}`
-                        : `${currentStep.titleEn || ""}. ${currentStep.descriptionEn || ""}`
-                    }
-                  />
-
                   {currentStep.type === "intro" && (
                     <IntroScreen
                       {...baseProps}
@@ -848,6 +858,21 @@ export default function PenpalIntervention() {
           </div>
         </div>
       </div>
+
+      {/* PLACED AT THE VERY END OF THE DOM: CC & Audio Narration Controls */}
+      {/* Tab order will hit these naturally AFTER the slide content and Next button */}
+      {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary") && (
+        <AudioPlayer
+          audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+          stepId={currentStep.id}
+          locale={locale}
+          transcriptText={
+            locale === "es"
+              ? `${currentStep.titleEs || ""}. ${currentStep.descriptionEs || ""}`
+              : `${currentStep.titleEn || ""}. ${currentStep.descriptionEn || ""}`
+          }
+        />
+      )}
     </main>
   );
 }
@@ -932,16 +957,8 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
           </fieldset>
         </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex flex-shrink-0 relative items-center justify-center p-1 self-center md:self-center my-auto">
-          <img
-            src="/images/nurse-anna.png"
-            alt={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            role="img"
-            aria-label={locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+        {/* Nurse Anna Illustration (Slide 1: Introduced to screen readers) */}
+        <NurseAnna size="lg" isDecorative={false} locale={locale} />
       </div>
     </div>
   );
@@ -1158,7 +1175,7 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
           <div className="mb-3 sm:mb-4">
             <h2 className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug outline-none rounded-lg">
               {props.title || (isSpanish
-                ? "¡Todas las afirmaciones sobre la penicilina son correctas!"
+                ? "Todas las aseveraciones sobre la penicilina son correctas"
                 : "All the statements about penicillin are correct!")}
             </h2>
           </div>
@@ -1196,14 +1213,8 @@ function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: Question
           </ul>
         </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex flex-shrink-0 self-center sm:self-center my-auto p-1">
-          <img
-            src="/images/nurse-anna.png"
-            alt={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[140px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md pointer-events-none"
-          />
-        </div>
+        {/* Nurse Anna Illustration (Decorative on Slide 2) */}
+        <NurseAnna size="md" isDecorative={true} />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -1269,16 +1280,8 @@ function TestingScreen(props: BaseScreenProps) {
           </p>
         </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex flex-shrink-0 self-center md:self-center my-auto p-1">
-          <img
-            src="/images/nurse-anna.png"
-            alt={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            role="img"
-            aria-label={isSpanish ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+        {/* Nurse Anna Illustration (Decorative on Slide 3) */}
+        <NurseAnna size="md" isDecorative={true} />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -1518,16 +1521,8 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
           </fieldset>
         </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex flex-shrink-0 self-center md:self-center my-auto p-1">
-          <img
-            src="/images/nurse-anna.png"
-            alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            role="img"
-            aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+        {/* Nurse Anna Illustration (Decorative on Slide 5) */}
+        <NurseAnna size="md" isDecorative={true} />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -1557,43 +1552,43 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
 }
 
 const MEDICAL_CARE_LOCATION_OPTIONS = [
-  { value: "Emergency room (ER)", labelEn: "Emergency room (ER)", labelEs: "Sala de emergencias (ER)" },
+  { value: "Emergency room (ER)", labelEn: "Emergency room (ER)", labelEs: "Sala de emergencias (SE)" },
   { value: "Urgent care", labelEn: "Urgent care", labelEs: "Centro de atención de urgencias" },
-  { value: "Primary care doctor", labelEn: "Primary care doctor", labelEs: "Médico de cabecera" },
+  { value: "Primary care doctor", labelEn: "Primary care doctor", labelEs: "Médico de atención primaria" },
   { value: "Hospital", labelEn: "Hospital", labelEs: "Hospital" },
-  { value: "Phone call with doctor", labelEn: "Phone call with doctor", labelEs: "Llamada telefónica con el médico" },
-  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+  { value: "Phone call with doctor", labelEn: "Phone call with doctor", labelEs: "Consulta telefónica con un médico" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No lo sé" },
 ];
 
 const RESOLUTION_MEDICINE_OPTIONS = [
   { value: "Allergy medicine (Benadryl, Zyrtec)", labelEn: "Allergy medicine (Benadryl, Zyrtec)", labelEs: "Medicamento para la alergia (Benadryl, Zyrtec)" },
-  { value: "Steroid medicine (Prednisone)", labelEn: "Steroid medicine (Prednisone)", labelEs: "Medicamento con esteroides (Prednisona)" },
+  { value: "Steroid medicine (Prednisone)", labelEn: "Steroid medicine (Prednisone)", labelEs: "Medicamento esteroide (Prednisona)" },
   { value: "Epinephrine (EpiPen)", labelEn: "Epinephrine (EpiPen)", labelEs: "Epinefrina (EpiPen)" },
-  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No lo sé" },
 ];
 
 const RESOLUTION_ROUTE_OPTIONS = [
-  { value: "Mouth", labelEn: "Mouth", labelEs: "Boca" },
-  { value: "IV", labelEn: "IV", labelEs: "IV" },
+  { value: "Mouth", labelEn: "Mouth", labelEs: "Oral" },
+  { value: "IV", labelEn: "IV", labelEs: "Intravenosa" },
   { value: "Shot", labelEn: "Shot", labelEs: "Inyección" },
-  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No lo sé" },
 ];
 
 const YETAGAIN_REACTION_OPTIONS = [
   { 
     value: "Yes, and they did not have a reaction", 
     labelEn: "Yes, and they did not have a reaction", 
-    labelEs: "Sí, y no tuvieron una reacción" 
+    labelEs: "Sí, y no tuvo ninguna reacción alérgica" 
   },
   { 
     value: "Yes, and they had a reaction", 
     labelEn: "Yes, and they had a reaction", 
-    labelEs: "Sí, y tuvieron una reacción" 
+    labelEs: "Sí, y tuvo una reacción alérgica" 
   },
   { 
     value: "Unsure / I don't know", 
     labelEn: "Unsure / I don't know", 
-    labelEs: "No estoy seguro / No sé" 
+    labelEs: "No estoy seguro/No lo sé" 
   },
 ];
 
@@ -1646,13 +1641,13 @@ export function Slide10MedicalCareScreen(props: any) {
           ========================================================================= */}
       <div 
         id="slide-content"
-        aria-hidden={showBranchModal}
+        aria-hidden={showBranchModal ? true : undefined}
         className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
       >
         <div className="mb-6">
           <h2 
             id="slide10-title"
-            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug"
+            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug outline-none"
           >
             {isSpanish
               ? "¿Su hijo recibió atención médica por la reacción?"
@@ -1717,11 +1712,7 @@ export function Slide10MedicalCareScreen(props: any) {
           </div>
 
           <div className="shrink-0 self-center">
-            <img
-              src="/images/nurse-anna.png"
-              alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
-              className="w-24 sm:w-28 md:w-32 h-auto object-contain pointer-events-none"
-            />
+            <NurseAnna size="md" isDecorative={true} />
           </div>
         </div>
 
@@ -1767,7 +1758,7 @@ export function Slide10MedicalCareScreen(props: any) {
               className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
             >
               {isSpanish
-                ? "¿Dónde recibió atención médica su hijo por la reacción?"
+                ? "¿Dónde recibió su hijo atención médica por la reacción alérgica?"
                 : "Where did your child get medical care for the reaction?"}
             </h3>
 
@@ -1973,11 +1964,7 @@ export function Slide11MedicationScreen(props: any) {
           </div>
 
           <div className="shrink-0 self-center">
-            <img
-              src="/images/nurse-anna.png"
-              alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
-              className="w-24 sm:w-28 md:w-32 h-auto object-contain pointer-events-none"
-            />
+            <NurseAnna size="md" isDecorative={true} />
           </div>
         </div>
 
@@ -2029,7 +2016,7 @@ export function Slide11MedicationScreen(props: any) {
                   className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
                 >
                   {isSpanish
-                    ? "¿Qué medicamento se le dio a su hijo para la reacción?"
+                    ? "¿Qué medicamento le dieron a su hijo para tratar la reacción alérgica?"
                     : "What medicine was given to your child for the reaction?"}
                 </h3>
 
@@ -2093,7 +2080,7 @@ export function Slide11MedicationScreen(props: any) {
                   className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
                 >
                   {isSpanish
-                    ? "¿Su hijo recibió el medicamento por:"
+                    ? "¿Su hijo recibió el medicamento por vía:"
                     : "Did your child receive the medicine by:"}
                 </h3>
 
@@ -2269,11 +2256,7 @@ export function Slide12RepeatUseScreen(props: any) {
           </div>
 
           <div className="shrink-0 self-center">
-            <img
-              src="/images/nurse-anna.png"
-              alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
-              className="w-24 sm:w-28 md:w-32 h-auto object-contain pointer-events-none"
-            />
+            <NurseAnna size="md" isDecorative={true} />
           </div>
         </div>
 
@@ -2316,7 +2299,7 @@ export function Slide12RepeatUseScreen(props: any) {
               className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
             >
               {isSpanish
-                ? "¿Su hijo ha tomado penicilina (amoxicilina) nuevamente desde la reacción?"
+                ? "¿Su hijo ha vuelto a tomar penicilina (amoxicilina) desde que tuvo la reacción?"
                 : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
             </h3>
 
@@ -2593,16 +2576,8 @@ function SurveySingleChoice({
           </fieldset>
         </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex flex-shrink-0 self-center md:self-center my-auto p-1">
-          <img
-            src="/images/nurse-anna.png"
-            alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            role="img"
-            aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+        {/* Nurse Anna Illustration (Decorative) */}
+        <NurseAnna size="md" isDecorative={true} />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -2631,7 +2606,7 @@ function SurveySingleChoice({
               className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug"
             >
               {isSpanish
-                ? "¿Dónde recibió atención médica su hijo por la reacción?"
+                ? "¿Dónde recibió su hijo atención médica por la reacción alérgica?"
                 : "Where did your child get medical care for the reaction?"}
             </h3>
 
@@ -2709,7 +2684,7 @@ function SurveySingleChoice({
               className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug"
             >
               {isSpanish
-                ? "¿Qué medicamento se le dio a su hijo para la reacción?"
+                ? "¿Qué medicamento le dieron a su hijo para tratar la reacción alérgica?"
                 : "What medicine was given to your child for the reaction?"}
             </h3>
 
@@ -2800,7 +2775,7 @@ function SurveySingleChoice({
                     className="text-sm sm:text-base font-bold text-[#132c27] mb-3 leading-snug"
                   >
                     {isSpanish
-                      ? "¿Su hijo recibió el medicamento por:"
+                      ? "¿Su hijo recibió el medicamento por vía:"
                       : "Did your child receive the medicine by:"}
                   </h4>
 
@@ -2881,7 +2856,7 @@ function SurveySingleChoice({
               className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug"
             >
               {isSpanish
-                ? "¿Su hijo ha tomado penicilina (amoxicilina) nuevamente desde la reacción?"
+                ? "¿Su hijo ha vuelto a tomar penicilina (amoxicilina) desde que tuvo la reacción?"
                 : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
             </h3>
 
@@ -3055,17 +3030,9 @@ function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }
         </div>
       </div>
 
-      {/* Nurse Anna Illustration (Safe Positioned Outside Text Area) */}
+      {/* Nurse Anna Illustration (Safe Positioned Outside Text Area, Decorative) */}
       <div className="block absolute bottom-6 right-2 sm:bottom-10 sm:right-5 pointer-events-none z-10">
-        <img
-          src="/images/nurse-anna.png"
-          alt={
-            isSpanish
-              ? "Ilustración de la enfermera Anna sonriendo"
-              : "Illustration of Nurse Anna smiling in blue scrubs"
-          }
-          className="w-14 sm:w-18 md:w-22 max-h-[130px] sm:max-h-[160px] md:max-h-[180px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-        />
+        <NurseAnna size="sm" isDecorative={true} />
       </div>
 
       {/* Centered Yellow Next Button */}
@@ -3101,16 +3068,8 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
           )}
         </div>
 
-        {/* Nurse Anna Illustration */}
-        <div className="flex flex-shrink-0 self-center my-auto p-1">
-          <img
-            src="/images/nurse-anna.png"
-            alt={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            role="img"
-            aria-label={navProps.locale === "es" ? "Ilustración de la enfermera Anna sonriendo" : "Illustration of Nurse Anna smiling in blue scrubs"}
-            className="w-16 sm:w-20 md:w-24 lg:w-28 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] h-auto object-contain filter drop-shadow-md select-none pointer-events-none"
-          />
-        </div>
+        {/* Nurse Anna Illustration (Decorative) */}
+        <NurseAnna size="md" isDecorative={true} />
       </div>
 
       {/* Centered Yellow Next Button */}
