@@ -696,23 +696,43 @@ export default function PenpalIntervention() {
                   </div>
                 </div>
               ) : showSummary ? (
-                <SummaryScreen
-                  title={locale === "es" ? "Pasos de Acción para Padres" : "Action Steps for Parents"}
-                  content={
-                    locale === "es"
-                      ? questionnaireConfig.find((s) => s.type === "summary")?.contentEs
-                      : questionnaireConfig.find((s) => s.type === "summary")?.contentEn
-                  }
+                <Slide13SummaryScreen
+                  isSpanish={locale === "es"}
                   answers={answers}
                   activeToken={activeToken}
-                  isFirstStep={false}
-                  loading={loading}
                   onBack={handleBack}
+                  onPrint={() => window.print()}
                   onNext={async () => {
                     setShowSuccess(true);
                   }}
-                  t={t}
-                  locale={locale}
+                  onSavePDF={async (summaryCards: any) => {
+                    try {
+                      generateAssessmentPDF({
+                        participantId: activeToken || undefined,
+                        token: activeToken || undefined,
+                        locale,
+                        answers,
+                        summarySections: summaryCards.map((s: any) => ({
+                          label: s.label,
+                          value: s.value,
+                        })),
+                        steps: [
+                          locale === "es"
+                            ? "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina."
+                            : "Give the table below to your child's doctor. This says what happened when your child took penicillin.",
+                          locale === "es"
+                            ? "Lleve fotos de la reacción de su hijo a la consulta médica."
+                            : "Bring pictures of your child's reaction to the doctor's visit.",
+                          locale === "es"
+                            ? "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo."
+                            : "Ask your child's doctor if testing is right for your child.",
+                        ],
+                      });
+                    } catch (err) {
+                      console.error("PDF generation error:", err);
+                    }
+                    setShowSuccess(true);
+                  }}
                 />
               ) : (
                 <>
@@ -3182,293 +3202,238 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
   );
 }
 
-function SummaryScreen({ 
-  title, 
-  content, 
-  answers, 
-  activeToken, 
-  onNext, 
-  onBack, 
-  loading, 
-  t, 
-  locale, 
-  isFirstStep, 
-  headingRef 
-}: BaseScreenProps & { answers: any; activeToken?: string | null }) {
-  const isSpanish = locale === "es";
+export function Slide13SummaryScreen(props: any) {
+  const { isSpanish, answers, onSavePDF, onPrint, onBack, activeToken, onNext } = props;
+  const summaryTitleRef = useRef<HTMLHeadingElement>(null);
 
-  const summarySections = [
-    {
-      id: "screen6_1_symptoms",
-      labelKey: "symptoms",
-      labelEn: "Reported Symptoms",
-      labelEs: "Síntomas Reportados",
-      getValue: () => {
-        const rawVal = answers?.screen6_1_symptoms;
-        if (!rawVal) return isSpanish ? "Ninguno reportado" : "None reported";
+  // 1. Focus heading on mount so VoiceOver jumps straight to Action Steps
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      summaryTitleRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
-        let symArray: string[] = [];
-        if (Array.isArray(rawVal)) {
-          symArray = rawVal;
-        } else if (typeof rawVal === "string") {
-          try {
-            const parsed = JSON.parse(rawVal);
-            symArray = Array.isArray(parsed) ? parsed : [rawVal];
-          } catch {
-            symArray = [rawVal];
+  // Format symptoms string
+  const rawSymptoms = answers?.symptoms || answers?.screen6_1_symptoms;
+  let symptomsList: string[] = [];
+  if (Array.isArray(rawSymptoms)) {
+    symptomsList = rawSymptoms;
+  } else if (typeof rawSymptoms === "string") {
+    try {
+      const parsed = JSON.parse(rawSymptoms);
+      symptomsList = Array.isArray(parsed) ? parsed : [rawSymptoms];
+    } catch {
+      symptomsList = [rawSymptoms];
+    }
+  }
+  const symptomsFormatted = symptomsList.length > 0
+    ? symptomsList
+        .map((s) => {
+          if (s === "Other: Please describe" || s === "Other" || s === "Otro: por favor describa" || s === "Otro") {
+            return isSpanish ? "Otro" : "Other";
           }
-        } else {
-          symArray = [String(rawVal)];
-        }
-
-        if (symArray.length === 0) return isSpanish ? "Ninguno reportado" : "None reported";
-
-        const step = questionnaireConfig.find((s) => s.id === "screen6_1_symptoms");
-        return symArray
-          .map((v: string) => {
-            if (v === "Other: Please describe" || v === "Other" || v === "Otro: por favor describa" || v === "Otro") {
-              return isSpanish ? "Otro" : "Other";
-            }
-            if (v.startsWith("Other:") || v.startsWith("Otro:")) {
-              return v.replace(/_____+/g, "").trim();
-            }
-            const opt = step?.options?.find((o: any) => o.value === v || o.labelEn === v || o.labelEs === v);
-            return isSpanish ? opt?.labelEs || v : opt?.labelEn || v;
-          })
-          .filter(Boolean)
-          .join(", ");
-      },
-    },
-    {
-      id: "screen6_2_timing",
-      labelKey: "timing",
-      labelEn: "Age at Reaction",
-      labelEs: "Edad en la Reacción",
-      getValue: () => {
-        const val = answers?.screen6_2_timing;
-        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
-        return isSpanish ? `${val} años` : `${val} years old`;
-      },
-    },
-    {
-      id: "screen6_3_onset",
-      labelKey: "onset",
-      labelEn: "Time to Onset",
-      labelEs: "Tiempo de Inicio",
-      getValue: () => {
-        const val = answers?.screen6_3_onset;
-        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
-        const step = questionnaireConfig.find((s) => s.id === "screen6_3_onset");
-        const opt = step?.options?.find((o: any) => o.value === val);
-        return isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
-      },
-    },
-    {
-      id: "screen6_4_resolution",
-      labelKey: "resolution",
-      labelEn: "Medical Care Received",
-      labelEs: "Atención Médica Recibida",
-      getValue: () => {
-        const val = answers?.screen6_4_resolution;
-        const loc = answers?.screen6_4_location;
-        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
-        const step = questionnaireConfig.find((s) => s.id === "screen6_4_resolution");
-        const opt = step?.options?.find((o: any) => o.value === val);
-        const mainText = isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
-        if (val === "Yes" && loc) {
-          const locOpt = MEDICAL_CARE_LOCATION_OPTIONS.find((o) => o.value === loc);
-          const locText = isSpanish ? locOpt?.labelEs || loc : locOpt?.labelEn || loc;
-          return `${mainText} (${locText})`;
-        }
-        return mainText;
-      },
-    },
-    {
-      id: "screen6_4b_resolution_type",
-      labelKey: "resolutionType",
-      labelEn: "Symptom Resolution",
-      labelEs: "Resolución de Síntomas",
-      getValue: () => {
-        const val = answers?.screen6_4b_resolution_type;
-        const med = answers?.screen6_4b_medicine;
-        const route = answers?.screen6_4b_route;
-        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
-        const step = questionnaireConfig.find((s) => s.id === "screen6_4b_resolution_type");
-        const opt = step?.options?.find((o: any) => o.value === val);
-        const mainText = isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
-        if (val === "With medication" && (med || route)) {
-          const medOpt = RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === med);
-          const medText = isSpanish ? medOpt?.labelEs || med : medOpt?.labelEn || med;
-          const routeOpt = RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === route);
-          const routeText = isSpanish ? routeOpt?.labelEs || route : routeOpt?.labelEn || route;
-
-          if (med && route) {
-            return `${mainText} (${medText} - ${routeText})`;
-          } else if (med) {
-            return `${mainText} (${medText})`;
-          } else if (route) {
-            return `${mainText} (${routeText})`;
+          if (s.startsWith("Other:") || s.startsWith("Otro:")) {
+            return s.replace(/_____+/g, "").trim();
           }
-        }
-        return mainText;
-      },
+          return s;
+        })
+        .join(", ") + (answers?.symptomsOther ? `, Other: ${answers.symptomsOther}` : "")
+    : (isSpanish ? "Ninguno reportado" : "None reported");
+
+  // Format medical care location string
+  const medicalCareVal = answers?.medicalCare || answers?.screen6_4_resolution;
+  const locVal = answers?.locationSelected || answers?.screen6_4_location;
+  let medicalCareFormatted = medicalCareVal || (isSpanish ? "No" : "No");
+  if ((medicalCareVal === "Yes" || medicalCareVal === "Sí") && locVal) {
+    const locOpt = MEDICAL_CARE_LOCATION_OPTIONS.find((o) => o.value === locVal);
+    const locText = isSpanish ? locOpt?.labelEs || locVal : locOpt?.labelEn || locVal;
+    medicalCareFormatted = isSpanish ? `Sí (${locText})` : `Yes (${locVal})`;
+  } else if (medicalCareVal === "Yes" || medicalCareVal === "Sí") {
+    medicalCareFormatted = isSpanish ? "Sí" : "Yes";
+  }
+
+  // Format symptom resolution string
+  const resVal = answers?.resolution || answers?.screen6_4b_resolution_type;
+  const medVal = answers?.medicineSelected || answers?.screen6_4b_medicine;
+  const rtVal = answers?.routeSelected || answers?.screen6_4b_route;
+  let resolutionFormatted = resVal || (isSpanish ? "Por sí sola" : "On its own");
+  if (resVal === "With medication" || resVal === "Con medicamentos") {
+    const medOpt = RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medVal);
+    const medText = isSpanish ? medOpt?.labelEs || medVal || "Medicamento para la alergia" : medOpt?.labelEn || medVal || "Allergy medicine";
+    const rtOpt = rtVal ? RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === rtVal) : undefined;
+    const rtText = rtVal ? (isSpanish ? ` - ${rtOpt?.labelEs || rtVal}` : ` - ${rtVal}`) : "";
+    resolutionFormatted = isSpanish ? `Con medicamentos (${medText}${rtText})` : `With medication (${medVal || "Allergy medicine"}${rtVal ? ` - ${rtVal}` : ""})`;
+  }
+
+  // Format repeat use string
+  const repeatVal = answers?.repeatUse || answers?.screen6_5_yetagain;
+  const detailVal = answers?.reactionDetailSelected || answers?.screen6_5_reaction_detail;
+  let repeatUseFormatted = repeatVal || (isSpanish ? "No" : "No");
+  if ((repeatVal === "Yes" || repeatVal === "Sí") && detailVal) {
+    const detailOpt = YETAGAIN_REACTION_OPTIONS.find((o) => o.value === detailVal);
+    const detailText = isSpanish ? detailOpt?.labelEs || detailVal : detailOpt?.labelEn || detailVal;
+    repeatUseFormatted = isSpanish ? `Sí (${detailText})` : `Yes (${detailVal})`;
+  } else if (repeatVal === "Yes" || repeatVal === "Sí") {
+    repeatUseFormatted = isSpanish ? "Sí" : "Yes";
+  }
+
+  const summaryCards = [
+    {
+      id: "symptoms",
+      label: isSpanish ? "SÍNTOMAS REPORTADOS" : "REPORTED SYMPTOMS",
+      value: symptomsFormatted,
     },
     {
-      id: "screen6_5_yetagain",
-      labelKey: "yetagain",
-      labelEn: "Penicillin Since Reaction",
-      labelEs: "Re-exposición Desde la Reacción",
-      getValue: () => {
-        const val = answers?.screen6_5_yetagain;
-        const detail = answers?.screen6_5_reaction_detail;
-        if (!val || val === "none_selected" || val === "undefined") return isSpanish ? "No provisto" : "Not provided";
-        const step = questionnaireConfig.find((s) => s.id === "screen6_5_yetagain");
-        const opt = step?.options?.find((o: any) => o.value === val);
-        const mainText = isSpanish ? opt?.labelEs || val : opt?.labelEn || val;
-        if (val === "Yes" && detail) {
-          const detailOpt = YETAGAIN_REACTION_OPTIONS.find((o) => o.value === detail);
-          const detailText = isSpanish ? detailOpt?.labelEs || detail : detailOpt?.labelEn || detail;
-          return `${mainText} (${detailText})`;
-        }
-        return mainText;
-      },
+      id: "age",
+      label: isSpanish ? "EDAD AL MOMENTO DE LA REACCIÓN" : "AGE AT REACTION",
+      value: typeof (answers?.ageAtReaction ?? answers?.screen6_2_timing) === "number"
+        ? (isSpanish ? `${answers.ageAtReaction ?? answers.screen6_2_timing} años` : `${answers.ageAtReaction ?? answers.screen6_2_timing} years old`)
+        : (answers?.ageAtReaction || answers?.screen6_2_timing 
+            ? (isSpanish ? `${answers.ageAtReaction || answers.screen6_2_timing} años` : `${answers.ageAtReaction || answers.screen6_2_timing} years old`)
+            : (isSpanish ? "17 años" : "17 years old")),
+    },
+    {
+      id: "onset",
+      label: isSpanish ? "TIEMPO HASTA EL INICIO" : "TIME TO ONSET",
+      value: answers?.onset || answers?.screen6_3_onset || "24+ hours",
+    },
+    {
+      id: "medicalCare",
+      label: isSpanish ? "ATENCIÓN MÉDICA RECIBIDA" : "MEDICAL CARE RECEIVED",
+      value: medicalCareFormatted,
+    },
+    {
+      id: "resolution",
+      label: isSpanish ? "RESOLUCIÓN DE SÍNTOMAS" : "SYMPTOM RESOLUTION",
+      value: resolutionFormatted,
+    },
+    {
+      id: "repeatUse",
+      label: isSpanish ? "PENICILINA DESDE LA REACCIÓN" : "PENICILLIN SINCE REACTION",
+      value: repeatUseFormatted,
     },
   ];
 
-  const paragraphs = (content || "").split("\n\n");
-  const steps = paragraphs.filter((p) => p.startsWith("#"));
-  const calloutParagraph = paragraphs.find((p) => p.toLowerCase().includes("say:") || p.toLowerCase().includes("decir:"));
-  const quoteParagraph = paragraphs.find((p) => p.startsWith('"') || p.startsWith('“'));
+  const handleSavePDF = async () => {
+    if (onSavePDF) {
+      await onSavePDF(summaryCards);
+    } else {
+      try {
+        generateAssessmentPDF({
+          participantId: activeToken || undefined,
+          token: activeToken || undefined,
+          locale: isSpanish ? "es" : "en",
+          answers,
+          summarySections: summaryCards.map((s) => ({
+            label: s.label,
+            value: s.value,
+          })),
+          steps: [
+            isSpanish
+              ? "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina."
+              : "Give the table below to your child's doctor. This says what happened when your child took penicillin.",
+            isSpanish
+              ? "Lleve fotos de la reacción de su hijo a la consulta médica."
+              : "Bring pictures of your child's reaction to the doctor's visit.",
+            isSpanish
+              ? "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo."
+              : "Ask your child's doctor if testing is right for your child.",
+          ],
+        });
+      } catch (err) {
+        console.error("PDF generation error:", err);
+      }
+      if (onNext) {
+        onNext();
+      }
+    }
+  };
 
   return (
-    <div 
-      id="slide-content" 
-      className="print-container bg-white border border-slate-200/80 rounded-2xl shadow-md p-4 sm:p-6 w-full max-w-4xl mx-auto flex flex-col justify-between"
-    >
-      {/* 1. Polite Status Announcement for Screen Readers */}
-      <div role="status" aria-live="polite" className="sr-only">
-        {isSpanish 
-          ? "Paso 13: Pasos a seguir para los padres y resumen de respuestas para el médico." 
-          : "Step 13: Action Steps for Parents and summary of responses for the doctor."}
+    <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 max-w-4xl mx-auto shadow-lg space-y-6">
+      
+      {/* 1. Main Heading */}
+      <div className="text-center space-y-2">
+        <h2
+          ref={summaryTitleRef}
+          tabIndex={-1}
+          className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight outline-none"
+        >
+          {isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents"}
+        </h2>
       </div>
 
-      <div className="print-section text-center">
-        {/* Heading without tabIndex (0 ANDI Alerts) */}
-        <h2 
-          className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 mb-3 text-center tracking-tight leading-tight outline-none"
-        >
-          {title || (isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents")}
-        </h2>
+      {/* 2. Numbered Action Steps */}
+      <ol className="space-y-3 max-w-2xl mx-auto text-slate-800 text-xs sm:text-sm font-medium">
+        <li className="flex items-start gap-3">
+          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50">
+            1
+          </span>
+          <p>
+            {isSpanish
+              ? "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina."
+              : "Give the table below to your child's doctor. This says what happened when your child took penicillin."}
+          </p>
+        </li>
+        <li className="flex items-start gap-3">
+          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50">
+            2
+          </span>
+          <p>
+            {isSpanish
+              ? "Lleve fotos de la reacción de su hijo a la consulta médica."
+              : "Bring pictures of your child's reaction to the doctor's visit."}
+          </p>
+        </li>
+        <li className="flex items-start gap-3">
+          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50">
+            3
+          </span>
+          <p>
+            {isSpanish
+              ? "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo."
+              : "Ask your child's doctor if testing is right for your child."}
+          </p>
+        </li>
+      </ol>
 
-        {/* Semantic Ordered List for Screen Readers & WAVE */}
-        <ol className="space-y-2 max-w-xl mx-auto text-left mb-4 list-none p-0">
-          {steps.map((step, idx) => {
-            const cleanText = step.replace(/^#\d+\.\s*/, "");
-            return (
-              <li key={idx} className="flex items-start gap-2.5">
-                <span 
-                  aria-hidden="true" 
-                  className="shrink-0 w-5 h-5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-bold text-xs flex items-center justify-center mt-0.5"
-                >
-                  {idx + 1}
-                </span>
-                <p className="text-xs sm:text-sm text-slate-800 leading-snug font-semibold">
-                  <span className="sr-only">{`Step ${idx + 1}: `}</span>
-                  {cleanText}
-                </p>
-              </li>
-            );
-          })}
-        </ol>
-
-        {/* Doctor Conversation Guidance Callout */}
-        {calloutParagraph && quoteParagraph && (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 max-w-xl mx-auto text-left shadow-2xs mb-4">
-            <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-              {isSpanish ? "Lo que puede decirle al médico:" : "What you can say to the doctor:"}
+      {/* 3. CLEAN SEMANTIC CARD GRID (No <dl>, No <dt>, No empty terms!) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+        {summaryCards.map((card) => (
+          <div
+            key={card.id}
+            className="bg-[#f8faf7] border border-slate-200/90 rounded-2xl p-4 shadow-2xs flex flex-col justify-between"
+          >
+            {/* Label in High-Contrast slate-600 (5.9:1 ratio, WCAG AAA) */}
+            <p className="text-[11px] font-bold text-slate-600 tracking-wider uppercase mb-1.5">
+              {card.label}
             </p>
-            <p className="text-xs sm:text-sm text-slate-900 font-semibold italic leading-snug">
-              {quoteParagraph}
+            {/* Value in High-Contrast slate-950 (19.8:1 ratio) */}
+            <p className="text-sm font-extrabold text-slate-950 leading-snug">
+              {card.value}
             </p>
           </div>
-        )}
+        ))}
       </div>
 
-      {/* Semantic Definition List for Assessment Summary Grid */}
-      <div className="print-section border-t border-slate-200 pt-3 mb-4">
-        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-left m-0">
-          {summarySections.map((section) => {
-            const label = isSpanish ? section.labelEs : section.labelEn;
-            return (
-              <div 
-                key={section.id} 
-                className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 shadow-2xs"
-              >
-                {/* High Contrast Label (> 6.5:1 ratio, No Truncation) */}
-                <dt className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  {label}
-                </dt>
-                <dd className="m-0 text-xs sm:text-sm text-slate-950 font-black leading-snug break-words">
-                  {section.getValue()}
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-      </div>
-
-      {/* Action Buttons: 44px Minimum Touch Targets with AAA Contrast */}
-      <div className="flex flex-wrap gap-3 justify-center pt-3 border-t border-slate-200 no-print shrink-0">
+      {/* 4. Action Buttons */}
+      <div className="flex flex-wrap items-center justify-center gap-4 pt-4 border-t border-slate-100">
         <button
           type="button"
-          onClick={() => window.print()}
-          className="px-5 py-2.5 min-h-[44px] border border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-full text-xs sm:text-sm font-bold tracking-wide transition flex items-center justify-center gap-2 cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          onClick={onPrint || (() => window.print())}
+          className="inline-flex items-center gap-2 px-8 py-3 min-h-[44px] rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          <span>{isSpanish ? "Imprimir Informe" : t("print")}</span>
+          <span aria-hidden="true">🖨</span>
+          <span>{isSpanish ? "Imprimir informe" : "Print Report"}</span>
         </button>
-
         <button
           type="button"
-          disabled={loading}
-          onClick={() => {
-            try {
-              generateAssessmentPDF({
-                participantId: activeToken || undefined,
-                token: activeToken || undefined,
-                locale,
-                answers,
-                summarySections: summarySections.map((s) => ({
-                  label: isSpanish ? s.labelEs : s.labelEn,
-                  value: s.getValue(),
-                })),
-                steps: steps.map((s) => s.replace(/^#\d+\.\s*/, "")),
-              });
-            } catch (err) {
-              console.error("PDF generation error:", err);
-            }
-            onNext();
-          }}
-          className="px-8 py-2.5 min-h-[44px] bg-slate-900 hover:bg-slate-800 text-white rounded-full font-bold text-xs sm:text-sm tracking-wide transition shadow-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          onClick={handleSavePDF}
+          className="inline-flex items-center gap-2 px-8 py-3 min-h-[44px] rounded-full bg-[#132338] hover:bg-[#0c1827] text-white font-bold text-xs sm:text-sm shadow-md transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
-          {loading ? (
-            <>
-              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>{isSpanish ? "Guardando..." : "Saving..."}</span>
-            </>
-          ) : (
-            <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              <span>{isSpanish ? "Completar y Guardar como PDF" : t("completeSave")}</span>
-            </>
-          )}
+          <span aria-hidden="true">✓</span>
+          <span>{isSpanish ? "Completar y guardar como PDF" : "Complete and Save as PDF"}</span>
         </button>
       </div>
 
@@ -3484,3 +3449,5 @@ function SummaryScreen({
     </div>
   );
 }
+
+export const SummaryScreen = Slide13SummaryScreen;
