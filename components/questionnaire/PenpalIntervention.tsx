@@ -1562,16 +1562,16 @@ const MEDICAL_CARE_LOCATION_OPTIONS = [
 
 const RESOLUTION_MEDICINE_OPTIONS = [
   { value: "Allergy medicine (Benadryl, Zyrtec)", labelEn: "Allergy medicine (Benadryl, Zyrtec)", labelEs: "Medicamento para la alergia (Benadryl, Zyrtec)" },
-  { value: "Steroid medicine (Prednisone)", labelEn: "Steroid medicine (Prednisone)", labelEs: "Medicamento esteroide (Prednisona)" },
+  { value: "Steroid medicine (Prednisone)", labelEn: "Steroid medicine (Prednisone)", labelEs: "Medicamento con esteroides (Prednisona)" },
   { value: "Epinephrine (EpiPen)", labelEn: "Epinephrine (EpiPen)", labelEs: "Epinefrina (EpiPen)" },
-  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No lo sé" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
 ];
 
 const RESOLUTION_ROUTE_OPTIONS = [
-  { value: "Mouth", labelEn: "Mouth", labelEs: "Oral" },
-  { value: "IV", labelEn: "IV", labelEs: "Intravenosa" },
+  { value: "Mouth", labelEn: "Mouth", labelEs: "Boca" },
+  { value: "IV", labelEn: "IV", labelEs: "Vía intravenosa (IV)" },
   { value: "Shot", labelEn: "Shot", labelEs: "Inyección" },
-  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No lo sé" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
 ];
 
 const YETAGAIN_REACTION_OPTIONS = [
@@ -1597,17 +1597,27 @@ export function Slide10MedicalCareScreen(props: any) {
   const [showBranchModal, setShowBranchModal] = useState(false);
 
   // Focus management refs
+  const slideTitleRef = useRef<HTMLHeadingElement>(null);
   const modalTitleRef = useRef<HTMLHeadingElement>(null);
   const yesButtonRef = useRef<HTMLButtonElement>(null);
   const changeButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Move focus into modal when opened; announce dialog
+  // 1. FIX: Focus the parent slide heading on mount so Apple VoiceOver speaks immediately
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      slideTitleRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 2. Move focus into modal when opened
   useEffect(() => {
     if (showBranchModal) {
       logInteraction("MODAL_VIEW", { modal: "screen6_4_location", slideId: "screen6_4_resolution" }, "/intervention/flow").catch(() => {});
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         modalTitleRef.current?.focus();
       }, 50);
+      return () => clearTimeout(timer);
     }
   }, [showBranchModal]);
 
@@ -1636,6 +1646,13 @@ export function Slide10MedicalCareScreen(props: any) {
 
   return (
     <>
+      {/* Screen Reader Live Status Announcement on Entry */}
+      <div role="status" aria-live="polite" className="sr-only">
+        {isSpanish
+          ? "¿Su hijo recibió atención médica por la reacción?"
+          : "Did your child receive medical care for their reaction?"}
+      </div>
+
       {/* =========================================================================
           PART 1: PARENT SLIDE (aria-hidden while modal is open)
           ========================================================================= */}
@@ -1645,7 +1662,10 @@ export function Slide10MedicalCareScreen(props: any) {
         className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
       >
         <div className="mb-6">
+          {/* Main heading with ref and tabIndex={-1} for VoiceOver capture */}
           <h2 
+            ref={slideTitleRef}
+            tabIndex={-1}
             id="slide10-title"
             className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug outline-none"
           >
@@ -1795,7 +1815,7 @@ export function Slide10MedicalCareScreen(props: any) {
               })}
             </div>
 
-            {/* Modal Action Controls (Cleaned symbols + 44px targets) */}
+            {/* Modal Action Controls */}
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/60">
               <button
                 type="button"
@@ -1828,31 +1848,61 @@ export function Slide10MedicalCareScreen(props: any) {
 }
 
 export function Slide11MedicationScreen(props: any) {
-  const { isSpanish, selected, onSelect, medicineSelected, onMedicineSelect, routeSelected, onRouteSelect, navProps } = props;
-  const [showModal, setShowModal] = useState(false);
-  const [modalStep, setModalStep] = useState<1 | 2>(1); // 1 = Medicine, 2 = Route
+  const { 
+    isSpanish, 
+    selected, 
+    onSelect, 
+    medicineSelected, 
+    onMedicineSelect, 
+    routeSelected, 
+    onRouteSelect, 
+    navProps 
+  } = props;
 
-  const modalTitleRef = useRef<HTMLHeadingElement>(null);
+  const [showBranchModal, setShowBranchModal] = useState(false);
+  const [wizardStep, setWizardStep] = useState<1 | 2>(1); // 1 = Medicine, 2 = Route
+
+  // Focus management refs
+  const slideTitleRef = useRef<HTMLHeadingElement>(null);
+  const modalHeadingRef = useRef<HTMLHeadingElement>(null);
+  const withMedButtonRef = useRef<HTMLButtonElement>(null);
   const changeButtonRef = useRef<HTMLButtonElement>(null);
-  const medTriggerButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Focus title on modal open or step transition
+  // 1. FIX: Focus the parent slide heading on mount so Apple VoiceOver speaks immediately
+  // This stops VoiceOver from falling back and reading the window description!
   useEffect(() => {
-    if (showModal) {
-      logInteraction("MODAL_VIEW", { modal: "screen6_4b_resolution", step: modalStep, slideId: "screen6_4b_resolution_type" }, "/intervention/flow").catch(() => {});
-      setTimeout(() => {
-        modalTitleRef.current?.focus();
-      }, 50);
-    }
-  }, [showModal, modalStep]);
+    const timer = setTimeout(() => {
+      slideTitleRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const handleClose = () => {
-    setShowModal(false);
-    setModalStep(1);
+  // 2. Focus modal heading when opened
+  useEffect(() => {
+    if (showBranchModal) {
+      logInteraction("MODAL_VIEW", { modal: "screen6_4b_resolution", step: wizardStep, slideId: "screen6_4b_resolution_type" }, "/intervention/flow").catch(() => {});
+      const timer = setTimeout(() => {
+        modalHeadingRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [showBranchModal, wizardStep]);
+
+  const handleCloseModal = () => {
+    setShowBranchModal(false);
+    setWizardStep(1);
     if (medicineSelected && changeButtonRef.current) {
       changeButtonRef.current.focus();
-    } else if (medTriggerButtonRef.current) {
-      medTriggerButtonRef.current.focus();
+    } else if (withMedButtonRef.current) {
+      withMedButtonRef.current.focus();
+    }
+  };
+
+  const handleMainSelect = (val: string) => {
+    onSelect(val);
+    if (val === "With medication" && (!medicineSelected || !routeSelected)) {
+      setWizardStep(1);
+      setShowBranchModal(true);
     }
   };
 
@@ -1864,18 +1914,28 @@ export function Slide11MedicationScreen(props: any) {
 
   return (
     <>
+      {/* Screen Reader Live Status Announcement on Entry */}
+      <div role="status" aria-live="polite" className="sr-only">
+        {isSpanish
+          ? "¿Cómo desapareció la reacción de su hijo?"
+          : "How did your child's reaction go away?"}
+      </div>
+
       {/* =========================================================================
           PART 1: PARENT SLIDE (aria-hidden while modal is open)
           ========================================================================= */}
       <div 
         id="slide-content"
-        aria-hidden={showModal}
+        aria-hidden={showBranchModal ? true : undefined}
         className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
       >
         <div className="mb-6">
+          {/* Main heading with ref and tabIndex={-1} for VoiceOver capture */}
           <h2 
+            ref={slideTitleRef}
+            tabIndex={-1}
             id="slide11-title"
-            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug"
+            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug outline-none"
           >
             {isSpanish
               ? "¿Cómo desapareció la reacción de su hijo?"
@@ -1892,22 +1952,17 @@ export function Slide11MedicationScreen(props: any) {
               className="bg-[#7da199]/60 p-3 sm:p-4 rounded-3xl flex flex-wrap items-center gap-3"
             >
               {mainOptions.map((opt) => {
-                const isSelected = selected === opt.value;
+                const isSelected = selected === opt.value || 
+                  (opt.value.startsWith("Unsure") && (selected === "Unsure" || selected === "Unsure/I don't know"));
                 const label = isSpanish ? opt.labelEs : opt.labelEn;
                 return (
                   <button
                     key={opt.value}
-                    ref={opt.value === "With medication" ? medTriggerButtonRef : undefined}
+                    ref={opt.value === "With medication" ? withMedButtonRef : undefined}
                     type="button"
                     role="radio"
                     aria-checked={isSelected}
-                    onClick={() => {
-                      onSelect(opt.value);
-                      if (opt.value === "With medication" && !medicineSelected) {
-                        setModalStep(1);
-                        setShowModal(true);
-                      }
-                    }}
+                    onClick={() => handleMainSelect(opt.value)}
                     className={`px-6 py-3 min-h-[44px] rounded-2xl font-bold text-sm sm:text-base transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
                       isSelected
                         ? "bg-[#1f5c66] text-white shadow-md border-2 border-[#1f5c66]"
@@ -1921,38 +1976,30 @@ export function Slide11MedicationScreen(props: any) {
               })}
             </div>
 
-            {/* Selected Summary Chip */}
+            {/* Selected Medication Summary Chip */}
             {selected === "With medication" && (medicineSelected || routeSelected) && (
               <div className="mt-3.5 flex items-center justify-between bg-white/60 backdrop-blur-xs rounded-xl px-4 py-2.5 text-xs font-semibold text-[#132c27] border border-slate-200 shadow-2xs">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                  {medicineSelected && (
-                    <span>
-                      {isSpanish ? "Medicamento: " : "Medicine: "}
-                      <strong className="font-bold text-[#1f5c66]">
-                        {isSpanish
-                          ? (RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medicineSelected)?.labelEs || medicineSelected)
-                          : (RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medicineSelected)?.labelEn || medicineSelected)}
-                      </strong>
-                    </span>
-                  )}
-                  {medicineSelected && routeSelected && <span className="hidden sm:inline text-slate-400">•</span>}
+                <span>
+                  {isSpanish ? "Medicamento: " : "Medicine: "}
+                  <strong className="font-bold text-[#1f5c66]">
+                    {(RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medicineSelected)?.[isSpanish ? "labelEs" : "labelEn"]) || medicineSelected || (isSpanish ? "No especificado" : "Not specified")}
+                  </strong>
                   {routeSelected && (
-                    <span>
-                      {isSpanish ? "Toma: " : "Intake: "}
+                    <>
+                      {" • "}
+                      {isSpanish ? "Vía: " : "Route: "}
                       <strong className="font-bold text-[#1f5c66]">
-                        {isSpanish
-                          ? (RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === routeSelected)?.labelEs || routeSelected)
-                          : (RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === routeSelected)?.labelEn || routeSelected)}
+                        {(RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === routeSelected)?.[isSpanish ? "labelEs" : "labelEn"]) || routeSelected}
                       </strong>
-                    </span>
+                    </>
                   )}
-                </div>
+                </span>
                 <button
                   ref={changeButtonRef}
                   type="button"
                   onClick={() => {
-                    setModalStep(1);
-                    setShowModal(true);
+                    setWizardStep(1);
+                    setShowBranchModal(true);
                   }}
                   aria-label={isSpanish ? "Cambiar detalles del medicamento" : "Change medication details"}
                   className="text-[#1f5c66] hover:underline font-bold ml-3 min-h-[44px] inline-flex items-center cursor-pointer"
@@ -1986,152 +2033,164 @@ export function Slide11MedicationScreen(props: any) {
       </div>
 
       {/* =========================================================================
-          PART 2: SINGLE 2-STEP MODAL (Eliminates Nested Dialog Bug)
+          PART 2: SINGLE ACCESSIBLE 2-STEP WIZARD MODAL
           ========================================================================= */}
-      {showModal && (
+      {showBranchModal && (
         <div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="med-modal-title"
+          aria-labelledby="branch-modal-title"
           onKeyDown={(e) => {
-            if (e.key === "Escape") handleClose();
+            if (e.key === "Escape") {
+              handleCloseModal();
+            }
           }}
         >
           <div className="bg-[#f4f8e8] border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-2xl max-w-lg w-full relative animate-in zoom-in-95 duration-200">
-            {/* Step Indicator Header */}
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-xs font-bold text-[#1f5c66] uppercase tracking-wider">
-                {isSpanish ? `Paso ${modalStep} de 2` : `Step ${modalStep} of 2`}
+            
+            {/* Step Indicator */}
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#1f5c66] bg-white px-2.5 py-1 rounded-full border border-slate-200">
+                {isSpanish ? `Paso ${wizardStep} de 2` : `Step ${wizardStep} of 2`}
               </span>
             </div>
 
-            {/* STEP 1: What Medicine Was Given? */}
-            {modalStep === 1 && (
-              <div>
-                <h3
-                  ref={modalTitleRef}
-                  tabIndex={-1}
-                  id="med-modal-title"
-                  className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
-                >
-                  {isSpanish
-                    ? "¿Qué medicamento le dieron a su hijo para tratar la reacción alérgica?"
-                    : "What medicine was given to your child for the reaction?"}
-                </h3>
+            {/* Modal Heading */}
+            <h3
+              ref={modalHeadingRef}
+              tabIndex={-1}
+              id="branch-modal-title"
+              className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
+            >
+              {wizardStep === 1
+                ? (isSpanish ? "¿Qué medicamento se le dio a su hijo?" : "What medicine was given to your child?")
+                : (isSpanish ? "¿Cómo recibió su hijo el medicamento?" : "Did your child receive the medicine by:")}
+            </h3>
 
-                <div role="radiogroup" aria-labelledby="med-modal-title" className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5">
-                  {RESOLUTION_MEDICINE_OPTIONS.map((medOpt) => {
-                    const isSelected = medicineSelected === medOpt.value;
-                    const label = isSpanish ? medOpt.labelEs : medOpt.labelEn;
-                    return (
-                      <button
-                        key={medOpt.value}
-                        type="button"
-                        role="radio"
-                        aria-checked={isSelected}
-                        onClick={() => onMedicineSelect && onMedicineSelect(medOpt.value)}
-                        className={`px-4 py-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-                          isSelected
-                            ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
-                            : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
-                        <span>{label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/60">
-                  <button
-                    type="button"
-                    onClick={handleClose}
-                    className="px-5 py-2.5 min-h-[44px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-                  >
-                    <span aria-hidden="true">✕</span>
-                    <span>{isSpanish ? "Cerrar" : "Close"}</span>
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!medicineSelected}
-                    onClick={() => setModalStep(2)}
-                    className={`px-8 py-2.5 min-h-[44px] font-bold text-xs sm:text-sm rounded-full transition shadow-xs flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-                      medicineSelected
-                        ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95"
-                        : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
-                    }`}
-                  >
-                    <span>{isSpanish ? "Siguiente" : "Next"}</span>
-                    <span aria-hidden="true">→</span>
-                  </button>
-                </div>
+            {/* WIZARD STEP 1: MEDICINE TYPE */}
+            {wizardStep === 1 && (
+              <div 
+                role="radiogroup" 
+                aria-labelledby="branch-modal-title"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5"
+              >
+                {RESOLUTION_MEDICINE_OPTIONS.map((medOpt) => {
+                  const isMedSelected = medicineSelected === medOpt.value;
+                  const label = isSpanish ? medOpt.labelEs : medOpt.labelEn;
+                  return (
+                    <button
+                      type="button"
+                      key={medOpt.value}
+                      role="radio"
+                      aria-checked={isMedSelected}
+                      onClick={() => {
+                        if (onMedicineSelect) {
+                          onMedicineSelect(medOpt.value);
+                        }
+                      }}
+                      className={`px-4 py-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                        isMedSelected
+                          ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                          : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                      }`}
+                    >
+                      {isMedSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
 
-            {/* STEP 2: Did Your Child Receive the Medicine By? */}
-            {modalStep === 2 && (
-              <div>
-                <h3
-                  ref={modalTitleRef}
-                  tabIndex={-1}
-                  id="med-modal-title"
-                  className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
-                >
-                  {isSpanish
-                    ? "¿Su hijo recibió el medicamento por vía:"
-                    : "Did your child receive the medicine by:"}
-                </h3>
-
-                <div role="radiogroup" aria-labelledby="med-modal-title" className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5">
-                  {RESOLUTION_ROUTE_OPTIONS.map((routeOpt) => {
-                    const isSelected = routeSelected === routeOpt.value;
-                    const label = isSpanish ? routeOpt.labelEs : routeOpt.labelEn;
-                    return (
-                      <button
-                        key={routeOpt.value}
-                        type="button"
-                        role="radio"
-                        aria-checked={isSelected}
-                        onClick={() => onRouteSelect && onRouteSelect(routeOpt.value)}
-                        className={`px-4 py-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-                          isSelected
-                            ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
-                            : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        {isSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
-                        <span>{label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/60">
-                  <button
-                    type="button"
-                    onClick={() => setModalStep(1)}
-                    className="px-5 py-2.5 min-h-[44px] bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm rounded-full transition cursor-pointer flex items-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-                  >
-                    <span aria-hidden="true">←</span>
-                    <span>{isSpanish ? "Atrás" : "Back"}</span>
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!routeSelected}
-                    onClick={handleClose}
-                    className={`px-8 py-2.5 min-h-[44px] font-bold text-xs sm:text-sm rounded-full transition shadow-xs flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-                      routeSelected
-                        ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95"
-                        : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
-                    }`}
-                  >
-                    {isSpanish ? "Confirmar" : "Confirm"}
-                  </button>
-                </div>
+            {/* WIZARD STEP 2: ROUTE */}
+            {wizardStep === 2 && (
+              <div 
+                role="radiogroup" 
+                aria-labelledby="branch-modal-title"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5"
+              >
+                {RESOLUTION_ROUTE_OPTIONS.map((rtOpt) => {
+                  const isRtSelected = routeSelected === rtOpt.value;
+                  const label = isSpanish ? rtOpt.labelEs : rtOpt.labelEn;
+                  return (
+                    <button
+                      type="button"
+                      key={rtOpt.value}
+                      role="radio"
+                      aria-checked={isRtSelected}
+                      onClick={() => {
+                        if (onRouteSelect) {
+                          onRouteSelect(rtOpt.value);
+                        }
+                      }}
+                      className={`px-4 py-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                        isRtSelected
+                          ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
+                          : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
+                      }`}
+                    >
+                      {isRtSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
+
+            {/* Modal Action Controls */}
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-300/60">
+              {wizardStep === 2 ? (
+                <button
+                  type="button"
+                  onClick={() => setWizardStep(1)}
+                  className="px-4 py-2.5 min-h-[44px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-full transition cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                >
+                  <span>&larr;</span>
+                  <span>{isSpanish ? "Atrás" : "Back"}</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  aria-label={isSpanish ? "Cerrar ventana" : "Close window"}
+                  className="px-4 py-2.5 min-h-[44px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm rounded-full transition cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+                >
+                  <span aria-hidden="true">✕</span>
+                  <span>{isSpanish ? "Cerrar" : "Close"}</span>
+                </button>
+              )}
+
+              {wizardStep === 1 ? (
+                <button
+                  type="button"
+                  disabled={!medicineSelected}
+                  onClick={() => setWizardStep(2)}
+                  className={`px-6 py-2.5 min-h-[44px] font-bold text-xs sm:text-sm rounded-full transition shadow-xs flex items-center justify-center gap-1 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                    medicineSelected
+                      ? "bg-[#1f5c66] text-white hover:bg-[#16484e] cursor-pointer"
+                      : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                  }`}
+                >
+                  <span>{isSpanish ? "Siguiente" : "Next"}</span>
+                  <span>&rarr;</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={!routeSelected}
+                  onClick={handleCloseModal}
+                  className={`px-8 py-2.5 min-h-[44px] font-bold text-xs sm:text-sm rounded-full transition shadow-xs flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                    routeSelected
+                      ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95"
+                      : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
+                  }`}
+                >
+                  {isSpanish ? "Aceptar" : "Confirm"}
+                </button>
+              )}
+            </div>
+
           </div>
         </div>
       )}
