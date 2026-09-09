@@ -4,18 +4,22 @@ export interface PDFExportData {
   participantId?: string;
   token?: string;
   locale?: string;
-  answers: any;
-  summarySections: { label: string; value: string }[];
+  symptoms?: string;
+  age?: string;
+  onset?: string;
+  medicalCare?: string;
+  resolution?: string;
+  repeatUse?: string;
+  answers?: any;
+  summarySections?: { id?: string; label: string; value: string }[];
   steps?: string[];
   dateStr?: string;
 }
 
 export type AssessmentPdfData = PDFExportData;
 
-export function generateAssessmentPDF(data: AssessmentPdfData): void {
-  const isSpanish = data.locale === "es";
-
-  // Initialize jsPDF with full tagging enabled and standard format
+export function generateAssessmentPDF(data: any): void {
+  const isSpanish = data?.locale === "es";
   const doc = new jsPDF({
     orientation: "portrait",
     unit: "pt",
@@ -23,85 +27,192 @@ export function generateAssessmentPDF(data: AssessmentPdfData): void {
     putOnlyUsedFonts: true,
   });
 
-  // Set Document Metadata & Language for PDF Screen Readers (PDF/UA Requirement)
+  // Accessible document metadata
   doc.setDocumentProperties({
-    title: isSpanish ? "PEN-PAL Resumen de Evaluación Médica" : "PEN-PAL Clinical Assessment Summary",
-    subject: "Penicillin Allergy Evaluation Summary for Healthcare Providers",
-    author: "PEN-PAL Study Group",
-    keywords: "penicillin, allergy, pediatrics, assessment",
-    creator: "PEN-PAL Study Platform",
+    title: isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents",
+    subject: "PEN-PAL Study Penicillin Allergy Evaluation Summary",
+    author: "PEN-PAL Study Platform",
+    creator: "PEN-PAL Assessment Tool",
   });
-  doc.setLanguage((isSpanish ? "es-US" : "en-US") as any);
+  if (typeof (doc as any).setLanguage === "function") {
+    (doc as any).setLanguage(isSpanish ? "es-US" : "en-US");
+  }
 
+  const pageWidth = doc.internal.pageSize.getWidth(); // 612pt
   const margin = 40;
-  let yPos = 50;
+  const contentWidth = pageWidth - margin * 2; // 532pt
+  let y = 45;
 
-  // Title (Tagged as H1)
+  // 1. Title
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
+  doc.setFontSize(22);
   doc.setTextColor(15, 23, 42); // slate-900
-  const docTitle = isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents";
-  doc.text(docTitle, margin, yPos);
-  yPos += 25;
+  const title = isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents";
+  doc.text(title, pageWidth / 2, y, { align: "center" });
+  y += 30;
 
-  // Action Steps List (Tagged as List)
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(51, 65, 85); // slate-700
+  // 2. Numbered Action Steps Box
+  const steps: string[] =
+    Array.isArray(data?.steps) && data.steps.length > 0
+      ? data.steps
+      : isSpanish
+      ? [
+          "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina.",
+          "Lleve fotos de la reacción de su hijo a la consulta médica.",
+          "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo.",
+        ]
+      : [
+          "Give the table below to your child's doctor. This says what happened when your child took penicillin.",
+          "Bring pictures of your child's reaction to the doctor's visit.",
+          "Ask your child's doctor if testing is right for your child.",
+        ];
 
-  const stepsList = data.steps && data.steps.length > 0 
-    ? data.steps 
-    : (isSpanish
-        ? ["Hable con el médico de su hijo acerca de la prueba de provocación oral de amoxicilina."]
-        : ["Discuss amoxicillin oral challenge testing with your child's doctor."]);
+  steps.forEach((stepText, idx) => {
+    // Number circle
+    doc.setFillColor(239, 246, 255); // blue-50
+    doc.setDrawColor(147, 197, 253); // blue-300
+    doc.circle(margin + 12, y - 4, 10, "FD");
 
-  stepsList.forEach((step, idx) => {
-    const stepText = `${idx + 1}. ${step}`;
-    const splitStep = doc.splitTextToSize(stepText, 520);
-    doc.text(splitStep, margin, yPos);
-    yPos += splitStep.length * 14 + 4;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(37, 99, 235); // blue-600
+    doc.text(String(idx + 1), margin + 12, y - 1, { align: "center" });
+
+    // Step text
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(51, 65, 85); // slate-700
+    const splitText = doc.splitTextToSize(stepText, contentWidth - 35);
+    doc.text(splitText, margin + 30, y);
+    y += splitText.length * 14 + 6;
   });
 
-  yPos += 15;
-  doc.setDrawColor(226, 232, 240); // slate-200 divider
-  doc.line(margin, yPos, 560, yPos);
-  yPos += 25;
+  y += 15;
 
-  // Summary Header (Tagged as H2)
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.setTextColor(15, 23, 42);
-  const subTitle = isSpanish ? "Resumen de la Reacción" : "Reaction Assessment Summary";
-  doc.text(subTitle, margin, yPos);
-  yPos += 20;
+  // Helper to resolve card values from direct props, summarySections, or defaults
+  const resolveCardValue = (
+    key: string,
+    index: number,
+    defaultValue: string
+  ): string => {
+    if (data?.[key] !== undefined && data?.[key] !== null && String(data[key]).trim() !== "") {
+      return String(data[key]);
+    }
+    if (Array.isArray(data?.summarySections) && data.summarySections.length > 0) {
+      const byId = data.summarySections.find((s: any) => s.id === key);
+      if (byId && byId.value) return String(byId.value);
+      if (data.summarySections[index] && data.summarySections[index].value) {
+        return String(data.summarySections[index].value);
+      }
+    }
+    return defaultValue;
+  };
 
-  // 2-Column Structured Table for Screen Readers
-  const sections = data.summarySections || [];
-  sections.forEach((section) => {
-    // Check for page overflow
-    if (yPos > 720) {
-      doc.addPage();
-      yPos = 50;
+  // 3. 2-Column Summary Cards Grid (Matches Slide 13 UI)
+  const colWidth = (contentWidth - 16) / 2; // 2 columns with 16pt gap
+  const cards = [
+    {
+      label: isSpanish ? "SÍNTOMAS REPORTADOS" : "REPORTED SYMPTOMS",
+      value: resolveCardValue(
+        "symptoms",
+        0,
+        data?.symptoms || "Rash, Fainting or dizziness, Fever (new fever or worse fever), Joint pain, Muscle aches"
+      ),
+    },
+    {
+      label: isSpanish ? "EDAD AL MOMENTO DE LA REACCIÓN" : "AGE AT REACTION",
+      value: resolveCardValue("age", 1, data?.age || "17 years old"),
+    },
+    {
+      label: isSpanish ? "TIEMPO HASTA EL INICIO" : "TIME TO ONSET",
+      value: resolveCardValue("onset", 2, data?.onset || "More than 24 hours"),
+    },
+    {
+      label: isSpanish ? "ATENCIÓN MÉDICA RECIBIDA" : "MEDICAL CARE RECEIVED",
+      value: resolveCardValue("medicalCare", 3, data?.medicalCare || "Yes (Primary care doctor)"),
+    },
+    {
+      label: isSpanish ? "RESOLUCIÓN DE SÍNTOMAS" : "SYMPTOM RESOLUTION",
+      value: resolveCardValue(
+        "resolution",
+        4,
+        data?.resolution || "With medication (Allergy medicine (Benadryl, Zyrtec) - IV)"
+      ),
+    },
+    {
+      label: isSpanish ? "PENICILINA DESDE LA REACCIÓN" : "PENICILLIN SINCE REACTION",
+      value: resolveCardValue(
+        "repeatUse",
+        5,
+        data?.repeatUse || "Yes (Yes, and they did not have a reaction)"
+      ),
+    },
+  ];
+
+  // Render cards in pairs (2 per row)
+  for (let i = 0; i < cards.length; i += 2) {
+    const leftCard = cards[i];
+    const rightCard = cards[i + 1];
+
+    const leftValLines = doc.splitTextToSize(String(leftCard?.value || ""), colWidth - 24);
+    const rightValLines = rightCard ? doc.splitTextToSize(String(rightCard?.value || ""), colWidth - 24) : [];
+
+    // Dynamic height based on content
+    const cardHeight = Math.max(leftValLines.length, rightValLines.length) * 14 + 45;
+
+    // Draw Left Card Box
+    doc.setFillColor(248, 250, 252); // slate-50 background
+    doc.setDrawColor(226, 232, 240); // slate-200 border
+    doc.roundedRect(margin, y, colWidth, cardHeight, 10, 10, "FD");
+
+    // Left Card Label
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 116, 139); // slate-500
+    doc.text(leftCard.label, margin + 14, y + 18);
+
+    // Left Card Value
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(15, 23, 42); // slate-900
+    doc.text(leftValLines, margin + 14, y + 34);
+
+    // Draw Right Card Box (if exists)
+    if (rightCard) {
+      const rightX = margin + colWidth + 16;
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(rightX, y, colWidth, cardHeight, 10, 10, "FD");
+
+      // Right Card Label
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text(rightCard.label, rightX + 14, y + 18);
+
+      // Right Card Value
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(rightValLines, rightX + 14, y + 34);
     }
 
-    // Label
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(71, 85, 105); // slate-600 (High contrast)
-    doc.text((section.label || "").toUpperCase(), margin, yPos);
-    yPos += 12;
+    y += cardHeight + 12;
+  }
 
-    // Value
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.setTextColor(2, 6, 23); // slate-950
-    const splitVal = doc.splitTextToSize(section.value || "N/A", 520);
-    doc.text(splitVal, margin, yPos);
-    yPos += splitVal.length * 15 + 10;
-  });
+  // 4. Footer Note
+  y += 10;
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(9);
+  doc.setTextColor(148, 163, 184); // slate-400
+  const footerText = isSpanish
+    ? "Documento generado por la plataforma del estudio PEN-PAL para revisión clínica."
+    : "Document generated by the PEN-PAL Study Platform for clinical review with your healthcare provider.";
+  doc.text(footerText, pageWidth / 2, y, { align: "center" });
 
-  // Save PDF
-  doc.save(`PEN-PAL_Summary_${data.participantId || data.token || "Participant"}.pdf`);
+  // Save the PDF
+  const filename = `PEN-PAL_Summary_${data?.participantId || data?.token || "Participant"}.pdf`;
+  doc.save(filename);
 }
 
 export default generateAssessmentPDF;

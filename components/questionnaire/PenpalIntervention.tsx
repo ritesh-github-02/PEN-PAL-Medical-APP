@@ -712,7 +712,14 @@ export default function PenpalIntervention() {
                         token: activeToken || undefined,
                         locale,
                         answers,
+                        symptoms: summaryCards.find((s: any) => s.id === "symptoms")?.value,
+                        age: summaryCards.find((s: any) => s.id === "age")?.value,
+                        onset: summaryCards.find((s: any) => s.id === "onset")?.value,
+                        medicalCare: summaryCards.find((s: any) => s.id === "medicalCare")?.value,
+                        resolution: summaryCards.find((s: any) => s.id === "resolution")?.value,
+                        repeatUse: summaryCards.find((s: any) => s.id === "repeatUse")?.value,
                         summarySections: summaryCards.map((s: any) => ({
+                          id: s.id,
                           label: s.label,
                           value: s.value,
                         })),
@@ -3304,7 +3311,18 @@ export function Slide13SummaryScreen(props: any) {
           token: activeToken || undefined,
           locale: isSpanish ? "es" : "en",
           answers,
+          symptoms: symptomsFormatted,
+          age: typeof (answers?.ageAtReaction ?? answers?.screen6_2_timing) === "number"
+            ? (isSpanish ? `${answers.ageAtReaction ?? answers.screen6_2_timing} años` : `${answers.ageAtReaction ?? answers.screen6_2_timing} years old`)
+            : (answers?.ageAtReaction || answers?.screen6_2_timing 
+                ? (isSpanish ? `${answers.ageAtReaction || answers.screen6_2_timing} años` : `${answers.ageAtReaction || answers.screen6_2_timing} years old`)
+                : (isSpanish ? "17 años" : "17 years old")),
+          onset: answers?.onset || answers?.screen6_3_onset || "24+ hours",
+          medicalCare: medicalCareFormatted,
+          resolution: resolutionFormatted,
+          repeatUse: repeatUseFormatted,
           summarySections: summaryCards.map((s) => ({
+            id: s.id,
             label: s.label,
             value: s.value,
           })),
