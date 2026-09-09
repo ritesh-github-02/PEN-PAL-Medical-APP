@@ -1667,13 +1667,6 @@ export function Slide10MedicalCareScreen(props: any) {
 
   return (
     <>
-      {/* Screen Reader Live Status Announcement on Entry */}
-      <div role="status" aria-live="polite" className="sr-only">
-        {isSpanish
-          ? "¿Su hijo recibió atención médica por la reacción?"
-          : "Did your child receive medical care for their reaction?"}
-      </div>
-
       {/* =========================================================================
           PART 1: PARENT SLIDE (aria-hidden while modal is open)
           ========================================================================= */}
@@ -1935,13 +1928,6 @@ export function Slide11MedicationScreen(props: any) {
 
   return (
     <>
-      {/* Screen Reader Live Status Announcement on Entry */}
-      <div role="status" aria-live="polite" className="sr-only">
-        {isSpanish
-          ? "¿Cómo desapareció la reacción de su hijo?"
-          : "How did your child's reaction go away?"}
-      </div>
-
       {/* =========================================================================
           PART 1: PARENT SLIDE (aria-hidden while modal is open)
           ========================================================================= */}
@@ -2281,13 +2267,6 @@ export function Slide12RepeatUseScreen(props: any) {
 
   return (
     <>
-      {/* Screen Reader Live Announcement on Entry */}
-      <div role="status" aria-live="polite" className="sr-only">
-        {isSpanish
-          ? "¿Su hijo ha vuelto a tomar penicilina (amoxicilina) desde la reacción?"
-          : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
-      </div>
-
       {/* =========================================================================
           PART 1: PARENT SLIDE
           ========================================================================= */}
