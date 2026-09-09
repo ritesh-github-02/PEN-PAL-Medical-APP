@@ -17,6 +17,7 @@ import Loader from "@/components/common/Loader";
 import AudioPlayer from "./AudioPlayer";
 import { NurseAnna } from "./NurseAnna";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
+import { SuccessScreen } from "./SuccessScreen";
 import esMessages from "@/messages/es.json";
 import enMessages from "@/messages/en.json";
 
@@ -552,44 +553,10 @@ export default function PenpalIntervention() {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 font-sans bg-[#f4f8e8] relative">
-        <div className="absolute top-6 right-6 z-20">
-          <LanguageSwitcher locale={locale} onSwitch={handleLanguageSwitch} />
-        </div>
-        <div className="max-w-md w-full bg-white border border-slate-200 p-8 sm:p-10 text-center shadow-lg rounded-3xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
-          <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto rounded-full text-2xl font-bold shadow-xs">
-            ✓
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              {locale === "es" ? "¡Éxito!" : "Success"}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
-              {locale === "es"
-                ? "Sus respuestas han sido registradas. Gracias por participar en el estudio PEN-PAL."
-                : "Your responses have been recorded. Thank you for participating in the PEN-PAL study."}
-            </p>
-          </div>
-          
-          <div className="space-y-3 pt-6 border-t border-slate-100">
-            <button 
-              type="button"
-              onClick={() => {
-                try {
-                  window.close();
-                } catch {}
-                logout();
-              }}
-              className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition shadow-sm active:scale-[0.98] cursor-pointer"
-            >
-              {locale === "es" ? "Cerrar esta Ventana" : "Close this Window"}
-            </button>
-            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
-              {locale === "es" ? "La sesión se cerrará • Puede cerrar esta ventana con seguridad" : "Session will be cleared • You may safely close this window"}
-            </p>
-          </div>
-        </div>
-      </div>
+      <SuccessScreen
+        locale={locale}
+        onSwitchLanguage={handleLanguageSwitch}
+      />
     );
   }
 
@@ -3448,3 +3415,5 @@ export function Slide13SummaryScreen(props: any) {
 }
 
 export const SummaryScreen = Slide13SummaryScreen;
+export { SuccessScreen } from "./SuccessScreen";
+export type { SuccessScreenProps } from "./SuccessScreen";
