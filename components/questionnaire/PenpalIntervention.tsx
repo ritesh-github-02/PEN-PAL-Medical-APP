@@ -1574,21 +1574,22 @@ const RESOLUTION_ROUTE_OPTIONS = [
   { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No sé" },
 ];
 
+// Clinical Options matching Eileen's exact protocol
 const YETAGAIN_REACTION_OPTIONS = [
   { 
     value: "Yes, and they did not have a reaction", 
     labelEn: "Yes, and they did not have a reaction", 
-    labelEs: "Sí, y no tuvo ninguna reacción alérgica" 
+    labelEs: "Sí, y no tuvieron una reacción" 
   },
   { 
     value: "Yes, and they had a reaction", 
     labelEn: "Yes, and they had a reaction", 
-    labelEs: "Sí, y tuvo una reacción alérgica" 
+    labelEs: "Sí, y tuvieron una reacción" 
   },
   { 
     value: "Unsure / I don't know", 
     labelEn: "Unsure / I don't know", 
-    labelEs: "No estoy seguro/No lo sé" 
+    labelEs: "No estoy seguro / No sé" 
   },
 ];
 
@@ -2199,19 +2200,40 @@ export function Slide11MedicationScreen(props: any) {
 }
 
 export function Slide12RepeatUseScreen(props: any) {
-  const { isSpanish, selected, onSelect, reactionDetailSelected, onReactionDetailSelect, navProps } = props;
+  const { 
+    isSpanish, 
+    selected, 
+    onSelect, 
+    reactionDetailSelected, 
+    onReactionDetailSelect, 
+    navProps 
+  } = props;
+
   const [showYetAgainModal, setShowYetAgainModal] = useState(false);
 
+  // Focus management refs
+  const slideTitleRef = useRef<HTMLHeadingElement>(null);
   const modalTitleRef = useRef<HTMLHeadingElement>(null);
   const yesButtonRef = useRef<HTMLButtonElement>(null);
   const changeButtonRef = useRef<HTMLButtonElement>(null);
 
+  // 1. FIX: Focus the parent slide heading on mount so VoiceOver speaks immediately
+  // This eliminates the "window description" announcement!
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      slideTitleRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 2. Focus modal heading when opened
   useEffect(() => {
     if (showYetAgainModal) {
       logInteraction("MODAL_VIEW", { modal: "screen6_5_reaction_detail", slideId: "screen6_5_yetagain" }, "/intervention/flow").catch(() => {});
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         modalTitleRef.current?.focus();
       }, 50);
+      return () => clearTimeout(timer);
     }
   }, [showYetAgainModal]);
 
@@ -2239,22 +2261,32 @@ export function Slide12RepeatUseScreen(props: any) {
 
   return (
     <>
+      {/* Screen Reader Live Announcement on Entry */}
+      <div role="status" aria-live="polite" className="sr-only">
+        {isSpanish
+          ? "¿Su hijo ha vuelto a tomar penicilina (amoxicilina) desde la reacción?"
+          : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
+      </div>
+
       {/* =========================================================================
-          PART 1: PARENT SLIDE (aria-hidden while modal is open)
+          PART 1: PARENT SLIDE
           ========================================================================= */}
       <div 
         id="slide-content"
-        aria-hidden={showYetAgainModal}
+        aria-hidden={showYetAgainModal ? true : undefined}
         className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
       >
         <div className="mb-6">
+          {/* Main heading with ref and tabIndex={-1} for VoiceOver capture */}
           <h2 
+            ref={slideTitleRef}
+            tabIndex={-1}
             id="slide12-title"
-            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug"
+            className="text-xl sm:text-2xl md:text-3xl font-black text-[#2d221b] tracking-tight leading-snug outline-none"
           >
             {isSpanish
-              ? "¿Su hijo ha recibido penicilina desde la reacción?"
-              : "Has your child received penicillin since the reaction?"}
+              ? "¿Su hijo ha vuelto a tomar penicilina (amoxicilina) desde la reacción?"
+              : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
           </h2>
         </div>
 
@@ -2267,7 +2299,8 @@ export function Slide12RepeatUseScreen(props: any) {
               className="bg-[#7da199]/60 p-3 sm:p-4 rounded-3xl flex flex-wrap items-center gap-3"
             >
               {mainOptions.map((opt) => {
-                const isSelected = selected === opt.value || (opt.value.startsWith("Unsure") && (selected === "Unsure" || selected === "Unsure/I don't know"));
+                const isSelected = selected === opt.value || 
+                  (opt.value.startsWith("Unsure") && (selected === "Unsure" || selected === "Unsure/I don't know"));
                 const label = isSpanish ? opt.labelEs : opt.labelEn;
                 return (
                   <button
@@ -2290,7 +2323,7 @@ export function Slide12RepeatUseScreen(props: any) {
               })}
             </div>
 
-            {/* Selected Reaction Detail Summary Chip */}
+            {/* Selected Detail Summary Chip */}
             {selected === "Yes" && reactionDetailSelected && (
               <div className="mt-3.5 flex items-center justify-between bg-white/60 backdrop-blur-xs rounded-xl px-4 py-2.5 text-xs font-semibold text-[#132c27] border border-slate-200 shadow-2xs">
                 <span>
@@ -2305,7 +2338,7 @@ export function Slide12RepeatUseScreen(props: any) {
                   ref={changeButtonRef}
                   type="button"
                   onClick={() => setShowYetAgainModal(true)}
-                  aria-label={isSpanish ? "Cambiar detalle de la reacción" : "Change reaction detail"}
+                  aria-label={isSpanish ? "Cambiar detalle de reacción previa" : "Change repeat exposure detail"}
                   className="text-[#1f5c66] hover:underline font-bold ml-3 min-h-[44px] inline-flex items-center cursor-pointer"
                 >
                   {isSpanish ? "Cambiar" : "Change"}
@@ -2337,36 +2370,39 @@ export function Slide12RepeatUseScreen(props: any) {
       </div>
 
       {/* =========================================================================
-          PART 2: ACCESSIBLE MODAL DIALOG
+          PART 2: BRANCH MODAL
           ========================================================================= */}
       {showYetAgainModal && (
         <div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="yetagain-modal-title"
+          aria-labelledby="branch-modal-title"
           onKeyDown={(e) => {
-            if (e.key === "Escape") handleCloseModal();
+            if (e.key === "Escape") {
+              handleCloseModal();
+            }
           }}
         >
           <div className="bg-[#f4f8e8] border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-2xl max-w-lg w-full relative animate-in zoom-in-95 duration-200">
             
+            {/* Modal Heading */}
             <h3
               ref={modalTitleRef}
               tabIndex={-1}
-              id="yetagain-modal-title"
+              id="branch-modal-title"
               className="text-base sm:text-lg font-black text-[#2d221b] text-center mb-4 leading-snug outline-none focus:ring-2 focus:ring-[#236f7a] rounded-lg p-1"
             >
               {isSpanish
-                ? "¿Su hijo ha vuelto a tomar penicilina (amoxicilina) desde que tuvo la reacción?"
-                : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
+                ? "Cuando su hijo volvió a tomar penicilina, ¿qué ocurrió?"
+                : "When your child took penicillin again, what happened?"}
             </h3>
 
-            {/* Semantic Radiogroup Wrapper */}
+            {/* Modal Radiogroup */}
             <div 
               role="radiogroup" 
-              aria-labelledby="yetagain-modal-title"
-              className="space-y-3 mb-5"
+              aria-labelledby="branch-modal-title"
+              className="flex flex-col gap-2.5 mb-5"
             >
               {YETAGAIN_REACTION_OPTIONS.map((opt) => {
                 const isOptSelected = reactionDetailSelected === opt.value;
@@ -2382,20 +2418,20 @@ export function Slide12RepeatUseScreen(props: any) {
                         onReactionDetailSelect(opt.value);
                       }
                     }}
-                    className={`w-full px-5 py-3.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-center text-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+                    className={`w-full px-4 py-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs border cursor-pointer flex items-center justify-between text-left gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
                       isOptSelected
                         ? "bg-[#1f5c66] text-white border-[#1f5c66] shadow-md ring-2 ring-[#1f5c66]/40"
                         : "bg-white text-[#132c27] border-slate-200 hover:bg-slate-50"
                     }`}
                   >
-                    {isOptSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
                     <span>{label}</span>
+                    {isOptSelected && <span aria-hidden="true" className="text-amber-300 font-black">✓</span>}
                   </button>
                 );
               })}
             </div>
 
-            {/* Footer with 44px touch targets and Figma tag removed */}
+            {/* Modal Action Controls */}
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/60">
               <button
                 type="button"
@@ -2416,7 +2452,7 @@ export function Slide12RepeatUseScreen(props: any) {
                     : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
                 }`}
               >
-                {isSpanish ? "Confirmar" : "Confirm"}
+                {isSpanish ? "Aceptar" : "Confirm"}
               </button>
             </div>
 
