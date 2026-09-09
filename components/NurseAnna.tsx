@@ -5,20 +5,21 @@ import React from "react";
 export interface NurseAnnaProps {
   size?: "sm" | "md" | "lg";
   className?: string;
-  isDecorative?: boolean; // When true, screen readers ignore the image
+  isDecorative?: boolean; // When true, screen readers silently ignore the image
   locale?: string;
 }
 
-export const NurseAnna: React.FC<NurseAnnaProps> = ({
-  size = "md",
-  className = "",
-  isDecorative = true, // Default to true (decorative)
+export const NurseAnna: React.FC<NurseAnnaProps> = ({ 
+  size = "md", 
+  className = "", 
+  isDecorative = true, // Default to true on all subsequent slides
   locale = "en",
 }) => {
+  // Matches original responsive sizing for the official illustration
   const sizeClasses = {
-    sm: "w-16 sm:w-20 md:w-24 max-h-[140px] sm:max-h-[170px] md:max-h-[190px]",
-    md: "w-20 sm:w-24 md:w-28 lg:w-32 max-h-[170px] sm:max-h-[210px] md:max-h-[240px]",
-    lg: "w-24 sm:w-28 md:w-32 lg:w-36 max-h-[200px] sm:max-h-[250px] md:max-h-[290px]",
+    sm: "w-16 sm:w-20 max-h-[140px]",
+    md: "w-20 sm:w-24 md:w-28 max-h-[190px]",
+    lg: "w-24 sm:w-28 md:w-32 lg:w-36 max-h-[240px]",
   }[size];
 
   const altText = locale === "es"
@@ -26,10 +27,11 @@ export const NurseAnna: React.FC<NurseAnnaProps> = ({
     : "Illustration of Nurse Anna smiling in blue scrubs";
 
   return (
-    <div
-      className={`flex flex-shrink-0 relative items-center justify-center p-1 select-none ${className}`}
+    <div 
+      className={`flex flex-shrink-0 self-center my-auto p-1 select-none ${className}`}
       aria-hidden={isDecorative ? "true" : undefined}
     >
+      {/* Official Nurse Anna PNG Artwork */}
       <img
         src="/images/nurse-anna.png"
         alt={isDecorative ? "" : altText}
