@@ -667,44 +667,13 @@ export default function PenpalIntervention() {
                   isSpanish={locale === "es"}
                   answers={answers}
                   activeToken={activeToken}
+                  participantId={activeToken}
                   onBack={handleBack}
                   onPrint={() => window.print()}
-                  onNext={async () => {
+                  onNavigateToSuccess={() => {
                     setShowSuccess(true);
                   }}
-                  onSavePDF={async (summaryCards: any) => {
-                    try {
-                      generateAssessmentPDF({
-                        participantId: activeToken || undefined,
-                        token: activeToken || undefined,
-                        locale,
-                        answers,
-                        symptoms: summaryCards.find((s: any) => s.id === "symptoms")?.value,
-                        age: summaryCards.find((s: any) => s.id === "age")?.value,
-                        onset: summaryCards.find((s: any) => s.id === "onset")?.value,
-                        medicalCare: summaryCards.find((s: any) => s.id === "medicalCare")?.value,
-                        resolution: summaryCards.find((s: any) => s.id === "resolution")?.value,
-                        repeatUse: summaryCards.find((s: any) => s.id === "repeatUse")?.value,
-                        summarySections: summaryCards.map((s: any) => ({
-                          id: s.id,
-                          label: s.label,
-                          value: s.value,
-                        })),
-                        steps: [
-                          locale === "es"
-                            ? "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina."
-                            : "Give the table below to your child's doctor. This says what happened when your child took penicillin.",
-                          locale === "es"
-                            ? "Lleve fotos de la reacción de su hijo a la consulta médica."
-                            : "Bring pictures of your child's reaction to the doctor's visit.",
-                          locale === "es"
-                            ? "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo."
-                            : "Ask your child's doctor if testing is right for your child.",
-                        ],
-                      });
-                    } catch (err) {
-                      console.error("PDF generation error:", err);
-                    }
+                  onNext={() => {
                     setShowSuccess(true);
                   }}
                 />
@@ -3156,7 +3125,17 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
 }
 
 export function Slide13SummaryScreen(props: any) {
-  const { isSpanish, answers, onSavePDF, onPrint, onBack, activeToken, onNext } = props;
+  const {
+    isSpanish,
+    answers,
+    onSavePDF,
+    onPrint,
+    onBack,
+    activeToken,
+    onNext,
+    participantId = props.activeToken,
+    onNavigateToSuccess = props.onNext,
+  } = props;
   const summaryTitleRef = useRef<HTMLHeadingElement>(null);
 
   // 1. Focus heading on mount so VoiceOver jumps straight to Action Steps
@@ -3268,49 +3247,46 @@ export function Slide13SummaryScreen(props: any) {
     },
   ];
 
-  const handleSavePDF = async () => {
-    if (onSavePDF) {
-      await onSavePDF(summaryCards);
-    } else {
-      try {
-        generateAssessmentPDF({
-          participantId: activeToken || undefined,
-          token: activeToken || undefined,
-          locale: isSpanish ? "es" : "en",
-          answers,
-          symptoms: symptomsFormatted,
-          age: typeof (answers?.ageAtReaction ?? answers?.screen6_2_timing) === "number"
-            ? (isSpanish ? `${answers.ageAtReaction ?? answers.screen6_2_timing} años` : `${answers.ageAtReaction ?? answers.screen6_2_timing} years old`)
-            : (answers?.ageAtReaction || answers?.screen6_2_timing 
-                ? (isSpanish ? `${answers.ageAtReaction || answers.screen6_2_timing} años` : `${answers.ageAtReaction || answers.screen6_2_timing} years old`)
-                : (isSpanish ? "17 años" : "17 years old")),
-          onset: answers?.onset || answers?.screen6_3_onset || "24+ hours",
-          medicalCare: medicalCareFormatted,
-          resolution: resolutionFormatted,
-          repeatUse: repeatUseFormatted,
-          summarySections: summaryCards.map((s) => ({
-            id: s.id,
-            label: s.label,
-            value: s.value,
-          })),
-          steps: [
-            isSpanish
-              ? "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina."
-              : "Give the table below to your child's doctor. This says what happened when your child took penicillin.",
-            isSpanish
-              ? "Lleve fotos de la reacción de su hijo a la consulta médica."
-              : "Bring pictures of your child's reaction to the doctor's visit.",
-            isSpanish
-              ? "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo."
-              : "Ask your child's doctor if testing is right for your child.",
-          ],
-        });
-      } catch (err) {
-        console.error("PDF generation error:", err);
-      }
-      if (onNext) {
-        onNext();
-      }
+  // Inside Slide 13 / SummaryScreen:
+  const handleCompleteAndSave = () => {
+    // 1. Generate and download the PDF
+    generateAssessmentPDF({
+      locale: isSpanish ? "es" : "en",
+      answers,
+      participantId: participantId || activeToken,
+      symptoms: symptomsFormatted,
+      age: typeof (answers?.ageAtReaction ?? answers?.screen6_2_timing) === "number"
+        ? (isSpanish ? `${answers.ageAtReaction ?? answers.screen6_2_timing} años` : `${answers.ageAtReaction ?? answers.screen6_2_timing} years old`)
+        : (answers?.ageAtReaction || answers?.screen6_2_timing 
+            ? (isSpanish ? `${answers.ageAtReaction || answers.screen6_2_timing} años` : `${answers.ageAtReaction || answers.screen6_2_timing} years old`)
+            : (isSpanish ? "17 años" : "17 years old")),
+      onset: answers?.onset || answers?.screen6_3_onset || (isSpanish ? "Más de 24 horas" : "More than 24 hours"),
+      medicalCare: medicalCareFormatted,
+      resolution: resolutionFormatted,
+      repeatUse: repeatUseFormatted,
+      summarySections: summaryCards.map((s) => ({
+        id: s.id,
+        label: s.label,
+        value: s.value,
+      })),
+      steps: [
+        isSpanish
+          ? "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina."
+          : "Give the table below to your child's doctor. This says what happened when your child took penicillin.",
+        isSpanish
+          ? "Lleve fotos de la reacción de su hijo a la consulta médica."
+          : "Bring pictures of your child's reaction to the doctor's visit.",
+        isSpanish
+          ? "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo."
+          : "Ask your child's doctor if testing is right for your child.",
+      ],
+    });
+    // 2. Direct clean transition to Success Screen without opening a flash dialog
+    // No temporary modal that gets cut off mid-speech!
+    if (onNavigateToSuccess) {
+      onNavigateToSuccess();
+    } else if (onNext) {
+      onNext();
     }
   };
 
@@ -3393,7 +3369,7 @@ export function Slide13SummaryScreen(props: any) {
         </button>
         <button
           type="button"
-          onClick={handleSavePDF}
+          onClick={handleCompleteAndSave}
           className="inline-flex items-center gap-2 px-8 py-3 min-h-[44px] rounded-full bg-[#132338] hover:bg-[#0c1827] text-white font-bold text-xs sm:text-sm shadow-md transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           <span aria-hidden="true">✓</span>

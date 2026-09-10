@@ -62,7 +62,7 @@ export function SuccessScreen({ locale, onSwitchLanguage, onClose }: SuccessScre
             >
               <span aria-hidden="true">🇺🇸</span>
               <span>English</span>
-            </button>
+            </button> 
             <button
               type="button"
               onClick={() => onSwitchLanguage("es")}

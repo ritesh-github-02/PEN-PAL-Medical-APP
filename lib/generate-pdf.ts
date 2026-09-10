@@ -89,7 +89,7 @@ export function generateAssessmentPDF(data: any): void {
 
   y += 15;
 
-  // Helper to resolve card values from direct props, summarySections, or defaults
+  // Helper to resolve card values from direct props, summarySections, answers, or defaults
   const resolveCardValue = (
     key: string,
     index: number,
@@ -103,6 +103,33 @@ export function generateAssessmentPDF(data: any): void {
       if (byId && byId.value) return String(byId.value);
       if (data.summarySections[index] && data.summarySections[index].value) {
         return String(data.summarySections[index].value);
+      }
+    }
+    if (data?.answers) {
+      const ans = data.answers;
+      if (key === "symptoms") {
+        const s = ans.symptoms || ans.screen6_1_symptoms;
+        if (s) return Array.isArray(s) ? s.join(", ") : String(s);
+      }
+      if (key === "age") {
+        const a = ans.ageAtReaction ?? ans.screen6_2_timing;
+        if (a !== undefined) return typeof a === "number" ? (isSpanish ? `${a} años` : `${a} years old`) : String(a);
+      }
+      if (key === "onset") {
+        const o = ans.onset || ans.screen6_3_onset;
+        if (o) return String(o);
+      }
+      if (key === "medicalCare") {
+        const m = ans.medicalCare || ans.screen6_4_resolution;
+        if (m) return String(m);
+      }
+      if (key === "resolution") {
+        const r = ans.resolution || ans.screen6_4b_resolution_type;
+        if (r) return String(r);
+      }
+      if (key === "repeatUse") {
+        const u = ans.repeatUse || ans.screen6_5_yetagain;
+        if (u) return String(u);
       }
     }
     return defaultValue;
