@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useParams } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, Link } from '@/routing';
+import { useRouter } from '@/routing';
 import { validateToken } from './actions';
 
 import { RotateCcw } from 'lucide-react';
@@ -426,15 +426,6 @@ export default function InterventionEntryPage() {
             ? 'Aviso de seguridad: Los enlaces y tokens de acceso son personales, están asegurados criptográficamente y protegen la integridad del estudio clínico.'
             : 'Security Notice: Participant links and access tokens are private, cryptographically verified, and protected for clinical study integrity.'}
         </p>
-        <div className="pt-1">
-          <Link
-            href="/admin"
-            className="text-[11px] font-semibold text-slate-500 hover:text-[#1d5c64] transition-colors inline-flex items-center gap-1 hover:underline"
-          >
-            <span>{locale === 'es' ? 'Portal de Administración' : 'Admin Portal'}</span>
-            <span aria-hidden="true">&rarr;</span>
-          </Link>
-        </div>
       </div>
     </main>
   );
