@@ -41,17 +41,27 @@ export function generateAssessmentPDF(data: any): void {
   const pageWidth = doc.internal.pageSize.getWidth(); // 612pt
   const margin = 40;
   const contentWidth = pageWidth - margin * 2; // 532pt
-  let y = 45;
+  let y = 46;
 
-  // 1. Title
+  // 1. Title & Clinical Header
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(15, 23, 42); // slate-900
   const title = isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents";
   doc.text(title, pageWidth / 2, y, { align: "center" });
-  y += 30;
+  y += 24;
 
-  // 2. Numbered Action Steps Box
+  // Professional Clinical Subtitle
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  doc.setTextColor(100, 116, 139); // slate-500
+  const subtitle = isSpanish 
+    ? "ESTUDIO CLÍNICO PEN-PAL • GUÍA DE DISCUSIÓN MÉDICA" 
+    : "PEN-PAL CLINICAL STUDY • DOCTOR DISCUSSION GUIDE";
+  doc.text(subtitle, pageWidth / 2, y, { align: "center" });
+  y += 26;
+
+  // 2. Numbered Action Steps (Spaced, Clean & Professional)
   const steps: string[] =
     Array.isArray(data?.steps) && data.steps.length > 0
       ? data.steps
@@ -67,27 +77,59 @@ export function generateAssessmentPDF(data: any): void {
           "Ask your child's doctor if testing is right for your child.",
         ];
 
+  const badgeRadius = 10;
+  const badgeX = margin + 14;
+  const textX = margin + 36;
+  const maxTextWidth = contentWidth - 44;
+
   steps.forEach((stepText, idx) => {
-    // Number circle
+    // Step text formatting
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(30, 41, 59); // slate-800
+    const splitText = doc.splitTextToSize(stepText, maxTextWidth);
+
+    const lineHeight = 15;
+    const textBlockHeight = splitText.length * lineHeight;
+    const itemHeight = Math.max(badgeRadius * 2, textBlockHeight);
+
+    // Number circle badge (vertically aligned with first line of text)
+    const badgeCenterY = y + 7.5;
     doc.setFillColor(239, 246, 255); // blue-50
     doc.setDrawColor(147, 197, 253); // blue-300
-    doc.circle(margin + 12, y - 4, 10, "FD");
+    doc.setLineWidth(0.75);
+    doc.circle(badgeX, badgeCenterY, badgeRadius, "FD");
 
+    // Badge Number
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(37, 99, 235); // blue-600
-    doc.text(String(idx + 1), margin + 12, y - 1, { align: "center" });
+    doc.text(String(idx + 1), badgeX, badgeCenterY + 3.5, { align: "center" });
 
-    // Step text
+    // Step text rendered with clean line height
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(51, 65, 85); // slate-700
-    const splitText = doc.splitTextToSize(stepText, contentWidth - 35);
-    doc.text(splitText, margin + 30, y);
-    y += splitText.length * 14 + 6;
+    doc.setFontSize(10.5);
+    doc.setTextColor(30, 41, 59);
+    doc.text(splitText, textX, y + 11);
+
+    // Generous vertical separation (item height + 14pt gap) so bullet points never touch or crowd
+    y += itemHeight + 14;
   });
 
-  y += 15;
+  // Section divider before Summary Cards
+  y += 6;
+  doc.setDrawColor(226, 232, 240); // slate-200
+  doc.setLineWidth(0.75);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 18;
+
+  // Section Header for the Clinical Cards
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9.5);
+  doc.setTextColor(71, 85, 105); // slate-600
+  const summaryHeader = isSpanish ? "RESUMEN DE LA REACCIÓN REPORTADA" : "REPORTED REACTION SUMMARY";
+  doc.text(summaryHeader, margin, y);
+  y += 14;
 
   // Helper to resolve card values from direct props, summarySections, answers, or defaults
   const resolveCardValue = (
@@ -148,22 +190,22 @@ export function generateAssessmentPDF(data: any): void {
     },
     {
       label: isSpanish ? "EDAD AL MOMENTO DE LA REACCIÓN" : "AGE AT REACTION",
-      value: resolveCardValue("age", 1, data?.age || "17 years old"),
+      value: resolveCardValue("age", 1, data?.age || (isSpanish ? "17 años" : "17 years old")),
     },
     {
       label: isSpanish ? "TIEMPO HASTA EL INICIO" : "TIME TO ONSET",
-      value: resolveCardValue("onset", 2, data?.onset || "More than 24 hours"),
+      value: resolveCardValue("onset", 2, data?.onset || (isSpanish ? "Más de 24 horas" : "More than 24 hours")),
     },
     {
       label: isSpanish ? "ATENCIÓN MÉDICA RECIBIDA" : "MEDICAL CARE RECEIVED",
-      value: resolveCardValue("medicalCare", 3, data?.medicalCare || "Yes (Primary care doctor)"),
+      value: resolveCardValue("medicalCare", 3, data?.medicalCare || (isSpanish ? "Sí (Médico de atención primaria)" : "Yes (Primary care doctor)")),
     },
     {
       label: isSpanish ? "RESOLUCIÓN DE SÍNTOMAS" : "SYMPTOM RESOLUTION",
       value: resolveCardValue(
         "resolution",
         4,
-        data?.resolution || "With medication (Allergy medicine (Benadryl, Zyrtec) - IV)"
+        data?.resolution || (isSpanish ? "Con medicamentos (Medicamento para la alergia (Benadryl, Zyrtec) - IV)" : "With medication (Allergy medicine (Benadryl, Zyrtec) - IV)")
       ),
     },
     {
@@ -171,7 +213,7 @@ export function generateAssessmentPDF(data: any): void {
       value: resolveCardValue(
         "repeatUse",
         5,
-        data?.repeatUse || "Yes (Yes, and they did not have a reaction)"
+        data?.repeatUse || (isSpanish ? "Sí (Sí, y no tuvieron ninguna reacción)" : "Yes (Yes, and they did not have a reaction)")
       ),
     },
   ];
@@ -185,55 +227,57 @@ export function generateAssessmentPDF(data: any): void {
     const rightValLines = rightCard ? doc.splitTextToSize(String(rightCard?.value || ""), colWidth - 24) : [];
 
     // Dynamic height based on content
-    const cardHeight = Math.max(leftValLines.length, rightValLines.length) * 14 + 45;
+    const cardHeight = Math.max(leftValLines.length, rightValLines.length, 1) * 14 + 44;
 
     // Draw Left Card Box
     doc.setFillColor(248, 250, 252); // slate-50 background
     doc.setDrawColor(226, 232, 240); // slate-200 border
-    doc.roundedRect(margin, y, colWidth, cardHeight, 10, 10, "FD");
+    doc.setLineWidth(0.75);
+    doc.roundedRect(margin, y, colWidth, cardHeight, 8, 8, "FD");
 
     // Left Card Label
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
     doc.setTextColor(100, 116, 139); // slate-500
-    doc.text(leftCard.label, margin + 14, y + 18);
+    doc.text(leftCard.label, margin + 14, y + 17);
 
     // Left Card Value
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10.5);
     doc.setTextColor(15, 23, 42); // slate-900
-    doc.text(leftValLines, margin + 14, y + 34);
+    doc.text(leftValLines, margin + 14, y + 33);
 
     // Draw Right Card Box (if exists)
     if (rightCard) {
       const rightX = margin + colWidth + 16;
       doc.setFillColor(248, 250, 252);
       doc.setDrawColor(226, 232, 240);
-      doc.roundedRect(rightX, y, colWidth, cardHeight, 10, 10, "FD");
+      doc.setLineWidth(0.75);
+      doc.roundedRect(rightX, y, colWidth, cardHeight, 8, 8, "FD");
 
       // Right Card Label
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8.5);
       doc.setTextColor(100, 116, 139);
-      doc.text(rightCard.label, rightX + 14, y + 18);
+      doc.text(rightCard.label, rightX + 14, y + 17);
 
       // Right Card Value
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10.5);
       doc.setTextColor(15, 23, 42);
-      doc.text(rightValLines, rightX + 14, y + 34);
+      doc.text(rightValLines, rightX + 14, y + 33);
     }
 
     y += cardHeight + 12;
   }
 
   // 4. Footer Note
-  y += 10;
+  y += 12;
   doc.setFont("helvetica", "italic");
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(148, 163, 184); // slate-400
   const footerText = isSpanish
-    ? "Documento generado por la plataforma del estudio PEN-PAL para revisión clínica."
+    ? "Documento generado por la plataforma del estudio PEN-PAL para revisión clínica con su proveedor de salud."
     : "Document generated by the PEN-PAL Study Platform for clinical review with your healthcare provider.";
   doc.text(footerText, pageWidth / 2, y, { align: "center" });
 
