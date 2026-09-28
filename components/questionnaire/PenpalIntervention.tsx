@@ -18,6 +18,21 @@ import AudioPlayer from "./AudioPlayer";
 import { NurseAnna } from "./NurseAnna";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
 import { SuccessScreen } from "./SuccessScreen";
+import { Slide12AgeCohortScreen } from "./Slide12AgeCohortScreen";
+import { Slide2MedicineNamingScreen } from "./Slide2MedicineNamingScreen";
+import { Slide3EfficacyScreen } from "./Slide3EfficacyScreen";
+import { Slide4AllergyBarrierScreen } from "./Slide4AllergyBarrierScreen";
+import { Slide5PrevalenceScreen } from "./Slide5PrevalenceScreen";
+import { Slide6MythTruthScreen } from "./Slide6MythTruthScreen";
+import { Slide8MilestoneScreen } from "./Slide8MilestoneScreen";
+import { Slide9WhyItMattersScreen } from "./Slide9WhyItMattersScreen";
+import { Slide10TestingOverviewScreen } from "./Slide10TestingOverviewScreen";
+import { Slide11SymptomsScreen } from "./Slide11SymptomsScreen";
+import { Slide13OnsetScreen } from "./Slide13OnsetScreen";
+import { Slide14MedicalCareScreen } from "./Slide14MedicalCareScreen";
+import { Slide16ResolutionScreen } from "./Slide16ResolutionScreen";
+import { Slide19RepeatUseScreen } from "./Slide19RepeatUseScreen";
+import { Slide21WhatNowScreen } from "./Slide21WhatNowScreen";
 import esMessages from "@/messages/es.json";
 import enMessages from "@/messages/en.json";
 
@@ -560,6 +575,7 @@ export default function PenpalIntervention() {
     );
   }
 
+  const medicationName = answers?.medicationName || answers?.screen2_naming || "";
   const content = locale === "es" ? currentStep.contentEs : currentStep.contentEn;
   const title = locale === "es" ? currentStep.titleEs : currentStep.titleEn;
   const description = locale === "es" ? currentStep.descriptionEs : currentStep.descriptionEn;
@@ -622,14 +638,20 @@ export default function PenpalIntervention() {
             <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]" aria-hidden="true"></span>
             <span className="font-black text-xs tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
             <span className="text-slate-300 text-xs" aria-hidden="true">|</span>
-            <span 
-              className="text-[11px] font-bold text-slate-700"
-              aria-label={locale === "es" ? `Progreso: Paso ${showSummary ? 13 : Math.min(currentStepIndex + 1, 13)} de 13` : `Progress: Step ${showSummary ? 13 : Math.min(currentStepIndex + 1, 13)} of 13`}
-            >
-              {locale === "es"
-                ? `Paso ${showSummary ? 13 : Math.min(currentStepIndex + 1, 13)} de 13`
-                : `Step ${showSummary ? 13 : Math.min(currentStepIndex + 1, 13)} of 13`}
-            </span>
+            {(() => {
+              const activeCount = questionnaireConfig.filter((s) => !s.isTerminal && s.id !== "screen_end").length + 1;
+              const displayStep = showSummary ? activeCount : Math.min(currentStepIndex + 1, activeCount);
+              return (
+                <span 
+                  className="text-[11px] font-bold text-slate-700"
+                  aria-label={locale === "es" ? `Progreso: Paso ${displayStep} de ${activeCount}` : `Progress: Step ${displayStep} of ${activeCount}`}
+                >
+                  {locale === "es"
+                    ? `Paso ${displayStep} de ${activeCount}`
+                    : `Step ${displayStep} of ${activeCount}`}
+                </span>
+              );
+            })()}
           </div>
 
           {/* Language Switcher Pill Button */}
@@ -637,9 +659,9 @@ export default function PenpalIntervention() {
         </header>
 
         <div className="w-full">
-          {/* Responsive Device Frame: Preserves Tablet/Mobile Bezel, Removes Border with Properly Visible Soft Shadow on Desktop */}
-          <div className="flex-1 w-full bg-zinc-900 lg:bg-transparent border-[6px] sm:border-[10px] lg:border-none border-zinc-900 rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-3xl shadow-2xl lg:shadow-[0_16px_40px_-8px_rgba(20,60,65,0.20),0_8px_20px_-4px_rgba(0,0,0,0.08)] relative p-0.5 lg:p-0 ring-1 lg:ring-0 ring-white/10 overflow-hidden">
-            <div className="rounded-[1.2rem] sm:rounded-[1.6rem] lg:rounded-3xl overflow-hidden">
+          {/* 100% Fluid Edge-to-Edge Responsive Container (Zero Simulated Hardware Bezels) */}
+          <div className="w-full relative overflow-visible">
+            <div className="w-full overflow-visible">
               {isTerminated ? (
                 <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg text-center max-w-xl mx-auto space-y-4 my-2">
                   <h2
@@ -679,109 +701,288 @@ export default function PenpalIntervention() {
                 />
               ) : (
                 <>
-                  {currentStep.type === "intro" && (
+                  {currentStep.id === "screen1_intro" ? (
                     <IntroScreen
                       {...baseProps}
                       onAnswer={handleAnswer}
                       onNoBranching={() => setIsTerminated(true)}
                     />
-                  )}
-                  {currentStep.type === "statistics" && (
-                    <StatisticsScreen {...baseProps} value={answers[currentStep.id]} onSelect={handleAnswer} />
-                  )}
-                  {currentStep.type === "knowledge_revelation" && (
-                    <KnowledgeRevelationScreen {...baseProps} options={currentStep.options} />
-                  )}
-                  {currentStep.type === "testing_info" && <TestingScreen {...baseProps} />}
-                  {currentStep.type === "multiple_choice" && (
-                    <SurveyMultipleChoice {...baseProps} options={currentStep.options} selected={answers[currentStep.id]} onSelect={handleAnswer} />
-                  )}
-                  {currentStep.id === "screen6_4_resolution" ? (
-                    <Slide10MedicalCareScreen
+                  ) : currentStep.id === "slide2_naming" ? (
+                    <Slide2MedicineNamingScreen
                       isSpanish={locale === "es"}
-                      selected={answers[currentStep.id]}
-                      locationSelected={answers["screen6_4_location"]}
+                      selected={answers["medicationName"] || answers["screen2_naming"]}
+                      onSelect={(val: string) => {
+                        setAnswers((prev) => {
+                          const updated = { ...prev, medicationName: val, screen2_naming: val };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("medicationName", val, 0).catch(() => {});
+                        logInteraction("MEDICINE_NAME_SELECT", { medicationName: val }, "/intervention/flow").catch(() => {});
+                      }}
+                      onNext={() => handleNext(answers["medicationName"] || answers["screen2_naming"])}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "slide3_efficacy" ? (
+                    <Slide3EfficacyScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      onNext={() => handleNext()}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "slide4_barrier" ? (
+                    <Slide4AllergyBarrierScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      onNext={() => handleNext()}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "slide5_prevalence" || currentStep.id === "screen2_statistics" ? (
+                    <Slide5PrevalenceScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      onNext={() => handleNext()}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "slide6_myths" || currentStep.id === "screen3_5_knowledge_test" || currentStep.id === "screen3_6_all_correct" ? (
+                    <Slide6MythTruthScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      revealedCards={answers["revealedMyths"] || []}
+                      onRevealedChange={(rev) => {
+                        setAnswers((prev) => {
+                          const updated = { ...prev, revealedMyths: rev };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("revealedMyths", JSON.stringify(rev), 0).catch(() => {});
+                      }}
+                      onNext={() => handleNext()}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "slide8_milestone" ? (
+                    <Slide8MilestoneScreen
+                      isSpanish={locale === "es"}
+                      onNext={() => handleNext()}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "slide9_why_it_matters" ? (
+                    <Slide9WhyItMattersScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      onNext={() => handleNext()}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "slide10_testing" || currentStep.id === "screen4_testing" ? (
+                    <Slide10TestingOverviewScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      onNext={() => handleNext()}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "screen6_1_symptoms" ? (
+                    <Slide11SymptomsScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      selectedSymptoms={Array.isArray(answers["screen6_1_symptoms"]) ? answers["screen6_1_symptoms"] : (answers["screen6_1_symptoms"] ? [answers["screen6_1_symptoms"]] : [])}
+                      symptomsOther={answers["symptomsOther"] || ""}
+                      rashDetails={answers["rashDetails"] || []}
+                      onSelectSymptoms={(syms) => {
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_1_symptoms: syms, symptoms: syms };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("screen6_1_symptoms", syms, 0).catch(() => {});
+                      }}
+                      onSymptomsOtherChange={(val) => {
+                        setAnswers((prev) => ({ ...prev, symptomsOther: val }));
+                        submitAnswer("symptomsOther", val, 0).catch(() => {});
+                      }}
+                      onRashDetailsChange={(details) => {
+                        setAnswers((prev) => ({ ...prev, rashDetails: details }));
+                        submitAnswer("rashDetails", details, 0).catch(() => {});
+                      }}
+                      onNext={() => handleNext(answers["screen6_1_symptoms"])}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "screen6_2_timing" ? (
+                    <Slide12AgeCohortScreen
+                      isSpanish={locale === "es"}
+                      selected={answers[currentStep.id] || answers["ageCohort"]}
+                      medicationName={answers["medicationName"] || answers["screen2_naming"]}
                       onSelect={(val: string) => {
                         handleAnswer(val);
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_2_timing: val, ageCohort: val };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("screen6_2_timing", val, 0).catch(() => {});
+                        logInteraction("QUESTION_ANSWER", { stepId: "screen6_2_timing", answer: val }, "/intervention/flow").catch(() => {});
+                      }}
+                      navProps={baseProps}
+                    />
+                  ) : currentStep.id === "screen6_3_onset" ? (
+                    <Slide13OnsetScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      selected={answers["screen6_3_onset"] || answers["onset"]}
+                      onSelect={(val: string) => {
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_3_onset: val, onset: val };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("screen6_3_onset", val, 0).catch(() => {});
+                        logInteraction("QUESTION_ANSWER", { stepId: "screen6_3_onset", answer: val }, "/intervention/flow").catch(() => {});
+                      }}
+                      onNext={() => handleNext(answers["screen6_3_onset"] || answers["onset"])}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "screen6_4_resolution" ? (
+                    <Slide14MedicalCareScreen
+                      isSpanish={locale === "es"}
+                      selected={answers["screen6_4_resolution"] || answers["medicalCareReceived"]}
+                      locationSelected={answers["screen6_4_location"] || answers["medicalCareLocation"]}
+                      onSelect={(val: string) => {
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_4_resolution: val, medicalCareReceived: val };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
                         submitAnswer("screen6_4_resolution", val, 0).catch(() => {});
-                        try {
-                          localStorage.setItem("penpal_progress", JSON.stringify({ ...answers, screen6_4_resolution: val }));
-                        } catch {}
                       }}
                       onLocationSelect={(loc: string) => {
                         setAnswers((prev) => {
-                          const updated = { ...prev, screen6_4_location: loc };
+                          const updated = { ...prev, screen6_4_location: loc, medicalCareLocation: loc };
                           try {
                             localStorage.setItem("penpal_progress", JSON.stringify(updated));
                           } catch {}
                           return updated;
                         });
                         submitAnswer("screen6_4_location", loc, 0).catch(() => {});
-                        logInteraction("MODAL_ANSWER", { modal: "screen6_4_location", location: loc, stepId: "screen6_4_resolution" }, "/intervention/flow").catch(() => {});
                       }}
-                      navProps={baseProps}
+                      onNext={() => handleNext(answers["screen6_4_resolution"] || answers["medicalCareReceived"])}
+                      onBack={handleBack}
+                      loading={loading}
                     />
                   ) : currentStep.id === "screen6_4b_resolution_type" ? (
-                    <Slide11MedicationScreen
+                    <Slide16ResolutionScreen
                       isSpanish={locale === "es"}
-                      selected={answers[currentStep.id]}
-                      medicineSelected={answers["screen6_4b_medicine"]}
-                      routeSelected={answers["screen6_4b_route"]}
+                      selected={answers["screen6_4b_resolution_type"] || answers["resolution"]}
+                      resolutionMedicines={answers["resolutionMedicines"] || (answers["screen6_4b_medicine"] ? [answers["screen6_4b_medicine"]] : [])}
+                      resolutionRoute={answers["screen6_4b_route"] || answers["resolutionRoute"]}
                       onSelect={(val: string) => {
-                        handleAnswer(val);
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_4b_resolution_type: val, resolution: val };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
                         submitAnswer("screen6_4b_resolution_type", val, 0).catch(() => {});
-                        try {
-                          localStorage.setItem("penpal_progress", JSON.stringify({ ...answers, screen6_4b_resolution_type: val }));
-                        } catch {}
                       }}
-                      onMedicineSelect={(med: string) => {
+                      onMedicinesSelect={(meds: string[]) => {
                         setAnswers((prev) => {
-                          const updated = { ...prev, screen6_4b_medicine: med };
+                          const updated = { ...prev, resolutionMedicines: meds, screen6_4b_medicine: meds[0] || "" };
                           try {
                             localStorage.setItem("penpal_progress", JSON.stringify(updated));
                           } catch {}
                           return updated;
                         });
-                        submitAnswer("screen6_4b_medicine", med, 0).catch(() => {});
-                        logInteraction("MODAL_ANSWER", { modal: "screen6_4b_medicine", medicine: med, stepId: "screen6_4b_resolution_type" }, "/intervention/flow").catch(() => {});
+                        submitAnswer("resolutionMedicines", meds, 0).catch(() => {});
                       }}
-                      onRouteSelect={(route: string) => {
+                      onRouteChange={(rt: string) => {
                         setAnswers((prev) => {
-                          const updated = { ...prev, screen6_4b_route: route };
+                          const updated = { ...prev, screen6_4b_route: rt, resolutionRoute: rt };
                           try {
                             localStorage.setItem("penpal_progress", JSON.stringify(updated));
                           } catch {}
                           return updated;
                         });
-                        submitAnswer("screen6_4b_route", route, 0).catch(() => {});
-                        logInteraction("MODAL_ANSWER", { modal: "screen6_4b_route", route, stepId: "screen6_4b_resolution_type" }, "/intervention/flow").catch(() => {});
+                        submitAnswer("screen6_4b_route", rt, 0).catch(() => {});
                       }}
-                      navProps={baseProps}
+                      onNext={() => handleNext(answers["screen6_4b_resolution_type"] || answers["resolution"])}
+                      onBack={handleBack}
+                      loading={loading}
                     />
                   ) : currentStep.id === "screen6_5_yetagain" ? (
-                    <Slide12RepeatUseScreen
+                    <Slide19RepeatUseScreen
                       isSpanish={locale === "es"}
-                      selected={answers[currentStep.id]}
-                      reactionDetailSelected={answers["screen6_5_reaction_detail"]}
+                      selected={answers["screen6_5_yetagain"] || answers["repeatPenicillin"]}
+                      reactionDetailSelected={answers["screen6_5_reaction_detail"] || answers["repeatPenicillinDetail"]}
                       onSelect={(val: string) => {
-                        handleAnswer(val);
-                        submitAnswer("screen6_5_yetagain", val, 0).catch(() => {});
-                        try {
-                          localStorage.setItem("penpal_progress", JSON.stringify({ ...answers, screen6_5_yetagain: val }));
-                        } catch {}
-                      }}
-                      onReactionDetailSelect={(detail: string) => {
                         setAnswers((prev) => {
-                          const updated = { ...prev, screen6_5_reaction_detail: detail };
+                          const updated = { ...prev, screen6_5_yetagain: val, repeatPenicillin: val };
                           try {
                             localStorage.setItem("penpal_progress", JSON.stringify(updated));
                           } catch {}
                           return updated;
                         });
-                        submitAnswer("screen6_5_reaction_detail", detail, 0).catch(() => {});
-                        logInteraction("MODAL_ANSWER", { modal: "screen6_5_reaction_detail", reactionDetail: detail, stepId: "screen6_5_yetagain" }, "/intervention/flow").catch(() => {});
+                        submitAnswer("screen6_5_yetagain", val, 0).catch(() => {});
                       }}
-                      navProps={baseProps}
+                      onReactionDetailSelect={(det: string) => {
+                        setAnswers((prev) => {
+                          const updated = { ...prev, screen6_5_reaction_detail: det, repeatPenicillinDetail: det };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("screen6_5_reaction_detail", det, 0).catch(() => {});
+                      }}
+                      onNext={() => handleNext(answers["screen6_5_yetagain"] || answers["repeatPenicillin"])}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.id === "slide21_what_now" ? (
+                    <Slide21WhatNowScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      onNext={() => {
+                        setShowSummary(true);
+                        if (typeof window !== "undefined") {
+                          const sp = new URLSearchParams(window.location.search);
+                          sp.set("report", "true");
+                          window.history.replaceState(null, "", `${window.location.pathname}?${sp.toString()}`);
+                        }
+                      }}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
+                  ) : currentStep.type === "summary" ? (
+                    <Slide13SummaryScreen
+                      isSpanish={locale === "es"}
+                      answers={answers}
+                      activeToken={activeToken}
+                      participantId={activeToken}
+                      onBack={handleBack}
+                      onPrint={() => window.print()}
+                      onNavigateToSuccess={() => setShowSuccess(true)}
+                      onNext={() => setShowSuccess(true)}
                     />
                   ) : currentStep.type === "single_choice" ? (
                     <SurveySingleChoice
@@ -789,31 +990,17 @@ export default function PenpalIntervention() {
                       stepId={currentStep.id}
                       options={currentStep.options}
                       selected={answers[currentStep.id]}
-                      locationSelected={answers["screen6_4_location"]}
-                      medicineSelected={answers["screen6_4b_medicine"]}
-                      routeSelected={answers["screen6_4b_route"]}
-                      reactionDetailSelected={answers["screen6_5_reaction_detail"]}
                       onSelect={handleAnswer}
-                      onLocationSelect={(loc) => {
-                        setAnswers((prev) => ({ ...prev, screen6_4_location: loc }));
-                      }}
-                      onMedicineSelect={(med) => {
-                        setAnswers((prev) => ({ ...prev, screen6_4b_medicine: med }));
-                      }}
-                      onRouteSelect={(route) => {
-                        setAnswers((prev) => ({ ...prev, screen6_4b_route: route }));
-                      }}
-                      onReactionDetailSelect={(detail) => {
-                        setAnswers((prev) => ({ ...prev, screen6_5_reaction_detail: detail }));
-                      }}
                     />
-                  ) : null}
-                  {currentStep.type === "slider" && (
-                    <SurveySlider {...baseProps} min={currentStep.min} max={currentStep.max} unit={locale === "es" ? currentStep.unitEs : currentStep.unitEn} selected={answers[currentStep.id]} onSelect={handleAnswer} />
-                  )}
-                  {currentStep.type === "text" && <TextScreen {...baseProps} />}
-                  {currentStep.type === "summary" && (
-                    <SummaryScreen {...baseProps} answers={answers} activeToken={activeToken} />
+                  ) : currentStep.type === "multiple_choice" ? (
+                    <SurveyMultipleChoice
+                      {...baseProps}
+                      options={currentStep.options}
+                      selected={answers[currentStep.id]}
+                      onSelect={handleAnswer}
+                    />
+                  ) : (
+                    <TextScreen {...baseProps} />
                   )}
                 </>
               )}
@@ -861,67 +1048,58 @@ function NavigationFooter({ onNext, loading, t, locale }: Omit<BaseScreenProps, 
 
 // ============ Screen Components ============
 
-function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale, headingRef, onNoBranching }: BaseScreenProps & { onAnswer: (val: string) => void; onNoBranching?: () => void }) {
+function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale, headingRef }: BaseScreenProps & { onAnswer: (val: string) => void; onNoBranching?: () => void }) {
   const isSpanish = locale === "es";
   const introSubtitle = description || (isSpanish ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
-  const mainContent = content ? content.split('\n\n')[0] : (isSpanish ? "Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños." : "This is nurse Anna. Anna is giving information about allergies to penicillin in kids.");
-  const questionPrompt = isSpanish ? "¿Quieres saber más?" : "Do you want to know more?";
+  const mainCopy = isSpanish
+    ? "¡Hola! Soy la enfermera Anna. Hablemos sobre las alergias a la penicilina en los niños."
+    : "Hi! I'm nurse Anna. Let's talk about penicillin allergies in kids.";
 
   return (
-    <div id="slide-content" className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden">
-      <div className="flex flex-row gap-3 sm:gap-6 items-center justify-between">
-        <div className="flex-1 min-w-0 space-y-4">
-          <div className="space-y-1">
-            <h1 
-              ref={headingRef}
-              tabIndex={-1}
-              style={{ outline: "none", boxShadow: "none" }}
-              className="text-4xl sm:text-5xl font-black text-[#1d5c64] tracking-tight font-display outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 select-none"
-            >
-              {title || "PEN–PAL"}
-            </h1>
-            <p className="text-base sm:text-lg font-bold text-[#1f382f]">{introSubtitle}</p>
-          </div>
-
-          <div className="text-[#1f382f] leading-relaxed whitespace-pre-line text-sm sm:text-base font-medium max-w-xl">
-            {mainContent}
-          </div>
-
-          <fieldset className="border-0 p-0 m-0 space-y-2.5 pt-1">
-            <legend className="text-base sm:text-lg font-bold text-[#1f382f] mb-2">{questionPrompt}</legend>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  onAnswer("yes");
-                  onNext("yes");
-                }}
-                disabled={loading}
-                aria-label={isSpanish ? "Sí, quiero saber más sobre la alergia a la penicilina" : "Yes, I want to learn more about penicillin allergy"}
-                className="px-6 py-2.5 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-xl font-bold text-sm transition shadow-sm active:scale-[0.98] no-print cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+    <div
+      id="slide-content"
+      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-5 sm:p-7 shadow-md relative overflow-hidden flex flex-col justify-between min-h-[440px] max-h-[85vh]"
+    >
+      <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col justify-center space-y-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex-1 space-y-3 text-left">
+            <div>
+              <h1
+                ref={headingRef}
+                tabIndex={-1}
+                className="text-3xl sm:text-4xl md:text-5xl font-black text-[#236f7a] tracking-tight font-display outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
               >
-                {loading ? "..." : (isSpanish ? "Sí" : t("yes"))}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onAnswer("no");
-                  if (onNoBranching) {
-                    onNoBranching();
-                  }
-                }}
-                disabled={loading}
-                aria-label={isSpanish ? "No, salir o finalizar" : "No, do not continue"}
-                className="px-6 py-2.5 min-h-[44px] bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] border border-[#71ad9d] rounded-xl font-bold text-sm transition active:scale-[0.98] no-print cursor-pointer shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-              >
-                {isSpanish ? "No" : t("no")}
-              </button>
+                PEN–PAL
+              </h1>
+              <p className="text-sm sm:text-base md:text-lg font-bold text-slate-800 mt-1">
+                {introSubtitle}
+              </p>
             </div>
-          </fieldset>
-        </div>
 
-        {/* Nurse Anna Illustration (Slide 1: Introduced to screen readers) */}
-        <NurseAnna size="lg" isDecorative={false} locale={locale} />
+            <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-700 leading-relaxed max-w-md">
+              {mainCopy}
+            </p>
+          </div>
+
+          <div className="shrink-0 flex items-center justify-center">
+            <NurseAnna size="lg" isDecorative={false} locale={locale} />
+          </div>
+        </div>
+      </div>
+
+      {/* Centered Yellow Pill CTA Button: "Get Started!" */}
+      <div className="flex justify-center pt-4 mt-3 border-t border-slate-200/60">
+        <button
+          type="button"
+          onClick={() => {
+            onAnswer("yes");
+            onNext("yes");
+          }}
+          disabled={loading}
+          className="px-8 py-2.5 min-h-[44px] rounded-full bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#d6be0e] font-bold text-xs sm:text-sm md:text-base shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+        >
+          {loading ? "..." : (isSpanish ? "¡Comenzar!" : "Get Started!")}
+        </button>
       </div>
     </div>
   );
@@ -3210,6 +3388,54 @@ export function Slide13SummaryScreen(props: any) {
     repeatUseFormatted = isSpanish ? "Sí" : "Yes";
   }
 
+  const rawAge = answers?.ageCohort || answers?.ageAtReaction || answers?.screen6_2_timing;
+  const formatAgeValue = (val: any) => {
+    if (val === undefined || val === null || val === "" || val === "none_selected") {
+      return isSpanish ? "No reportado" : "Not reported";
+    }
+    if (typeof val === "number") {
+      return isSpanish ? `${val} años` : `${val} years old`;
+    }
+    const valStr = String(val);
+    if (isSpanish) {
+      if (valStr.includes("Baby")) return "Bebé (0-12 meses)";
+      if (valStr.includes("Toddler")) return "Niño pequeño (1-3 años)";
+      if (valStr.includes("School")) return "Edad escolar (4-12 años)";
+      if (valStr.includes("Teen")) return "Adolescente (13-17 años)";
+      if (valStr.includes("Adult")) return "Adulto (18+)";
+      return !isNaN(Number(valStr)) ? `${valStr} años` : valStr;
+    } else {
+      if (!isNaN(Number(valStr)) && !valStr.includes("(") && !valStr.includes("year") && !valStr.includes("month")) {
+        return `${valStr} years old`;
+      }
+      return valStr;
+    }
+  };
+  const ageFormatted = formatAgeValue(rawAge);
+
+  const rawOnset = answers?.onset || answers?.screen6_3_onset;
+  const formatOnsetValue = (val: any) => {
+    if (!val || val === "none_selected") {
+      return isSpanish ? "No reportado" : "Not reported";
+    }
+    const valStr = String(val);
+    if (valStr.toLowerCase().includes("less") || valStr === "<1 hour" || valStr === "< 1 hour" || valStr === "less_than_1_hour") {
+      return isSpanish ? "<1 hora" : "<1 hour";
+    }
+    if (valStr.includes("1-24") || valStr === "1_to_24_hours" || valStr.toLowerCase().includes("1 to 24")) {
+      return isSpanish ? "1-24 horas" : "1-24 hours";
+    }
+    if (valStr.toLowerCase().includes("more than 24") || valStr === "24+ hours" || valStr === "more_than_24_hours" || valStr.includes("24+")) {
+      return isSpanish ? "Más de 24 horas" : "24+ hours";
+    }
+    if (valStr.toLowerCase().includes("unsure") || valStr.toLowerCase().includes("don't know") || valStr.toLowerCase().includes("sé")) {
+      return isSpanish ? "No estoy seguro/ No lo sé" : "Unsure/I don't know";
+    }
+    return valStr;
+  };
+  const onsetFormatted = formatOnsetValue(rawOnset);
+  const effectiveMedName = answers?.medicationName || answers?.screen2_naming || (isSpanish ? "penicilina" : "penicillin");
+
   const summaryCards = [
     {
       id: "symptoms",
@@ -3219,16 +3445,12 @@ export function Slide13SummaryScreen(props: any) {
     {
       id: "age",
       label: isSpanish ? "EDAD AL MOMENTO DE LA REACCIÓN" : "AGE AT REACTION",
-      value: typeof (answers?.ageAtReaction ?? answers?.screen6_2_timing) === "number"
-        ? (isSpanish ? `${answers.ageAtReaction ?? answers.screen6_2_timing} años` : `${answers.ageAtReaction ?? answers.screen6_2_timing} years old`)
-        : (answers?.ageAtReaction || answers?.screen6_2_timing 
-            ? (isSpanish ? `${answers.ageAtReaction || answers.screen6_2_timing} años` : `${answers.ageAtReaction || answers.screen6_2_timing} years old`)
-            : (isSpanish ? "17 años" : "17 years old")),
+      value: ageFormatted,
     },
     {
       id: "onset",
       label: isSpanish ? "TIEMPO HASTA EL INICIO" : "TIME TO ONSET",
-      value: answers?.onset || answers?.screen6_3_onset || "24+ hours",
+      value: onsetFormatted,
     },
     {
       id: "medicalCare",
@@ -3255,12 +3477,8 @@ export function Slide13SummaryScreen(props: any) {
       answers,
       participantId: participantId || activeToken,
       symptoms: symptomsFormatted,
-      age: typeof (answers?.ageAtReaction ?? answers?.screen6_2_timing) === "number"
-        ? (isSpanish ? `${answers.ageAtReaction ?? answers.screen6_2_timing} años` : `${answers.ageAtReaction ?? answers.screen6_2_timing} years old`)
-        : (answers?.ageAtReaction || answers?.screen6_2_timing 
-            ? (isSpanish ? `${answers.ageAtReaction || answers.screen6_2_timing} años` : `${answers.ageAtReaction || answers.screen6_2_timing} years old`)
-            : (isSpanish ? "17 años" : "17 years old")),
-      onset: answers?.onset || answers?.screen6_3_onset || (isSpanish ? "Más de 24 horas" : "More than 24 hours"),
+      age: ageFormatted,
+      onset: onsetFormatted,
       medicalCare: medicalCareFormatted,
       resolution: resolutionFormatted,
       repeatUse: repeatUseFormatted,
@@ -3271,8 +3489,8 @@ export function Slide13SummaryScreen(props: any) {
       })),
       steps: [
         isSpanish
-          ? "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina."
-          : "Give the table below to your child's doctor. This says what happened when your child took penicillin.",
+          ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
+          : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}.`,
         isSpanish
           ? "Lleve fotos de la reacción de su hijo a la consulta médica."
           : "Bring pictures of your child's reaction to the doctor's visit.",
@@ -3312,8 +3530,8 @@ export function Slide13SummaryScreen(props: any) {
           </span>
           <p>
             {isSpanish
-              ? "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina."
-              : "Give the table below to your child's doctor. This says what happened when your child took penicillin."}
+              ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
+              : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}.`}
           </p>
         </li>
         <li className="flex items-start gap-3">
@@ -3337,6 +3555,21 @@ export function Slide13SummaryScreen(props: any) {
           </p>
         </li>
       </ol>
+
+      {/* Doctor Discussion Prompt Callout Box */}
+      <div className="bg-[#e8f4f1] border-l-4 border-[#236f7a] p-4 sm:p-5 rounded-r-2xl shadow-xs space-y-2 max-w-2xl mx-auto w-full">
+        <div className="flex items-center gap-2">
+          <span className="text-[#236f7a] text-lg font-bold" aria-hidden="true">💬</span>
+          <h3 className="text-sm sm:text-base font-extrabold text-[#132338]">
+            {isSpanish ? "Qué decirle al médico de su hijo:" : "What to tell your child's doctor:"}
+          </h3>
+        </div>
+        <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed pl-6">
+          {isSpanish
+            ? "«Leí sobre las alergias a la penicilina en niños. La mayoría de los niños no son verdaderamente alérgicos. ¿Podríamos evaluar si mi hijo aún necesita esta etiqueta de alergia?»"
+            : '"I read about penicillin allergies in kids. Most children are not truly allergic. Could we evaluate whether my child still needs this allergy label?"'}
+        </p>
+      </div>
 
       {/* 3. CLEAN SEMANTIC CARD GRID (No <dl>, No <dt>, No empty terms!) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">

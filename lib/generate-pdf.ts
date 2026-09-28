@@ -62,17 +62,22 @@ export function generateAssessmentPDF(data: any): void {
   y += 26;
 
   // 2. Numbered Action Steps (Spaced, Clean & Professional)
+  const medName =
+    data?.answers?.medicationName ||
+    data?.medicationName ||
+    (isSpanish ? "penicilina" : "penicillin");
+
   const steps: string[] =
     Array.isArray(data?.steps) && data.steps.length > 0
       ? data.steps
       : isSpanish
       ? [
-          "Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó penicilina.",
+          `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${medName}.`,
           "Lleve fotos de la reacción de su hijo a la consulta médica.",
           "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo.",
         ]
       : [
-          "Give the table below to your child's doctor. This says what happened when your child took penicillin.",
+          `Give the table below to your child's doctor. This says what happened when your child took ${medName}.`,
           "Bring pictures of your child's reaction to the doctor's visit.",
           "Ask your child's doctor if testing is right for your child.",
         ];
@@ -112,16 +117,43 @@ export function generateAssessmentPDF(data: any): void {
     doc.setTextColor(30, 41, 59);
     doc.text(splitText, textX, y + 11);
 
-    // Generous vertical separation (item height + 14pt gap) so bullet points never touch or crowd
-    y += itemHeight + 14;
+    // Generous vertical separation
+    y += itemHeight + 12;
   });
 
+  // 2b. Doctor Discussion Prompt Callout Box (Slide 22 Specification)
+  y += 4;
+  const promptTitle = isSpanish
+    ? "CONSEJO PARA LA CONVERSACIÓN CON EL MÉDICO:"
+    : "DOCTOR DISCUSSION PROMPT:";
+  const promptQuote = isSpanish
+    ? '“Leí sobre las alergias a la penicilina en los niños. ¿Podríamos hablar sobre verificar si mi hijo realmente tiene una alergia?”'
+    : '“I read about penicillin allergies in kids. Could we talk about checking to see if my child really has an allergy?”';
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(26, 86, 96);
+  const promptLines = doc.splitTextToSize(promptQuote, contentWidth - 24);
+  const promptBoxHeight = promptLines.length * 13 + 22;
+
+  doc.setFillColor(240, 249, 250); // teal-50
+  doc.setDrawColor(162, 210, 216); // teal-300
+  doc.setLineWidth(0.75);
+  doc.roundedRect(margin, y, contentWidth, promptBoxHeight, 6, 6, "FD");
+
+  doc.text(promptTitle, margin + 12, y + 12);
+  doc.setFont("helvetica", "bolditalic");
+  doc.setFontSize(9.5);
+  doc.setTextColor(19, 44, 39);
+  doc.text(promptLines, margin + 12, y + 24);
+
+  y += promptBoxHeight + 14;
+
   // Section divider before Summary Cards
-  y += 6;
   doc.setDrawColor(226, 232, 240); // slate-200
   doc.setLineWidth(0.75);
   doc.line(margin, y, pageWidth - margin, y);
-  y += 18;
+  y += 16;
 
   // Section Header for the Clinical Cards
   doc.setFont("helvetica", "bold");
@@ -131,47 +163,123 @@ export function generateAssessmentPDF(data: any): void {
   doc.text(summaryHeader, margin, y);
   y += 14;
 
+  // Helper to sanitize raw values (prevent "none_selected" or "undefined" from leaking)
+  const sanitizeVal = (val: any): string | null => {
+    if (val === undefined || val === null) return null;
+    const s = String(val).trim();
+    if (
+      s === "" ||
+      s.toLowerCase() === "none_selected" ||
+      s.toLowerCase() === "undefined" ||
+      s.toLowerCase() === "null"
+    ) {
+      return null;
+    }
+    return s;
+  };
+
   // Helper to resolve card values from direct props, summarySections, answers, or defaults
   const resolveCardValue = (
     key: string,
     index: number,
     defaultValue: string
   ): string => {
-    if (data?.[key] !== undefined && data?.[key] !== null && String(data[key]).trim() !== "") {
-      return String(data[key]);
-    }
+    const directVal = sanitizeVal(data?.[key]);
+    if (directVal) return directVal;
+
     if (Array.isArray(data?.summarySections) && data.summarySections.length > 0) {
       const byId = data.summarySections.find((s: any) => s.id === key);
-      if (byId && byId.value) return String(byId.value);
-      if (data.summarySections[index] && data.summarySections[index].value) {
-        return String(data.summarySections[index].value);
-      }
+      const byIdVal = sanitizeVal(byId?.value);
+      if (byIdVal) return byIdVal;
+      const byIndexVal = sanitizeVal(data.summarySections[index]?.value);
+      if (byIndexVal) return byIndexVal;
     }
+
     if (data?.answers) {
       const ans = data.answers;
       if (key === "symptoms") {
         const s = ans.symptoms || ans.screen6_1_symptoms;
-        if (s) return Array.isArray(s) ? s.join(", ") : String(s);
+        if (s) {
+          const list: string[] = Array.isArray(s) ? s : [String(s)];
+          const cleanList = list.filter((item) => sanitizeVal(item) !== null);
+          if (cleanList.length > 0) {
+            let res = cleanList.join(", ");
+            if (ans.rashDetails && Array.isArray(ans.rashDetails) && ans.rashDetails.length > 0) {
+              res = res.replace(/Rash/i, `Rash (${ans.rashDetails.join(", ")})`);
+            }
+            if (ans.symptomsOther) {
+              res += `, Other: ${ans.symptomsOther}`;
+            }
+            return res;
+          }
+        }
+        return isSpanish ? "Ninguno reportado" : "None reported";
       }
       if (key === "age") {
-        const a = ans.ageAtReaction ?? ans.screen6_2_timing;
-        if (a !== undefined) return typeof a === "number" ? (isSpanish ? `${a} años` : `${a} years old`) : String(a);
+        const a = ans.ageCohort ?? ans.ageAtReaction ?? ans.screen6_2_timing;
+        if (a !== undefined && a !== null && a !== "") {
+          if (typeof a === "number") return isSpanish ? `${a} años` : `${a} years old`;
+          const aStr = String(a);
+          if (isSpanish) {
+            if (aStr.includes("Baby")) return "Bebé (0-12 meses)";
+            if (aStr.includes("Toddler")) return "Niño pequeño (1-3 años)";
+            if (aStr.includes("School")) return "Edad escolar (4-12 años)";
+            if (aStr.includes("Teen")) return "Adolescente (13-17 años)";
+            if (aStr.includes("Adult")) return "Adulto (18+)";
+            return !isNaN(Number(aStr)) ? `${aStr} años` : aStr;
+          }
+          if (!isNaN(Number(aStr)) && !aStr.includes("(") && !aStr.includes("year") && !aStr.includes("month")) {
+            return `${aStr} years old`;
+          }
+          return aStr;
+        }
       }
       if (key === "onset") {
-        const o = ans.onset || ans.screen6_3_onset;
-        if (o) return String(o);
+        const o = sanitizeVal(ans.onset || ans.screen6_3_onset);
+        if (o) {
+          if (isSpanish) {
+            if (o === "Less than 1 hour" || o === "<1 hour") return "<1 hora";
+            if (o === "1-24 hours") return "1-24 horas";
+            if (o === "More than 24 hours" || o === "24+ hours") return "Más de 24 horas";
+            if (o.startsWith("Unsure")) return "No estoy seguro/No sé";
+          } else {
+            if (o === "Less than 1 hour") return "<1 hour";
+          }
+          return o;
+        }
+        return isSpanish ? "No reportado" : "Not reported";
       }
       if (key === "medicalCare") {
-        const m = ans.medicalCare || ans.screen6_4_resolution;
-        if (m) return String(m);
+        const m = sanitizeVal(ans.medicalCare || ans.screen6_4_resolution);
+        if (m) {
+          const loc = sanitizeVal(ans.locationSelected || ans.screen6_4_location);
+          if ((m === "Yes" || m === "Sí") && loc) {
+            return isSpanish ? `Sí (${loc})` : `Yes (${loc})`;
+          }
+          return isSpanish ? (m === "Yes" ? "Sí" : m) : m;
+        }
       }
       if (key === "resolution") {
-        const r = ans.resolution || ans.screen6_4b_resolution_type;
-        if (r) return String(r);
+        const r = sanitizeVal(ans.resolution || ans.screen6_4b_resolution_type);
+        if (r) {
+          const med = sanitizeVal(ans.medicineSelected || ans.screen6_4b_medicine);
+          const rt = sanitizeVal(ans.routeSelected || ans.screen6_4b_route);
+          if ((r === "With medication" || r === "Con medicamentos") && (med || rt)) {
+            const extra = [med, rt].filter(Boolean).join(" - ");
+            return isSpanish ? `Con medicamentos (${extra})` : `With medication (${extra})`;
+          }
+          return isSpanish ? (r === "With medication" ? "Con medicamentos" : r) : r;
+        }
       }
       if (key === "repeatUse") {
-        const u = ans.repeatUse || ans.screen6_5_yetagain;
-        if (u) return String(u);
+        const u = sanitizeVal(ans.repeatUse || ans.screen6_5_yetagain);
+        if (u) {
+          const d = sanitizeVal(ans.reactionDetailSelected || ans.screen6_5_reaction_detail);
+          if ((u === "Yes" || u === "Sí") && d) {
+            return isSpanish ? `Sí (${d})` : `Yes (${d})`;
+          }
+          return isSpanish ? (u === "Yes" ? "Sí" : u) : u;
+        }
       }
     }
     return defaultValue;
@@ -185,7 +293,7 @@ export function generateAssessmentPDF(data: any): void {
       value: resolveCardValue(
         "symptoms",
         0,
-        data?.symptoms || "Rash, Fainting or dizziness, Fever (new fever or worse fever), Joint pain, Muscle aches"
+        data?.symptoms || (isSpanish ? "Ninguno reportado" : "None reported")
       ),
     },
     {
@@ -194,18 +302,18 @@ export function generateAssessmentPDF(data: any): void {
     },
     {
       label: isSpanish ? "TIEMPO HASTA EL INICIO" : "TIME TO ONSET",
-      value: resolveCardValue("onset", 2, data?.onset || (isSpanish ? "Más de 24 horas" : "More than 24 hours")),
+      value: resolveCardValue("onset", 2, data?.onset || (isSpanish ? "Más de 24 horas" : "24+ hours")),
     },
     {
       label: isSpanish ? "ATENCIÓN MÉDICA RECIBIDA" : "MEDICAL CARE RECEIVED",
-      value: resolveCardValue("medicalCare", 3, data?.medicalCare || (isSpanish ? "Sí (Médico de atención primaria)" : "Yes (Primary care doctor)")),
+      value: resolveCardValue("medicalCare", 3, data?.medicalCare || (isSpanish ? "No" : "No")),
     },
     {
       label: isSpanish ? "RESOLUCIÓN DE SÍNTOMAS" : "SYMPTOM RESOLUTION",
       value: resolveCardValue(
         "resolution",
         4,
-        data?.resolution || (isSpanish ? "Con medicamentos (Medicamento para la alergia (Benadryl, Zyrtec) - IV)" : "With medication (Allergy medicine (Benadryl, Zyrtec) - IV)")
+        data?.resolution || (isSpanish ? "Por sí sola" : "On its own")
       ),
     },
     {
@@ -213,7 +321,7 @@ export function generateAssessmentPDF(data: any): void {
       value: resolveCardValue(
         "repeatUse",
         5,
-        data?.repeatUse || (isSpanish ? "Sí (Sí, y no tuvieron ninguna reacción)" : "Yes (Yes, and they did not have a reaction)")
+        data?.repeatUse || (isSpanish ? "No" : "No")
       ),
     },
   ];

@@ -91,30 +91,76 @@ export async function POST(req: NextRequest) {
 
     const { eventType, eventData, stepId, stepIndex, durationMs, isNewVisit, path, isComplete } = body;
 
+    // Verify foreign keys exist to avoid constraint violation errors (P2003)
+    let validParticipantId: string | null = null;
+    if (participantId) {
+      const p = await prisma.participant.findUnique({
+        where: { id: participantId },
+        select: { id: true },
+      }).catch(() => null);
+      if (p) validParticipantId = p.id;
+    }
+
+    let validSessionId: string | null = null;
+    if (sessionId) {
+      const s = await prisma.session.findUnique({
+        where: { id: sessionId },
+        select: { id: true },
+      }).catch(() => null);
+      if (s) validSessionId = s.id;
+    }
+
+    // Auto-heal session association if participant is valid but session is stale/missing
+    if (validParticipantId && !validSessionId) {
+      const activeSession = await prisma.session.findFirst({
+        where: { participantId: validParticipantId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      }).catch(() => null);
+      if (activeSession) {
+        validSessionId = activeSession.id;
+      } else {
+        const createdSession = await prisma.session.create({
+          data: {
+            participantId: validParticipantId,
+            status: 'IN_PROGRESS',
+            startTime: new Date(),
+          },
+          select: { id: true },
+        }).catch(() => null);
+        if (createdSession) {
+          validSessionId = createdSession.id;
+        }
+      }
+      sessionId = validSessionId;
+    }
+
     // 1. Log generic interaction event
     if (eventType) {
-      if (participantId || sessionId) {
+      if (validParticipantId || validSessionId) {
         await prisma.eventLog.create({
           data: {
-            participantId: participantId || null,
-            sessionId: sessionId || null,
+            participantId: validParticipantId,
+            sessionId: validSessionId,
             eventType: eventType,
             eventData: eventData ? JSON.stringify(eventData) : null,
             path: path || null,
             ipAddress,
             userAgent,
           },
+        }).catch((err) => {
+          console.warn('Failed to log interaction event:', err);
         });
       }
     }
 
     // 2. Record duration metrics (for slides or control page)
-    if (durationMs && durationMs > 50 && participantId && stepId) {
+    if (durationMs && durationMs > 50 && validParticipantId && stepId) {
       const isVisit = Boolean(isNewVisit);
       await prisma.slideMetric.upsert({
         where: {
           participantId_stepId: {
-            participantId,
+            participantId: validParticipantId,
             stepId,
           },
         },
@@ -123,20 +169,20 @@ export async function POST(req: NextRequest) {
           ...(isVisit ? { visitCount: { increment: 1 } } : {}),
         },
         create: {
-          participantId,
+          participantId: validParticipantId,
           stepId,
           stepIndex: stepIndex || 0,
           durationMs: Math.round(durationMs),
           visitCount: 1,
         },
-      });
+      }).catch(() => {});
     }
 
     // 3. Update session duration & heartbeat
-    if (sessionId) {
+    if (validSessionId) {
       const additionalSeconds = durationMs ? Math.round(durationMs / 1000) : 0;
       await prisma.session.update({
-        where: { id: sessionId },
+        where: { id: validSessionId },
         data: {
           updatedAt: new Date(),
           durationSeconds: additionalSeconds > 0 ? { increment: additionalSeconds } : undefined,

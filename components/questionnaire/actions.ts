@@ -8,7 +8,8 @@ import { questionnaireConfig } from '@/config/questionnaire';
 // submitAnswer
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function submitAnswer(questionId: string, answerValue: string, timeSpentMs?: number, metadata?: string) {
+export async function submitAnswer(questionId: string, answerValue: string | string[], timeSpentMs?: number, metadata?: string) {
+  const finalValue = typeof answerValue === 'object' ? JSON.stringify(answerValue) : String(answerValue);
   const cookieStore = await cookies();
   const participantId = cookieStore.get('penpal_participant')?.value;
 
@@ -18,6 +19,16 @@ export async function submitAnswer(questionId: string, answerValue: string, time
   }
 
   try {
+    const participantExists = await prisma.participant.findUnique({
+      where: { id: participantId },
+      select: { id: true },
+    }).catch(() => null);
+
+    if (!participantExists) {
+      console.warn('Participant not found for submitAnswer.');
+      return;
+    }
+
     await prisma.questionnaireResponse.upsert({
       where: {
         participantId_questionId: {
@@ -26,14 +37,14 @@ export async function submitAnswer(questionId: string, answerValue: string, time
         },
       },
       update: {
-        answerValue: answerValue,
+        answerValue: finalValue,
         timeSpentMs: timeSpentMs ? { increment: timeSpentMs } : undefined,
         ...(metadata !== undefined ? { metadata } : {}),
       },
       create: {
         participantId: participantId,
         questionId: questionId,
-        answerValue: answerValue,
+        answerValue: finalValue,
         timeSpentMs: timeSpentMs || 0,
         metadata: metadata || null,
       },
@@ -57,6 +68,13 @@ export async function recordSlideTiming(stepId: string, stepIndex: number, durat
   if (!participantId || !stepId || durationMs < 50) return;
 
   try {
+    const participantExists = await prisma.participant.findUnique({
+      where: { id: participantId },
+      select: { id: true },
+    }).catch(() => null);
+
+    if (!participantExists) return;
+
     await prisma.slideMetric.upsert({
       where: {
         participantId_stepId: {
@@ -120,27 +138,75 @@ async function enforceSessionIP(): Promise<EnforceSessionIPResult> {
   const participantId = cookieStore.get('penpal_participant')?.value;
   const sessionId = cookieStore.get('penpal_session')?.value;
 
-  if (!participantId || !sessionId) {
+  if (!participantId) {
     return { ok: false, reason: 'No active session', sessionId: null, participantId: null };
+  }
+
+  let participant = null;
+  try {
+    participant = await prisma.participant.findUnique({
+      where: { id: participantId },
+      select: { id: true },
+    });
+  } catch {
+    return { ok: true, sessionId: sessionId || null, participantId };
+  }
+
+  if (!participant) {
+    cookieStore.delete('penpal_session');
+    cookieStore.delete('penpal_participant');
+    return { ok: false, reason: 'Participant not found', sessionId: null, participantId: null };
   }
 
   let session: { id: string; ipFingerprint: string | null } | null = null;
 
-  try {
-    session = await prisma.session.findUnique({
-      where: { id: sessionId },
-      select: { id: true, ipFingerprint: true },
-    });
-  } catch {
-    // DB unreachable in preview — allow through
-    return { ok: true, sessionId, participantId };
+  if (sessionId) {
+    try {
+      session = await prisma.session.findUnique({
+        where: { id: sessionId },
+        select: { id: true, ipFingerprint: true },
+      });
+    } catch {
+      return { ok: true, sessionId, participantId };
+    }
   }
 
+  // Auto-heal session if session is missing or invalid
   if (!session) {
-    return { ok: false, reason: 'Session not found', sessionId, participantId };
+    try {
+      const latest = await prisma.session.findFirst({
+        where: { participantId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, ipFingerprint: true },
+      });
+
+      if (latest) {
+        session = latest;
+      } else {
+        session = await prisma.session.create({
+          data: {
+            participantId,
+            status: 'IN_PROGRESS',
+            startTime: new Date(),
+          },
+          select: { id: true, ipFingerprint: true },
+        });
+      }
+
+      const isProd = process.env.NODE_ENV === 'production';
+      cookieStore.set('penpal_session', session.id, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 2,
+        path: '/',
+      });
+    } catch {
+      return { ok: true, sessionId: sessionId || null, participantId };
+    }
   }
 
-  return { ok: true, sessionId, participantId };
+  return { ok: true, sessionId: session.id, participantId };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -274,13 +340,30 @@ export async function completeQuestionnaire() {
   const participantId = cookieStore.get('penpal_participant')?.value;
   const sessionId = cookieStore.get('penpal_session')?.value;
 
-  if (!participantId || !sessionId) return;
+  if (!participantId) return;
 
   try {
-    const session = await prisma.session.findUnique({
-      where: { id: sessionId },
-      select: { startTime: true },
-    });
+    const participant = await prisma.participant.findUnique({
+      where: { id: participantId },
+      select: { id: true },
+    }).catch(() => null);
+
+    if (!participant) return;
+
+    let session = sessionId
+      ? await prisma.session.findUnique({
+          where: { id: sessionId },
+          select: { id: true, startTime: true },
+        }).catch(() => null)
+      : null;
+
+    if (!session) {
+      session = await prisma.session.findFirst({
+        where: { participantId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, startTime: true },
+      }).catch(() => null);
+    }
 
     const now = new Date();
     let durationSeconds = 0;
@@ -288,29 +371,31 @@ export async function completeQuestionnaire() {
       durationSeconds = Math.max(0, Math.round((now.getTime() - new Date(session.startTime).getTime()) / 1000));
     }
 
-    await prisma.session.update({
-      where: { id: sessionId },
-      data: {
-        status: 'COMPLETED',
-        endTime: now,
-        durationSeconds: durationSeconds > 0 ? durationSeconds : undefined,
-      },
-    });
+    if (session) {
+      await prisma.session.update({
+        where: { id: session.id },
+        data: {
+          status: 'COMPLETED',
+          endTime: now,
+          durationSeconds: durationSeconds > 0 ? durationSeconds : undefined,
+        },
+      }).catch(() => {});
+    }
 
     await prisma.participant.update({
       where: { id: participantId },
       data: { status: 'COMPLETED' },
-    });
+    }).catch(() => {});
 
     await prisma.participantToken.updateMany({
       where: { participantId },
       data: { status: 'CONSUMED', consumedAt: now },
-    });
+    }).catch(() => {});
 
     await prisma.eventLog.create({
       data: {
         participantId,
-        sessionId,
+        sessionId: session?.id || null,
         eventType: 'ASSESSMENT_COMPLETED',
         eventData: JSON.stringify({ durationSeconds }),
         path: '/intervention/flow',

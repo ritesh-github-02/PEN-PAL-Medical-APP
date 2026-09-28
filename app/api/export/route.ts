@@ -5,23 +5,27 @@ import { parseUserAgent } from '@/lib/device-detector';
 
 const STUDY_SLIDES_CONFIG = [
   { id: 'screen1_intro', slideNumber: 1, title: 'Introduction & Consent Briefing', type: 'Intro' },
-  { id: 'screen2_statistics', slideNumber: 2, title: 'Safety Statistics (100 Kids)', type: 'Statistics' },
-  { id: 'screen3_5_knowledge_test', slideNumber: 3, title: 'Penicillin Knowledge Quiz', type: 'Quiz' },
-  { id: 'screen3_6_all_correct', slideNumber: 4, title: 'Penicillin Statements Verified', type: 'Education' },
-  { id: 'screen4_testing', slideNumber: 5, title: 'Allergy Testing Education', type: 'Education' },
-  { id: 'screen6_survey_intro', slideNumber: 6, title: 'Clinical Survey Overview', type: 'Info' },
-  { id: 'screen6_1_symptoms', slideNumber: 7, title: 'Reported Symptoms Assessment', type: 'Question' },
-  { id: 'screen6_2_timing', slideNumber: 8, title: 'Age at Reaction (Slider)', type: 'Question' },
-  { id: 'screen6_3_onset', slideNumber: 9, title: 'Time to Symptom Onset', type: 'Question' },
-  { id: 'screen6_4_resolution', slideNumber: 10, title: 'Medical Care Received', type: 'Question' },
-  { id: 'screen6_4_location', slideNumber: 10, title: 'Medical Care Location (Modal)', type: 'Question' },
-  { id: 'screen6_4b_resolution_type', slideNumber: 11, title: 'Reaction Resolution Method', type: 'Question' },
-  { id: 'screen6_4b_medicine', slideNumber: 11, title: 'Resolution Medication (Modal Step 1)', type: 'Question' },
-  { id: 'screen6_4b_route', slideNumber: 11, title: 'Medication Intake Route (Modal Step 2)', type: 'Question' },
-  { id: 'screen6_5_yetagain', slideNumber: 12, title: 'Subsequent Penicillin Exposure', type: 'Question' },
-  { id: 'screen6_5_reaction_detail', slideNumber: 12, title: 'Subsequent Reaction History (Modal)', type: 'Question' },
-  { id: 'screen7_summary', slideNumber: 13, title: 'Action Steps & Clinical Summary', type: 'Summary' },
-  { id: 'screen_end', slideNumber: 14, title: 'Non-Participant End Screen', type: 'Exit' },
+  { id: 'screen2_naming', slideNumber: 2, title: 'Medication Naming', type: 'Question' },
+  { id: 'screen2_statistics', slideNumber: 5, title: 'Safety Statistics (95% Not Allergic)', type: 'Statistics' },
+  { id: 'screen3_5_knowledge_test', slideNumber: 6, title: 'Penicillin Myths & Facts', type: 'Quiz' },
+  { id: 'screen3_6_all_correct', slideNumber: 7, title: 'Penicillin Statements Verified', type: 'Education' },
+  { id: 'screen4_testing', slideNumber: 10, title: 'Allergy Testing Education', type: 'Education' },
+  { id: 'screen6_survey_intro', slideNumber: 10, title: 'Clinical Survey Overview', type: 'Info' },
+  { id: 'screen6_1_symptoms', slideNumber: 11, title: 'Reported Symptoms Assessment', type: 'Question' },
+  { id: 'symptomsOther', slideNumber: 11, title: 'Other Symptoms Described', type: 'Question' },
+  { id: 'rashDetails', slideNumber: 11, title: 'Rash Characteristics (Modal 11B)', type: 'Question' },
+  { id: 'screen6_2_timing', slideNumber: 12, title: 'Age Cohort at Reaction', type: 'Question' },
+  { id: 'screen6_3_onset', slideNumber: 13, title: 'Time to Symptom Onset', type: 'Question' },
+  { id: 'screen6_4_resolution', slideNumber: 14, title: 'Medical Care Received', type: 'Question' },
+  { id: 'screen6_4_location', slideNumber: 15, title: 'Medical Care Location (Modal 15)', type: 'Question' },
+  { id: 'screen6_4b_resolution_type', slideNumber: 16, title: 'Reaction Resolution Method', type: 'Question' },
+  { id: 'resolutionMedicines', slideNumber: 17, title: 'Resolution Medications (Modal 17)', type: 'Question' },
+  { id: 'screen6_4b_medicine', slideNumber: 17, title: 'Resolution Medication (Modal Step 1)', type: 'Question' },
+  { id: 'screen6_4b_route', slideNumber: 18, title: 'Medication Intake Route (Modal 18)', type: 'Question' },
+  { id: 'screen6_5_yetagain', slideNumber: 19, title: 'Subsequent Penicillin Exposure', type: 'Question' },
+  { id: 'screen6_5_reaction_detail', slideNumber: 20, title: 'Subsequent Reaction History (Modal 20)', type: 'Question' },
+  { id: 'screen7_summary', slideNumber: 22, title: 'Action Steps & Clinical Summary', type: 'Summary' },
+  { id: 'screen_end', slideNumber: 23, title: 'Non-Participant End Screen', type: 'Exit' },
   { id: 'control_baseline_page', slideNumber: 1, title: 'Educational Handout Website (Control Arm)', type: 'Handout' },
 ];
 
@@ -102,7 +106,16 @@ function formatAnswerValue(questionId: string, rawVal: any, allResponses?: any[]
   }
 
   if (questionId === 'screen6_2_timing') {
-    return `${rawVal} years old`;
+    const valStr = String(rawVal).toLowerCase();
+    if (valStr === 'baby') return 'Baby (< 1 year)';
+    if (valStr === 'toddler') return 'Toddler (1-3 years)';
+    if (valStr === 'school') return 'School-aged (4-12 years)';
+    if (valStr === 'teen') return 'Teen (13-17 years)';
+    if (valStr === 'adult') return 'Adult (18+ years)';
+    if (typeof rawVal === 'number' || (!isNaN(Number(rawVal)) && !String(rawVal).includes('('))) {
+      return `${rawVal} years old`;
+    }
+    return String(rawVal);
   }
 
   // Handle compound formatting if allResponses is provided
@@ -115,7 +128,7 @@ function formatAnswerValue(questionId: string, rawVal: any, allResponses?: any[]
     }
 
     if (questionId === 'screen6_4b_resolution_type' && (rawVal === 'With medication' || String(rawVal).toLowerCase().includes('medication'))) {
-      const medResp = allResponses.find((r: any) => r.questionId === 'screen6_4b_medicine');
+      const medResp = allResponses.find((r: any) => r.questionId === 'resolutionMedicines' || r.questionId === 'screen6_4b_medicine');
       const routeResp = allResponses.find((r: any) => r.questionId === 'screen6_4b_route');
       const med = medResp?.answerValue;
       const route = routeResp?.answerValue;
@@ -158,13 +171,17 @@ export async function GET(request: Request) {
       const whereClause = participantId ? { participantId } : {};
       const questionIds = [
         'screen1_intro',
+        'screen2_naming',
         'screen3_5_knowledge_test',
         'screen6_1_symptoms',
+        'symptomsOther',
+        'rashDetails',
         'screen6_2_timing',
         'screen6_3_onset',
         'screen6_4_resolution',
         'screen6_4_location',
         'screen6_4b_resolution_type',
+        'resolutionMedicines',
         'screen6_4b_medicine',
         'screen6_4b_route',
         'screen6_5_yetagain',

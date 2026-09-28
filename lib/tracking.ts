@@ -21,11 +21,42 @@ export async function logInteraction(eventType: string, eventData: any, path: st
       userAgent = h.get('user-agent') || 'unknown';
     } catch {}
 
+    // Verify foreign keys exist to avoid constraint violation errors (P2003)
+    let validParticipantId: string | null = null;
+    if (participantId) {
+      const p = await prisma.participant.findUnique({
+        where: { id: participantId },
+        select: { id: true },
+      }).catch(() => null);
+      if (p) validParticipantId = p.id;
+    }
+
+    let validSessionId: string | null = null;
+    if (sessionId) {
+      const s = await prisma.session.findUnique({
+        where: { id: sessionId },
+        select: { id: true },
+      }).catch(() => null);
+      if (s) validSessionId = s.id;
+    }
+
+    // Auto-heal session association if participant is valid but session is stale/missing
+    if (validParticipantId && !validSessionId) {
+      const activeSession = await prisma.session.findFirst({
+        where: { participantId: validParticipantId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      }).catch(() => null);
+      if (activeSession) {
+        validSessionId = activeSession.id;
+      }
+    }
+
     try {
       await prisma.eventLog.create({
         data: {
-          participantId: participantId || null,
-          sessionId: sessionId || null,
+          participantId: validParticipantId,
+          sessionId: validSessionId,
           eventType: eventType,
           eventData: eventData ? JSON.stringify(eventData) : null,
           path: path || null,
@@ -34,7 +65,7 @@ export async function logInteraction(eventType: string, eventData: any, path: st
         },
       });
     } catch (createErr: any) {
-      // If foreign key constraint failed (e.g. session was already deleted), safely fallback without foreign keys
+      // Fallback if foreign key constraint failed
       if (createErr.code === 'P2003') {
         await prisma.eventLog.create({
           data: {
@@ -62,24 +93,38 @@ export async function completeUserSession(path: string = '/control') {
     const participantId = cookieStore.get('penpal_participant')?.value;
 
     if (sessionId) {
-      await prisma.session.update({
+      const sessionExists = await prisma.session.findUnique({
         where: { id: sessionId },
-        data: {
-          status: 'COMPLETED',
-          endTime: new Date(),
-          updatedAt: new Date(),
-        },
-      }).catch(() => {});
+        select: { id: true },
+      }).catch(() => null);
+
+      if (sessionExists) {
+        await prisma.session.update({
+          where: { id: sessionId },
+          data: {
+            status: 'COMPLETED',
+            endTime: new Date(),
+            updatedAt: new Date(),
+          },
+        }).catch(() => {});
+      }
     }
 
     if (participantId) {
-      await prisma.participant.update({
+      const participantExists = await prisma.participant.findUnique({
         where: { id: participantId },
-        data: {
-          status: 'COMPLETED',
-          updatedAt: new Date(),
-        },
-      }).catch(() => {});
+        select: { id: true },
+      }).catch(() => null);
+
+      if (participantExists) {
+        await prisma.participant.update({
+          where: { id: participantId },
+          data: {
+            status: 'COMPLETED',
+            updatedAt: new Date(),
+          },
+        }).catch(() => {});
+      }
     }
 
     await logInteraction('SESSION_COMPLETE', { completedAt: new Date().toISOString() }, path);

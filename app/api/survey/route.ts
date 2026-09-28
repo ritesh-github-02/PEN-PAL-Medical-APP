@@ -58,13 +58,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Update session status to completed
-    await prisma.session.update({
-      where: { id: sessionId },
-      data: {
-        status: 'COMPLETED',
-        endTime: new Date()
+    if (sessionId) {
+      const sessionExists = await prisma.session.findUnique({
+        where: { id: sessionId },
+        select: { id: true },
+      }).catch(() => null);
+
+      if (sessionExists) {
+        await prisma.session.update({
+          where: { id: sessionId },
+          data: {
+            status: 'COMPLETED',
+            endTime: new Date(),
+          },
+        }).catch(() => {});
       }
-    });
+    }
 
     return NextResponse.json(
       {

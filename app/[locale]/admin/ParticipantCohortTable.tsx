@@ -52,18 +52,22 @@ interface ParticipantCohortTableProps {
 // Complete sequential curriculum of study slides (Intervention Arm)
 const STUDY_SLIDES_CONFIG = [
   { id: 'screen1_intro', slideNumber: 1, title: 'Introduction & Consent Briefing', subtitle: 'Nurse Anna Penicillin Intro', type: 'Intro' },
-  { id: 'screen2_statistics', slideNumber: 2, title: 'Safety Statistics (100 Kids)', subtitle: 'Pediatric Allergy Epidemiology', type: 'Statistics' },
-  { id: 'screen3_5_knowledge_test', slideNumber: 3, title: 'Penicillin Knowledge Quiz', subtitle: 'Interactive Knowledge Check', type: 'Quiz' },
-  { id: 'screen3_6_all_correct', slideNumber: 4, title: 'Penicillin Statements Verified', subtitle: 'All 4 Penicillin Facts Verified', type: 'Education' },
-  { id: 'screen4_testing', slideNumber: 5, title: 'Allergy Testing Education', subtitle: 'Oral Challenge & Skin Testing Info', type: 'Education' },
-  { id: 'screen6_survey_intro', slideNumber: 6, title: 'Clinical Survey Overview', subtitle: 'Assessment Introduction Transition', type: 'Info' },
-  { id: 'screen6_1_symptoms', slideNumber: 7, title: 'Reported Symptoms Assessment', subtitle: 'Multi-choice symptom checklist', type: 'Question' },
-  { id: 'screen6_2_timing', slideNumber: 8, title: 'Age at Reaction', subtitle: 'Interactive Milestone Slider (1-26 yrs)', type: 'Question' },
-  { id: 'screen6_3_onset', slideNumber: 9, title: 'Time to Symptom Onset', subtitle: '<1 hr, 1-24 hrs, or 24+ hrs onset', type: 'Question' },
-  { id: 'screen6_4_resolution', slideNumber: 10, title: 'Medical Care Received', subtitle: 'Provider / Emergency Treatment', type: 'Question' },
-  { id: 'screen6_4b_resolution_type', slideNumber: 11, title: 'Reaction Resolution Method', subtitle: 'Medication vs spontaneous resolution', type: 'Question' },
-  { id: 'screen6_5_yetagain', slideNumber: 12, title: 'Subsequent Penicillin Exposure', subtitle: 'Re-exposure history since reaction', type: 'Question' },
-  { id: 'screen7_summary', slideNumber: 13, title: 'Action Steps & Clinical Summary', subtitle: 'Printable report & Doctor Talking Points', type: 'Summary' },
+  { id: 'screen2_naming', slideNumber: 2, title: 'Medication Naming', subtitle: 'Reported Penicillin Antibiotic', type: 'Question' },
+  { id: 'screen2_statistics', slideNumber: 5, title: 'Safety Statistics (95% Not Allergic)', subtitle: 'Pediatric Allergy Epidemiology', type: 'Statistics' },
+  { id: 'screen3_5_knowledge_test', slideNumber: 6, title: 'Penicillin Knowledge Quiz', subtitle: 'Interactive Knowledge Check', type: 'Quiz' },
+  { id: 'screen3_6_all_correct', slideNumber: 7, title: 'Penicillin Statements Verified', subtitle: 'All 4 Penicillin Facts Verified', type: 'Education' },
+  { id: 'screen4_testing', slideNumber: 10, title: 'Allergy Testing Education', subtitle: 'Oral Challenge & In-Office Testing Info', type: 'Education' },
+  { id: 'screen6_survey_intro', slideNumber: 10, title: 'Clinical Survey Overview', subtitle: 'Assessment Introduction Transition', type: 'Info' },
+  { id: 'screen6_1_symptoms', slideNumber: 11, title: 'Reported Symptoms Assessment', subtitle: 'Multi-choice symptom checklist', type: 'Question' },
+  { id: 'symptomsOther', slideNumber: 11, title: 'Other Symptoms Described', subtitle: 'Free-text symptom description', type: 'Question' },
+  { id: 'rashDetails', slideNumber: 11, title: 'Rash Characteristics (Modal 11B)', subtitle: 'Morphology of reported rash', type: 'Question' },
+  { id: 'screen6_2_timing', slideNumber: 12, title: 'Age Cohort at Reaction', subtitle: 'Baby, Toddler, School-aged, Teen, Adult', type: 'Question' },
+  { id: 'screen6_3_onset', slideNumber: 13, title: 'Time to Symptom Onset', subtitle: '<1 hr, 1-24 hrs, or 24+ hrs onset', type: 'Question' },
+  { id: 'screen6_4_resolution', slideNumber: 14, title: 'Medical Care Received', subtitle: 'Provider / Emergency Treatment', type: 'Question' },
+  { id: 'screen6_4b_resolution_type', slideNumber: 16, title: 'Reaction Resolution Method', subtitle: 'Medication vs spontaneous resolution', type: 'Question' },
+  { id: 'resolutionMedicines', slideNumber: 17, title: 'Resolution Medications (Modal 17)', subtitle: 'Multi-select medications administered', type: 'Question' },
+  { id: 'screen6_5_yetagain', slideNumber: 19, title: 'Subsequent Penicillin Exposure', subtitle: 'Re-exposure history since reaction', type: 'Question' },
+  { id: 'screen7_summary', slideNumber: 22, title: 'Action Steps & Clinical Summary', subtitle: 'Printable report & Doctor Talking Points', type: 'Summary' },
 ];
 
 // Educational Handout Sections (Control Arm)
@@ -78,27 +82,27 @@ const CONTROL_HANDOUT_SECTIONS = [
 const STEP_LABELS_MAP: Record<string, { slideNumber: number; title: string; subtitle: string; type: string }> = {
   ...Object.fromEntries(STUDY_SLIDES_CONFIG.map(s => [s.id, s])),
   'screen6_4_location': {
-    slideNumber: 10,
-    title: 'Medical Care Location (Modal)',
-    subtitle: 'Slide 10 Sub-Step · Care Location Received',
+    slideNumber: 15,
+    title: 'Medical Care Location (Modal 15)',
+    subtitle: 'Slide 15 Sub-Step · Care Location Received',
     type: 'Question',
   },
   'screen6_4b_medicine': {
-    slideNumber: 11,
+    slideNumber: 17,
     title: 'Resolution Medication (Modal Step 1)',
-    subtitle: 'Slide 11 Sub-Step · Medicine Administered',
+    subtitle: 'Slide 17 Sub-Step · Medicine Administered',
     type: 'Question',
   },
   'screen6_4b_route': {
-    slideNumber: 11,
-    title: 'Medication Intake Route (Modal Step 2)',
-    subtitle: 'Slide 11 Sub-Step · Administration Route',
+    slideNumber: 18,
+    title: 'Medication Intake Route (Modal 18)',
+    subtitle: 'Slide 18 Sub-Step · Administration Route',
     type: 'Question',
   },
   'screen6_5_reaction_detail': {
-    slideNumber: 12,
-    title: 'Subsequent Reaction History (Modal)',
-    subtitle: 'Slide 12 Sub-Step · Repeat Exposure Reaction Detail',
+    slideNumber: 20,
+    title: 'Subsequent Reaction History (Modal 20)',
+    subtitle: 'Slide 20 Sub-Step · Repeat Exposure Reaction Detail',
     type: 'Question',
   },
 };
@@ -168,7 +172,16 @@ function formatDisplayAnswer(questionId: string, rawVal: any, allResponses?: any
   }
 
   if (questionId === 'screen6_2_timing') {
-    return `${rawVal} years old`;
+    const valStr = String(rawVal).toLowerCase();
+    if (valStr === 'baby') return 'Baby (< 1 year)';
+    if (valStr === 'toddler') return 'Toddler (1-3 years)';
+    if (valStr === 'school') return 'School-aged (4-12 years)';
+    if (valStr === 'teen') return 'Teen (13-17 years)';
+    if (valStr === 'adult') return 'Adult (18+ years)';
+    if (typeof rawVal === 'number' || (!isNaN(Number(rawVal)) && !String(rawVal).includes('('))) {
+      return `${rawVal} years old`;
+    }
+    return String(rawVal);
   }
 
   // Handle compound formatting if allResponses is provided
@@ -181,7 +194,7 @@ function formatDisplayAnswer(questionId: string, rawVal: any, allResponses?: any
     }
 
     if (questionId === 'screen6_4b_resolution_type' && (rawVal === 'With medication' || String(rawVal).toLowerCase().includes('medication'))) {
-      const medResp = allResponses.find((r: any) => r.questionId === 'screen6_4b_medicine');
+      const medResp = allResponses.find((r: any) => r.questionId === 'resolutionMedicines' || r.questionId === 'screen6_4b_medicine');
       const routeResp = allResponses.find((r: any) => r.questionId === 'screen6_4b_route');
       const med = medResp?.answerValue;
       const route = routeResp?.answerValue;
