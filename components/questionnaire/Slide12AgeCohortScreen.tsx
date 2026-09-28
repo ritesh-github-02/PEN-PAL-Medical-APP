@@ -89,7 +89,7 @@ export function Slide12AgeCohortScreen({
   const slideTitleRef = useRef<HTMLHeadingElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // WCAG 2.1 AA Compliance (Auditor Karen): Focus heading on mount after 50ms without duplicate aria-live
+  // WCAG 2.1 AA Compliance: Focus heading on mount after 50ms without duplicate aria-live
   useEffect(() => {
     const timer = setTimeout(() => {
       if (slideTitleRef.current) {
@@ -134,25 +134,25 @@ export function Slide12AgeCohortScreen({
   return (
     <div
       id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-5 sm:p-7 md:p-8 min-h-[520px] sm:min-h-[560px]"
+      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl shadow-md relative overflow-hidden w-full max-w-3xl mx-auto flex flex-col justify-between p-4 sm:p-6 min-h-[400px] sm:min-h-[430px] max-h-[82vh]"
     >
       {/* Slide Heading */}
-      <div className="mb-4 sm:mb-6 md:mb-8 text-center">
+      <div className="mb-2 sm:mb-4 text-center">
         <h2
           ref={slideTitleRef}
           tabIndex={-1}
           id="slide12-title"
-          className="text-lg sm:text-2xl md:text-3xl font-bold text-[#1f382f] tracking-tight leading-snug outline-none max-w-2xl mx-auto focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg p-1"
+          className="text-base sm:text-lg md:text-xl font-bold text-[#1f382f] tracking-tight leading-snug outline-none max-w-xl mx-auto focus-visible:ring-2 focus-visible:ring-[#236f7a] rounded-lg p-0.5"
         >
           {titleText}
         </h2>
       </div>
 
-      {/* 5 Interactive Age Cohort Cards */}
+      {/* 5 Interactive Age Cohort Cards in a clean single row */}
       <div
         role="radiogroup"
         aria-labelledby="slide12-title"
-        className="grid grid-cols-5 gap-2 sm:gap-3 items-end justify-center w-full max-w-3xl mx-auto px-1 sm:px-2 my-auto"
+        className="grid grid-cols-5 gap-2 sm:gap-3 items-end justify-center w-full max-w-2xl mx-auto px-1 my-auto"
       >
         {AGE_COHORTS.map((cohort, index) => {
           const isSelected = selected === cohort.value;
@@ -170,7 +170,7 @@ export function Slide12AgeCohortScreen({
               }}
             >
               {/* Character Illustration standing directly on top of button */}
-              <div className="h-16 sm:h-20 md:h-24 w-full flex items-end justify-center pb-1 select-none">
+              <div className="h-14 sm:h-16 md:h-20 w-full flex items-end justify-center pb-1 select-none">
                 <img
                   src={cohort.imageSrc}
                   alt=""
@@ -194,7 +194,7 @@ export function Slide12AgeCohortScreen({
                   onSelect(cohort.value);
                 }}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className={`w-full min-h-[44px] px-1 py-1.5 rounded-xl flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer shadow-2xs active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
+                className={`w-full min-h-[42px] px-1 py-1 rounded-xl flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer shadow-2xs active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
                   isSelected
                     ? "bg-[#f0d411] hover:bg-[#e6ca0f] text-[#1f382f] border-2 border-[#cca900] shadow-xs"
                     : "bg-[#82afb5] hover:bg-[#729fa5] text-[#132c27] border border-[#689196]"
@@ -213,13 +213,13 @@ export function Slide12AgeCohortScreen({
       </div>
 
       {/* Centered Paired Navigation [ Back ] [ Next ] */}
-      <div className="flex items-center justify-center gap-6 sm:gap-8 pt-6 sm:pt-8 pb-2 mt-auto">
+      <div className="flex items-center justify-center gap-4 pt-3 mt-3 border-t border-slate-200/60">
         {/* Back Button */}
         <button
           type="button"
           onClick={navProps.onBack}
           aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-8 sm:px-10 py-2.5 min-h-[44px] min-w-[110px] rounded-full font-bold text-sm sm:text-base bg-[#82afb5] hover:bg-[#709da3] text-[#132c27] border border-[#689196] shadow-xs cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          className="px-7 py-2 min-h-[44px] min-w-[110px] rounded-full font-bold text-xs sm:text-sm bg-[#82afb5] hover:bg-[#709da3] text-[#132c27] border border-[#689196] shadow-xs cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {isSpanish ? "Atrás" : "Back"}
         </button>
@@ -234,9 +234,9 @@ export function Slide12AgeCohortScreen({
             }
           }}
           aria-label={isSpanish ? "Continuar al siguiente paso" : "Continue to next step"}
-          className={`px-8 sm:px-10 py-2.5 min-h-[44px] min-w-[110px] rounded-full font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+          className={`px-7 py-2 min-h-[44px] min-w-[110px] rounded-full font-bold text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
             selected
-              ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#cca900] cursor-pointer active:scale-95"
+              ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#d6be0e] cursor-pointer active:scale-95"
               : "bg-[#f0d411]/50 text-[#1f382f]/50 border border-transparent cursor-not-allowed"
           }`}
         >
