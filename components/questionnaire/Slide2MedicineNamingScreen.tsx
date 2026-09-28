@@ -57,11 +57,12 @@ export function Slide2MedicineNamingScreen({
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center pt-1">
           {/* Left: Amoxicillin Bottle Artwork */}
           <div className="sm:col-span-3 flex justify-center items-center">
-            <div className="relative w-20 sm:w-28 h-36 sm:h-44 filter drop-shadow-sm">
+            <div className="relative w-24 sm:w-32 h-40 sm:h-48 filter drop-shadow-sm">
               <Image
-                src="/images/amoxicillin-bottle.png"
+                src="/images/TonicBottle.png"
                 alt={isSpanish ? "Frasco de amoxicilina rosa para niños" : "Pink amoxicillin suspension bottle"}
                 fill
+                unoptimized
                 className="object-contain"
                 priority
               />

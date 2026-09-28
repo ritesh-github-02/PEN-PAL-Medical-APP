@@ -42,11 +42,12 @@ export function Slide5PrevalenceScreen({
       <div className="flex-1 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 max-w-3xl mx-auto w-full py-2">
         {/* Left: Pink Bottle & Boy with 95% Shield */}
         <div className="flex items-center justify-center gap-3 sm:gap-5 shrink-0">
-          <div className="relative w-16 sm:w-24 h-32 sm:h-44 filter drop-shadow-sm">
+          <div className="relative w-20 sm:w-28 h-36 sm:h-48 filter drop-shadow-sm">
             <Image
-              src="/images/amoxicillin-bottle.png"
+              src="/images/TonicBottle.png"
               alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
               fill
+              unoptimized
               className="object-contain"
               priority
             />
