@@ -599,7 +599,7 @@ export default function PenpalIntervention() {
 
   return (
     <main 
-      className="min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col items-center justify-center p-2 sm:p-4 md:p-5 relative font-sans bg-[#f4f8e8] overflow-x-hidden overflow-y-auto"
+      className="min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 relative font-sans bg-[#f4f8e8] overflow-x-hidden overflow-y-auto"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
