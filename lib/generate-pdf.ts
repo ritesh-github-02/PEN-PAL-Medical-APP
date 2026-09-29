@@ -72,14 +72,14 @@ export function generateAssessmentPDF(data: any): void {
       ? data.steps
       : isSpanish
       ? [
-          `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${medName}.`,
-          "Lleve fotos de la reacción de su hijo a la consulta médica.",
-          "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo.",
+          "Hable con el médico de su hijo sobre la alergia en su próxima visita.",
+          "Comparta fotos de la reacción de su hijo con el médico.",
+          `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${medName}:`,
         ]
       : [
-          `Give the table below to your child's doctor. This says what happened when your child took ${medName}.`,
-          "Bring pictures of your child's reaction to the doctor's visit.",
-          "Ask your child's doctor if testing is right for your child.",
+          "Talk to your child's doctor about the allergy at their next visit.",
+          "Share pictures of your child's reaction with the doctor.",
+          `Give the table below to your child's doctor. This says what happened when your child took ${medName}:`,
         ];
 
   const badgeRadius = 10;
@@ -204,11 +204,26 @@ export function generateAssessmentPDF(data: any): void {
           const cleanList = list.filter((item) => sanitizeVal(item) !== null);
           if (cleanList.length > 0) {
             let res = cleanList.join(", ");
-            if (ans.rashDetails && Array.isArray(ans.rashDetails) && ans.rashDetails.length > 0) {
-              res = res.replace(/Rash/i, `Rash (${ans.rashDetails.join(", ")})`);
+            const rashArr = Array.isArray(ans.rashDetails)
+              ? ans.rashDetails
+              : (typeof ans.rashDetails === "string" ? (() => { try { return JSON.parse(ans.rashDetails); } catch { return []; } })() : []);
+            if (rashArr.length > 0) {
+              const formattedDetails = isSpanish
+                ? rashArr.map((d: string) => {
+                    if (d === "Hives") return "Ronchas";
+                    if (d === "Blisters") return "Ampollas";
+                    if (d === "Red, fine or bumpy rash") return "Rojo, fino o con protuberancias";
+                    if (d === "Flushing") return "Enrojecimiento";
+                    if (d === "Pus-filled pimples") return "Granos con pus";
+                    if (d === "Unsure" || d.includes("Unsure")) return "No estoy seguro";
+                    return d;
+                  }).join(", ")
+                : rashArr.join(", ");
+              res = res.replace(/Rash/i, `Rash (${formattedDetails})`);
+              res = res.replace(/Sarpullido/i, `Sarpullido (${formattedDetails})`);
             }
             if (ans.symptomsOther) {
-              res += `, Other: ${ans.symptomsOther}`;
+              res += `, ${isSpanish ? "Otro" : "Other"}: ${ans.symptomsOther}`;
             }
             return res;
           }
@@ -262,10 +277,23 @@ export function generateAssessmentPDF(data: any): void {
       if (key === "resolution") {
         const r = sanitizeVal(ans.resolution || ans.screen6_4b_resolution_type);
         if (r) {
-          const med = sanitizeVal(ans.medicineSelected || ans.screen6_4b_medicine);
-          const rt = sanitizeVal(ans.routeSelected || ans.screen6_4b_route);
-          if ((r === "With medication" || r === "Con medicamentos") && (med || rt)) {
-            const extra = [med, rt].filter(Boolean).join(" - ");
+          let medsList: string[] = [];
+          if (Array.isArray(ans.resolutionMedicines)) {
+            medsList = ans.resolutionMedicines;
+          } else if (typeof ans.resolutionMedicines === "string") {
+            try {
+              const p = JSON.parse(ans.resolutionMedicines);
+              medsList = Array.isArray(p) ? p : [ans.resolutionMedicines];
+            } catch {
+              medsList = [ans.resolutionMedicines];
+            }
+          } else if (ans.medicineSelected || ans.screen6_4b_medicine) {
+            medsList = [ans.medicineSelected || ans.screen6_4b_medicine];
+          }
+          const medStr = medsList.filter((m) => sanitizeVal(m) !== null).join(", ");
+          const rt = sanitizeVal(ans.routeSelected || ans.screen6_4b_route || ans.resolutionRoute);
+          if ((r === "With medication" || r === "Con medicamentos") && (medStr || rt)) {
+            const extra = [medStr, rt].filter(Boolean).join(" - ");
             return isSpanish ? `Con medicamentos (${extra})` : `With medication (${extra})`;
           }
           return isSpanish ? (r === "With medication" ? "Con medicamentos" : r) : r;

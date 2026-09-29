@@ -186,8 +186,8 @@ export function Slide19RepeatUseScreen({
                 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight outline-none"
               >
                 {isSpanish
-                  ? "¿Qué sucedió cuando volvió a tomar penicilina?"
-                  : "What happened when they took penicillin again?"}
+                  ? "¿Ha tomado su hijo penicilina (amoxicilina) nuevamente desde la reacción?"
+                  : "Has your child taken penicillin (amoxicillin) again since the reaction?"}
               </h2>
             </div>
 

@@ -419,10 +419,18 @@ export default function PenpalIntervention() {
     try {
       // Build compound metadata for slides with modal branching
       let metadata: string | undefined = undefined;
-      if (currentStep.id === "screen6_4_resolution" && answers["screen6_4_location"]) {
-        metadata = JSON.stringify({ locaton: answers["screen6_4_location"] });
+      if (currentStep.id === "screen6_1_symptoms") {
+        if (answers["rashDetails"] || answers["symptomsOther"]) {
+          metadata = JSON.stringify({
+            rashDetails: answers["rashDetails"] || null,
+            symptomsOther: answers["symptomsOther"] || null,
+          });
+        }
+      } else if (currentStep.id === "screen6_4_resolution" && answers["screen6_4_location"]) {
+        metadata = JSON.stringify({ location: answers["screen6_4_location"] });
       } else if (currentStep.id === "screen6_4b_resolution_type") {
         metadata = JSON.stringify({ 
+          medicines: answers["resolutionMedicines"] || (answers["screen6_4b_medicine"] ? [answers["screen6_4b_medicine"]] : null),
           medicine: answers["screen6_4b_medicine"] || null, 
           route: answers["screen6_4b_route"] || null 
         });
@@ -435,6 +443,9 @@ export default function PenpalIntervention() {
         await submitAnswer("screen6_4_location", String(answers["screen6_4_location"]), Math.round(currentSlideDwellMs));
       }
       if (currentStep.id === "screen6_4b_resolution_type") {
+        if (answers["resolutionMedicines"] && Array.isArray(answers["resolutionMedicines"])) {
+          await submitAnswer("resolutionMedicines", answers["resolutionMedicines"], Math.round(currentSlideDwellMs));
+        }
         if (answers["screen6_4b_medicine"]) {
           await submitAnswer("screen6_4b_medicine", String(answers["screen6_4b_medicine"]), Math.round(currentSlideDwellMs));
         }
@@ -450,7 +461,9 @@ export default function PenpalIntervention() {
         {
           stepId: currentStep.id,
           answer,
+          rashDetails: answers["rashDetails"] || undefined,
           location: answers["screen6_4_location"] || undefined,
+          medicines: answers["resolutionMedicines"] || undefined,
           medicine: answers["screen6_4b_medicine"] || undefined,
           route: answers["screen6_4b_route"] || undefined,
           reactionDetail: answers["screen6_5_reaction_detail"] || undefined,
@@ -1105,365 +1118,6 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   );
 }
 
-function StatisticsScreen({ title, content, value, onNext, onBack, onSelect, loading, t, locale, isFirstStep, headingRef }: BaseScreenProps & { value?: any; onSelect?: (val: number) => void }) {
-  const allergicCount = 5;
-  const totalKids = 100;
-
-  return (
-    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-2xl p-3 sm:p-4.5 md:p-5 shadow-lg relative overflow-hidden">
-      <div className="text-center space-y-0.5 mb-2">
-        <h2 
-          ref={headingRef}
-          tabIndex={-1}
-          className="text-base sm:text-lg md:text-xl font-extrabold text-[#2d221b] max-w-3xl mx-auto tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
-        >
-          {title}
-        </h2>
-        <p className="text-xs sm:text-xs font-bold text-[#2d221b] max-w-2xl mx-auto">
-          {content}
-        </p>
-      </div>
-
-      <div className="mb-2 text-center select-none">
-        {/* Main 100 Kids Card */}
-        <div className="mx-auto max-w-2xl sm:max-w-3xl p-3 sm:p-4 bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-xs mb-2">
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {/* GROUP 1: 95 Safe Children (Treated as an accessible graphic) */}
-            <div
-              role="img"
-              aria-label={
-                locale === "es"
-                  ? "Grupo de 95 niños que no tienen una alergia real y pueden tomar penicilina de manera segura."
-                  : "Group of 95 children who do not have a real allergy and can safely take penicillin."
-              }
-              className="grid grid-cols-10 sm:grid-cols-19 gap-0.5 sm:gap-1 justify-center p-1"
-            >
-              {/* Screen reader text backup (guarantees VoiceOver speaks it) */}
-              <span className="sr-only">
-                {locale === "es"
-                  ? "Grupo de 95 niños que pueden tomar penicilina de manera segura."
-                  : "Group of 95 children who can safely take penicillin."}
-              </span>
-              {/* Visual icons hidden from audio clutter */}
-              <div aria-hidden="true" className="contents">
-                {Array(95)
-                  .fill(0)
-                  .map((_, i) => {
-                    const isGirl = i % 2 === 0;
-                    return (
-                      <div key={`safe-${i}`} className="flex items-center justify-center p-0.5">
-                        <KidIcon isAllergic={false} isGirl={isGirl} />
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-
-            {/* GROUP 2: 5 Allergic Children (Treated as an accessible graphic + color-blind box) */}
-            <div
-              role="img"
-              aria-label={
-                locale === "es"
-                  ? "Grupo de 5 niños destacados en un recuadro que sí tienen una alergia real a la penicilina."
-                  : "Group of 5 children highlighted in an orange box who have a true penicillin allergy."
-              }
-              className="flex items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 bg-orange-100/90 border-2 border-[#c84a26] rounded-xl shadow-2xs"
-            >
-              {/* Screen reader text backup */}
-              <span className="sr-only">
-                {locale === "es"
-                  ? "Grupo de 5 niños destacados en un recuadro que sí tienen una alergia real a la penicilina."
-                  : "Group of 5 children highlighted in an orange box who have a true penicillin allergy."}
-              </span>
-              {/* Visual icons hidden from audio clutter */}
-              <div aria-hidden="true" className="contents">
-                {Array(5)
-                  .fill(0)
-                  .map((_, i) => {
-                    const isGirl = i % 2 === 0;
-                    return (
-                      <div key={`allergic-${i}`} className="flex items-center justify-center p-0.5">
-                        <KidIcon isAllergic={true} isGirl={isGirl} />
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Text Summary Badge */}
-        <div className="flex justify-end max-w-2xl sm:max-w-3xl mx-auto pr-2">
-          <p className="text-[11px] sm:text-xs font-bold text-[#2d221b] bg-amber-50/80 border border-amber-200 px-3 py-1 rounded-xl shadow-2xs">
-            {locale === "es" ? "solo" : "only"}{" "}
-            <span className="text-xs sm:text-sm font-black text-[#c84a26] mx-0.5">
-              {allergicCount}
-            </span>{" "}
-            {locale === "es" ? "tienen una alergia real" : "have a real allergy"}
-          </p>
-        </div>
-      </div>
-
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-2 mt-2 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={() => onNext(5)}
-          disabled={loading}
-          aria-label={locale === "es" ? "Continuar al siguiente paso" : "Continue to next step"}
-          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {loading ? "..." : (locale === "es" ? "Siguiente" : t("next"))}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-const KidIcon = memo(function KidIcon({ isAllergic, isGirl }: { isAllergic: boolean; isGirl: boolean }) {
-  const color = isAllergic ? "#c84a26" : "#1f5c66";
-  return (
-    <svg viewBox="0 0 32 32" className="w-4.5 h-4.5 sm:w-5 sm:h-5 md:w-5.5 md:h-5.5 select-none pointer-events-none" aria-hidden="true">
-      {/* Shoulders / Shirt */}
-      <path
-        d="M 7 29 C 7 23, 25 23, 25 29"
-        fill="none"
-        stroke={color}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-      
-      {/* Face background circle */}
-      <circle cx="16" cy="14.5" r="7.5" fill="#ffffff" stroke={color} strokeWidth="2" />
-      
-      {/* Eyes */}
-      <circle cx="13.2" cy="14" r="1.1" fill={color} />
-      <circle cx="18.8" cy="14" r="1.1" fill={color} />
-      
-      {/* Smile */}
-      <path
-        d="M 13.2 17 Q 16 19.8 18.8 17"
-        fill="none"
-        stroke={color}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      
-      {/* Hair */}
-      {isGirl ? (
-        <path
-          d="M 16 5.5 C 10 5.5, 7.5 9.5, 7.5 15 C 7.5 19.5, 9 22, 10.5 22 C 11.5 21, 11 18, 10 16 C 12.5 11.5, 15 10.5, 16.5 10.5 C 18 10.5, 20 11.5, 22 16 C 21 18, 20.5 21, 21.5 22 C 23 22, 24.5 19.5, 24.5 15 C 24.5 9.5, 22 5.5, 16 5.5 Z"
-          fill={color}
-        />
-      ) : (
-        <path
-          d="M 16 5.5 C 10.5 5.5, 8 9, 8 13.5 C 10 12.8, 12 11, 14.5 11.8 C 17 10.8, 20.5 10.8, 24 13.5 C 24 9, 21.5 5.5, 16 5.5 Z"
-          fill={color}
-        />
-      )}
-    </svg>
-  );
-});
-
-
-function KnowledgeRevelationScreen(props: BaseScreenProps & { options?: QuestionnaireOption[] }) {
-  const isSpanish = props.locale === "es";
-
-  const statements = [
-    {
-      num: "1",
-      textEn: "Only about 5% of kids with a reported penicillin allergy have a true, life-threatening allergy.",
-      textEs: "Solo alrededor del 5% de los niños con reporte de alergia a la penicilina tienen una alergia verdadera y potencialmente mortal.",
-    },
-    {
-      num: "2",
-      textEn: "9 out of 10 kids grow out of their penicillin allergy over 10 years.",
-      textEs: "9 de cada 10 niños superan su alergia a la penicilina con el paso de 10 años.",
-    },
-    {
-      num: "3",
-      textEn: "It kills bacteria better than other antibiotics.",
-      textEs: "Mata las bacterias mejor que otros antibióticos.",
-    },
-    {
-      num: "4",
-      textEn: "It is cheaper than other antibiotics.",
-      textEs: "Es más barata que otros antibióticos.",
-    },
-  ];
-
-  return (
-    <div 
-      id="slide-content" 
-      className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative overflow-hidden"
-    >
-      {/* 1. Global Announcement for Screen Readers on Slide Load */}
-      <div 
-        role="status" 
-        aria-live="polite" 
-        className="sr-only"
-      >
-        {isSpanish 
-          ? "Aviso de accesibilidad: Todas las 4 afirmaciones ya están marcadas como correctas y verdaderas." 
-          : "Accessibility notice: All 4 statements are already checked as correct and true."}
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-between">
-        
-        {/* Main Content Column */}
-        <div className="flex-1 min-w-0 w-full max-w-3xl pb-2">
-          {/* Slide Heading without tabIndex (Guarantees 0 ANDI Scanner Alerts) */}
-          <div className="mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg md:text-xl font-black text-[#2d221b] tracking-tight leading-snug outline-none rounded-lg">
-              {props.title || (isSpanish
-                ? "Todas las aseveraciones sobre la penicilina son correctas"
-                : "All the statements about penicillin are correct!")}
-            </h2>
-          </div>
-
-          {/* Semantic List of Confirmed Statements */}
-          <ul role="list" className="space-y-3 pt-1">
-            {statements.map((stmt) => (
-              <li
-                key={stmt.num}
-                className="w-full text-left flex items-start gap-3 rounded-xl p-1 min-h-[44px]"
-              >
-                {/* Visual Toggle Track (aria-hidden to prevent redundant announcements) */}
-                <div 
-                  aria-hidden="true" 
-                  className="flex flex-col items-center shrink-0 pt-1 select-none"
-                >
-                  <div className="w-12 h-6 rounded-full p-0.5 bg-[#1f5c66] transition-colors">
-                    <div className="w-5 h-5 rounded-full bg-white border border-slate-300 shadow-sm transform translate-x-6" />
-                  </div>
-                  <div className="flex justify-between w-full px-1.5 text-[10px] font-extrabold text-[#2d221b] mt-0.5 leading-none">
-                    <span>×</span>
-                    <span>✓</span>
-                  </div>
-                </div>
-
-                {/* Unified Accessible Statement (Read once cleanly by screen readers) */}
-                <div className="text-xs sm:text-sm font-semibold text-[#2d221b] leading-relaxed pt-0.5">
-                  <span className="sr-only">
-                    {isSpanish ? "Verificado como verdadero: " : "Verified as true: "}
-                  </span>
-                  <span>{stmt.num}. {isSpanish ? stmt.textEs : stmt.textEn}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Nurse Anna Illustration (Decorative on Slide 2) */}
-        <NurseAnna size="md" isDecorative={true} />
-      </div>
-
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={() => props.onNext("all_statements_acknowledged")}
-          disabled={props.loading}
-          className="px-10 py-2.5 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {props.loading ? "..." : (isSpanish ? "Siguiente" : props.t("next"))}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function TestingScreen(props: BaseScreenProps) {
-  const isSpanish = props.locale === "es";
-
-  return (
-    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg relative overflow-hidden">
-      <div className="flex flex-row items-center justify-between gap-3 sm:gap-6">
-        <div className="space-y-3 flex-1 min-w-0 max-w-2xl pb-1">
-          <h2 
-            ref={props.headingRef}
-            tabIndex={-1}
-            className="text-lg sm:text-xl md:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
-          >
-            {props.title || (isSpanish ? "¡Hable con el médico sobre la alergia de su hijo!" : "Talk to the doctor about your child's allergy!")}
-          </h2>
-          
-          {/* Semantic 2-Item Bullet List (WCAG 1.3.1) */}
-          <ul className="space-y-2.5 text-[#2d221b] text-xs sm:text-sm font-medium leading-relaxed">
-            <li className="flex items-start gap-2">
-              <span className="text-[#236f7a] font-bold shrink-0 mt-0.5" aria-hidden="true">•</span>
-              <span>
-                {isSpanish
-                  ? "Los médicos pueden comprobar si la reacción de su hijo fue solo un efecto secundario y no una alergia."
-                  : "Doctors can check to see if your child's reaction was just a side-effect and not an allergy."}
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#236f7a] font-bold shrink-0 mt-0.5" aria-hidden="true">•</span>
-              <span>
-                {isSpanish
-                  ? "También hay una prueba simple que puede saber si su hijo tiene una alergia."
-                  : "There is also a simple test that can tell if your child has an allergy."}
-                <span className="block text-slate-700 text-[11px] sm:text-xs mt-0.5 font-normal">
-                  {isSpanish
-                    ? "Para la prueba, los niños tragan medicamentos. A veces, los niños también toman medicamentos a través de un pinchazo en la piel."
-                    : "For the test, kids swallow medicine. Sometimes, kids also take medicine through a skin prick."}
-                </span>
-              </span>
-            </li>
-          </ul>
-
-          {/* Distinct Bottom Paragraph (No Bullet) */}
-          <p className="text-xs sm:text-sm font-bold text-[#1f382f] pt-1">
-            {isSpanish
-              ? "Si su hijo puede tomar penicilina de manera segura, no es alérgico."
-              : "If your child can safely take penicillin, they are not allergic."}
-          </p>
-        </div>
-
-        {/* Nurse Anna Illustration (Decorative on Slide 3) */}
-        <NurseAnna size="md" isDecorative={true} />
-      </div>
-
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-2 mt-3 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={() => props.onNext()}
-          disabled={props.loading}
-          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs sm:text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {props.loading ? "..." : (isSpanish ? "Siguiente" : props.t("next"))}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function TestimonialScreen(props: BaseScreenProps) {
-  return (
-    <div className="bg-gradient-to-br from-[#a2b4ff] via-[#8ce5ce] to-[#eef8ce] border border-white/60 rounded-3xl p-8 sm:p-12 shadow-lg relative">
-      <div className="flex flex-col md:flex-row gap-8 items-start">
-        <div className="flex-1 space-y-4">
-          <h2 
-            ref={props.headingRef}
-            tabIndex={-1}
-            className="text-2xl sm:text-3xl font-extrabold text-[#1f382f] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
-          >
-            {props.title}
-          </h2>
-          <blockquote className="text-[#1f382f] leading-relaxed space-y-3 whitespace-pre-line text-base font-medium bg-white/70 p-6 rounded-2xl border border-white/80 shadow-sm backdrop-blur-sm italic">
-            {props.content}
-          </blockquote>
-        </div>
-        <div className="flex-shrink-0 w-28 h-28 flex items-center justify-center text-7xl md:sticky md:top-4 select-none filter drop-shadow-md" aria-hidden="true">
-          👩‍👦
-        </div>
-      </div>
-      <NavigationFooter {...props} />
-    </div>
-  );
-}
 
 function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string[]; onSelect: (val: string[]) => void }) {
   const isSpanish = navProps.locale === "es";
@@ -3137,134 +2791,6 @@ function SurveySingleChoice({
   );
 }
 
-// Milestone tick marks for accurate positioning
-const milestoneTicks = [
-  { val: 1, labelEn: "<1 yr", labelEs: "<1 año" },
-  { val: 5, labelEn: "5 yrs", labelEs: "5 años" },
-  { val: 10, labelEn: "10 yrs", labelEs: "10 años" },
-  { val: 15, labelEn: "15 yrs", labelEs: "15 años" },
-  { val: 20, labelEn: "20 yrs", labelEs: "20 años" },
-  { val: 26, labelEn: "26 yrs", labelEs: "26 años" },
-];
-
-function SurveySlider({ title, min, max, unit, selected, onSelect, ...navProps }: BaseScreenProps & { min?: number; max?: number; unit?: string; selected: number; onSelect: (val: number) => void }) {
-  const isSpanish = navProps.locale === "es";
-  const minVal = min || 1;
-  const maxVal = max || 26;
-  const value = selected || 9;
-
-  const displayTitle =
-    title ||
-    (isSpanish
-      ? "¿Qué edad tenía su hijo cuando ocurrió la reacción?"
-      : "How old was your child when the reaction happened?");
-  const instructionText =
-    navProps.description ||
-    (isSpanish
-      ? "Arrastre el control o use las teclas de flecha para seleccionar la edad."
-      : "Drag the slider or use arrow keys to select your child's age.");
-
-  // Mathematical percentage calculation (0% to 100%)
-  const percentage = Math.max(
-    0,
-    Math.min(100, ((value - minVal) / (maxVal - minVal)) * 100)
-  );
-
-  return (
-    <div
-      id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg relative overflow-hidden"
-    >
-      <div className="space-y-4 max-w-3xl pb-2">
-        {/* Main Heading (Auto-Focus Target) */}
-        <h2 
-          ref={navProps.headingRef}
-          tabIndex={-1}
-          className="text-xl sm:text-2xl font-black text-[#2d221b] tracking-tight leading-snug outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
-        >
-          {displayTitle}
-        </h2>
-
-        {/* Sage Container Card with Safe Right Padding to prevent Nurse Anna collision */}
-        <div className="bg-[#8caeab] p-6 sm:p-7 pr-16 sm:pr-24 rounded-3xl text-[#132c27] shadow-inner relative space-y-5 max-w-3xl">
-          <p className="text-xs sm:text-sm font-semibold text-[#132c27] leading-snug">
-            {instructionText}
-          </p>
-
-          {/* Interactive Slider Area */}
-          <div className="relative pt-8 pb-6 px-1">
-            {/* Dynamic Floating Yellow Value Badge */}
-            <div 
-              aria-hidden="true"
-              className="absolute top-0 -translate-x-1/2 bg-[#f0d411] text-[#1f382f] font-black text-xs px-3 py-1 rounded-full border border-[#e0c406] shadow-sm transition-all pointer-events-none whitespace-nowrap"
-              style={{
-                left: percentage + "%"
-              }}
-            >
-              {value} {isSpanish ? (value === 1 ? "año" : "años") : (value === 1 ? "yr" : "yrs")}
-            </div>
-
-            {/* Native Accessible Range Input */}
-            <input
-              type="range"
-              min={minVal}
-              max={maxVal}
-              value={value}
-              aria-valuemin={minVal}
-              aria-valuemax={maxVal}
-              aria-valuenow={value}
-              aria-valuetext={
-                isSpanish
-                  ? value + " " + (unit || (value === 1 ? "año de edad" : "años de edad"))
-                  : value + " " + (unit || (value === 1 ? "year old" : "years old"))
-              }
-              aria-label={displayTitle}
-              onChange={(e) => onSelect(Number(e.target.value))}
-              className="w-full h-3.5 bg-[#234b50] rounded-lg appearance-none cursor-pointer accent-[#f0d411] hover:accent-[#e1c504] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-            />
-
-            {/* Mathematically Aligned Milestone Ticks */}
-            <div
-              className="relative w-full h-6 mt-3 text-[10px] sm:text-[11px] font-bold text-[#132c27] select-none"
-              aria-hidden="true"
-            >
-              {milestoneTicks.map((tick) => {
-                const tickPct = ((tick.val - minVal) / (maxVal - minVal)) * 100;
-                return (
-                  <span
-                    key={tick.val}
-                    className="absolute -translate-x-1/2 whitespace-nowrap text-center"
-                    style={{ left: tickPct + "%" }}
-                  >
-                    {isSpanish ? tick.labelEs : tick.labelEn}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Nurse Anna Illustration (Safe Positioned Outside Text Area, Decorative) */}
-      <div className="block absolute bottom-6 right-2 sm:bottom-10 sm:right-5 pointer-events-none z-10">
-        <NurseAnna size="sm" isDecorative={true} />
-      </div>
-
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={() => navProps.onNext(value)}
-          disabled={navProps.loading}
-          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   const isSpanish = navProps.locale === "es";
   return (
@@ -3337,9 +2863,42 @@ export function Slide13SummaryScreen(props: any) {
       symptomsList = [rawSymptoms];
     }
   }
+
+  // Rash sub-types (PDF Page 15: "Formats in Slide 22 Summary Table as: Rash (Hives, Blisters)")
+  const rawRash = answers?.rashDetails;
+  let rashList: string[] = [];
+  if (Array.isArray(rawRash)) {
+    rashList = rawRash;
+  } else if (typeof rawRash === "string") {
+    try {
+      const parsed = JSON.parse(rawRash);
+      rashList = Array.isArray(parsed) ? parsed : [rawRash];
+    } catch {
+      rashList = [rawRash];
+    }
+  }
+
+  const formatRashDetail = (d: string) => {
+    if (!isSpanish) return d;
+    if (d === "Hives") return "Ronchas";
+    if (d === "Blisters") return "Ampollas";
+    if (d === "Red, fine or bumpy rash") return "Rojo, fino o con protuberancias";
+    if (d === "Flushing") return "Enrojecimiento";
+    if (d === "Pus-filled pimples") return "Granos con pus";
+    if (d === "Unsure" || d.includes("Unsure")) return "No estoy seguro";
+    return d;
+  };
+
   const symptomsFormatted = symptomsList.length > 0
     ? symptomsList
         .map((s) => {
+          if (s.toLowerCase() === "rash" || s === "Sarpullido") {
+            if (rashList.length > 0) {
+              const detailsStr = rashList.map(formatRashDetail).join(", ");
+              return isSpanish ? `Sarpullido (${detailsStr})` : `Rash (${detailsStr})`;
+            }
+            return isSpanish ? "Sarpullido" : "Rash";
+          }
           if (s === "Other: Please describe" || s === "Other" || s === "Otro: por favor describa" || s === "Otro") {
             return isSpanish ? "Otro" : "Other";
           }
@@ -3348,7 +2907,7 @@ export function Slide13SummaryScreen(props: any) {
           }
           return s;
         })
-        .join(", ") + (answers?.symptomsOther ? `, Other: ${answers.symptomsOther}` : "")
+        .join(", ") + (answers?.symptomsOther ? `, ${isSpanish ? "Otro" : "Other"}: ${answers.symptomsOther}` : "")
     : (isSpanish ? "Ninguno reportado" : "None reported");
 
   // Format medical care location string
@@ -3363,17 +2922,35 @@ export function Slide13SummaryScreen(props: any) {
     medicalCareFormatted = isSpanish ? "Sí" : "Yes";
   }
 
-  // Format symptom resolution string
+  // Format symptom resolution string (PDF Page 17 multi-select checkboxes support)
   const resVal = answers?.resolution || answers?.screen6_4b_resolution_type;
-  const medVal = answers?.medicineSelected || answers?.screen6_4b_medicine;
-  const rtVal = answers?.routeSelected || answers?.screen6_4b_route;
+  let rawMeds = answers?.resolutionMedicines;
+  let medsList: string[] = [];
+  if (Array.isArray(rawMeds)) {
+    medsList = rawMeds;
+  } else if (typeof rawMeds === "string") {
+    try {
+      const parsed = JSON.parse(rawMeds);
+      medsList = Array.isArray(parsed) ? parsed : [rawMeds];
+    } catch {
+      medsList = [rawMeds];
+    }
+  } else if (answers?.medicineSelected || answers?.screen6_4b_medicine) {
+    medsList = [answers.medicineSelected || answers.screen6_4b_medicine];
+  }
+
+  const rtVal = answers?.routeSelected || answers?.screen6_4b_route || answers?.resolutionRoute;
   let resolutionFormatted = resVal || (isSpanish ? "Por sí sola" : "On its own");
   if (resVal === "With medication" || resVal === "Con medicamentos") {
-    const medOpt = RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === medVal);
-    const medText = isSpanish ? medOpt?.labelEs || medVal || "Medicamento para la alergia" : medOpt?.labelEn || medVal || "Allergy medicine";
+    const formattedMeds = medsList.map((m) => {
+      const medOpt = RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === m);
+      return isSpanish ? (medOpt?.labelEs || m) : (medOpt?.labelEn || m);
+    }).join(", ");
+
     const rtOpt = rtVal ? RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === rtVal) : undefined;
     const rtText = rtVal ? (isSpanish ? ` - ${rtOpt?.labelEs || rtVal}` : ` - ${rtVal}`) : "";
-    resolutionFormatted = isSpanish ? `Con medicamentos (${medText}${rtText})` : `With medication (${medVal || "Allergy medicine"}${rtVal ? ` - ${rtVal}` : ""})`;
+    const medsDisplay = formattedMeds || (isSpanish ? "Medicamento para la alergia" : "Allergy medicine");
+    resolutionFormatted = isSpanish ? `Con medicamentos (${medsDisplay}${rtText})` : `With medication (${medsDisplay}${rtText})`;
   }
 
   // Format repeat use string
@@ -3489,18 +3066,17 @@ export function Slide13SummaryScreen(props: any) {
       })),
       steps: [
         isSpanish
-          ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
-          : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}.`,
+          ? "Hable con el médico de su hijo sobre la alergia en su próxima visita."
+          : "Talk to your child's doctor about the allergy at their next visit.",
         isSpanish
-          ? "Lleve fotos de la reacción de su hijo a la consulta médica."
-          : "Bring pictures of your child's reaction to the doctor's visit.",
+          ? "Comparta fotos de la reacción de su hijo con el médico."
+          : "Share pictures of your child's reaction with the doctor.",
         isSpanish
-          ? "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo."
-          : "Ask your child's doctor if testing is right for your child.",
+          ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}:`
+          : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}:`,
       ],
     });
     // 2. Direct clean transition to Success Screen without opening a flash dialog
-    // No temporary modal that gets cut off mid-speech!
     if (onNavigateToSuccess) {
       onNavigateToSuccess();
     } else if (onNext) {
@@ -3509,67 +3085,72 @@ export function Slide13SummaryScreen(props: any) {
   };
 
   return (
-    <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 max-w-4xl mx-auto shadow-lg space-y-6">
+    <div className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-7 max-w-4xl mx-auto shadow-lg space-y-5">
       
-      {/* 1. Main Heading */}
-      <div className="text-center space-y-2">
-        <h2
-          ref={summaryTitleRef}
-          tabIndex={-1}
-          className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight outline-none"
-        >
-          {isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents"}
-        </h2>
+      {/* 1. Header Pill (Yellow badge matching PDF Page 18) */}
+      <div className="flex justify-center">
+        <div className="inline-block bg-[#f0d411] text-[#1f382f] border border-[#d6be0e] px-6 py-1.5 rounded-full shadow-2xs text-center">
+          <h2
+            ref={summaryTitleRef}
+            tabIndex={-1}
+            className="text-sm sm:text-base md:text-lg font-bold tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+          >
+            {isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents"}
+          </h2>
+        </div>
       </div>
 
-      {/* 2. Numbered Action Steps */}
-      <ol className="space-y-3 max-w-2xl mx-auto text-slate-800 text-xs sm:text-sm font-medium">
+      {/* 2. Numbered Action Steps (PDF Page 18 Exact Sequence) */}
+      <ol className="space-y-3.5 max-w-2xl mx-auto text-slate-800 text-xs sm:text-sm font-medium">
+        {/* Step 1 with nested script quote */}
         <li className="flex items-start gap-3">
-          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50">
+          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50 mt-0.5">
             1
           </span>
-          <p>
-            {isSpanish
-              ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
-              : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}.`}
-          </p>
+          <div className="flex-1 space-y-2">
+            <p className="font-semibold text-slate-900 leading-snug">
+              {isSpanish
+                ? "Hable con el médico de su hijo sobre la alergia en su próxima visita."
+                : "Talk to your child's doctor about the allergy at their next visit."}
+            </p>
+            {/* Nested Doctor Discussion Script Callout Box */}
+            <div className="bg-[#e8f4f1] border-l-4 border-[#236f7a] p-3 sm:p-3.5 rounded-r-xl shadow-2xs space-y-1">
+              <p className="text-xs font-bold text-[#132338]">
+                {isSpanish ? "Esto es lo que puede decir:" : "Here's what you can say:"}
+              </p>
+              <p className="text-xs sm:text-sm text-slate-700 italic leading-snug">
+                {isSpanish
+                  ? '«Leí sobre las alergias a la penicilina en niños. ¿Podríamos hablar sobre verificar si mi hijo realmente tiene una alergia?»'
+                  : '"I read about penicillin allergies in kids. Could we talk about checking to see if my child really has an allergy?"'}
+              </p>
+            </div>
+          </div>
         </li>
+
+        {/* Step 2 */}
         <li className="flex items-start gap-3">
-          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50">
+          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50 mt-0.5">
             2
           </span>
-          <p>
+          <p className="pt-0.5 font-semibold text-slate-900 leading-snug">
             {isSpanish
-              ? "Lleve fotos de la reacción de su hijo a la consulta médica."
-              : "Bring pictures of your child's reaction to the doctor's visit."}
+              ? "Comparta fotos de la reacción de su hijo con el médico."
+              : "Share pictures of your child's reaction with the doctor."}
           </p>
         </li>
+
+        {/* Step 3 */}
         <li className="flex items-start gap-3">
-          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50">
+          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50 mt-0.5">
             3
           </span>
-          <p>
+          <p className="pt-0.5 font-semibold text-slate-900 leading-snug">
             {isSpanish
-              ? "Pregúntele al médico de su hijo si las pruebas de alergia son adecuadas para su hijo."
-              : "Ask your child's doctor if testing is right for your child."}
+              ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}:`
+              : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}:`}
           </p>
         </li>
       </ol>
-
-      {/* Doctor Discussion Prompt Callout Box */}
-      <div className="bg-[#e8f4f1] border-l-4 border-[#236f7a] p-4 sm:p-5 rounded-r-2xl shadow-xs space-y-2 max-w-2xl mx-auto w-full">
-        <div className="flex items-center gap-2">
-          <span className="text-[#236f7a] text-lg font-bold" aria-hidden="true">💬</span>
-          <h3 className="text-sm sm:text-base font-extrabold text-[#132338]">
-            {isSpanish ? "Qué decirle al médico de su hijo:" : "What to tell your child's doctor:"}
-          </h3>
-        </div>
-        <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed pl-6">
-          {isSpanish
-            ? "«Leí sobre las alergias a la penicilina en niños. La mayoría de los niños no son verdaderamente alérgicos. ¿Podríamos evaluar si mi hijo aún necesita esta etiqueta de alergia?»"
-            : '"I read about penicillin allergies in kids. Most children are not truly allergic. Could we evaluate whether my child still needs this allergy label?"'}
-        </p>
-      </div>
 
       {/* 3. CLEAN SEMANTIC CARD GRID (No <dl>, No <dt>, No empty terms!) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
