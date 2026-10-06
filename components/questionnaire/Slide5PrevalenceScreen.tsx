@@ -37,22 +37,23 @@ export function Slide5PrevalenceScreen({
   return (
     <div
       id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-5 sm:p-7 shadow-md relative overflow-hidden flex flex-col justify-between min-h-[440px] max-h-[85vh]"
+      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-4 sm:p-7 shadow-md relative flex flex-col justify-between min-h-0 sm:min-h-[440px] max-h-none overflow-y-auto"
     >
-      <div className="flex-1 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 max-w-3xl mx-auto w-full py-2">
-        {/* Left: Pink Bottle & Boy with 95% Shield */}
+      <div className="flex-1 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 max-w-3xl mx-auto w-full py-2">
+        {/* Left: Pink Bottle & Boy with 95% Shield (High-resolution, crisp rendering) */}
         <div className="flex items-center justify-center gap-3 sm:gap-5 shrink-0">
-          <div className="relative w-20 sm:w-28 h-36 sm:h-48 filter drop-shadow-sm">
+          <div className="relative w-16 sm:w-28 h-28 sm:h-48 filter drop-shadow-xs">
             <Image
               src="/images/TonicBottle.png"
               alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
               fill
               unoptimized
+              style={{ imageRendering: "-webkit-optimize-contrast" }}
               className="object-contain"
               priority
             />
           </div>
-          <div className="relative w-24 sm:w-36 h-40 sm:h-52 filter drop-shadow-sm">
+          <div className="relative w-20 sm:w-36 h-32 sm:h-52 filter drop-shadow-xs">
             <Image
               src="/images/boy-95-percent.png"
               alt={
@@ -61,6 +62,8 @@ export function Slide5PrevalenceScreen({
                   : "Boy holding shield badge: 95% of kids can take it safely"
               }
               fill
+              unoptimized
+              style={{ imageRendering: "-webkit-optimize-contrast" }}
               className="object-contain"
               priority
             />
@@ -68,11 +71,11 @@ export function Slide5PrevalenceScreen({
         </div>
 
         {/* Right: Main Content Text */}
-        <div className="flex-1 text-left">
+        <div className="flex-1 text-center sm:text-left">
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="text-sm sm:text-base md:text-lg font-bold text-slate-800 leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+            className="text-xs sm:text-base md:text-lg font-bold text-slate-800 leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
           >
             {copyText}
           </h1>
@@ -80,12 +83,12 @@ export function Slide5PrevalenceScreen({
       </div>
 
       {/* Paired Navigation Buttons */}
-      <div className="flex items-center justify-center gap-4 pt-4 mt-3 border-t border-slate-200/60">
+      <div className="flex items-center justify-center gap-4 pt-3 sm:pt-4 mt-2 sm:mt-3 border-t border-slate-200/60 shrink-0">
         <button
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="px-7 py-2 min-h-[44px] min-w-[110px] rounded-full bg-[#7da199] hover:bg-[#6c8e86] text-[#132c27] font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          className="px-6 sm:px-7 py-2 min-h-[44px] min-w-[100px] sm:min-w-[110px] rounded-full bg-[#7da199] hover:bg-[#6c8e86] text-[#132c27] font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {isSpanish ? "Atrás" : "Back"}
         </button>
@@ -93,7 +96,7 @@ export function Slide5PrevalenceScreen({
           type="button"
           onClick={onNext}
           disabled={loading}
-          className="px-7 py-2 min-h-[44px] min-w-[110px] rounded-full bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#d6be0e] font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          className="px-6 sm:px-7 py-2 min-h-[44px] min-w-[100px] sm:min-w-[110px] rounded-full bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#d6be0e] font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
         </button>

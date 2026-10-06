@@ -48,7 +48,7 @@ export function Slide13OnsetScreen({
   return (
     <div
       id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-5 sm:p-7 shadow-md relative overflow-hidden flex flex-col justify-between min-h-[440px] max-h-[85vh]"
+      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-4 sm:p-7 shadow-md relative flex flex-col justify-between min-h-0 sm:min-h-[440px] max-h-none overflow-y-auto"
     >
       <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-center space-y-4">
         {/* Main Heading */}

@@ -6,43 +6,59 @@ import { NurseAnna } from "./NurseAnna";
 export interface Slide16ResolutionScreenProps {
   isSpanish: boolean;
   selected?: string;
+  medicines?: string[];
   resolutionMedicines?: string[];
+  route?: string;
   resolutionRoute?: string;
-  onSelect: (val: string) => void;
-  onMedicinesSelect: (meds: string[]) => void;
-  onRouteChange: (route: string) => void;
+  onSelectResolution?: (val: string) => void;
+  onSelect?: (val: string) => void;
+  onSelectMedicines?: (meds: string[]) => void;
+  onMedicinesSelect?: (meds: string[]) => void;
+  onSelectRoute?: (route: string) => void;
+  onRouteChange?: (route: string) => void;
   onNext: () => void;
   onBack: () => void;
   loading?: boolean;
 }
 
-const RESOLUTION_OPTIONS = [
-  { value: "With medication", labelEn: "With medication", labelEs: "Con medicamentos" },
+interface ResolutionOption {
+  value: string;
+  labelEn: string;
+  labelEs: string;
+}
+
+const RESOLUTION_OPTIONS: ResolutionOption[] = [
+  { value: "With medication", labelEn: "With medication", labelEs: "Con medicación" },
   { value: "On its own", labelEn: "On its own", labelEs: "Por sí sola" },
-  { value: "Unsure", labelEn: "Unsure", labelEs: "No estoy seguro" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/ No lo sé" },
 ];
 
-const MEDICINE_CHECKBOX_OPTIONS = [
-  { value: "Allergy medicine (Benadryl, Zyrtec)", labelEn: "Allergy medicine (Benadryl, Zyrtec)", labelEs: "Antialérgico (Benadryl, Zyrtec)" },
-  { value: "Steroid medicine (Prednisone)", labelEn: "Steroid medicine (Prednisone)", labelEs: "Esteroides (Prednisona)" },
+const MEDICATION_OPTIONS: ResolutionOption[] = [
+  { value: "Allergy medicine (Benadryl, Zyrtec)", labelEn: "Allergy medicine (Benadryl, Zyrtec)", labelEs: "Medicina para la alergia (Benadryl, Zyrtec)" },
+  { value: "Steroid medicine (Prednisone)", labelEn: "Steroid medicine (Prednisone)", labelEs: "Medicina esteroidea (Prednisona)" },
   { value: "Epinephrine (EpiPen)", labelEn: "Epinephrine (EpiPen)", labelEs: "Epinefrina (EpiPen)" },
-  { value: "Unsure", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/ No lo sé" },
 ];
 
-const ROUTE_OPTIONS = [
-  { value: "Mouth", labelEn: "Mouth", labelEs: "Vía oral (Boca)" },
+const ROUTE_OPTIONS: ResolutionOption[] = [
+  { value: "Mouth", labelEn: "Mouth", labelEs: "Por la boca" },
   { value: "IV", labelEn: "IV", labelEs: "Vía intravenosa (IV)" },
   { value: "Shot", labelEn: "Shot", labelEs: "Inyección" },
-  { value: "Unsure", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro" },
+  { value: "Unsure/I don't know", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/ No lo sé" },
 ];
 
 export function Slide16ResolutionScreen({
   isSpanish,
   selected,
-  resolutionMedicines = [],
+  medicines,
+  resolutionMedicines,
+  route,
   resolutionRoute,
+  onSelectResolution,
   onSelect,
+  onSelectMedicines,
   onMedicinesSelect,
+  onSelectRoute,
   onRouteChange,
   onNext,
   onBack,
@@ -52,10 +68,29 @@ export function Slide16ResolutionScreen({
   const modal17HeadingRef = useRef<HTMLHeadingElement | null>(null);
   const modal18HeadingRef = useRef<HTMLHeadingElement | null>(null);
 
-  const [activeMeds, setActiveMeds] = useState<string[]>(resolutionMedicines);
-  const [activeRoute, setActiveRoute] = useState<string | undefined>(resolutionRoute);
+  const initialMeds = medicines ?? resolutionMedicines ?? [];
+  const initialRoute = route ?? resolutionRoute;
+  const handleResolution = onSelectResolution ?? onSelect ?? (() => {});
+  const handleMedicines = onSelectMedicines ?? onMedicinesSelect;
+  const handleRoute = onSelectRoute ?? onRouteChange;
+
   const [modal17Open, setModal17Open] = useState(false);
   const [modal18Open, setModal18Open] = useState(false);
+
+  const [activeMeds, setActiveMeds] = useState<string[]>(initialMeds);
+  const [activeRoute, setActiveRoute] = useState<string | undefined>(initialRoute);
+
+  useEffect(() => {
+    if (medicines !== undefined || resolutionMedicines !== undefined) {
+      setActiveMeds(medicines ?? resolutionMedicines ?? []);
+    }
+  }, [medicines, resolutionMedicines]);
+
+  useEffect(() => {
+    if (route !== undefined || resolutionRoute !== undefined) {
+      setActiveRoute(route ?? resolutionRoute);
+    }
+  }, [route, resolutionRoute]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -64,34 +99,51 @@ export function Slide16ResolutionScreen({
     return () => clearTimeout(timer);
   }, []);
 
+  // Trap focus for Modal 17 (Medicines)
   useEffect(() => {
-    if (modal17Open) {
-      setTimeout(() => modal17HeadingRef.current?.focus(), 50);
-    }
+    if (!modal17Open) return;
+    const timer = setTimeout(() => {
+      modal17HeadingRef.current?.focus();
+    }, 50);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setModal17Open(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [modal17Open]);
 
+  // Trap focus for Modal 18 (Route)
   useEffect(() => {
-    if (modal18Open) {
-      setTimeout(() => modal18HeadingRef.current?.focus(), 50);
-    }
+    if (!modal18Open) return;
+    const timer = setTimeout(() => {
+      modal18HeadingRef.current?.focus();
+    }, 50);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setModal18Open(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [modal18Open]);
 
   const handleMainOption = (val: string) => {
-    onSelect(val);
+    handleResolution(val);
     if (val === "With medication") {
-      setModal17Open(true);
-    } else {
-      onMedicinesSelect([]);
-      onRouteChange("");
+      setTimeout(() => setModal17Open(true), 150);
     }
   };
 
-  const toggleMedicine = (val: string) => {
+  const toggleMed = (val: string) => {
     let updated: string[];
-    if (val === "Unsure") {
-      updated = activeMeds.includes("Unsure") ? [] : ["Unsure"];
+    if (val === "Unsure/I don't know") {
+      updated = activeMeds.includes("Unsure/I don't know") ? [] : ["Unsure/I don't know"];
     } else {
-      const withoutUnsure = activeMeds.filter((m) => m !== "Unsure");
+      const withoutUnsure = activeMeds.filter((m) => m !== "Unsure/I don't know");
       if (withoutUnsure.includes(val)) {
         updated = withoutUnsure.filter((m) => m !== val);
       } else {
@@ -99,20 +151,20 @@ export function Slide16ResolutionScreen({
       }
     }
     setActiveMeds(updated);
-    onMedicinesSelect(updated);
+    if (handleMedicines) handleMedicines(updated);
   };
 
-  const handleRouteSelect = (r: string) => {
-    setActiveRoute(r);
-    onRouteChange(r);
+  const handleRouteSelect = (val: string) => {
+    setActiveRoute(val);
+    if (handleRoute) handleRoute(val);
   };
 
   return (
     <div
       id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-5 sm:p-7 shadow-md relative overflow-hidden flex flex-col justify-between min-h-[440px] max-h-[85vh]"
+      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-3.5 sm:p-6 md:p-7 shadow-md relative flex flex-col justify-between min-h-0 sm:min-h-[440px] max-h-none overflow-y-auto"
     >
-      <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-center space-y-4">
+      <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-center space-y-3 sm:space-y-4">
         {/* Main Heading */}
         <h1
           ref={headingRef}
@@ -125,10 +177,10 @@ export function Slide16ResolutionScreen({
         </h1>
 
         {/* Content: Options Row & Nurse Anna */}
-        <div className="flex items-center gap-4 sm:gap-6 pt-1">
-          {/* Horizontal Buttons */}
+        <div className="flex items-center gap-3 sm:gap-6 pt-1">
+          {/* Horizontal / Stacked Buttons */}
           <div className="flex-1 space-y-2">
-            <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={isSpanish ? "Resolución de la reacción" : "Reaction resolution"}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label={isSpanish ? "Resolución de la reacción" : "Reaction resolution"}>
               {RESOLUTION_OPTIONS.map((opt) => {
                 const isChecked = selected === opt.value;
                 const label = isSpanish ? opt.labelEs : opt.labelEn;
@@ -140,7 +192,7 @@ export function Slide16ResolutionScreen({
                     role="radio"
                     aria-checked={isChecked}
                     onClick={() => handleMainOption(opt.value)}
-                    className={`flex flex-col items-center justify-center p-3 min-h-[56px] rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer border ${
+                    className={`flex flex-col items-center justify-center p-2.5 sm:p-3 min-h-[48px] sm:min-h-[56px] rounded-xl text-center font-bold text-xs sm:text-sm transition cursor-pointer border ${
                       isChecked
                         ? "bg-[#236f7a] text-white border-[#1a555e] shadow-xs"
                         : "bg-[#82bdad] text-[#132c27] border-[#6fa99b] hover:bg-[#72ae9e]"
@@ -180,19 +232,19 @@ export function Slide16ResolutionScreen({
           </div>
 
           {/* Nurse Anna on Right */}
-          <div className="shrink-0 flex items-center justify-center">
+          <div className="shrink-0 hidden sm:flex items-center justify-center">
             <NurseAnna size="sm" isDecorative={true} />
           </div>
         </div>
       </div>
 
       {/* Paired Navigation Buttons */}
-      <div className="flex items-center justify-center gap-4 pt-4 mt-3 border-t border-slate-200/60">
+      <div className="flex items-center justify-center gap-4 pt-3 sm:pt-4 mt-2 sm:mt-3 border-t border-slate-200/60 shrink-0">
         <button
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="px-7 py-2 min-h-[44px] min-w-[110px] rounded-full bg-[#7da199] hover:bg-[#6c8e86] text-[#132c27] font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          className="px-6 sm:px-7 py-2 min-h-[44px] min-w-[100px] sm:min-w-[110px] rounded-full bg-[#7da199] hover:bg-[#6c8e86] text-[#132c27] font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
         >
           {isSpanish ? "Atrás" : "Back"}
         </button>
@@ -200,7 +252,7 @@ export function Slide16ResolutionScreen({
           type="button"
           onClick={onNext}
           disabled={!selected || loading}
-          className={`px-7 py-2 min-h-[44px] min-w-[110px] rounded-full font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
+          className={`px-6 sm:px-7 py-2 min-h-[44px] min-w-[100px] sm:min-w-[110px] rounded-full font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
             selected && !loading
               ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#d6be0e]"
               : "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300 shadow-none"
@@ -210,7 +262,9 @@ export function Slide16ResolutionScreen({
         </button>
       </div>
 
-      {/* MODAL 17: Multi-Select Medication Checkboxes */}
+      {/* ========================================================================= */}
+      {/* MODAL 17 (Figma 7-4-1): Multi-Select Medication Checkboxes */}
+      {/* ========================================================================= */}
       {modal17Open && (
         <div
           role="dialog"
@@ -231,25 +285,23 @@ export function Slide16ResolutionScreen({
                   : "What medicine was given to your child for the reaction?"}
               </h2>
               <p className="text-xs font-medium text-slate-500">
-                {isSpanish
-                  ? "Seleccione todos los medicamentos que correspondan."
-                  : "Select all medications that apply."}
+                {isSpanish ? "Seleccione todos los que correspondan." : "Select all that apply."}
               </p>
             </div>
 
             <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
-              {MEDICINE_CHECKBOX_OPTIONS.map((med) => {
-                const isChecked = activeMeds.includes(med.value);
-                const label = isSpanish ? med.labelEs : med.labelEn;
+              {MEDICATION_OPTIONS.map((opt) => {
+                const isChecked = activeMeds.includes(opt.value);
+                const label = isSpanish ? opt.labelEs : opt.labelEn;
 
                 return (
                   <button
-                    key={med.value}
+                    key={opt.value}
                     type="button"
                     role="checkbox"
                     aria-checked={isChecked}
-                    onClick={() => toggleMedicine(med.value)}
-                    className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 min-h-[42px] rounded-xl text-left font-semibold text-xs sm:text-sm transition cursor-pointer border ${
+                    onClick={() => toggleMed(opt.value)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-xl text-left font-semibold text-xs sm:text-sm transition cursor-pointer border ${
                       isChecked
                         ? "bg-[#236f7a] text-white border-[#1a555e] shadow-2xs"
                         : "bg-[#f8faf7] text-slate-800 border-slate-300 hover:bg-slate-100"
@@ -273,23 +325,26 @@ export function Slide16ResolutionScreen({
               })}
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+              <span className="text-[11px] font-mono text-slate-400">7-4-1</span>
               <button
                 type="button"
                 onClick={() => {
                   setModal17Open(false);
-                  setModal18Open(true);
+                  setTimeout(() => setModal18Open(true), 150);
                 }}
                 className="px-6 py-2 min-h-[44px] rounded-full bg-[#132338] hover:bg-[#0c1827] text-white font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
               >
-                {isSpanish ? "Siguiente: Vía de administración" : "Next: Route of Intake"}
+                {isSpanish ? "Siguiente: Vía" : "Next: Route"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL 18: Route of Administration */}
+      {/* ========================================================================= */}
+      {/* MODAL 18 (Figma 7-4-1-1): Route Administered Modal */}
+      {/* ========================================================================= */}
       {modal18Open && (
         <div
           role="dialog"
@@ -306,37 +361,52 @@ export function Slide16ResolutionScreen({
                 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight outline-none"
               >
                 {isSpanish
-                  ? "¿Cómo se le administró el medicamento?"
-                  : "How was the medicine given?"}
+                  ? "¿Cómo recibió su hijo el medicamento?"
+                  : "Did your child receive the medicine by:"}
               </h2>
             </div>
 
-            <div className="space-y-1.5 max-h-[50vh] overflow-y-auto pr-1">
-              {ROUTE_OPTIONS.map((rt) => {
-                const isRouteChecked = activeRoute === rt.value;
-                const rtLabel = isSpanish ? rt.labelEs : rt.labelEn;
+            <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+              {ROUTE_OPTIONS.map((opt) => {
+                const isChecked = activeRoute === opt.value;
+                const label = isSpanish ? opt.labelEs : opt.labelEn;
 
                 return (
                   <button
-                    key={rt.value}
+                    key={opt.value}
                     type="button"
-                    onClick={() => {
-                      handleRouteSelect(rt.value);
-                      setModal18Open(false);
-                    }}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 min-h-[42px] rounded-xl text-left font-semibold text-xs sm:text-sm transition cursor-pointer border ${
-                      isRouteChecked
+                    role="radio"
+                    aria-checked={isChecked}
+                    onClick={() => handleRouteSelect(opt.value)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-xl text-left font-semibold text-xs sm:text-sm transition cursor-pointer border ${
+                      isChecked
                         ? "bg-[#236f7a] text-white border-[#1a555e] shadow-2xs"
                         : "bg-[#f8faf7] text-slate-800 border-slate-300 hover:bg-slate-100"
                     } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] active:scale-[0.99]`}
                   >
-                    <span>{rtLabel}</span>
-                    <span className="text-xs opacity-75 font-bold">
-                      {isRouteChecked ? "✓" : "→"}
-                    </span>
+                    <div
+                      className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        isChecked ? "border-[#236f7a] bg-white" : "border-slate-400 bg-white"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      {isChecked && <div className="w-2 h-2 rounded-full bg-[#236f7a]" />}
+                    </div>
+                    <span className="leading-tight">{label}</span>
                   </button>
                 );
               })}
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+              <span className="text-[11px] font-mono text-slate-400">7-4-1-1</span>
+              <button
+                type="button"
+                onClick={() => setModal18Open(false)}
+                className="px-6 py-2 min-h-[44px] rounded-full bg-[#132338] hover:bg-[#0c1827] text-white font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+              >
+                {isSpanish ? "Guardar y continuar" : "Save and Continue"}
+              </button>
             </div>
           </div>
         </div>

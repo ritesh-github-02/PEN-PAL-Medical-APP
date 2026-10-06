@@ -222,6 +222,24 @@ export function generateAssessmentPDF(data: any): void {
               res = res.replace(/Rash/i, `Rash (${formattedDetails})`);
               res = res.replace(/Sarpullido/i, `Sarpullido (${formattedDetails})`);
             }
+            const swellingArr = Array.isArray(ans.swellingDetails)
+              ? ans.swellingDetails
+              : (typeof ans.swellingDetails === "string" ? (() => { try { return JSON.parse(ans.swellingDetails); } catch { return []; } })() : []);
+            if (swellingArr.length > 0) {
+              const formattedSwelling = isSpanish
+                ? swellingArr.map((d: string) => {
+                    if (d === "Face or eyes" || d === "Face / Eyes") return "Cara u ojos";
+                    if (d === "Lips") return "Labios";
+                    if (d === "Tongue") return "Lengua";
+                    if (d === "Throat") return "Garganta";
+                    if (d === "Hands or feet" || d === "Hands / Feet") return "Manos o pies";
+                    if (d === "Unsure" || d.includes("Unsure")) return "No estoy seguro";
+                    return d;
+                  }).join(", ")
+                : swellingArr.join(", ");
+              res = res.replace(/Swelling/i, `Swelling (${formattedSwelling})`);
+              res = res.replace(/Inflamación/i, `Inflamación (${formattedSwelling})`);
+            }
             if (ans.symptomsOther) {
               res += `, ${isSpanish ? "Otro" : "Other"}: ${ans.symptomsOther}`;
             }

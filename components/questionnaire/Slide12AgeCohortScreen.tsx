@@ -134,15 +134,15 @@ export function Slide12AgeCohortScreen({
   return (
     <div
       id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative overflow-hidden w-full max-w-4xl mx-auto flex flex-col justify-between p-5 sm:p-7 md:p-8 min-h-[520px] sm:min-h-[560px]"
+      className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative flex flex-col justify-between p-4 sm:p-6 md:p-8 min-h-0 sm:min-h-[520px] max-h-none overflow-y-auto w-full max-w-4xl mx-auto"
     >
       {/* Slide Heading */}
-      <div className="mb-4 sm:mb-6 md:mb-8 text-center">
+      <div className="mb-3 sm:mb-6 md:mb-8 text-center">
         <h2
           ref={slideTitleRef}
           tabIndex={-1}
           id="slide12-title"
-          className="text-lg sm:text-2xl md:text-3xl font-bold text-[#1f382f] tracking-tight leading-snug outline-none max-w-2xl mx-auto focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg p-1"
+          className="text-base sm:text-2xl md:text-3xl font-bold text-[#1f382f] tracking-tight leading-snug outline-none max-w-2xl mx-auto focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg p-1"
         >
           {titleText}
         </h2>
@@ -152,7 +152,7 @@ export function Slide12AgeCohortScreen({
       <div
         role="radiogroup"
         aria-labelledby="slide12-title"
-        className="grid grid-cols-5 gap-2 sm:gap-3 items-end justify-center w-full max-w-3xl mx-auto px-1 sm:px-2 my-auto"
+        className="grid grid-cols-5 gap-1.5 sm:gap-3 items-end justify-center w-full max-w-3xl mx-auto px-0.5 sm:px-2 my-auto"
       >
         {AGE_COHORTS.map((cohort, index) => {
           const isSelected = selected === cohort.value;
@@ -170,12 +170,13 @@ export function Slide12AgeCohortScreen({
               }}
             >
               {/* Character Illustration standing directly on top of button */}
-              <div className="h-16 sm:h-20 md:h-24 w-full flex items-end justify-center pb-1 select-none">
+              <div className="h-12 sm:h-20 md:h-24 w-full flex items-end justify-center pb-1 select-none">
                 <img
                   src={cohort.imageSrc}
                   alt=""
                   aria-hidden="true"
                   className="max-h-full w-auto object-contain transition-transform duration-200 group-hover:scale-105 pointer-events-none drop-shadow-2xs"
+                  style={{ imageRendering: "-webkit-optimize-contrast" }}
                 />
               </div>
 
@@ -200,10 +201,10 @@ export function Slide12AgeCohortScreen({
                     : "bg-[#82afb5] hover:bg-[#729fa5] text-[#132c27] border border-[#689196]"
                 }`}
               >
-                <span className="font-bold text-[11px] sm:text-xs md:text-sm leading-tight block">
+                <span className="font-bold text-[10px] sm:text-xs md:text-sm leading-tight block">
                   {title}
                 </span>
-                <span className="font-medium text-[9px] sm:text-[10px] md:text-xs leading-tight block mt-0.5 opacity-90">
+                <span className="font-medium text-[8px] sm:text-[10px] md:text-xs leading-tight block mt-0.5 opacity-90">
                   {subtitle}
                 </span>
               </button>
@@ -213,7 +214,7 @@ export function Slide12AgeCohortScreen({
       </div>
 
       {/* Centered Paired Navigation [ Back ] [ Next ] */}
-      <div className="flex items-center justify-center gap-6 sm:gap-8 pt-6 sm:pt-8 pb-2 mt-auto">
+      <div className="flex items-center justify-center gap-4 sm:gap-8 pt-4 sm:pt-6 pb-2 mt-auto">
         {/* Back Button */}
         <button
           type="button"
