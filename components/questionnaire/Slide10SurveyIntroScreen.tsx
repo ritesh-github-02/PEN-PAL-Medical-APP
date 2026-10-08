@@ -2,21 +2,20 @@
 
 import React, { useRef, useEffect } from "react";
 import { NurseAnna } from "./NurseAnna";
-import { resolveMedicineToken } from "@/lib/token-engine";
 
-const SLIDE4_CSS = `
+const SLIDE10_SURVEY_INTRO_CSS = `
 /* ==========================================================
-   Slide4AllergyBarrierScreen – Scoped Pixel-Perfect Styles
+   Slide10SurveyIntroScreen – Scoped Pixel-Perfect Styles
    ========================================================== */
 
-.s4-root,
-.s4-root *,
-.s4-root *::before,
-.s4-root *::after {
+.s10b-root,
+.s10b-root *,
+.s10b-root *::before,
+.s10b-root *::after {
   box-sizing: border-box;
 }
 
-.s4-root {
+.s10b-root {
   position: relative;
   width: 100%;
   height: 100%;
@@ -30,8 +29,8 @@ const SLIDE4_CSS = `
   overflow: hidden;
 }
 
-/* Middle Content: Large Speech Bubble + Nurse Anna Combo */
-.s4-middle {
+/* Middle Content: Nurse Anna (Left) + Large Speech Bubble (Right) */
+.s10b-middle {
   flex: 1 1 0%;
   min-height: 0;
   width: 100%;
@@ -41,35 +40,61 @@ const SLIDE4_CSS = `
   margin: auto;
 }
 
-.s4-combo {
+.s10b-combo {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   position: relative;
-  width: 680px;
-  height: 335px;
+  width: 700px;
+  height: 350px;
 }
 
-.s4-bubble {
+/* Nurse Anna standing on Left, mirrored horizontally to gesture toward the right */
+.s10b-nurse {
   position: relative;
-  width: 490px;
+  width: 125px;
+  height: auto;
+  max-height: 265px;
+  object-fit: contain;
+  align-self: flex-end;
+  margin-right: -42px;
+  margin-bottom: 5px;
+  z-index: 1;
+  flex-shrink: 0;
+  transform: scaleX(-1);
+}
+
+.s10b-nurse-img {
+  width: 100%;
+  height: auto;
+  max-height: 265px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Speech Bubble with pointer tail pointing to Anna on the left */
+.s10b-bubble {
+  position: relative;
+  width: 505px;
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 10px;
-  filter: drop-shadow(2px 4px 10px rgba(20, 60, 55, 0.18));
+  filter: drop-shadow(2px 3px 6px rgba(20, 60, 55, 0.18));
   z-index: 2;
 }
-.s4-bubble-svg {
+
+.s10b-bubble-svg {
   width: 100%;
   height: auto;
   display: block;
 }
-.s4-bubble-text-wrap {
+
+.s10b-bubble-text-wrap {
   position: absolute;
   top: 5%;
-  left: 5%;
+  left: 10%;
   width: 82%;
-  height: 84%;
+  height: 85%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -78,42 +103,23 @@ const SLIDE4_CSS = `
   pointer-events: none;
   padding: 0 16px;
 }
-.s4-bubble-text {
-  font-size: 19px;
+
+.s10b-bubble-text {
+  font-size: 19.5px;
   font-weight: 600;
-  line-height: 1.38;
+  line-height: 1.4;
   color: #142724;
   margin: 0;
   display: flex;
   flex-direction: column;
   outline: none;
 }
-.s4-bubble-text:focus-visible {
+.s10b-bubble-text:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
 }
 
-.s4-nurse {
-  position: relative;
-  width: 118px;
-  height: auto;
-  max-height: 250px;
-  object-fit: contain;
-  align-self: flex-end;
-  margin-left: -54px;
-  z-index: 1;
-  margin-bottom: 5px;
-  flex-shrink: 0;
-}
-.s4-nurse-img {
-  width: 100%;
-  height: auto;
-  max-height: 250px;
-  object-fit: contain;
-  display: block;
-}
-
 /* Bottom Centered Navigation */
-.s4-nav {
+.s10b-nav {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,8 +127,11 @@ const SLIDE4_CSS = `
   padding: 0.25rem 0;
   flex-shrink: 0;
 }
-.s4-btn {
+
+.s10b-btn {
   padding: 0.45rem 2rem;
+  min-height: 44px;
+  min-width: 100px;
   border-radius: 9999px;
   font-size: 0.95rem;
   font-weight: 500;
@@ -132,78 +141,99 @@ const SLIDE4_CSS = `
   cursor: pointer;
   border: none;
   transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.s4-btn:active {
+.s10b-btn:active {
   transform: scale(0.96);
 }
-.s4-btn:focus-visible {
+.s10b-btn:focus-visible {
   box-shadow: 0 0 0 4px #236f7a;
 }
 
-.s4-btn--back {
+.s10b-btn--back {
   background-color: #adc9c4;
   border: 1px solid #96bcb5;
 }
-.s4-btn--back:hover {
+.s10b-btn--back:hover {
   background-color: #9cbdb8;
 }
 
-.s4-btn--next {
+.s10b-btn--next {
   background-color: #fae88a;
   color: #143833;
   border: 1px solid #d8c85c;
 }
-.s4-btn--next:hover {
+.s10b-btn--next:hover {
   background-color: #f6df6e;
 }
 
 /* Tablet & Smaller Screens Scaling */
 @media (max-height: 600px), (max-width: 768px) {
-  .s4-root {
+  .s10b-root {
     padding: 1rem 1.5rem 0.5rem 1.5rem;
   }
-  .s4-combo {
-    width: 580px;
-    height: 290px;
+  .s10b-combo {
+    width: 590px;
+    height: 300px;
   }
-  .s4-bubble {
-    width: 420px;
+  .s10b-bubble {
+    width: 430px;
     margin-top: 8px;
   }
-  .s4-bubble-text {
-    font-size: 16px;
+  .s10b-bubble-text {
+    font-size: 16.5px;
     line-height: 1.35;
   }
-  .s4-nurse {
-    width: 100px;
-    max-height: 215px;
-    margin-left: -46px;
+  .s10b-nurse {
+    width: 105px;
+    max-height: 225px;
+    margin-right: -36px;
   }
-  .s4-nurse-img {
-    max-height: 215px;
+  .s10b-nurse-img {
+    max-height: 225px;
   }
-  .s4-btn {
+  .s10b-btn {
     padding: 0.35rem 1.6rem;
     font-size: 0.85rem;
   }
 }
+
+@media (max-width: 640px) {
+  .s10b-combo {
+    flex-direction: column-reverse;
+    align-items: center;
+    width: 100%;
+    height: auto;
+  }
+  .s10b-nurse {
+    margin-right: 0;
+    margin-top: 10px;
+  }
+  .s10b-bubble {
+    width: 100%;
+    max-width: 380px;
+  }
+  .s10b-bubble-text {
+    font-size: 15px;
+  }
+}
 `;
 
-export interface Slide4AllergyBarrierScreenProps {
+export interface Slide10SurveyIntroScreenProps {
   isSpanish: boolean;
-  medicationName?: string;
   onNext: () => void;
   onBack: () => void;
   loading?: boolean;
 }
 
-export function Slide4AllergyBarrierScreen({
+export function Slide10SurveyIntroScreen({
   isSpanish,
-  medicationName,
   onNext,
   onBack,
   loading = false,
-}: Slide4AllergyBarrierScreenProps) {
+}: Slide10SurveyIntroScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
 
   useEffect(() => {
@@ -213,20 +243,26 @@ export function Slide4AllergyBarrierScreen({
     return () => clearTimeout(timer);
   }, []);
 
-  const resolvedName = medicationName && medicationName.trim()
-    ? medicationName
-    : (isSpanish ? "La penicilina" : "[Name]");
-
   return (
-    <div id="slide-content" className="s4-root">
-      <style>{SLIDE4_CSS}</style>
+    <div id="slide-content" className="s10b-root">
+      <style>{SLIDE10_SURVEY_INTRO_CSS}</style>
 
-      {/* Middle Content: Large Speech Bubble + Nurse Anna Combo */}
-      <div className="s4-middle">
-        <div className="s4-combo">
-          {/* Custom Large Vector Speech Bubble with natural round shape and downward pointer tail */}
-          <div className="s4-bubble">
-            <svg viewBox="0 0 430 260" fill="none" className="s4-bubble-svg">
+      {/* Middle Content: Nurse Anna (Left) + Large Speech Bubble (Right) */}
+      <div className="s10b-middle">
+        <div className="s10b-combo">
+          {/* Nurse Anna standing on Left, mirrored to gesture toward speech bubble */}
+          <div className="s10b-nurse">
+            <NurseAnna
+              size="md"
+              imgClassName="s10b-nurse-img"
+              isDecorative={true}
+              locale={isSpanish ? "es" : "en"}
+            />
+          </div>
+
+          {/* Large Vector Speech Bubble with pointer tail pointing to Anna on the left */}
+          <div className="s10b-bubble">
+            <svg viewBox="0 0 430 260" fill="none" className="s10b-bubble-svg" aria-hidden="true">
               <path
                 d="M 213, 8
                    C 317, 8  404, 56  404, 120
@@ -237,6 +273,7 @@ export function Slide4AllergyBarrierScreen({
                    C 109, 236  28, 184  28, 120
                    C 28, 56  109, 8  213, 8
                    Z"
+                transform="translate(430, 0) scale(-1, 1)"
                 fill="#ffffff"
                 stroke="#27707e"
                 strokeWidth="2.8"
@@ -244,47 +281,36 @@ export function Slide4AllergyBarrierScreen({
                 strokeLinejoin="round"
               />
             </svg>
+
             {/* Centered Speech Text inside oval body */}
-            <div className="s4-bubble-text-wrap">
-              <h1 ref={headingRef} tabIndex={-1} className="s4-bubble-text">
+            <div className="s10b-bubble-text-wrap">
+              <h1 ref={headingRef} tabIndex={-1} className="s10b-bubble-text">
                 {isSpanish ? (
                   <>
-                    <span>{resolvedName} es uno de los mejores</span>
-                    <span>antibióticos. Pero muchos niños no</span>
-                    <span>lo reciben porque se cree</span>
-                    <span>que son alérgicos a él.</span>
+                    <span>El siguiente conjunto de preguntas puede</span>
+                    <span>ayudarlo a usted y al médico a decidir</span>
+                    <span>qué es lo mejor para su hijo.</span>
                   </>
                 ) : (
                   <>
-                    <span>{resolvedName} is one of the best</span>
-                    <span>antibiotics. But many kids do</span>
-                    <span>not get it because they are</span>
-                    <span>believed to be allergic to it.</span>
+                    <span>The next set of questions can help</span>
+                    <span>you and the doctor see what&apos;s best</span>
+                    <span>for your child.</span>
                   </>
                 )}
               </h1>
             </div>
           </div>
-
-          {/* Nurse Anna standing on bottom-right, head directly under bubble tail */}
-          <div className="s4-nurse">
-            <NurseAnna
-              size="md"
-              imgClassName="s4-nurse-img"
-              isDecorative={true}
-              locale={isSpanish ? "es" : "en"}
-            />
-          </div>
         </div>
       </div>
 
       {/* Bottom Centered Navigation Buttons (Back & Next) */}
-      <div className="s4-nav">
+      <div className="s10b-nav">
         <button
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="s4-btn s4-btn--back"
+          className="s10b-btn s10b-btn--back"
         >
           {isSpanish ? "Atrás" : "Back"}
         </button>
@@ -292,7 +318,7 @@ export function Slide4AllergyBarrierScreen({
           type="button"
           onClick={onNext}
           disabled={loading}
-          className="s4-btn s4-btn--next"
+          className="s10b-btn s10b-btn--next"
         >
           {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
         </button>
@@ -301,4 +327,4 @@ export function Slide4AllergyBarrierScreen({
   );
 }
 
-export default Slide4AllergyBarrierScreen;
+export default Slide10SurveyIntroScreen;

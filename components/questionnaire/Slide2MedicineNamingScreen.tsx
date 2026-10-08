@@ -1,10 +1,326 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import Image from "next/image";
 import { NurseAnna } from "./NurseAnna";
-import { SpeechBubble } from "./SpeechBubble";
-import { MEDICINE_OPTIONS } from "@/lib/token-engine";
+
+const SLIDE2_CSS = `
+/* ==========================================================
+   Slide2MedicineNamingScreen – Scoped Pixel-Perfect Styles
+   ========================================================== */
+
+.s2-root,
+.s2-root *,
+.s2-root *::before,
+.s2-root *::after {
+  box-sizing: border-box;
+}
+
+.s2-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #f4f8ec;
+  padding: 0.85rem 1.5rem 0.65rem 1.5rem;
+  overflow: hidden;
+}
+
+/* 1. Top Banner Pill */
+.s2-banner-wrap {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-top: 0.25rem;
+}
+.s2-banner {
+  display: inline-block;
+  background-color: #fef794;
+  color: #132623;
+  border: 2.5px solid #296a63;
+  padding: 0.5rem 2.75rem;
+  border-radius: 26px;
+  box-shadow: 0 5px 14px -2px rgba(20, 60, 55, 0.22);
+  text-align: center;
+  max-width: 44rem;
+}
+.s2-heading {
+  font-size: 1.15rem;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0;
+  outline: none;
+}
+.s2-heading:focus-visible {
+  box-shadow: 0 0 0 2px #236f7a;
+}
+
+/* 2. Middle Row */
+.s2-middle {
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.25rem;
+  padding: 0 0.5rem;
+  margin: auto 0;
+}
+
+/* Bottle */
+.s2-bottle-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.s2-bottle {
+  width: 5.5rem;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
+  user-select: none;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Checkbox Options */
+.s2-options {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.s2-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.125rem 0;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+.s2-option:focus-visible {
+  box-shadow: 0 0 0 2px #236f7a;
+}
+
+.s2-checkbox {
+  width: 1.625rem;
+  height: 1.625rem;
+  flex-shrink: 0;
+  border-radius: 2.5px;
+  border: 2px solid #386e68;
+  background-color: #cbd8d4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.s2-option:hover .s2-checkbox:not(.s2-checkbox--checked) {
+  border-color: #20524d;
+}
+.s2-checkbox--checked {
+  background-color: #226a63;
+  border-color: #174f49;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.s2-check-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: #ffffff;
+}
+
+.s2-option-label {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  font-weight: 400;
+  color: #152925;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+.s2-option:hover .s2-option-label {
+  color: #0f221e;
+}
+.s2-option-label--checked {
+  font-weight: 600;
+  color: #0d1e1a;
+}
+
+/* Right Section: Speech Bubble + Nurse Anna Combo */
+.s2-combo {
+  position: relative;
+  width: 345px;
+  height: 250px;
+  flex-shrink: 0;
+}
+
+.s2-bubble {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  width: 255px;
+  z-index: 2;
+  filter: drop-shadow(2px 3px 5px rgba(20, 60, 55, 0.18));
+}
+.s2-bubble-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.s2-bubble-text-wrap {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 82%;
+  height: 84%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  padding: 0 10px;
+}
+.s2-bubble-text {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.38;
+  color: #152925;
+  margin: 0;
+}
+
+.s2-nurse {
+  position: absolute;
+  bottom: 0;
+  right: 6px;
+  width: 102px;
+  height: auto;
+  max-height: 230px;
+  z-index: 1;
+}
+.s2-nurse-img {
+  width: 100%;
+  height: auto;
+  max-height: 230px;
+  object-fit: contain;
+  display: block;
+}
+
+/* 3. Navigation Bar */
+.s2-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.25rem 0;
+  flex-shrink: 0;
+}
+.s2-btn {
+  padding: 0.45rem 2rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #143833;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  outline: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+.s2-btn:active {
+  transform: scale(0.96);
+}
+.s2-btn:focus-visible {
+  box-shadow: 0 0 0 4px #236f7a;
+}
+
+.s2-btn--back {
+  background-color: #adc9c4;
+  border: 1px solid #96bcb5;
+}
+.s2-btn--back:hover {
+  background-color: #9cbdb8;
+}
+
+.s2-btn--next {
+  background-color: rgba(250, 232, 138, 0.75);
+  color: rgba(20, 56, 51, 0.7);
+  border: 1px solid rgba(216, 200, 92, 0.7);
+  cursor: not-allowed;
+}
+.s2-btn--next-enabled {
+  background-color: #fae88a;
+  color: #143833;
+  border: 1px solid #d8c85c;
+  cursor: pointer;
+}
+.s2-btn--next-enabled:hover {
+  background-color: #f6df6e;
+}
+
+/* Tablet & Smaller Screens Scaling */
+@media (max-height: 600px), (max-width: 768px) {
+  .s2-middle {
+    gap: 1.5rem;
+  }
+  .s2-bottle {
+    width: 4.5rem;
+    max-height: 165px;
+  }
+  .s2-options {
+    gap: 0.65rem;
+  }
+  .s2-checkbox {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+  .s2-check-icon {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+  .s2-option-label {
+    font-size: 1.05rem;
+  }
+  .s2-combo {
+    width: 300px;
+    height: 220px;
+  }
+  .s2-bubble {
+    width: 220px;
+  }
+  .s2-bubble-text {
+    font-size: 11.5px;
+    line-height: 1.32;
+  }
+  .s2-nurse {
+    width: 90px;
+    max-height: 200px;
+    right: 4px;
+  }
+  .s2-nurse-img {
+    max-height: 200px;
+  }
+  .s2-banner {
+    padding: 0.4rem 2rem;
+  }
+  .s2-heading {
+    font-size: 0.95rem;
+  }
+  .s2-btn {
+    padding: 0.35rem 1.6rem;
+    font-size: 0.85rem;
+  }
+}
+`;
 
 export interface Slide2MedicineNamingScreenProps {
   isSpanish: boolean;
@@ -14,6 +330,14 @@ export interface Slide2MedicineNamingScreenProps {
   onBack: () => void;
   loading?: boolean;
 }
+
+export const MEDICINE_OPTIONS_DISPLAY = [
+  { value: "Penicillin", labelEn: "Penicillin", labelEs: "Penicilina" },
+  { value: "Pink medicine", labelEn: "“Pink medicine”", labelEs: "“Medicina rosa”" },
+  { value: "Amoxicillin", labelEn: "Amoxicillin", labelEs: "Amoxicilina" },
+  { value: "Amoxicillin Clavulanate", labelEn: "Amoxicillin Clavulanate", labelEs: "Amoxicilina Clavulanato" },
+  { value: "Augmentin", labelEn: "Augmentin", labelEs: "Augmentin" },
+];
 
 export function Slide2MedicineNamingScreen({
   isSpanish,
@@ -32,136 +356,137 @@ export function Slide2MedicineNamingScreen({
     return () => clearTimeout(timer);
   }, []);
 
+  const nextEnabled = !!selected && !loading;
+
   return (
-    <div
-      id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-3.5 sm:p-6 md:p-7 shadow-md relative flex flex-col justify-between min-h-0 sm:min-h-[440px] max-h-none overflow-y-auto"
-    >
-      <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-center space-y-2.5 sm:space-y-4">
-        {/* 1. Header Pill (Yellow badge matching Figma) */}
-        <div className="flex justify-center">
-          <div className="inline-block bg-[#f0d411] text-[#1f382f] border border-[#d6be0e] px-4 sm:px-5 py-1 sm:py-1.5 rounded-full shadow-2xs text-center">
-            <h1
-              ref={headingRef}
-              tabIndex={-1}
-              className="text-xs sm:text-sm md:text-base font-bold tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
-            >
-              {isSpanish
-                ? "¡Primero hablemos de la penicilina. ¡Tiene muchos nombres!"
-                : "Let's first talk about penicillin. It has lots of names!"}
-            </h1>
-          </div>
+    <div id="slide-content" className="s2-root">
+      <style>{SLIDE2_CSS}</style>
+
+      {/* 1. Top Yellow Banner Pill */}
+      <div className="s2-banner-wrap">
+        <div className="s2-banner">
+          <h1 ref={headingRef} tabIndex={-1} className="s2-heading">
+            {isSpanish
+              ? "¡Primero hablemos de la penicilina. ¡Tiene muchos nombres!"
+              : "Let's first talk about penicillin. It has lots of names!"}
+          </h1>
+        </div>
+      </div>
+
+      {/* 2. Middle Content Row (Bottle + Checkboxes + Speech Bubble & Nurse Anna) */}
+      <div className="s2-middle">
+        {/* Pink Amoxicillin Bottle */}
+        <div className="s2-bottle-wrap">
+          <img
+            src="/images/amoxicillin-bottle.png"
+            alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
+            className="s2-bottle"
+          />
         </div>
 
-        {/* 2. Mobile Visual Header (< sm): Bottle & Nurse Anna side-by-side to save vertical space */}
-        <div className="flex sm:hidden items-center justify-around gap-2 px-1 py-1 bg-white/40 rounded-2xl border border-slate-200/60">
-          <div className="relative w-14 h-24 filter drop-shadow-2xs shrink-0">
-            <Image
-              src="/images/TonicBottle.png"
-              alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
-              fill
-              unoptimized
-              style={{ imageRendering: "-webkit-optimize-contrast" }}
-              className="object-contain"
-              priority
-            />
-          </div>
-          <div className="flex-1 max-w-[170px] text-center">
-            <p className="text-[10px] font-semibold text-slate-800 leading-tight">
-              {isSpanish
-                ? "¡Seleccione cómo lo llama! Usaremos el nombre que elija."
-                : "Select what you call it! We'll use the name you choose."}
-            </p>
-          </div>
-          <div className="shrink-0">
-            <NurseAnna size="sm" isDecorative={true} className="w-12 max-h-[80px]" />
-          </div>
-        </div>
-
-        {/* 3. Main Content Grid for Tablet/Desktop & Landscape */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 items-center">
-          {/* Left: Amoxicillin Bottle Artwork (Desktop / Tablet) */}
-          <div className="hidden sm:flex sm:col-span-3 justify-center items-center">
-            <div className="relative w-24 sm:w-32 h-36 sm:h-48 filter drop-shadow-xs">
-              <Image
-                src="/images/TonicBottle.png"
-                alt={isSpanish ? "Frasco de amoxicilina rosa para niños" : "Pink amoxicillin suspension bottle"}
-                fill
-                unoptimized
-                style={{ imageRendering: "-webkit-optimize-contrast" }}
-                className="object-contain"
-                priority
-              />
-            </div>
-          </div>
-
-          {/* Center: 5 Interactive Options */}
-          <div
-            className="sm:col-span-5 space-y-1 sm:space-y-1.5"
-            role="radiogroup"
-            aria-label={isSpanish ? "Seleccione el nombre que usa para el medicamento" : "Select what you call the medicine"}
-          >
-            {MEDICINE_OPTIONS.map((opt) => {
-              const isChecked = selected === opt.value;
-              const label = isSpanish ? opt.labelEs : opt.labelEn;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={isChecked}
-                  onClick={() => onSelect(opt.value)}
-                  className={`w-full flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:py-2 min-h-[40px] sm:min-h-[44px] rounded-xl text-left font-bold text-xs sm:text-sm transition cursor-pointer border ${
-                    isChecked
-                      ? "bg-[#236f7a] text-white border-[#1a555e] shadow-xs ring-2 ring-[#236f7a]/30"
-                      : "bg-white text-slate-800 border-slate-300 hover:bg-slate-50 hover:border-slate-400 shadow-2xs"
-                  } focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] active:scale-[0.99]`}
+        {/* Checkbox Options List */}
+        <div
+          className="s2-options"
+          role="radiogroup"
+          aria-label={isSpanish ? "Seleccione el nombre que usa para el medicamento" : "Select what you call the medicine"}
+        >
+          {MEDICINE_OPTIONS_DISPLAY.map((opt) => {
+            const isChecked = selected === opt.value;
+            const label = isSpanish ? opt.labelEs : opt.labelEn;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={isChecked}
+                onClick={() => onSelect(opt.value)}
+                className="s2-option"
+              >
+                <div
+                  className={`s2-checkbox${isChecked ? " s2-checkbox--checked" : ""}`}
+                  aria-hidden="true"
                 >
-                  <div
-                    className={`w-4 h-4 sm:w-5 sm:h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
-                      isChecked ? "border-white bg-[#1a555e]" : "border-slate-400 bg-white"
-                    }`}
-                    aria-hidden="true"
-                  >
-                    {isChecked && (
-                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className="leading-tight">{label}</span>
-                </button>
-              );
-            })}
+                  {isChecked && (
+                    <svg
+                      className="s2-check-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth="3.5"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <span className={`s2-option-label${isChecked ? " s2-option-label--checked" : ""}`}>
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right Section: Speech Bubble + Nurse Anna Combo */}
+        <div className="s2-combo">
+          {/* Custom Vector Speech Bubble with natural round shape and downward pointer tail */}
+          <div className="s2-bubble">
+            <svg viewBox="0 0 430 260" fill="none" className="s2-bubble-svg">
+              <path
+                d="M 213, 8
+                   C 317, 8  404, 56  404, 120
+                   C 404, 146  388, 172  360, 189
+                   C 375, 204  392, 222  409, 239
+                   C 390, 241  356, 233  325, 214
+                   C 292, 228  254, 236  213, 236
+                   C 109, 236  28, 184  28, 120
+                   C 28, 56  109, 8  213, 8
+                   Z"
+                fill="#ffffff"
+                stroke="#27707e"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {/* Centered Speech Text inside oval body */}
+            <div className="s2-bubble-text-wrap">
+              <p className="s2-bubble-text">
+                {isSpanish ? (
+                  <>
+                    ¡Seleccione cómo lo llama!<br />
+                    Usaremos el nombre que elija<br />
+                    durante nuestro tiempo juntos.
+                  </>
+                ) : (
+                  <>
+                    Select what you call it! We&apos;ll<br />
+                    use the name you choose<br />
+                    during our time together.
+                  </>
+                )}
+              </p>
+            </div>
           </div>
 
-          {/* Right: Nurse Anna with Speech Bubble (Desktop / Tablet) */}
-          <div className="hidden sm:flex sm:col-span-4 items-center justify-center sm:justify-end gap-2">
-            <SpeechBubble
-              tailPosition="right-center"
-              className="max-w-[180px] p-2.5 text-center"
-            >
-              <p className="text-[11px] sm:text-xs font-semibold text-slate-800 leading-snug">
-                {isSpanish
-                  ? "¡Seleccione cómo lo llama! Usaremos el nombre que elija durante nuestro tiempo juntos."
-                  : "Select what you call it! We'll use the name you choose during our time together."}
-              </p>
-            </SpeechBubble>
-
-            <div className="shrink-0 flex items-center justify-center">
-              <NurseAnna size="sm" isDecorative={true} />
-            </div>
+          {/* Nurse Anna Illustration standing on bottom-right, head directly under bubble tail */}
+          <div className="s2-nurse">
+            <NurseAnna
+              size="md"
+              imgClassName="s2-nurse-img"
+              isDecorative={true}
+              locale={isSpanish ? "es" : "en"}
+            />
           </div>
         </div>
       </div>
 
-      {/* 3. Bottom Paired Navigation Buttons (Always visible and reachable) */}
-      <div className="flex items-center justify-center gap-4 pt-3 sm:pt-4 mt-2 sm:mt-3 border-t border-slate-200/60 shrink-0">
+      {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}
+      <div className="s2-nav">
         <button
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="px-6 sm:px-7 py-2 min-h-[44px] min-w-[100px] sm:min-w-[110px] rounded-full bg-[#7da199] hover:bg-[#6c8e86] text-[#132c27] font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          className="s2-btn s2-btn--back"
         >
           {isSpanish ? "Atrás" : "Back"}
         </button>
@@ -169,11 +494,7 @@ export function Slide2MedicineNamingScreen({
           type="button"
           onClick={onNext}
           disabled={!selected || loading}
-          className={`px-6 sm:px-7 py-2 min-h-[44px] min-w-[100px] sm:min-w-[110px] rounded-full font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-            selected && !loading
-              ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#d6be0e]"
-              : "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300 shadow-none"
-          }`}
+          className={`s2-btn s2-btn--next${nextEnabled ? " s2-btn--next-enabled" : ""}`}
         >
           {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
         </button>

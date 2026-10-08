@@ -4,6 +4,318 @@ import React, { useState, useRef, useEffect } from "react";
 import { NurseAnna } from "./NurseAnna";
 import { resolveMedicineToken } from "@/lib/token-engine";
 
+const SLIDE11_CSS = `
+/* ==========================================================
+   Slide11SymptomsScreen – Scoped Pixel-Perfect Styles
+   ========================================================== */
+
+.s11-root,
+.s11-root *,
+.s11-root *::before,
+.s11-root *::after {
+  box-sizing: border-box;
+}
+
+.s11-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #f4f8ec;
+  padding: 1.5rem 2.5rem 0.85rem 2.5rem;
+  overflow: hidden;
+}
+
+/* Top Heading */
+.s11-top-section {
+  width: 100%;
+  padding-left: 0.25rem;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+.s11-heading {
+  font-size: 1.35rem;
+  line-height: 1.38;
+  font-weight: 700;
+  color: #142724;
+  letter-spacing: -0.015em;
+  margin: 0;
+  outline: none;
+}
+.s11-heading:focus-visible {
+  box-shadow: 0 0 0 2px #236f7a;
+}
+
+/* Middle Content: Sage Green Card (Left) + Nurse Anna (Right) */
+.s11-middle {
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0 0.25rem;
+  margin: auto 0;
+}
+
+/* Sage Green Container Card */
+.s11-card {
+  flex: 1 1 0%;
+  max-width: 580px;
+  background-color: #84aba0;
+  border-radius: 20px;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 4px 14px -3px rgba(20, 60, 55, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Rows of symptom chips */
+.s11-chip-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.s11-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  background-color: #ffffff;
+  color: #142724;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 9px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  outline: none;
+}
+
+.s11-chip:hover {
+  background-color: #f7faf8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+}
+
+.s11-chip:active {
+  transform: scale(0.97);
+}
+
+.s11-chip:focus-visible {
+  box-shadow: 0 0 0 3px #1f4a43;
+}
+
+/* Checked / Active Chip State */
+.s11-chip--checked {
+  background-color: #1f4d45;
+  color: #ffffff;
+  border-color: #163d36;
+  box-shadow: 0 2px 6px rgba(10, 40, 35, 0.25);
+}
+
+.s11-chip--checked:hover {
+  background-color: #19423b;
+}
+
+.s11-chip-edit {
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+/* Row 5: Other describe underline + Unsure chip */
+.s11-row-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+
+.s11-other-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.s11-other-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #142724;
+  white-space: nowrap;
+}
+
+.s11-other-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #142724;
+  outline: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #142724;
+  padding: 2px 4px;
+}
+
+.s11-other-input::placeholder {
+  color: rgba(20, 39, 36, 0.55);
+}
+
+.s11-other-input:focus {
+  border-bottom-color: #0b1f1c;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px 4px 0 0;
+}
+
+/* Right Section: Nurse Anna */
+.s11-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.s11-nurse {
+  width: 120px;
+  height: auto;
+  max-height: 255px;
+}
+
+.s11-nurse-img {
+  width: 100%;
+  height: auto;
+  max-height: 255px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Bottom Centered Navigation */
+.s11-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.25rem 0;
+  flex-shrink: 0;
+}
+
+.s11-btn {
+  padding: 0.45rem 2rem;
+  min-height: 44px;
+  min-width: 100px;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #143833;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  outline: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.s11-btn:active {
+  transform: scale(0.96);
+}
+.s11-btn:focus-visible {
+  box-shadow: 0 0 0 4px #236f7a;
+}
+
+.s11-btn--back {
+  background-color: #adc9c4;
+  border: 1px solid #96bcb5;
+}
+.s11-btn--back:hover {
+  background-color: #9cbdb8;
+}
+
+.s11-btn--next {
+  background-color: #fae88a;
+  color: #143833;
+  border: 1px solid #d8c85c;
+}
+.s11-btn--next:hover {
+  background-color: #f6df6e;
+}
+
+.s11-btn--disabled {
+  background-color: rgba(250, 232, 138, 0.5);
+  color: rgba(20, 56, 51, 0.45);
+  border-color: rgba(216, 200, 92, 0.45);
+  cursor: not-allowed;
+}
+.s11-btn--disabled:hover {
+  background-color: rgba(250, 232, 138, 0.5);
+}
+
+/* Tablet & Smaller Screens Scaling */
+@media (max-height: 650px), (max-width: 820px) {
+  .s11-root {
+    padding: 1rem 1.5rem 0.5rem 1.5rem;
+  }
+  .s11-card {
+    max-width: 480px;
+    padding: 1rem 1.2rem;
+    gap: 0.55rem;
+  }
+  .s11-chip {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.8rem;
+  }
+  .s11-other-label, .s11-other-input {
+    font-size: 0.8rem;
+  }
+  .s11-nurse {
+    width: 95px;
+    max-height: 215px;
+  }
+  .s11-nurse-img {
+    max-height: 215px;
+  }
+  .s11-btn {
+    padding: 0.35rem 1.6rem;
+    font-size: 0.85rem;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .s11-root {
+    overflow-y: auto;
+    height: auto;
+    min-height: 100%;
+  }
+  .s11-middle {
+    flex-direction: column;
+    align-items: center;
+  }
+  .s11-card {
+    max-width: 100%;
+    width: 100%;
+  }
+  .s11-right {
+    margin-top: 1rem;
+  }
+}
+`;
+
 export interface Slide11SymptomsScreenProps {
   isSpanish: boolean;
   medicationName?: string;
@@ -20,30 +332,37 @@ export interface Slide11SymptomsScreenProps {
   loading?: boolean;
 }
 
-interface SymptomOption {
+interface SymptomItem {
   value: string;
   labelEn: string;
   labelEs: string;
 }
 
-const SYMPTOM_OPTIONS: SymptomOption[] = [
+const ROW_1: SymptomItem[] = [
   { value: "Rash", labelEn: "Rash", labelEs: "Sarpullido" },
   { value: "Swelling", labelEn: "Swelling", labelEs: "Inflamación" },
   { value: "Fainting or dizziness", labelEn: "Fainting or dizziness", labelEs: "Desmayos o mareos" },
   { value: "Itchiness", labelEn: "Itchiness", labelEs: "Picazón" },
+];
+
+const ROW_2: SymptomItem[] = [
   { value: "Throat tightness", labelEn: "Throat tightness", labelEs: "Opresión en la garganta" },
   { value: "Shortness of breath", labelEn: "Shortness of breath or hard time breathing", labelEs: "Dificultad para respirar" },
-  { value: "Fever", labelEn: "Fever (new or worse)", labelEs: "Fiebre (nueva o peor)" },
+];
+
+const ROW_3: SymptomItem[] = [
+  { value: "Fever", labelEn: "Fever (new fever or worse fever)", labelEs: "Fiebre (nueva o peor)" },
   { value: "Belly pain", labelEn: "Belly pain", labelEs: "Dolor abdominal" },
   { value: "Diarrhea", labelEn: "Diarrhea", labelEs: "Diarrea" },
+];
+
+const ROW_4: SymptomItem[] = [
   { value: "Joint pain", labelEn: "Joint pain", labelEs: "Dolor articular" },
   { value: "Vomiting", labelEn: "Wanted to throw up or threw up", labelEs: "Ganas de vomitar o vomitó" },
   { value: "Muscle aches", labelEn: "Muscle aches", labelEs: "Dolores musculares" },
-  { value: "Other", labelEn: "Other: Please describe", labelEs: "Otro: Describa" },
-  { value: "Unsure", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro" },
 ];
 
-const RASH_SUBTYPE_OPTIONS: SymptomOption[] = [
+const RASH_SUBTYPE_OPTIONS: SymptomItem[] = [
   { value: "Hives", labelEn: "Hives", labelEs: "Ronchas (Urticaria)" },
   { value: "Blisters", labelEn: "Blisters", labelEs: "Ampollas" },
   { value: "Red, fine or bumpy rash", labelEn: "Red, fine or bumpy rash", labelEs: "Sarpullido rojo, fino o con protuberancias" },
@@ -52,7 +371,7 @@ const RASH_SUBTYPE_OPTIONS: SymptomOption[] = [
   { value: "Unsure", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro" },
 ];
 
-const SWELLING_SUBTYPE_OPTIONS: SymptomOption[] = [
+const SWELLING_SUBTYPE_OPTIONS: SymptomItem[] = [
   { value: "Face or eyes", labelEn: "Face or eyes", labelEs: "Cara u ojos" },
   { value: "Lips", labelEn: "Lips", labelEs: "Labios" },
   { value: "Tongue", labelEn: "Tongue", labelEs: "Lengua" },
@@ -167,6 +486,22 @@ export function Slide11SymptomsScreen({
     }
   };
 
+  const handleOtherChange = (text: string) => {
+    setOtherText(text);
+    if (onSymptomsOtherChange) onSymptomsOtherChange(text);
+
+    let updated = [...symptoms];
+    if (text.trim() && !updated.includes("Other")) {
+      updated = [...updated.filter((s) => s !== "Unsure"), "Other"];
+      setSymptoms(updated);
+      onSelectSymptoms(updated);
+    } else if (!text.trim() && updated.includes("Other")) {
+      updated = updated.filter((s) => s !== "Other");
+      setSymptoms(updated);
+      onSelectSymptoms(updated);
+    }
+  };
+
   const toggleRashDetail = (val: string) => {
     let updated: string[];
     if (val === "Unsure") {
@@ -209,135 +544,151 @@ export function Slide11SymptomsScreen({
 
   const titleText = resolveMedicineToken(rawTitle, medicationName, isSpanish);
 
+  const isNextEnabled = symptoms.length > 0 || otherText.trim().length > 0;
+
+  const renderChip = (item: SymptomItem) => {
+    const isChecked = symptoms.includes(item.value);
+    const label = isSpanish ? item.labelEs : item.labelEn;
+
+    return (
+      <button
+        key={item.value}
+        type="button"
+        role="checkbox"
+        aria-checked={isChecked}
+        onClick={(e) => toggleSymptom(item.value, e)}
+        className={`s11-chip${isChecked ? " s11-chip--checked" : ""}`}
+      >
+        <span>{label}</span>
+        {item.value === "Rash" && isChecked && activeRashDetails.length > 0 && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              modalTriggerRef.current = e.currentTarget as any;
+              setRashModalOpen(true);
+            }}
+            className="s11-chip-edit"
+            title={isSpanish ? "Editar tipo de sarpullido" : "Edit rash details"}
+            aria-label={isSpanish ? "Editar tipo de sarpullido" : "Edit rash details"}
+          >
+            ✎
+          </span>
+        )}
+        {item.value === "Swelling" && isChecked && activeSwellingDetails.length > 0 && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              swellingTriggerRef.current = e.currentTarget as any;
+              setSwellingModalOpen(true);
+            }}
+            className="s11-chip-edit"
+            title={isSpanish ? "Editar tipo de inflamación" : "Edit swelling details"}
+            aria-label={isSpanish ? "Editar tipo de inflamación" : "Edit swelling details"}
+          >
+            ✎
+          </span>
+        )}
+      </button>
+    );
+  };
+
   return (
-    <div
-      id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-3.5 sm:p-6 md:p-7 shadow-md relative flex flex-col justify-between min-h-0 sm:min-h-[440px] max-h-none overflow-y-auto"
-    >
-      <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-center space-y-2.5 sm:space-y-3">
-        {/* Main Heading */}
+    <div id="slide-content" className="s11-root">
+      <style>{SLIDE11_CSS}</style>
+
+      {/* 1. Main Heading */}
+      <div className="s11-top-section">
         <h1
           ref={headingRef}
           tabIndex={-1}
-          className="text-xs sm:text-sm md:text-base font-bold text-slate-900 tracking-tight leading-snug text-left outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+          className="s11-heading"
         >
           {titleText}
         </h1>
+      </div>
 
-        {/* Symptoms List & Nurse Anna Side-by-Side */}
-        <div className="flex items-center gap-3 sm:gap-4">
-          {/* Symptoms Grid */}
-          <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-1.5" role="group" aria-label={titleText}>
-            {SYMPTOM_OPTIONS.map((opt) => {
-              const isChecked = symptoms.includes(opt.value);
-              const label = isSpanish ? opt.labelEs : opt.labelEn;
-              const isRashWithSubtypes = opt.value === "Rash" && isChecked && activeRashDetails.length > 0;
-              const isSwellingWithSubtypes = opt.value === "Swelling" && isChecked && activeSwellingDetails.length > 0;
-
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  role="checkbox"
-                  aria-checked={isChecked}
-                  onClick={(e) => toggleSymptom(opt.value, e)}
-                  className={`flex items-center justify-between gap-1.5 px-2.5 py-1.5 min-h-[38px] sm:min-h-[40px] rounded-xl text-left font-semibold text-[11px] sm:text-xs transition cursor-pointer border ${
-                    isChecked
-                      ? "bg-[#236f7a] text-white border-[#1a555e] shadow-2xs"
-                      : "bg-white text-slate-800 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
-                  } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] active:scale-[0.99]`}
-                >
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <div
-                      className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 ${
-                        isChecked ? "border-white bg-[#1a555e]" : "border-slate-400 bg-white"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      {isChecked && (
-                        <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="truncate leading-tight">{label}</span>
-                  </div>
-
-                  {opt.value === "Rash" && isChecked && (
-                    <span
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        modalTriggerRef.current = e.currentTarget as any;
-                        setRashModalOpen(true);
-                      }}
-                      className="text-[10px] bg-white/25 hover:bg-white/40 text-white font-bold px-1.5 py-0.5 rounded cursor-pointer shrink-0 transition"
-                      aria-label={isSpanish ? "Editar tipo de sarpullido" : "Edit rash type"}
-                    >
-                      ✎
-                    </span>
-                  )}
-
-                  {opt.value === "Swelling" && isChecked && (
-                    <span
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        swellingTriggerRef.current = e.currentTarget as any;
-                        setSwellingModalOpen(true);
-                      }}
-                      className="text-[10px] bg-white/25 hover:bg-white/40 text-white font-bold px-1.5 py-0.5 rounded cursor-pointer shrink-0 transition"
-                      aria-label={isSpanish ? "Editar tipo de inflamación" : "Edit swelling details"}
-                    >
-                      ✎
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+      {/* 2. Middle Content: Sage Green Card + Nurse Anna */}
+      <div className="s11-middle">
+        {/* Sage Green Card Container */}
+        <div className="s11-card" role="group" aria-label={titleText}>
+          {/* Row 1 */}
+          <div className="s11-chip-row">
+            {ROW_1.map(renderChip)}
           </div>
 
-          {/* Nurse Anna on the Right (Tablet / Desktop) */}
-          <div className="shrink-0 hidden sm:flex items-center justify-center">
-            <NurseAnna size="sm" isDecorative={true} />
+          {/* Row 2 */}
+          <div className="s11-chip-row">
+            {ROW_2.map(renderChip)}
+          </div>
+
+          {/* Row 3 */}
+          <div className="s11-chip-row">
+            {ROW_3.map(renderChip)}
+          </div>
+
+          {/* Row 4 */}
+          <div className="s11-chip-row">
+            {ROW_4.map(renderChip)}
+          </div>
+
+          {/* Row 5: Other Input + Unsure Chip */}
+          <div className="s11-row-bottom">
+            <div className="s11-other-wrap">
+              <label htmlFor="symptoms-other-input" className="s11-other-label">
+                {isSpanish ? "Otro: Describa" : "Other: Please describe"}
+              </label>
+              <input
+                id="symptoms-other-input"
+                type="text"
+                value={otherText}
+                onChange={(e) => handleOtherChange(e.target.value)}
+                placeholder="________________"
+                className="s11-other-input"
+                aria-label={isSpanish ? "Otro síntoma, por favor describa" : "Other symptom, please describe"}
+              />
+            </div>
+
+            {/* Unsure/I don't know */}
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={symptoms.includes("Unsure")}
+              onClick={(e) => toggleSymptom("Unsure", e)}
+              className={`s11-chip${symptoms.includes("Unsure") ? " s11-chip--checked" : ""}`}
+            >
+              <span>{isSpanish ? "No estoy seguro/ No lo sé" : "Unsure/I don't know"}</span>
+            </button>
           </div>
         </div>
 
-        {/* Other text description input if Other is checked */}
-        {symptoms.includes("Other") && (
-          <div className="pt-1">
-            <input
-              id="symptoms-other"
-              type="text"
-              value={otherText}
-              onChange={(e) => {
-                setOtherText(e.target.value);
-                if (onSymptomsOtherChange) onSymptomsOtherChange(e.target.value);
-              }}
-              placeholder={isSpanish ? "Describa otros síntomas..." : "Describe other symptoms..."}
-              className="w-full px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-900 font-medium text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+        {/* Nurse Anna on Right */}
+        <div className="s11-right">
+          <div className="s11-nurse">
+            <NurseAnna
+              size="md"
+              imgClassName="s11-nurse-img"
+              isDecorative={true}
+              locale={isSpanish ? "es" : "en"}
             />
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Paired Navigation Buttons */}
-      <div className="flex items-center justify-center gap-4 pt-3 sm:pt-4 mt-2 sm:mt-3 border-t border-slate-200/60 shrink-0">
+      {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}
+      <div className="s11-nav">
         <button
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="px-6 sm:px-7 py-2 min-h-[44px] min-w-[100px] sm:min-w-[110px] rounded-full bg-[#7da199] hover:bg-[#6c8e86] text-[#132c27] font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          className="s11-btn s11-btn--back"
         >
           {isSpanish ? "Atrás" : "Back"}
         </button>
         <button
           type="button"
           onClick={onNext}
-          disabled={symptoms.length === 0 || loading}
-          className={`px-6 sm:px-7 py-2 min-h-[44px] min-w-[100px] sm:min-w-[110px] rounded-full font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-            symptoms.length > 0 && !loading
-              ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#d6be0e]"
-              : "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300 shadow-none"
-          }`}
+          disabled={!isNextEnabled || loading}
+          className={`s11-btn s11-btn--next${!isNextEnabled || loading ? " s11-btn--disabled" : ""}`}
         >
           {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
         </button>

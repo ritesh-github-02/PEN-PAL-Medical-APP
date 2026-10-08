@@ -141,6 +141,17 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     audioEn: '/audio/exported/screen4_testing_en.mp3',
     audioEs: '/audio/exported/screen4_testing_es.mp3',
     required: true,
+    nextStepId: 'screen6_survey_intro'
+  },
+  // Slide 10b / Survey Intro Transition: Clinical Survey Overview
+  {
+    id: 'screen6_survey_intro',
+    type: 'education',
+    titleEn: "The next set of questions can help you and the doctor see what's best for your child.",
+    titleEs: "El siguiente conjunto de preguntas puede ayudarlo a usted y al médico a decidir qué es lo mejor para su hijo.",
+    audioEn: '/audio/exported/screen6_survey_intro_en.mp3',
+    audioEs: '/audio/exported/screen6_survey_intro_es.mp3',
+    required: true,
     nextStepId: 'screen6_1_symptoms'
   },
   // Slide 11: Reported Symptoms Checklist (& Modal 11B)

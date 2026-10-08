@@ -1,6 +1,301 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import { resolveMedicineToken } from "@/lib/token-engine";
+
+const SLIDE12_CSS = `
+/* ==========================================================
+   Slide12AgeCohortScreen – Exact Target Design Pixel-Perfect Styles
+   ========================================================== */
+
+.s12-root,
+.s12-root *,
+.s12-root *::before,
+.s12-root *::after {
+  box-sizing: border-box;
+}
+
+.s12-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #f6faee;
+  padding: 1.5rem 2.5rem 0.85rem 2.5rem;
+  overflow: hidden;
+}
+
+/* Heading */
+.s12-top-section {
+  width: 100%;
+  text-align: center;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+.s12-heading {
+  font-size: 1.42rem;
+  line-height: 1.35;
+  font-weight: 700;
+  color: #142724;
+  letter-spacing: -0.015em;
+  margin: 0;
+  outline: none;
+}
+.s12-heading:focus-visible {
+  box-shadow: 0 0 0 2px #236f7a;
+}
+
+/* Cohorts Row (Centered) */
+.s12-middle {
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto 0;
+  padding: 0.25rem 0;
+}
+
+.s12-cohorts-grid {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 820px;
+}
+
+.s12-cohort-col {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: pointer;
+  user-select: none;
+}
+
+.s12-cohort-img-wrap {
+  width: 100%;
+  height: 185px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: 0px;
+  pointer-events: none;
+}
+
+.s12-cohort-img {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  display: block;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 2px 4px rgba(20, 50, 45, 0.08));
+}
+
+.s12-cohort-col:hover .s12-cohort-img {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.s12-cohort-col--selected .s12-cohort-img {
+  transform: translateY(-3px);
+}
+
+.s12-cohort-btn {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 9px;
+  padding: 0.45rem 0.35rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  background-color: #beddd7;
+  border: 1.5px solid #4a867e;
+  color: #142724;
+  box-shadow: 0 3px 6px rgba(20, 50, 45, 0.12);
+  transition: all 0.18s ease;
+  outline: none;
+}
+
+.s12-cohort-btn:hover {
+  background-color: #aed5ce;
+  border-color: #3b746c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(20, 50, 45, 0.18);
+}
+
+.s12-cohort-btn:active {
+  transform: scale(0.97);
+}
+
+.s12-cohort-btn:focus-visible {
+  box-shadow: 0 0 0 3px #1f4a43;
+}
+
+/* Checked / Selected Cohort Button */
+.s12-cohort-btn--selected {
+  background-color: #1f4d45;
+  border-color: #153933;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(10, 40, 35, 0.28);
+}
+
+.s12-cohort-btn--selected:hover {
+  background-color: #19433b;
+}
+
+.s12-cohort-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: inherit;
+}
+
+.s12-cohort-subtitle {
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-top: 2px;
+  opacity: 0.92;
+  color: inherit;
+}
+
+/* Navigation Bar */
+.s12-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.25rem 0 0.5rem 0;
+  flex-shrink: 0;
+}
+
+.s12-btn {
+  padding: 0.45rem 2.2rem;
+  min-height: 42px;
+  min-width: 104px;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #143833;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  outline: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.s12-btn:active {
+  transform: scale(0.96);
+}
+.s12-btn:focus-visible {
+  box-shadow: 0 0 0 4px #236f7a;
+}
+
+.s12-btn--back {
+  background-color: #adcbc7;
+  border: 1px solid #94b9b4;
+}
+.s12-btn--back:hover {
+  background-color: #9cbdb8;
+}
+
+.s12-btn--next {
+  background-color: #fae98f;
+  color: #143833;
+  border: 1px solid #dac85e;
+}
+.s12-btn--next:hover {
+  background-color: #f7e37b;
+}
+
+.s12-btn--disabled {
+  background-color: rgba(250, 233, 143, 0.5);
+  color: rgba(20, 56, 51, 0.45);
+  border-color: rgba(218, 200, 94, 0.45);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Tablet & Mobile Scaling */
+@media (max-height: 700px), (max-width: 860px) {
+  .s12-root {
+    padding: 1rem 1.75rem 0.5rem 1.75rem;
+  }
+  .s12-heading {
+    font-size: 1.25rem;
+  }
+  .s12-cohorts-grid {
+    gap: 0.85rem;
+    max-width: 700px;
+  }
+  .s12-cohort-img-wrap {
+    height: 155px;
+  }
+  .s12-cohort-btn {
+    min-height: 46px;
+    padding: 0.35rem 0.25rem;
+  }
+  .s12-cohort-title {
+    font-size: 0.86rem;
+  }
+  .s12-cohort-subtitle {
+    font-size: 0.72rem;
+  }
+  .s12-btn {
+    padding: 0.38rem 1.8rem;
+    font-size: 0.9rem;
+    min-height: 38px;
+  }
+}
+
+@media (max-height: 580px) {
+  .s12-cohort-img-wrap {
+    height: 125px;
+  }
+  .s12-cohort-btn {
+    min-height: 42px;
+  }
+  .s12-cohort-title {
+    font-size: 0.8rem;
+  }
+  .s12-cohort-subtitle {
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .s12-root {
+    overflow-y: auto;
+    height: auto;
+    min-height: 100%;
+  }
+  .s12-cohorts-grid {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .s12-cohort-col {
+    flex: 1 1 40%;
+  }
+  .s12-cohort-img-wrap {
+    height: 130px;
+  }
+}
+`;
 
 export interface AgeCohortOption {
   value: string;
@@ -20,7 +315,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(0-12 months)",
     titleEs: "Bebé",
     subtitleEs: "(0-12 meses)",
-    imageSrc: "/images/cohorts/baby.png",
+    imageSrc: "/images/cohorts/clean_baby.png?v=3",
     altEn: "Baby aged 0 to 12 months",
     altEs: "Bebé de 0 a 12 meses",
   },
@@ -30,7 +325,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(1-3 years)",
     titleEs: "Niño pequeño",
     subtitleEs: "(1-3 años)",
-    imageSrc: "/images/cohorts/toddler.png",
+    imageSrc: "/images/cohorts/clean_toddler.png?v=3",
     altEn: "Toddler aged 1 to 3 years",
     altEs: "Niño pequeño de 1 a 3 años",
   },
@@ -40,7 +335,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(4-12 years)",
     titleEs: "Edad escolar",
     subtitleEs: "(4-12 años)",
-    imageSrc: "/images/cohorts/school-aged.png",
+    imageSrc: "/images/cohorts/clean_school_aged.png?v=3",
     altEn: "School-aged child aged 4 to 12 years",
     altEs: "Niño en edad escolar de 4 a 12 años",
   },
@@ -50,7 +345,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(13-17 years)",
     titleEs: "Adolescente",
     subtitleEs: "(13-17 años)",
-    imageSrc: "/images/cohorts/teen.png",
+    imageSrc: "/images/cohorts/clean_teen.png?v=3",
     altEn: "Teenager aged 13 to 17 years",
     altEs: "Adolescente de 13 a 17 años",
   },
@@ -60,7 +355,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(18+)",
     titleEs: "Adulto",
     subtitleEs: "(18+)",
-    imageSrc: "/images/cohorts/adult.png",
+    imageSrc: "/images/cohorts/clean_adult.png?v=3",
     altEn: "Adult aged 18 and older",
     altEs: "Adulto de 18 años o más",
   },
@@ -71,7 +366,10 @@ export interface Slide12AgeCohortScreenProps {
   selected?: string;
   medicationName?: string;
   onSelect: (val: string) => void;
-  navProps: {
+  onNext?: () => void;
+  onBack?: () => void;
+  loading?: boolean;
+  navProps?: {
     onNext: (explicitAnswer?: any) => void;
     onBack: () => void;
     loading?: boolean;
@@ -84,30 +382,46 @@ export function Slide12AgeCohortScreen({
   selected,
   medicationName,
   onSelect,
+  onNext,
+  onBack,
+  loading = false,
   navProps,
 }: Slide12AgeCohortScreenProps) {
   const slideTitleRef = useRef<HTMLHeadingElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // WCAG 2.1 AA Compliance (Auditor Karen): Focus heading on mount after 50ms without duplicate aria-live
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (slideTitleRef.current) {
-        slideTitleRef.current.focus();
-      }
+      slideTitleRef.current?.focus();
     }, 50);
     return () => clearTimeout(timer);
   }, []);
 
-  // Medication token replacement
-  const effectiveMedName =
-    medicationName?.trim() || (isSpanish ? "la penicilina" : "penicillin");
+  const rawTitle = isSpanish
+    ? "¿Qué edad tenía su hijo cuando tuvo una reacción a [name]?"
+    : "How old was your child when they had a reaction to [name]?";
 
-  const titleText = isSpanish
-    ? `¿Qué edad tenía su hijo cuando tuvo una reacción a ${effectiveMedName}?`
-    : `How old was your child when they had a reaction to ${effectiveMedName}?`;
+  const titleText = resolveMedicineToken(rawTitle, medicationName, isSpanish);
 
-  // Standard Accessible Keyboard Navigation for Radiogroup (Arrows, Home, End)
+  const handleNextClick = () => {
+    if (onNext) {
+      onNext();
+    } else if (navProps?.onNext) {
+      navProps.onNext(selected);
+    }
+  };
+
+  const handleBackClick = () => {
+    if (onBack) {
+      onBack();
+    } else if (navProps?.onBack) {
+      navProps.onBack();
+    }
+  };
+
+  const isLoading = loading || navProps?.loading || false;
+  const isNextEnabled = !!selected && !isLoading;
+
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     let nextIndex = -1;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") {
@@ -132,116 +446,100 @@ export function Slide12AgeCohortScreen({
   };
 
   return (
-    <div
-      id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative flex flex-col justify-between p-4 sm:p-6 md:p-8 min-h-0 sm:min-h-[520px] max-h-none overflow-y-auto w-full max-w-4xl mx-auto"
-    >
-      {/* Slide Heading */}
-      <div className="mb-3 sm:mb-6 md:mb-8 text-center">
-        <h2
+    <div id="slide-content" className="s12-root">
+      <style>{SLIDE12_CSS}</style>
+
+      {/* 1. Slide Heading */}
+      <div className="s12-top-section">
+        <h1
           ref={slideTitleRef}
           tabIndex={-1}
           id="slide12-title"
-          className="text-base sm:text-2xl md:text-3xl font-bold text-[#1f382f] tracking-tight leading-snug outline-none max-w-2xl mx-auto focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg p-1"
+          className="s12-heading"
         >
           {titleText}
-        </h2>
+        </h1>
       </div>
 
-      {/* 5 Interactive Age Cohort Cards */}
-      <div
-        role="radiogroup"
-        aria-labelledby="slide12-title"
-        className="grid grid-cols-5 gap-1.5 sm:gap-3 items-end justify-center w-full max-w-3xl mx-auto px-0.5 sm:px-2 my-auto"
-      >
-        {AGE_COHORTS.map((cohort, index) => {
-          const isSelected = selected === cohort.value;
-          const title = isSpanish ? cohort.titleEs : cohort.titleEn;
-          const subtitle = isSpanish ? cohort.subtitleEs : cohort.subtitleEn;
-          const fullLabel = `${title} ${subtitle}`;
+      {/* 2. 5 Interactive Age Cohort Characters & Buttons */}
+      <div className="s12-middle">
+        <div
+          role="radiogroup"
+          aria-labelledby="slide12-title"
+          className="s12-cohorts-grid"
+        >
+          {AGE_COHORTS.map((cohort, index) => {
+            const isSelected = selected === cohort.value;
+            const title = isSpanish ? cohort.titleEs : cohort.titleEn;
+            const subtitle = isSpanish ? cohort.subtitleEs : cohort.subtitleEn;
+            const fullLabel = `${title} ${subtitle}`;
 
-          return (
-            <div
-              key={cohort.value}
-              className="flex flex-col items-center justify-end w-full group cursor-pointer"
-              onClick={() => {
-                onSelect(cohort.value);
-                buttonRefs.current[index]?.focus();
-              }}
-            >
-              {/* Character Illustration standing directly on top of button */}
-              <div className="h-12 sm:h-20 md:h-24 w-full flex items-end justify-center pb-1 select-none">
-                <img
-                  src={cohort.imageSrc}
-                  alt=""
-                  aria-hidden="true"
-                  className="max-h-full w-auto object-contain transition-transform duration-200 group-hover:scale-105 pointer-events-none drop-shadow-2xs"
-                  style={{ imageRendering: "-webkit-optimize-contrast" }}
-                />
-              </div>
-
-              {/* Selection Button */}
-              <button
-                ref={(el) => {
-                  buttonRefs.current[index] = el;
-                }}
-                type="button"
-                role="radio"
-                aria-checked={isSelected}
-                tabIndex={isSelected || (!selected && index === 0) ? 0 : -1}
-                aria-label={fullLabel}
-                onClick={(e) => {
-                  e.stopPropagation();
+            return (
+              <div
+                key={cohort.value}
+                className={`s12-cohort-col${isSelected ? " s12-cohort-col--selected" : ""}`}
+                onClick={() => {
                   onSelect(cohort.value);
+                  buttonRefs.current[index]?.focus();
                 }}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                className={`w-full min-h-[44px] px-1 py-1.5 rounded-xl flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer shadow-2xs active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
-                  isSelected
-                    ? "bg-[#f0d411] hover:bg-[#e6ca0f] text-[#1f382f] border-2 border-[#cca900] shadow-xs"
-                    : "bg-[#82afb5] hover:bg-[#729fa5] text-[#132c27] border border-[#689196]"
-                }`}
               >
-                <span className="font-bold text-[10px] sm:text-xs md:text-sm leading-tight block">
-                  {title}
-                </span>
-                <span className="font-medium text-[8px] sm:text-[10px] md:text-xs leading-tight block mt-0.5 opacity-90">
-                  {subtitle}
-                </span>
-              </button>
-            </div>
-          );
-        })}
+                {/* Character Illustration standing right above button */}
+                <div className="s12-cohort-img-wrap">
+                  <img
+                    src={cohort.imageSrc}
+                    alt=""
+                    aria-hidden="true"
+                    className="s12-cohort-img"
+                  />
+                </div>
+
+                {/* Selection Button */}
+                <button
+                  ref={(el) => {
+                    buttonRefs.current[index] = el;
+                  }}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  tabIndex={isSelected || (!selected && index === 0) ? 0 : -1}
+                  aria-label={fullLabel}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelect(cohort.value);
+                  }}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  className={`s12-cohort-btn${isSelected ? " s12-cohort-btn--selected" : ""}`}
+                >
+                  <span className="s12-cohort-title">
+                    {title}
+                  </span>
+                  <span className="s12-cohort-subtitle">
+                    {subtitle}
+                  </span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Centered Paired Navigation [ Back ] [ Next ] */}
-      <div className="flex items-center justify-center gap-4 sm:gap-8 pt-4 sm:pt-6 pb-2 mt-auto">
-        {/* Back Button */}
+      {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}
+      <div className="s12-nav">
         <button
           type="button"
-          onClick={navProps.onBack}
-          aria-label={isSpanish ? "Volver al paso anterior" : "Go back to previous step"}
-          className="px-8 sm:px-10 py-2.5 min-h-[44px] min-w-[110px] rounded-full font-bold text-sm sm:text-base bg-[#82afb5] hover:bg-[#709da3] text-[#132c27] border border-[#689196] shadow-xs cursor-pointer active:scale-95 transition-all flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+          onClick={handleBackClick}
+          disabled={isLoading}
+          className="s12-btn s12-btn--back"
         >
           {isSpanish ? "Atrás" : "Back"}
         </button>
-
-        {/* Next Button */}
         <button
           type="button"
-          disabled={!selected}
-          onClick={() => {
-            if (selected) {
-              navProps.onNext(selected);
-            }
-          }}
-          aria-label={isSpanish ? "Continuar al siguiente paso" : "Continue to next step"}
-          className={`px-8 sm:px-10 py-2.5 min-h-[44px] min-w-[110px] rounded-full font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] ${
-            selected
-              ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#cca900] cursor-pointer active:scale-95"
-              : "bg-[#f0d411]/50 text-[#1f382f]/50 border border-transparent cursor-not-allowed"
-          }`}
+          onClick={handleNextClick}
+          disabled={!isNextEnabled}
+          className={`s12-btn s12-btn--next${!isNextEnabled ? " s12-btn--disabled" : ""}`}
         >
-          {isSpanish ? "Siguiente" : "Next"}
+          {isLoading ? "..." : isSpanish ? "Siguiente" : "Next"}
         </button>
       </div>
     </div>

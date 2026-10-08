@@ -27,12 +27,14 @@ import { Slide6MythTruthScreen } from "./Slide6MythTruthScreen";
 import { Slide8MilestoneScreen } from "./Slide8MilestoneScreen";
 import { Slide9WhyItMattersScreen } from "./Slide9WhyItMattersScreen";
 import { Slide10TestingOverviewScreen } from "./Slide10TestingOverviewScreen";
+import { Slide10SurveyIntroScreen } from "./Slide10SurveyIntroScreen";
 import { Slide11SymptomsScreen } from "./Slide11SymptomsScreen";
 import { Slide13OnsetScreen } from "./Slide13OnsetScreen";
 import { Slide14MedicalCareScreen } from "./Slide14MedicalCareScreen";
 import { Slide16ResolutionScreen } from "./Slide16ResolutionScreen";
 import { Slide19RepeatUseScreen } from "./Slide19RepeatUseScreen";
 import { Slide21WhatNowScreen } from "./Slide21WhatNowScreen";
+import { Slide18SummaryScreen } from "./Slide18SummaryScreen";
 import esMessages from "@/messages/es.json";
 import enMessages from "@/messages/en.json";
 
@@ -612,7 +614,7 @@ export default function PenpalIntervention() {
 
   return (
     <main 
-      className="min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col items-center justify-start sm:justify-center p-2.5 sm:p-6 md:p-8 relative font-sans bg-[#f4f8e8] overflow-x-hidden overflow-y-auto"
+      className="h-screen h-[100dvh] max-h-[100dvh] w-full max-w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-3.5 relative font-sans bg-[#f4f8e8] overflow-hidden"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -630,9 +632,14 @@ export default function PenpalIntervention() {
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
-      <div className="w-full max-w-4xl relative z-10 my-auto space-y-2 py-0 transition-all duration-300 overflow-visible">
-        {/* Header Bar with Logo, Progress Step, and Right Controls (Audio & Language) */}
-        <header className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs">
+      <div 
+        className="w-full relative z-10 flex flex-col items-center gap-1.5 sm:gap-2 h-full max-h-full justify-center transition-all duration-300"
+        style={{
+          maxWidth: "min(56rem, calc((100dvh - 4.25rem) * 1.55), 100%)",
+        }}
+      >
+        {/* Header Bar matching old slide: Logo, Step Progress, and Language Switcher */}
+        <header className="w-full shrink-0 flex items-center justify-between px-3 sm:px-4 py-1 sm:py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs no-print">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]" aria-hidden="true"></span>
             <span className="font-black text-xs sm:text-sm tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
@@ -652,29 +659,49 @@ export default function PenpalIntervention() {
               );
             })()}
           </div>
-
-          {/* Right Controls: On-Page Audio Controls (Transcript & Play) + Language Switcher */}
-          <div className="flex items-center gap-2">
-            {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary") && (
-              <AudioPlayer
-                audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
-                stepId={currentStep.id}
-                locale={locale}
-                transcriptText={
-                  locale === "es"
-                    ? `${currentStep.titleEs || ""}. ${currentStep.descriptionEs || ""}`
-                    : `${currentStep.titleEn || ""}. ${currentStep.descriptionEn || ""}`
-                }
-              />
-            )}
-            <LanguageSwitcher locale={locale} onSwitch={handleLanguageSwitch} />
-          </div>
+          <LanguageSwitcher locale={locale} onSwitch={handleLanguageSwitch} />
         </header>
 
-        <div className="w-full">
-          {/* 100% Fluid Edge-to-Edge Responsive Container (Zero Simulated Hardware Bezels) */}
-          <div className="w-full relative overflow-visible">
-            <div className="w-full overflow-visible">
+        {/* =========================================================================
+            REALISTIC TABLET HARDWARE MOCKUP (LANDSCAPE ORIENTATION)
+            ========================================================================= */}
+        <div className="w-full flex-1 min-h-0 flex items-center justify-center relative">
+          {/* Outer Tablet Bezel Frame */}
+          <div 
+            className="relative w-full h-full max-h-full bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2.2rem] md:rounded-[2.5rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col"
+            style={{
+              aspectRatio: "16 / 10.3",
+              maxHeight: "calc(100dvh - 4.25rem)",
+            }}
+          >
+            
+            {/* Left Bezel Camera Array (Landscape Tablet) */}
+            <div 
+              className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 pointer-events-none select-none z-30"
+              aria-hidden="true"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
+              <span className="w-2 h-2 rounded-full bg-[#0a0f16] ring-1 ring-[#262f3d] flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-[#1e3c59]/90"></span>
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
+            </div>
+
+            {/* Tablet Inner Screen with Mesh Gradient */}
+            <div 
+              className="relative w-full h-full flex-1 min-h-0 rounded-[1.1rem] sm:rounded-[1.5rem] md:rounded-[1.7rem] overflow-hidden shadow-inner flex flex-col justify-between"
+              style={{
+                background: `
+                  radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
+                  radial-gradient(circle at 12% 75%, rgba(162, 230, 228, 0.9) 0%, rgba(162, 230, 228, 0) 50%),
+                  radial-gradient(circle at 82% 18%, rgba(204, 246, 219, 0.9) 0%, rgba(204, 246, 219, 0) 48%),
+                  radial-gradient(circle at 88% 82%, rgba(235, 248, 208, 0.95) 0%, rgba(235, 248, 208, 0) 52%),
+                  linear-gradient(135deg, #c4d4f8 0%, #b2e7e3 28%, #cdf3da 62%, #ecf9d4 100%)
+                `,
+              }}
+            >
+              {/* Slide Content */}
+              <div className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-between overflow-y-auto">
               {isTerminated ? (
                 <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg text-center max-w-xl mx-auto space-y-4 my-2">
                   <h2
@@ -698,7 +725,7 @@ export default function PenpalIntervention() {
                   </div>
                 </div>
               ) : showSummary ? (
-                <Slide13SummaryScreen
+                <Slide18SummaryScreen
                   isSpanish={locale === "es"}
                   answers={answers}
                   activeToken={activeToken}
@@ -805,6 +832,13 @@ export default function PenpalIntervention() {
                       onBack={handleBack}
                       loading={loading}
                     />
+                  ) : currentStep.id === "screen6_survey_intro" || currentStep.id === "slide10_survey_intro" ? (
+                    <Slide10SurveyIntroScreen
+                      isSpanish={locale === "es"}
+                      onNext={() => handleNext()}
+                      onBack={handleBack}
+                      loading={loading}
+                    />
                   ) : currentStep.id === "screen6_1_symptoms" ? (
                     <Slide11SymptomsScreen
                       isSpanish={locale === "es"}
@@ -857,6 +891,9 @@ export default function PenpalIntervention() {
                         submitAnswer("screen6_2_timing", val, 0).catch(() => {});
                         logInteraction("QUESTION_ANSWER", { stepId: "screen6_2_timing", answer: val }, "/intervention/flow").catch(() => {});
                       }}
+                      onNext={() => handleNext(answers[currentStep.id] || answers["ageCohort"])}
+                      onBack={handleBack}
+                      loading={loading}
                       navProps={baseProps}
                     />
                   ) : currentStep.id === "screen6_3_onset" ? (
@@ -878,6 +915,7 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext(answers["screen6_3_onset"] || answers["onset"])}
                       onBack={handleBack}
                       loading={loading}
+                      navProps={baseProps}
                     />
                   ) : currentStep.id === "screen6_4_resolution" ? (
                     <Slide14MedicalCareScreen
@@ -907,6 +945,7 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext(answers["screen6_4_resolution"] || answers["medicalCareReceived"])}
                       onBack={handleBack}
                       loading={loading}
+                      navProps={baseProps}
                     />
                   ) : currentStep.id === "screen6_4b_resolution_type" ? (
                     <Slide16ResolutionScreen
@@ -947,6 +986,7 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext(answers["screen6_4b_resolution_type"] || answers["resolution"])}
                       onBack={handleBack}
                       loading={loading}
+                      navProps={baseProps}
                     />
                   ) : currentStep.id === "screen6_5_yetagain" ? (
                     <Slide19RepeatUseScreen
@@ -976,6 +1016,7 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext(answers["screen6_5_yetagain"] || answers["repeatPenicillin"])}
                       onBack={handleBack}
                       loading={loading}
+                      navProps={baseProps}
                     />
                   ) : currentStep.id === "slide21_what_now" ? (
                     <Slide21WhatNowScreen
@@ -991,9 +1032,10 @@ export default function PenpalIntervention() {
                       }}
                       onBack={handleBack}
                       loading={loading}
+                      navProps={baseProps}
                     />
                   ) : currentStep.type === "summary" ? (
-                    <Slide13SummaryScreen
+                    <Slide18SummaryScreen
                       isSpanish={locale === "es"}
                       answers={answers}
                       activeToken={activeToken}
@@ -1022,6 +1064,23 @@ export default function PenpalIntervention() {
                     <TextScreen {...baseProps} />
                   )}
                 </>
+              )}
+              </div>
+
+              {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
+              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary") && (
+                <div className="absolute bottom-3 right-4 sm:bottom-4 sm:right-6 md:bottom-5 md:right-7 z-30">
+                  <AudioPlayer
+                    audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                    stepId={currentStep.id}
+                    locale={locale}
+                    transcriptText={
+                      locale === "es"
+                        ? `${currentStep.titleEs || ""}. ${currentStep.descriptionEs || ""}`
+                        : `${currentStep.titleEn || ""}. ${currentStep.descriptionEn || ""}`
+                    }
+                  />
+                </div>
               )}
             </div>
           </div>
@@ -1063,48 +1122,54 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   return (
     <div
       id="slide-content"
-      className="bg-[#f4f8e8] border border-slate-200/80 rounded-3xl p-4 sm:p-7 shadow-md relative flex flex-col justify-between min-h-0 sm:min-h-[440px] max-h-none overflow-y-auto"
+      className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-6 sm:px-10 md:px-14 lg:px-16 py-4 sm:py-6"
     >
-      <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col justify-center space-y-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex-1 space-y-3 text-left">
-            <div>
-              <h1
-                ref={headingRef}
-                tabIndex={-1}
-                className="text-3xl sm:text-4xl md:text-5xl font-black text-[#236f7a] tracking-tight font-display outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
-              >
-                PEN–PAL
-              </h1>
-              <p className="text-sm sm:text-base md:text-lg font-bold text-slate-800 mt-1">
-                {introSubtitle}
-              </p>
-            </div>
-
-            <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-700 leading-relaxed max-w-md">
-              {mainCopy}
+      <div className="flex flex-row items-center justify-between gap-4 sm:gap-8 md:gap-12 max-w-4xl w-full my-auto">
+        {/* Left Column: Heading, Subtitle, Copy, and Left-Aligned CTA Button */}
+        <div className="flex-1 space-y-2 sm:space-y-3 md:space-y-4 text-left z-10 max-w-lg">
+          <div>
+            {/* Golden-Yellow Title with Dark Teal Stroke & Drop Shadow matching Image */}
+            <h1
+              ref={headingRef}
+              tabIndex={-1}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-black tracking-tight font-display outline-none select-none text-[#ebb016]"
+              style={{
+                WebkitTextStroke: "1.8px #12403d",
+                paintOrder: "stroke fill",
+                textShadow: "0 2px 0 #12403d, 0 3px 2px rgba(18, 64, 61, 0.3)",
+              }}
+            >
+              PEN–PAL
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-[#143e3b] mt-1 sm:mt-1.5 tracking-tight">
+              {introSubtitle}
             </p>
           </div>
 
-          <div className="shrink-0 flex items-center justify-center">
-            <NurseAnna size="lg" isDecorative={false} locale={locale} />
+          <p className="text-xs sm:text-sm md:text-base lg:text-[1.05rem] font-medium text-[#1c403c] leading-relaxed max-w-xs sm:max-w-sm md:max-w-md pt-1 sm:pt-2">
+            {mainCopy}
+          </p>
+
+          {/* Left-Aligned Pastel Butter-Yellow Pill Button: "Get Started!" */}
+          <div className="pt-3 sm:pt-5">
+            <button
+              type="button"
+              onClick={() => {
+                onAnswer("yes");
+                onNext("yes");
+              }}
+              disabled={loading}
+              className="px-6 sm:px-7 py-2 sm:py-2.5 rounded-full bg-[#fde989] hover:bg-[#f6df71] text-[#1b3b32] border border-[#dcc65b] font-bold text-xs sm:text-sm md:text-[15px] shadow-xs transition duration-150 active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+            >
+              {loading ? "..." : (isSpanish ? "¡Comenzar!" : "Get Started!")}
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Centered Yellow Pill CTA Button: "Get Started!" */}
-      <div className="flex justify-center pt-4 mt-3 border-t border-slate-200/60">
-        <button
-          type="button"
-          onClick={() => {
-            onAnswer("yes");
-            onNext("yes");
-          }}
-          disabled={loading}
-          className="px-8 py-2.5 min-h-[44px] rounded-full bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#d6be0e] font-bold text-xs sm:text-sm md:text-base shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {loading ? "..." : (isSpanish ? "¡Comenzar!" : "Get Started!")}
-        </button>
+        {/* Right Column: Nurse Anna Illustration (Smaller scale) */}
+        <div className="shrink-0 flex items-center justify-center sm:pr-2 z-10">
+          <NurseAnna size="md" imgClassName="w-20 sm:w-24 md:w-28 lg:w-32 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] object-contain" isDecorative={false} locale={locale} />
+        </div>
       </div>
     </div>
   );
@@ -2821,411 +2886,7 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
 }
 
 export function Slide13SummaryScreen(props: any) {
-  const {
-    isSpanish,
-    answers,
-    onSavePDF,
-    onPrint,
-    onBack,
-    activeToken,
-    onNext,
-    participantId = props.activeToken,
-    onNavigateToSuccess = props.onNext,
-  } = props;
-  const summaryTitleRef = useRef<HTMLHeadingElement>(null);
-
-  // 1. Focus heading on mount so VoiceOver jumps straight to Action Steps
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      summaryTitleRef.current?.focus();
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Format symptoms string
-  const rawSymptoms = answers?.symptoms || answers?.screen6_1_symptoms;
-  let symptomsList: string[] = [];
-  if (Array.isArray(rawSymptoms)) {
-    symptomsList = rawSymptoms;
-  } else if (typeof rawSymptoms === "string") {
-    try {
-      const parsed = JSON.parse(rawSymptoms);
-      symptomsList = Array.isArray(parsed) ? parsed : [rawSymptoms];
-    } catch {
-      symptomsList = [rawSymptoms];
-    }
-  }
-
-  // Rash sub-types (PDF Page 15: "Formats in Slide 22 Summary Table as: Rash (Hives, Blisters)")
-  const rawRash = answers?.rashDetails;
-  let rashList: string[] = [];
-  if (Array.isArray(rawRash)) {
-    rashList = rawRash;
-  } else if (typeof rawRash === "string") {
-    try {
-      const parsed = JSON.parse(rawRash);
-      rashList = Array.isArray(parsed) ? parsed : [rawRash];
-    } catch {
-      rashList = [rawRash];
-    }
-  }
-
-  // Swelling sub-types (Modal 11C / Page 10: "Formats in Summary Table as: Swelling (Face, Lips)")
-  const rawSwelling = answers?.swellingDetails;
-  let swellingList: string[] = [];
-  if (Array.isArray(rawSwelling)) {
-    swellingList = rawSwelling;
-  } else if (typeof rawSwelling === "string") {
-    try {
-      const parsed = JSON.parse(rawSwelling);
-      swellingList = Array.isArray(parsed) ? parsed : [rawSwelling];
-    } catch {
-      swellingList = [rawSwelling];
-    }
-  }
-
-  const formatRashDetail = (d: string) => {
-    if (!isSpanish) return d;
-    if (d === "Hives") return "Ronchas";
-    if (d === "Blisters") return "Ampollas";
-    if (d === "Red, fine or bumpy rash") return "Rojo, fino o con protuberancias";
-    if (d === "Flushing") return "Enrojecimiento";
-    if (d === "Pus-filled pimples") return "Granos con pus";
-    if (d === "Unsure" || d.includes("Unsure")) return "No estoy seguro";
-    return d;
-  };
-
-  const formatSwellingDetail = (d: string) => {
-    if (!isSpanish) return d;
-    if (d.includes("Face") || d.includes("Cara")) return "Cara u ojos";
-    if (d.includes("Lips") || d.includes("Labios")) return "Labios";
-    if (d.includes("Tongue") || d.includes("Lengua")) return "Lengua";
-    if (d.includes("Throat") || d.includes("Garganta")) return "Garganta";
-    if (d.includes("Hands") || d.includes("Manos")) return "Manos o pies";
-    if (d.includes("Unsure") || d.includes("seguro")) return "No estoy seguro";
-    return d;
-  };
-
-  const symptomsFormatted = symptomsList.length > 0
-    ? symptomsList
-        .map((s) => {
-          if (s.toLowerCase() === "rash" || s === "Sarpullido") {
-            if (rashList.length > 0) {
-              const detailsStr = rashList.map(formatRashDetail).join(", ");
-              return isSpanish ? `Sarpullido (${detailsStr})` : `Rash (${detailsStr})`;
-            }
-            return isSpanish ? "Sarpullido" : "Rash";
-          }
-          if (s.toLowerCase() === "swelling" || s === "Inflamación" || s === "Hinchazón") {
-            if (swellingList.length > 0) {
-              const detailsStr = swellingList.map(formatSwellingDetail).join(", ");
-              return isSpanish ? `Inflamación (${detailsStr})` : `Swelling (${detailsStr})`;
-            }
-            return isSpanish ? "Inflamación" : "Swelling";
-          }
-          if (s === "Other: Please describe" || s === "Other" || s === "Otro: por favor describa" || s === "Otro") {
-            return isSpanish ? "Otro" : "Other";
-          }
-          if (s.startsWith("Other:") || s.startsWith("Otro:")) {
-            return s.replace(/_____+/g, "").trim();
-          }
-          return s;
-        })
-        .join(", ") + (answers?.symptomsOther ? `, ${isSpanish ? "Otro" : "Other"}: ${answers.symptomsOther}` : "")
-    : (isSpanish ? "Ninguno reportado" : "None reported");
-
-  // Format medical care location string
-  const medicalCareVal = answers?.medicalCare || answers?.screen6_4_resolution;
-  const locVal = answers?.locationSelected || answers?.screen6_4_location;
-  let medicalCareFormatted = medicalCareVal || (isSpanish ? "No" : "No");
-  if ((medicalCareVal === "Yes" || medicalCareVal === "Sí") && locVal) {
-    const locOpt = MEDICAL_CARE_LOCATION_OPTIONS.find((o) => o.value === locVal);
-    const locText = isSpanish ? locOpt?.labelEs || locVal : locOpt?.labelEn || locVal;
-    medicalCareFormatted = isSpanish ? `Sí (${locText})` : `Yes (${locVal})`;
-  } else if (medicalCareVal === "Yes" || medicalCareVal === "Sí") {
-    medicalCareFormatted = isSpanish ? "Sí" : "Yes";
-  }
-
-  // Format symptom resolution string (PDF Page 17 multi-select checkboxes support)
-  const resVal = answers?.resolution || answers?.screen6_4b_resolution_type;
-  let rawMeds = answers?.resolutionMedicines;
-  let medsList: string[] = [];
-  if (Array.isArray(rawMeds)) {
-    medsList = rawMeds;
-  } else if (typeof rawMeds === "string") {
-    try {
-      const parsed = JSON.parse(rawMeds);
-      medsList = Array.isArray(parsed) ? parsed : [rawMeds];
-    } catch {
-      medsList = [rawMeds];
-    }
-  } else if (answers?.medicineSelected || answers?.screen6_4b_medicine) {
-    medsList = [answers.medicineSelected || answers.screen6_4b_medicine];
-  }
-
-  const rtVal = answers?.routeSelected || answers?.screen6_4b_route || answers?.resolutionRoute;
-  let resolutionFormatted = resVal || (isSpanish ? "Por sí sola" : "On its own");
-  if (resVal === "With medication" || resVal === "Con medicamentos") {
-    const formattedMeds = medsList.map((m) => {
-      const medOpt = RESOLUTION_MEDICINE_OPTIONS.find((o) => o.value === m);
-      return isSpanish ? (medOpt?.labelEs || m) : (medOpt?.labelEn || m);
-    }).join(", ");
-
-    const rtOpt = rtVal ? RESOLUTION_ROUTE_OPTIONS.find((o) => o.value === rtVal) : undefined;
-    const rtText = rtVal ? (isSpanish ? ` - ${rtOpt?.labelEs || rtVal}` : ` - ${rtVal}`) : "";
-    const medsDisplay = formattedMeds || (isSpanish ? "Medicamento para la alergia" : "Allergy medicine");
-    resolutionFormatted = isSpanish ? `Con medicamentos (${medsDisplay}${rtText})` : `With medication (${medsDisplay}${rtText})`;
-  }
-
-  // Format repeat use string
-  const repeatVal = answers?.repeatUse || answers?.screen6_5_yetagain;
-  const detailVal = answers?.reactionDetailSelected || answers?.screen6_5_reaction_detail;
-  let repeatUseFormatted = repeatVal || (isSpanish ? "No" : "No");
-  if ((repeatVal === "Yes" || repeatVal === "Sí") && detailVal) {
-    const detailOpt = YETAGAIN_REACTION_OPTIONS.find((o) => o.value === detailVal);
-    const detailText = isSpanish ? detailOpt?.labelEs || detailVal : detailOpt?.labelEn || detailVal;
-    repeatUseFormatted = isSpanish ? `Sí (${detailText})` : `Yes (${detailVal})`;
-  } else if (repeatVal === "Yes" || repeatVal === "Sí") {
-    repeatUseFormatted = isSpanish ? "Sí" : "Yes";
-  }
-
-  const rawAge = answers?.ageCohort || answers?.ageAtReaction || answers?.screen6_2_timing;
-  const formatAgeValue = (val: any) => {
-    if (val === undefined || val === null || val === "" || val === "none_selected") {
-      return isSpanish ? "No reportado" : "Not reported";
-    }
-    if (typeof val === "number") {
-      return isSpanish ? `${val} años` : `${val} years old`;
-    }
-    const valStr = String(val);
-    if (isSpanish) {
-      if (valStr.includes("Baby")) return "Bebé (0-12 meses)";
-      if (valStr.includes("Toddler")) return "Niño pequeño (1-3 años)";
-      if (valStr.includes("School")) return "Edad escolar (4-12 años)";
-      if (valStr.includes("Teen")) return "Adolescente (13-17 años)";
-      if (valStr.includes("Adult")) return "Adulto (18+)";
-      return !isNaN(Number(valStr)) ? `${valStr} años` : valStr;
-    } else {
-      if (!isNaN(Number(valStr)) && !valStr.includes("(") && !valStr.includes("year") && !valStr.includes("month")) {
-        return `${valStr} years old`;
-      }
-      return valStr;
-    }
-  };
-  const ageFormatted = formatAgeValue(rawAge);
-
-  const rawOnset = answers?.onset || answers?.screen6_3_onset;
-  const formatOnsetValue = (val: any) => {
-    if (!val || val === "none_selected") {
-      return isSpanish ? "No reportado" : "Not reported";
-    }
-    const valStr = String(val);
-    if (valStr.toLowerCase().includes("less") || valStr === "<1 hour" || valStr === "< 1 hour" || valStr === "less_than_1_hour") {
-      return isSpanish ? "<1 hora" : "<1 hour";
-    }
-    if (valStr.includes("1-24") || valStr === "1_to_24_hours" || valStr.toLowerCase().includes("1 to 24")) {
-      return isSpanish ? "1-24 horas" : "1-24 hours";
-    }
-    if (valStr.toLowerCase().includes("more than 24") || valStr === "24+ hours" || valStr === "more_than_24_hours" || valStr.includes("24+")) {
-      return isSpanish ? "Más de 24 horas" : "24+ hours";
-    }
-    if (valStr.toLowerCase().includes("unsure") || valStr.toLowerCase().includes("don't know") || valStr.toLowerCase().includes("sé")) {
-      return isSpanish ? "No estoy seguro/ No lo sé" : "Unsure/I don't know";
-    }
-    return valStr;
-  };
-  const onsetFormatted = formatOnsetValue(rawOnset);
-  const effectiveMedName = answers?.medicationName || answers?.screen2_naming || (isSpanish ? "penicilina" : "penicillin");
-
-  const summaryCards = [
-    {
-      id: "symptoms",
-      label: isSpanish ? "SÍNTOMAS REPORTADOS" : "REPORTED SYMPTOMS",
-      value: symptomsFormatted,
-    },
-    {
-      id: "age",
-      label: isSpanish ? "EDAD AL MOMENTO DE LA REACCIÓN" : "AGE AT REACTION",
-      value: ageFormatted,
-    },
-    {
-      id: "onset",
-      label: isSpanish ? "TIEMPO HASTA EL INICIO" : "TIME TO ONSET",
-      value: onsetFormatted,
-    },
-    {
-      id: "medicalCare",
-      label: isSpanish ? "ATENCIÓN MÉDICA RECIBIDA" : "MEDICAL CARE RECEIVED",
-      value: medicalCareFormatted,
-    },
-    {
-      id: "resolution",
-      label: isSpanish ? "RESOLUCIÓN DE SÍNTOMAS" : "SYMPTOM RESOLUTION",
-      value: resolutionFormatted,
-    },
-    {
-      id: "repeatUse",
-      label: isSpanish ? "PENICILINA DESDE LA REACCIÓN" : "PENICILLIN SINCE REACTION",
-      value: repeatUseFormatted,
-    },
-  ];
-
-  // Inside Slide 13 / SummaryScreen:
-  const handleCompleteAndSave = () => {
-    // 1. Generate and download the PDF
-    generateAssessmentPDF({
-      locale: isSpanish ? "es" : "en",
-      answers,
-      participantId: participantId || activeToken,
-      symptoms: symptomsFormatted,
-      age: ageFormatted,
-      onset: onsetFormatted,
-      medicalCare: medicalCareFormatted,
-      resolution: resolutionFormatted,
-      repeatUse: repeatUseFormatted,
-      summarySections: summaryCards.map((s) => ({
-        id: s.id,
-        label: s.label,
-        value: s.value,
-      })),
-      steps: [
-        isSpanish
-          ? "Hable con el médico de su hijo sobre la alergia en su próxima visita."
-          : "Talk to your child's doctor about the allergy at their next visit.",
-        isSpanish
-          ? "Comparta fotos de la reacción de su hijo con el médico."
-          : "Share pictures of your child's reaction with the doctor.",
-        isSpanish
-          ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}:`
-          : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}:`,
-      ],
-    });
-    // 2. Direct clean transition to Success Screen without opening a flash dialog
-    if (onNavigateToSuccess) {
-      onNavigateToSuccess();
-    } else if (onNext) {
-      onNext();
-    }
-  };
-
-  return (
-    <div className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-7 max-w-4xl mx-auto shadow-lg space-y-5">
-      
-      {/* 1. Header Pill (Yellow badge matching PDF Page 18) */}
-      <div className="flex justify-center">
-        <div className="inline-block bg-[#f0d411] text-[#1f382f] border border-[#d6be0e] px-6 py-1.5 rounded-full shadow-2xs text-center">
-          <h2
-            ref={summaryTitleRef}
-            tabIndex={-1}
-            className="text-sm sm:text-base md:text-lg font-bold tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
-          >
-            {isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents"}
-          </h2>
-        </div>
-      </div>
-
-      {/* 2. Numbered Action Steps (PDF Page 18 Exact Sequence) */}
-      <ol className="space-y-3.5 max-w-2xl mx-auto text-slate-800 text-xs sm:text-sm font-medium">
-        {/* Step 1 with nested script quote */}
-        <li className="flex items-start gap-3">
-          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50 mt-0.5">
-            1
-          </span>
-          <div className="flex-1 space-y-2">
-            <p className="font-semibold text-slate-900 leading-snug">
-              {isSpanish
-                ? "Hable con el médico de su hijo sobre la alergia en su próxima visita."
-                : "Talk to your child's doctor about the allergy at their next visit."}
-            </p>
-            {/* Nested Doctor Discussion Script Callout Box */}
-            <div className="bg-[#e8f4f1] border-l-4 border-[#236f7a] p-3 sm:p-3.5 rounded-r-xl shadow-2xs space-y-1">
-              <p className="text-xs font-bold text-[#132338]">
-                {isSpanish ? "Esto es lo que puede decir:" : "Here's what you can say:"}
-              </p>
-              <p className="text-xs sm:text-sm text-slate-700 italic leading-snug">
-                {isSpanish
-                  ? '«Leí sobre las alergias a la penicilina en niños. ¿Podríamos hablar sobre verificar si mi hijo realmente tiene una alergia?»'
-                  : '"I read about penicillin allergies in kids. Could we talk about checking to see if my child really has an allergy?"'}
-              </p>
-            </div>
-          </div>
-        </li>
-
-        {/* Step 2 */}
-        <li className="flex items-start gap-3">
-          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50 mt-0.5">
-            2
-          </span>
-          <p className="pt-0.5 font-semibold text-slate-900 leading-snug">
-            {isSpanish
-              ? "Comparta fotos de la reacción de su hijo con el médico."
-              : "Share pictures of your child's reaction with the doctor."}
-          </p>
-        </li>
-
-        {/* Step 3 */}
-        <li className="flex items-start gap-3">
-          <span className="shrink-0 w-6 h-6 rounded-full border border-blue-400 text-blue-600 font-bold text-xs flex items-center justify-center bg-blue-50 mt-0.5">
-            3
-          </span>
-          <p className="pt-0.5 font-semibold text-slate-900 leading-snug">
-            {isSpanish
-              ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}:`
-              : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}:`}
-          </p>
-        </li>
-      </ol>
-
-      {/* 3. CLEAN SEMANTIC CARD GRID (No <dl>, No <dt>, No empty terms!) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-        {summaryCards.map((card) => (
-          <div
-            key={card.id}
-            className="bg-[#f8faf7] border border-slate-200/90 rounded-2xl p-4 shadow-2xs flex flex-col justify-between"
-          >
-            {/* Label in High-Contrast slate-600 (5.9:1 ratio, WCAG AAA) */}
-            <p className="text-[11px] font-bold text-slate-600 tracking-wider uppercase mb-1.5">
-              {card.label}
-            </p>
-            {/* Value in High-Contrast slate-950 (19.8:1 ratio) */}
-            <p className="text-sm font-extrabold text-slate-950 leading-snug">
-              {card.value}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* 4. Action Buttons */}
-      <div className="flex flex-wrap items-center justify-center gap-4 pt-4 border-t border-slate-100">
-        <button
-          type="button"
-          onClick={onPrint || (() => window.print())}
-          className="inline-flex items-center gap-2 px-8 py-3 min-h-[44px] rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          <span aria-hidden="true">🖨</span>
-          <span>{isSpanish ? "Imprimir informe" : "Print Report"}</span>
-        </button>
-        <button
-          type="button"
-          onClick={handleCompleteAndSave}
-          className="inline-flex items-center gap-2 px-8 py-3 min-h-[44px] rounded-full bg-[#132338] hover:bg-[#0c1827] text-white font-bold text-xs sm:text-sm shadow-md transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          <span aria-hidden="true">✓</span>
-          <span>{isSpanish ? "Completar y guardar como PDF" : "Complete and Save as PDF"}</span>
-        </button>
-      </div>
-
-      <style jsx global>{`
-        @media print {
-          @page { size: A4 portrait; margin: 0.5cm; }
-          .no-print { display: none !important; }
-          body { background: white !important; padding: 0 !important; margin: 0 !important; font-size: 11pt; }
-          html { background: white !important; }
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-shadow: none !important; }
-        }
-      `}</style>
-    </div>
-  );
+  return <Slide18SummaryScreen {...props} />;
 }
 
 export const SummaryScreen = Slide13SummaryScreen;

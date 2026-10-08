@@ -7,14 +7,49 @@ export interface SpeechBubbleProps {
   tailPosition?: "right-center" | "right-bottom" | "left-center" | "bottom-center";
   className?: string;
   borderColor?: string;
+  variant?: "round" | "box";
 }
 
 export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
   children,
   tailPosition = "right-bottom",
   className = "",
-  borderColor = "#132c27",
+  borderColor = "#27707e",
+  variant = "round",
 }) => {
+  if (variant === "round") {
+    return (
+      <div className={`relative inline-block filter drop-shadow(2px 3px 5px rgba(20,60,55,0.18)) ${className}`}>
+        <svg
+          viewBox="0 0 430 260"
+          fill="none"
+          className="w-full h-auto block"
+          aria-hidden="true"
+        >
+          <path
+            d="M 213, 8
+               C 317, 8  404, 56  404, 120
+               C 404, 146  388, 172  360, 189
+               C 375, 204  392, 222  409, 239
+               C 390, 241  356, 233  325, 214
+               C 292, 228  254, 236  213, 236
+               C 109, 236  28, 184  28, 120
+               C 28, 56  109, 8  213, 8
+               Z"
+            fill="#ffffff"
+            stroke={borderColor}
+            strokeWidth="2.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <div className="absolute inset-0 top-[5%] left-[5%] w-[82%] h-[84%] flex flex-col justify-center items-center text-center px-4 pointer-events-none">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`relative bg-white border-2 rounded-3xl p-4 sm:p-5 shadow-sm text-slate-800 text-xs sm:text-sm md:text-base font-semibold leading-relaxed ${className}`}
