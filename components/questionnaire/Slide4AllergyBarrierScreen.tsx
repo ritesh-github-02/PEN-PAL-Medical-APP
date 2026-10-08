@@ -42,21 +42,19 @@ const SLIDE4_CSS = `
 }
 
 .s4-combo {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
   position: relative;
-  width: 680px;
-  height: 335px;
+  width: 595px;
+  height: 385px;
+  max-width: 95%;
+  margin: 0 auto;
 }
 
 .s4-bubble {
-  position: relative;
-  width: 490px;
-  flex-shrink: 0;
-  align-self: flex-start;
-  margin-top: 10px;
-  filter: drop-shadow(2px 4px 10px rgba(20, 60, 55, 0.18));
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 460px;
+  filter: drop-shadow(2px 4px 10px rgba(20, 60, 55, 0.16));
   z-index: 2;
 }
 .s4-bubble-svg {
@@ -66,22 +64,22 @@ const SLIDE4_CSS = `
 }
 .s4-bubble-text-wrap {
   position: absolute;
-  top: 5%;
+  top: 6%;
   left: 5%;
-  width: 82%;
-  height: 84%;
+  width: 79%;
+  height: 80%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   pointer-events: none;
-  padding: 0 16px;
+  padding: 0 14px;
 }
 .s4-bubble-text {
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 600;
-  line-height: 1.38;
+  line-height: 1.4;
   color: #142724;
   margin: 0;
   display: flex;
@@ -93,16 +91,12 @@ const SLIDE4_CSS = `
 }
 
 .s4-nurse {
-  position: relative;
-  width: 118px;
+  position: absolute;
+  bottom: 0;
+  left: 442px;
+  width: 125px;
   height: auto;
-  max-height: 250px;
-  object-fit: contain;
-  align-self: flex-end;
-  margin-left: -54px;
   z-index: 1;
-  margin-bottom: 5px;
-  flex-shrink: 0;
 }
 .s4-nurse-img {
   width: 100%;
@@ -158,26 +152,24 @@ const SLIDE4_CSS = `
 }
 
 /* Tablet & Smaller Screens Scaling */
-@media (max-height: 600px), (max-width: 768px) {
+@media (max-height: 640px), (max-width: 768px) {
   .s4-root {
-    padding: 1rem 1.5rem 0.5rem 1.5rem;
+    padding: 0.85rem 1.5rem 0.5rem 1.5rem;
   }
   .s4-combo {
-    width: 580px;
-    height: 290px;
+    width: 510px;
+    height: 330px;
   }
   .s4-bubble {
-    width: 420px;
-    margin-top: 8px;
+    width: 390px;
   }
   .s4-bubble-text {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.35;
   }
   .s4-nurse {
-    width: 100px;
-    max-height: 215px;
-    margin-left: -46px;
+    left: 374px;
+    width: 105px;
   }
   .s4-nurse-img {
     max-height: 215px;
@@ -185,6 +177,26 @@ const SLIDE4_CSS = `
   .s4-btn {
     padding: 0.35rem 1.6rem;
     font-size: 0.85rem;
+  }
+}
+
+@media (max-height: 520px) {
+  .s4-combo {
+    width: 440px;
+    height: 285px;
+  }
+  .s4-bubble {
+    width: 335px;
+  }
+  .s4-bubble-text {
+    font-size: 13.5px;
+  }
+  .s4-nurse {
+    left: 320px;
+    width: 90px;
+  }
+  .s4-nurse-img {
+    max-height: 180px;
   }
 }
 `;
@@ -230,10 +242,10 @@ export function Slide4AllergyBarrierScreen({
               <path
                 d="M 213, 8
                    C 317, 8  404, 56  404, 120
-                   C 404, 146  388, 172  360, 189
-                   C 375, 204  392, 222  409, 239
-                   C 390, 241  356, 233  325, 214
-                   C 292, 228  254, 236  213, 236
+                   C 404, 146  392, 172  372, 186
+                   C 388, 198  412, 212  432, 224
+                   C 398, 228  362, 226  328, 222
+                   C 292, 230  254, 236  213, 236
                    C 109, 236  28, 184  28, 120
                    C 28, 56  109, 8  213, 8
                    Z"
