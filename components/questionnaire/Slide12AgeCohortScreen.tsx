@@ -23,22 +23,24 @@ const SLIDE12_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background-color: #f6faee;
-  padding: 1.5rem 2.5rem 0.85rem 2.5rem;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f8ec;
+  padding: 1.25rem 2.5rem 1rem 2.5rem;
   overflow: hidden;
+  gap: clamp(1.5rem, 4vh, 2.5rem);
 }
 
 /* Heading */
 .s12-top-section {
   width: 100%;
   text-align: center;
-  margin-top: 0.25rem;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 .s12-heading {
-  font-size: 1.42rem;
+  font-size: 1.55rem;
   line-height: 1.35;
   font-weight: 700;
   color: #142724;
@@ -52,23 +54,22 @@ const SLIDE12_CSS = `
 
 /* Cohorts Row (Centered) */
 .s12-middle {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto 0;
-  padding: 0.25rem 0;
+  margin: 0;
+  padding: 0;
 }
 
 .s12-cohorts-grid {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 1.25rem;
+  gap: 1.5rem;
   width: 100%;
-  max-width: 820px;
+  max-width: 860px;
 }
 
 .s12-cohort-col {
@@ -178,7 +179,8 @@ const SLIDE12_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0 0.5rem 0;
+  padding: 0;
+  margin: 0;
   flex-shrink: 0;
 }
 
@@ -315,7 +317,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(0-12 months)",
     titleEs: "Bebé",
     subtitleEs: "(0-12 meses)",
-    imageSrc: "/images/cohorts/clean_baby.png?v=3",
+    imageSrc: "/images/cohorts/baby.png?v=3",
     altEn: "Baby aged 0 to 12 months",
     altEs: "Bebé de 0 a 12 meses",
   },
@@ -325,7 +327,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(1-3 years)",
     titleEs: "Niño pequeño",
     subtitleEs: "(1-3 años)",
-    imageSrc: "/images/cohorts/clean_toddler.png?v=3",
+    imageSrc: "/images/cohorts/toddler.png?v=3",
     altEn: "Toddler aged 1 to 3 years",
     altEs: "Niño pequeño de 1 a 3 años",
   },
@@ -335,7 +337,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(4-12 years)",
     titleEs: "Edad escolar",
     subtitleEs: "(4-12 años)",
-    imageSrc: "/images/cohorts/clean_school_aged.png?v=3",
+    imageSrc: "/images/cohorts/school-aged.png?v=3",
     altEn: "School-aged child aged 4 to 12 years",
     altEs: "Niño en edad escolar de 4 a 12 años",
   },
@@ -345,7 +347,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(13-17 years)",
     titleEs: "Adolescente",
     subtitleEs: "(13-17 años)",
-    imageSrc: "/images/cohorts/clean_teen.png?v=3",
+    imageSrc: "/images/cohorts/teen.png?v=3",
     altEn: "Teenager aged 13 to 17 years",
     altEs: "Adolescente de 13 a 17 años",
   },
@@ -355,7 +357,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(18+)",
     titleEs: "Adulto",
     subtitleEs: "(18+)",
-    imageSrc: "/images/cohorts/clean_adult.png?v=3",
+    imageSrc: "/images/cohorts/adult.png?v=3",
     altEn: "Adult aged 18 and older",
     altEs: "Adulto de 18 años o más",
   },

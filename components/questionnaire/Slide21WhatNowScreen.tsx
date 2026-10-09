@@ -23,24 +23,25 @@ const SLIDE21_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background-color: #f6faee;
-  padding: 1.5rem 2.5rem 0.85rem 2.5rem;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f8ec;
+  padding: 1.25rem 2.5rem 1rem 2.5rem;
   overflow: hidden;
+  gap: clamp(1.25rem, 3.5vh, 2.25rem);
 }
 
 /* Centered Content Container */
 .s21-content {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 0.25rem 0;
+  padding: 0;
 }
 
 /* "What Now?" Yellow Badge */
@@ -136,7 +137,8 @@ const SLIDE21_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0 0.5rem 0;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 
@@ -323,7 +325,7 @@ export function Slide21WhatNowScreen({
         {/* Doctor Consultation Illustration */}
         <div className="s21-illustration-wrap" aria-hidden="true">
           <img
-            src="/images/doctor-consultation-v3.png"
+            src="/images/doctor-consultation.png"
             alt={
               isSpanish
                 ? "Madre e hija consultando con la pediatra sobre las pruebas de alergia"

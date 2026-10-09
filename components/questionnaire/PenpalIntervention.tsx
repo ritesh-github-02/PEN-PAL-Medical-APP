@@ -633,13 +633,13 @@ export default function PenpalIntervention() {
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
       <div 
-        className="w-full relative z-10 flex flex-col items-center gap-1.5 sm:gap-2 h-full max-h-full justify-center transition-all duration-300"
+        className="w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300"
         style={{
-          maxWidth: "min(56rem, calc((100dvh - 4.25rem) * 1.55), 100%)",
+          maxWidth: "min(65rem, calc((100dvh - 4.5rem) * 1.553), 100%)",
         }}
       >
         {/* Header Bar matching old slide: Logo, Step Progress, and Language Switcher */}
-        <header className="w-full shrink-0 flex items-center justify-between px-3 sm:px-4 py-1 sm:py-1.5 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs no-print">
+        <header className="w-full shrink-0 flex items-center justify-between px-3 sm:px-4 py-1 sm:py-1.5 mb-2 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs no-print">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]" aria-hidden="true"></span>
             <span className="font-black text-xs sm:text-sm tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
@@ -665,13 +665,14 @@ export default function PenpalIntervention() {
         {/* =========================================================================
             REALISTIC TABLET HARDWARE MOCKUP (LANDSCAPE ORIENTATION)
             ========================================================================= */}
-        <div className="w-full flex-1 min-h-0 flex items-center justify-center relative">
+        <div className="w-full flex items-center justify-center relative">
           {/* Outer Tablet Bezel Frame */}
           <div 
-            className="relative w-full h-full max-h-full bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2.2rem] md:rounded-[2.5rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col"
+            className="relative bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2.2rem] md:rounded-[2.5rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full"
             style={{
               aspectRatio: "16 / 10.3",
-              maxHeight: "calc(100dvh - 4.25rem)",
+              maxHeight: "calc(100dvh - 4.5rem)",
+              height: "auto",
             }}
           >
             
@@ -687,40 +688,33 @@ export default function PenpalIntervention() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
             </div>
 
-            {/* Tablet Inner Screen with Mesh Gradient */}
+            {/* Tablet Inner Screen with Clean Unified Background */}
             <div 
-              className="relative w-full h-full flex-1 min-h-0 rounded-[1.1rem] sm:rounded-[1.5rem] md:rounded-[1.7rem] overflow-hidden shadow-inner flex flex-col justify-between"
-              style={{
-                background: `
-                  radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
-                  radial-gradient(circle at 12% 75%, rgba(162, 230, 228, 0.9) 0%, rgba(162, 230, 228, 0) 50%),
-                  radial-gradient(circle at 82% 18%, rgba(204, 246, 219, 0.9) 0%, rgba(204, 246, 219, 0) 48%),
-                  radial-gradient(circle at 88% 82%, rgba(235, 248, 208, 0.95) 0%, rgba(235, 248, 208, 0) 52%),
-                  linear-gradient(135deg, #c4d4f8 0%, #b2e7e3 28%, #cdf3da 62%, #ecf9d4 100%)
-                `,
-              }}
+              className="relative w-full h-full flex-1 min-h-0 rounded-[1.1rem] sm:rounded-[1.5rem] md:rounded-[1.7rem] overflow-hidden shadow-inner flex flex-col justify-center items-center bg-[#f4f8ec]"
             >
               {/* Slide Content */}
-              <div className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-between overflow-y-auto">
+              <div className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center overflow-y-auto">
               {isTerminated ? (
-                <div className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg text-center max-w-xl mx-auto space-y-4 my-2">
-                  <h2
-                    ref={exitHeadingRef}
-                    tabIndex={-1}
-                    className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
-                  >
-                    {locale === "es" ? "¡Gracias por su tiempo!" : "Thank You for Your Time!"}
-                  </h2>
-                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto font-medium">
-                    {locale === "es"
-                      ? "Actualmente este estudio está destinado a padres de niños con sospecha de alergia a la penicilina. Dado que su hijo no presenta alergia a la penicilina, no se requiere ninguna acción adicional."
-                      : "This study is currently intended for parents of children who have a reported or suspected penicillin allergy. Since your child does not have a penicillin allergy, no further action is needed."}
-                  </p>
-                  <div className="pt-3">
-                    <div
-                      className="inline-block bg-[#82bdad] text-[#193630] font-bold py-2.5 px-8 rounded-full text-xs sm:text-sm shadow-sm border border-[#71ad9d] select-none cursor-default"
+                <div className="w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center p-6 sm:p-10 text-center bg-[#f4f8ec]">
+                  <div className="max-w-xl space-y-4">
+                    <h2
+                      ref={exitHeadingRef}
+                      tabIndex={-1}
+                      className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] rounded-lg"
                     >
-                      {locale === "es" ? "Puede cerrar esta ventana" : "You can close this window"}
+                      {locale === "es" ? "¡Gracias por su tiempo!" : "Thank You for Your Time!"}
+                    </h2>
+                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto font-medium">
+                      {locale === "es"
+                        ? "Actualmente este estudio está destinado a padres de niños con sospecha de alergia a la penicilina. Dado que su hijo no presenta alergia a la penicilina, no se requiere ninguna acción adicional."
+                        : "This study is currently intended for parents of children who have a reported or suspected penicillin allergy. Since your child does not have a penicillin allergy, no further action is needed."}
+                    </p>
+                    <div className="pt-3">
+                      <div
+                        className="inline-block bg-[#82bdad] text-[#193630] font-bold py-2.5 px-8 rounded-full text-xs sm:text-sm shadow-sm border border-[#71ad9d] select-none cursor-default"
+                      >
+                        {locale === "es" ? "Puede cerrar esta ventana" : "You can close this window"}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1123,6 +1117,15 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
     <div
       id="slide-content"
       className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-6 sm:px-10 md:px-14 lg:px-16 py-4 sm:py-6"
+      style={{
+        background: `
+          radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
+          radial-gradient(circle at 12% 75%, rgba(162, 230, 228, 0.9) 0%, rgba(162, 230, 228, 0) 50%),
+          radial-gradient(circle at 82% 18%, rgba(204, 246, 219, 0.9) 0%, rgba(204, 246, 219, 0) 48%),
+          radial-gradient(circle at 88% 82%, rgba(235, 248, 208, 0.95) 0%, rgba(235, 248, 208, 0) 52%),
+          linear-gradient(135deg, #c4d4f8 0%, #b2e7e3 28%, #cdf3da 62%, #ecf9d4 100%)
+        `,
+      }}
     >
       <div className="flex flex-row items-center justify-between gap-4 sm:gap-8 md:gap-12 max-w-4xl w-full my-auto">
         {/* Left Column: Heading, Subtitle, Copy, and Left-Aligned CTA Button */}
@@ -1218,7 +1221,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
   const isKnowledgeTest = options[0]?.value?.startsWith("curing_");
 
   return (
-    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-5 md:p-6 shadow-lg relative min-h-0 overflow-y-auto">
+    <div id="slide-content" className="w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-4 sm:p-6 md:p-8 overflow-y-auto">
       <div className="flex flex-row gap-2 sm:gap-6 items-center justify-between">
         <div className="flex-1 min-w-0 max-w-3xl pb-2">
           {/* 1. Heading & Subtitle Outside Fieldset (Eliminates Double Title Announcement) */}
@@ -2361,7 +2364,7 @@ function SurveySingleChoice({
   };
 
   return (
-    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg relative min-h-0 overflow-y-auto">
+    <div id="slide-content" className="w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-4 sm:p-6 md:p-8 overflow-y-auto">
       <div className="flex flex-row gap-2 sm:gap-6 items-center justify-between">
         <div className="flex-1 min-w-0 max-w-3xl pb-2">
           {/* 1. Heading & Description Outside Fieldset (WCAG 2.4.3 Focus Target) */}
@@ -2851,7 +2854,7 @@ function SurveySingleChoice({
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   const isSpanish = navProps.locale === "es";
   return (
-    <div id="slide-content" className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl p-4 sm:p-8 md:p-10 shadow-lg relative min-h-0 overflow-y-auto">
+    <div id="slide-content" className="w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-4 sm:p-8 md:p-10 overflow-y-auto">
       <div className="flex flex-row items-center justify-between gap-3 sm:gap-6">
         <div className="space-y-4 flex-1 min-w-0 max-w-2xl pb-2 text-left min-h-[10rem]">
           <h2 

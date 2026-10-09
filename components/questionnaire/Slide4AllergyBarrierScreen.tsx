@@ -24,27 +24,29 @@ const SLIDE4_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   background-color: #f4f8ec;
-  padding: 1.5rem 2.25rem 0.85rem 2.25rem;
+  padding: 1.25rem 2.25rem 1rem 2.25rem;
   overflow: hidden;
+  gap: clamp(1.5rem, 4vh, 2.75rem);
 }
 
 /* Middle Content: Large Speech Bubble + Nurse Anna Combo */
 .s4-middle {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;
+  margin: 0;
+  padding: 0;
 }
 
 .s4-combo {
   position: relative;
-  width: 595px;
-  height: 385px;
+  width: 660px;
+  height: 410px;
   max-width: 95%;
   margin: 0 auto;
 }
@@ -53,7 +55,7 @@ const SLIDE4_CSS = `
   position: absolute;
   top: 0;
   left: 0;
-  width: 460px;
+  width: 510px;
   filter: drop-shadow(2px 4px 10px rgba(20, 60, 55, 0.16));
   z-index: 2;
 }
@@ -66,7 +68,7 @@ const SLIDE4_CSS = `
   position: absolute;
   top: 6%;
   left: 5%;
-  width: 79%;
+  width: 80%;
   height: 80%;
   display: flex;
   flex-direction: column;
@@ -74,12 +76,12 @@ const SLIDE4_CSS = `
   align-items: center;
   text-align: center;
   pointer-events: none;
-  padding: 0 14px;
+  padding: 0 16px;
 }
 .s4-bubble-text {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
   color: #142724;
   margin: 0;
   display: flex;
@@ -93,15 +95,15 @@ const SLIDE4_CSS = `
 .s4-nurse {
   position: absolute;
   bottom: 0;
-  left: 442px;
-  width: 125px;
+  left: 490px;
+  width: 135px;
   height: auto;
   z-index: 1;
 }
 .s4-nurse-img {
   width: 100%;
   height: auto;
-  max-height: 250px;
+  max-height: 270px;
   object-fit: contain;
   display: block;
 }
@@ -112,7 +114,8 @@ const SLIDE4_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 .s4-btn {

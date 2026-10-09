@@ -23,10 +23,12 @@ const SLIDE2_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   background-color: #f4f8ec;
-  padding: 0.85rem 1.5rem 0.65rem 1.5rem;
+  padding: 1.5rem 2rem 1.25rem 2rem;
   overflow: hidden;
+  gap: clamp(1.75rem, 4.5vh, 2.85rem);
 }
 
 /* 1. Top Banner Pill */
@@ -34,21 +36,23 @@ const SLIDE2_CSS = `
   display: flex;
   justify-content: center;
   flex-shrink: 0;
-  padding-top: 0.25rem;
+  width: 100%;
+  padding: 0;
+  margin: 0;
 }
 .s2-banner {
   display: inline-block;
   background-color: #fef794;
   color: #132623;
   border: 2.5px solid #296a63;
-  padding: 0.5rem 2.75rem;
-  border-radius: 26px;
+  padding: 0.55rem 2.85rem;
+  border-radius: 28px;
   box-shadow: 0 5px 14px -2px rgba(20, 60, 55, 0.22);
   text-align: center;
   max-width: 44rem;
 }
 .s2-heading {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   line-height: 1.35;
   font-weight: 700;
   letter-spacing: -0.015em;
@@ -61,15 +65,14 @@ const SLIDE2_CSS = `
 
 /* 2. Middle Row */
 .s2-middle {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2.25rem;
+  gap: clamp(2rem, 4vw, 3.5rem);
   padding: 0 0.5rem;
-  margin: auto 0;
+  margin: 0;
 }
 
 /* Bottle */
@@ -80,9 +83,9 @@ const SLIDE2_CSS = `
   justify-content: center;
 }
 .s2-bottle {
-  width: 5.5rem;
+  width: 6.25rem;
   height: auto;
-  max-height: 200px;
+  max-height: 225px;
   object-fit: contain;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
   user-select: none;
@@ -94,13 +97,13 @@ const SLIDE2_CSS = `
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 1.05rem;
 }
 .s2-option {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.125rem 0;
+  gap: 1.05rem;
+  padding: 0.15rem 0;
   text-align: left;
   cursor: pointer;
   background: transparent;
@@ -114,10 +117,10 @@ const SLIDE2_CSS = `
 }
 
 .s2-checkbox {
-  width: 1.625rem;
-  height: 1.625rem;
+  width: 1.75rem;
+  height: 1.75rem;
   flex-shrink: 0;
-  border-radius: 2.5px;
+  border-radius: 3px;
   border: 2px solid #386e68;
   background-color: #cbd8d4;
   display: flex;
@@ -134,13 +137,13 @@ const SLIDE2_CSS = `
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 .s2-check-icon {
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 1.2rem;
+  height: 1.2rem;
   color: #ffffff;
 }
 
 .s2-option-label {
-  font-size: 1.25rem;
+  font-size: 1.28rem;
   line-height: 1.2;
   font-weight: 400;
   color: #152925;
@@ -158,8 +161,8 @@ const SLIDE2_CSS = `
 /* Right Section: Speech Bubble + Nurse Anna Combo */
 .s2-combo {
   position: relative;
-  width: 345px;
-  height: 250px;
+  width: 365px;
+  height: 260px;
   flex-shrink: 0;
 }
 
@@ -167,7 +170,7 @@ const SLIDE2_CSS = `
   position: absolute;
   top: 5px;
   left: 0;
-  width: 255px;
+  width: 270px;
   z-index: 2;
   filter: drop-shadow(2px 3px 5px rgba(20, 60, 55, 0.18));
 }
@@ -191,9 +194,9 @@ const SLIDE2_CSS = `
   padding: 0 10px;
 }
 .s2-bubble-text {
-  font-size: 13.5px;
+  font-size: 14.2px;
   font-weight: 500;
-  line-height: 1.38;
+  line-height: 1.4;
   color: #152925;
   margin: 0;
 }
@@ -202,15 +205,15 @@ const SLIDE2_CSS = `
   position: absolute;
   bottom: 0;
   right: 6px;
-  width: 102px;
+  width: 110px;
   height: auto;
-  max-height: 230px;
+  max-height: 245px;
   z-index: 1;
 }
 .s2-nurse-img {
   width: 100%;
   height: auto;
-  max-height: 230px;
+  max-height: 245px;
   object-fit: contain;
   display: block;
 }
@@ -221,8 +224,9 @@ const SLIDE2_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0;
+  padding: 0;
   flex-shrink: 0;
+  margin: 0;
 }
 .s2-btn {
   padding: 0.45rem 2rem;

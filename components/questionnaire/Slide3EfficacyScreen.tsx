@@ -24,22 +24,25 @@ const SLIDE3_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.25rem 0.85rem 2.25rem;
+  padding: 1.25rem 2.5rem 1rem 2.5rem;
   overflow: hidden;
+  gap: clamp(1.5rem, 4vh, 2.75rem);
 }
 
 /* 1. Top Section: Bold Statement */
 .s3-top-section {
-  max-width: 36.5rem;
-  padding-top: 2.25rem;
-  padding-left: 3.25rem;
+  width: 100%;
+  max-width: 44rem;
+  padding: 0;
+  margin: 0;
   flex-shrink: 0;
 }
 .s3-heading {
-  font-size: 1.45rem;
-  line-height: 1.38;
+  font-size: 1.55rem;
+  line-height: 1.42;
   font-weight: 700;
   color: #142724;
   letter-spacing: -0.015em;
@@ -54,26 +57,27 @@ const SLIDE3_CSS = `
 .s3-bottom-content-row {
   display: flex;
   justify-content: flex-end;
-  align-items: flex-end;
+  align-items: center;
   width: 100%;
-  flex: 1 1 0%;
-  min-height: 0;
-  margin-top: -0.75rem;
+  max-width: 44rem;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .s3-combo {
   position: relative;
-  width: 395px;
-  height: 265px;
+  width: 420px;
+  height: 275px;
   flex-shrink: 0;
-  margin-right: 2rem;
+  margin-right: 1.5rem;
 }
 
 .s3-bubble {
   position: absolute;
   top: 0;
   left: 0;
-  width: 295px;
+  width: 315px;
   z-index: 2;
   filter: drop-shadow(2px 3px 5px rgba(20, 60, 55, 0.18));
 }
@@ -97,9 +101,9 @@ const SLIDE3_CSS = `
   padding: 0 10px;
 }
 .s3-bubble-text {
-  font-size: 13.5px;
+  font-size: 14.2px;
   font-weight: 500;
-  line-height: 1.36;
+  line-height: 1.38;
   color: #152925;
   margin: 0;
   display: flex;
@@ -110,9 +114,9 @@ const SLIDE3_CSS = `
   position: absolute;
   bottom: 0;
   right: 8px;
-  width: 105px;
+  width: 112px;
   height: auto;
-  max-height: 230px;
+  max-height: 245px;
   z-index: 1;
 }
 .s3-nurse-img {
@@ -129,7 +133,8 @@ const SLIDE3_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 .s3-btn {
@@ -175,8 +180,8 @@ const SLIDE3_CSS = `
   }
   .s3-top-section {
     max-width: 32rem;
-    padding-top: 1rem;
-    padding-left: 1.5rem;
+    padding: 0;
+    margin: 0;
   }
   .s3-heading {
     font-size: 1.25rem;

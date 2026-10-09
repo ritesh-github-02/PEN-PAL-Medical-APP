@@ -24,21 +24,24 @@ const SLIDE11_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   background-color: #f4f8ec;
-  padding: 1.5rem 2.5rem 0.85rem 2.5rem;
+  padding: 1.25rem 2.5rem 1rem 2.5rem;
   overflow: hidden;
+  gap: clamp(1.25rem, 3.5vh, 2.25rem);
 }
 
 /* Top Heading */
 .s11-top-section {
   width: 100%;
-  padding-left: 0.25rem;
-  margin-bottom: 0.5rem;
+  max-width: 790px;
+  margin: 0 auto;
+  padding: 0;
   flex-shrink: 0;
 }
 .s11-heading {
-  font-size: 1.35rem;
+  font-size: 1.45rem;
   line-height: 1.38;
   font-weight: 700;
   color: #142724;
@@ -52,21 +55,22 @@ const SLIDE11_CSS = `
 
 /* Middle Content: Sage Green Card (Left) + Nurse Anna (Right) */
 .s11-middle {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
+  max-width: 790px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 0 0.25rem;
-  margin: auto 0;
+  justify-content: center;
+  gap: 1.75rem;
+  padding: 0;
+  margin: 0 auto;
 }
 
 /* Sage Green Container Card */
 .s11-card {
-  flex: 1 1 0%;
-  max-width: 580px;
+  flex: 0 1 auto;
+  width: 630px;
+  max-width: 100%;
   background-color: #84aba0;
   border-radius: 20px;
   padding: 1.25rem 1.4rem;
@@ -172,14 +176,151 @@ const SLIDE11_CSS = `
   padding: 2px 4px;
 }
 
-.s11-other-input::placeholder {
-  color: rgba(20, 39, 36, 0.55);
-}
-
 .s11-other-input:focus {
   border-bottom-color: #0b1f1c;
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 4px 4px 0 0;
+}
+
+/* ==========================================================
+   Swelling Pop-up (Figma 7-1-2) Pixel-Perfect Styles
+   ========================================================== */
+.s11-swelling-dialog {
+  background-color: #fffef2;
+  border-radius: 24px;
+  padding: 1.85rem 2rem 1.35rem 2rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 16px 40px -8px rgba(20, 40, 35, 0.28);
+  border: 1px solid #e5ded0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.s11-swelling-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.s11-swelling-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fde882;
+  color: #142724;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.55rem 1.25rem;
+  border-radius: 9px;
+  border: 1.2px solid #d8c85c;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  outline: none;
+  min-height: 42px;
+}
+
+.s11-swelling-btn:hover {
+  background-color: #fce268;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+}
+
+.s11-swelling-btn:active {
+  transform: scale(0.97);
+}
+
+.s11-swelling-btn:focus-visible {
+  box-shadow: 0 0 0 3px #1f4d45;
+}
+
+.s11-swelling-btn--checked {
+  background-color: #1f4d45;
+  color: #ffffff;
+  border-color: #163d36;
+  box-shadow: 0 2px 6px rgba(10, 40, 35, 0.3);
+}
+
+.s11-swelling-btn--checked:hover {
+  background-color: #19423b;
+}
+
+.s11-swelling-other {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  width: 100%;
+}
+
+.s11-swelling-other-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #142724;
+  white-space: nowrap;
+}
+
+.s11-swelling-other-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #142724;
+  outline: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #142724;
+  padding: 2px 4px;
+}
+
+.s11-swelling-other-input:focus {
+  border-bottom-color: #0b1f1c;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.s11-swelling-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.s11-swelling-code {
+  font-size: 0.72rem;
+  color: #78716c;
+  font-family: monospace;
+}
+
+.s11-swelling-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #d6d1c4;
+  background-color: #ffffff;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.s11-swelling-close-btn:hover {
+  background-color: #f7f5ed;
+  color: #111827;
+  border-color: #a8a29e;
+}
+
+.s11-swelling-close-btn:active {
+  transform: scale(0.92);
+}
+
+.s11-swelling-close-btn:focus-visible {
+  box-shadow: 0 0 0 2px #236f7a;
 }
 
 /* Right Section: Nurse Anna */
@@ -210,7 +351,8 @@ const SLIDE11_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0;
+  padding: 0;
+  margin: 0;
   flex-shrink: 0;
 }
 
@@ -270,8 +412,13 @@ const SLIDE11_CSS = `
   .s11-root {
     padding: 1rem 1.5rem 0.5rem 1.5rem;
   }
+  .s11-top-section,
+  .s11-middle {
+    max-width: 620px;
+    gap: 1.25rem;
+  }
   .s11-card {
-    max-width: 480px;
+    max-width: 490px;
     padding: 1rem 1.2rem;
     gap: 0.55rem;
   }
@@ -372,12 +519,11 @@ const RASH_SUBTYPE_OPTIONS: SymptomItem[] = [
 ];
 
 const SWELLING_SUBTYPE_OPTIONS: SymptomItem[] = [
-  { value: "Face or eyes", labelEn: "Face or eyes", labelEs: "Cara u ojos" },
-  { value: "Lips", labelEn: "Lips", labelEs: "Labios" },
-  { value: "Tongue", labelEn: "Tongue", labelEs: "Lengua" },
-  { value: "Throat", labelEn: "Throat", labelEs: "Garganta" },
-  { value: "Hands or feet", labelEn: "Hands or feet", labelEs: "Manos o pies" },
-  { value: "Unsure", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/ No lo sé" },
+  { value: "Face swelling", labelEn: "Face swelling", labelEs: "Inflamación de la cara" },
+  { value: "Throat swelling", labelEn: "Throat swelling", labelEs: "Inflamación de la garganta" },
+  { value: "Lip swelling", labelEn: "Lip swelling", labelEs: "Inflamación de los labios" },
+  { value: "Tongue swelling", labelEn: "Tongue swelling", labelEs: "Inflamación de la lengua" },
+  { value: "Unsure", labelEn: "Unsure/I don't know", labelEs: "No estoy seguro/No lo sé" },
 ];
 
 export function Slide11SymptomsScreen({
@@ -399,17 +545,21 @@ export function Slide11SymptomsScreen({
   const modalHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const modalTriggerRef = useRef<HTMLButtonElement | null>(null);
 
-  const swellingHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const swellingTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const swellingFirstBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const [symptoms, setSymptoms] = useState<string[]>(selectedSymptoms);
   const [otherText, setOtherText] = useState<string>(symptomsOther);
-  
+
   const [rashModalOpen, setRashModalOpen] = useState(false);
   const [activeRashDetails, setActiveRashDetails] = useState<string[]>(rashDetails);
 
   const [swellingModalOpen, setSwellingModalOpen] = useState(false);
   const [activeSwellingDetails, setActiveSwellingDetails] = useState<string[]>(swellingDetails);
+  const [swellingOtherText, setSwellingOtherText] = useState<string>(() => {
+    const found = (swellingDetails || []).find((d) => d.startsWith("Other:"));
+    return found ? found.replace(/^Other:\s*/, "") : "";
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -442,7 +592,7 @@ export function Slide11SymptomsScreen({
   useEffect(() => {
     if (!swellingModalOpen) return;
     const timer = setTimeout(() => {
-      swellingHeadingRef.current?.focus();
+      swellingFirstBtnRef.current?.focus();
     }, 50);
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -524,6 +674,7 @@ export function Slide11SymptomsScreen({
     let updated: string[];
     if (val === "Unsure") {
       updated = activeSwellingDetails.includes("Unsure") ? [] : ["Unsure"];
+      setSwellingOtherText("");
     } else {
       const withoutUnsure = activeSwellingDetails.filter((s) => s !== "Unsure");
       if (withoutUnsure.includes(val)) {
@@ -535,6 +686,18 @@ export function Slide11SymptomsScreen({
     setActiveSwellingDetails(updated);
     if (onSwellingDetailsChange) {
       onSwellingDetailsChange(updated);
+    }
+  };
+
+  const handleSwellingOtherChange = (text: string) => {
+    setSwellingOtherText(text);
+    const withoutOther = activeSwellingDetails.filter(
+      (d) => !d.startsWith("Other:") && d !== "Unsure"
+    );
+    const next = text.trim() ? [...withoutOther, `Other: ${text.trim()}`] : withoutOther;
+    setActiveSwellingDetails(next);
+    if (onSwellingDetailsChange) {
+      onSwellingDetailsChange(next);
     }
   };
 
@@ -642,7 +805,6 @@ export function Slide11SymptomsScreen({
                 type="text"
                 value={otherText}
                 onChange={(e) => handleOtherChange(e.target.value)}
-                placeholder="________________"
                 className="s11-other-input"
                 aria-label={isSpanish ? "Otro síntoma, por favor describa" : "Other symptom, please describe"}
               />
@@ -732,16 +894,14 @@ export function Slide11SymptomsScreen({
                     role="checkbox"
                     aria-checked={isChecked}
                     onClick={() => toggleRashDetail(sub.value)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 min-h-[42px] rounded-xl text-left font-semibold text-xs sm:text-sm transition cursor-pointer border ${
-                      isChecked
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 min-h-[42px] rounded-xl text-left font-semibold text-xs sm:text-sm transition cursor-pointer border ${isChecked
                         ? "bg-[#236f7a] text-white border-[#1a555e] shadow-2xs"
                         : "bg-[#f8faf7] text-slate-800 border-slate-300 hover:bg-slate-100"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] active:scale-[0.99]`}
+                      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] active:scale-[0.99]`}
                   >
                     <div
-                      className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                        isChecked ? "border-white bg-[#1a555e]" : "border-slate-400 bg-white"
-                      }`}
+                      className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isChecked ? "border-white bg-[#1a555e]" : "border-slate-400 bg-white"
+                        }`}
                       aria-hidden="true"
                     >
                       {isChecked && (
@@ -780,72 +940,104 @@ export function Slide11SymptomsScreen({
         <div
           role="dialog"
           aria-modal="true"
-          aria-labelledby="modal-11c-heading"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+          aria-label={isSpanish ? "Detalles de inflamación" : "Swelling details"}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-[2px]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSwellingModalOpen(false);
+              swellingTriggerRef.current?.focus();
+            }
+          }}
         >
-          <div className="bg-white rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="space-y-1">
-              <h2
-                id="modal-11c-heading"
-                ref={swellingHeadingRef}
-                tabIndex={-1}
-                className="text-base sm:text-lg font-bold text-slate-900 tracking-tight outline-none"
+          <div className="s11-swelling-dialog animate-in fade-in zoom-in-95 duration-200">
+            {/* Row 1: Face swelling & Throat swelling */}
+            <div className="s11-swelling-row">
+              <button
+                ref={swellingFirstBtnRef}
+                type="button"
+                role="checkbox"
+                aria-checked={activeSwellingDetails.includes("Face swelling")}
+                onClick={() => toggleSwellingDetail("Face swelling")}
+                className={`s11-swelling-btn${activeSwellingDetails.includes("Face swelling") ? " s11-swelling-btn--checked" : ""}`}
               >
-                {isSpanish ? "¿Dónde ocurrió la inflamación?" : "Where was the swelling?"}
-              </h2>
-              <p className="text-xs font-medium text-slate-500">
-                {isSpanish
-                  ? "Seleccione todas las opciones que correspondan."
-                  : "Select all that apply."}
-              </p>
+                {isSpanish ? "Inflamación de la cara" : "Face swelling"}
+              </button>
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={activeSwellingDetails.includes("Throat swelling")}
+                onClick={() => toggleSwellingDetail("Throat swelling")}
+                className={`s11-swelling-btn${activeSwellingDetails.includes("Throat swelling") ? " s11-swelling-btn--checked" : ""}`}
+              >
+                {isSpanish ? "Inflamación de la garganta" : "Throat swelling"}
+              </button>
             </div>
 
-            <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
-              {SWELLING_SUBTYPE_OPTIONS.map((sub) => {
-                const isChecked = activeSwellingDetails.includes(sub.value);
-                const label = isSpanish ? sub.labelEs : sub.labelEn;
-                return (
-                  <button
-                    key={sub.value}
-                    type="button"
-                    role="checkbox"
-                    aria-checked={isChecked}
-                    onClick={() => toggleSwellingDetail(sub.value)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 min-h-[42px] rounded-xl text-left font-semibold text-xs sm:text-sm transition cursor-pointer border ${
-                      isChecked
-                        ? "bg-[#236f7a] text-white border-[#1a555e] shadow-2xs"
-                        : "bg-[#f8faf7] text-slate-800 border-slate-300 hover:bg-slate-100"
-                    } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] active:scale-[0.99]`}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                        isChecked ? "border-white bg-[#1a555e]" : "border-slate-400 bg-white"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      {isChecked && (
-                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="leading-tight">{label}</span>
-                  </button>
-                );
-              })}
+            {/* Row 2: Lip swelling & Tongue swelling */}
+            <div className="s11-swelling-row">
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={activeSwellingDetails.includes("Lip swelling")}
+                onClick={() => toggleSwellingDetail("Lip swelling")}
+                className={`s11-swelling-btn${activeSwellingDetails.includes("Lip swelling") ? " s11-swelling-btn--checked" : ""}`}
+              >
+                {isSpanish ? "Inflamación de los labios" : "Lip swelling"}
+              </button>
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={activeSwellingDetails.includes("Tongue swelling")}
+                onClick={() => toggleSwellingDetail("Tongue swelling")}
+                className={`s11-swelling-btn${activeSwellingDetails.includes("Tongue swelling") ? " s11-swelling-btn--checked" : ""}`}
+              >
+                {isSpanish ? "Inflamación de la lengua" : "Tongue swelling"}
+              </button>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-              <span className="text-[11px] font-mono text-slate-400">7-1-2</span>
+            {/* Row 3: Unsure/I don't know */}
+            <div className="s11-swelling-row">
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={activeSwellingDetails.includes("Unsure")}
+                onClick={() => toggleSwellingDetail("Unsure")}
+                className={`s11-swelling-btn${activeSwellingDetails.includes("Unsure") ? " s11-swelling-btn--checked" : ""}`}
+              >
+                {isSpanish ? "No estoy seguro/No lo sé" : "Unsure/I don't know"}
+              </button>
+            </div>
+
+            {/* Other: Please describe */}
+            <div className="s11-swelling-other">
+              <label htmlFor="swelling-other-input" className="s11-swelling-other-label">
+                {isSpanish ? "Otro: Describa" : "Other: Please describe"}
+              </label>
+              <input
+                id="swelling-other-input"
+                type="text"
+                value={swellingOtherText}
+                onChange={(e) => handleSwellingOtherChange(e.target.value)}
+                className="s11-swelling-other-input"
+                aria-label={isSpanish ? "Otro tipo de inflamación, por favor describa" : "Other swelling, please describe"}
+              />
+            </div>
+
+            {/* Footer: 7-1-2 and [ X ] button */}
+            <div className="s11-swelling-footer">
+              <span className="s11-swelling-code">7-1-2</span>
               <button
                 type="button"
                 onClick={() => {
                   setSwellingModalOpen(false);
                   swellingTriggerRef.current?.focus();
                 }}
-                className="px-6 py-2 min-h-[44px] rounded-full bg-[#132338] hover:bg-[#0c1827] text-white font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+                className="s11-swelling-close-btn"
+                aria-label={isSpanish ? "Cerrar" : "Close"}
               >
-                {isSpanish ? "Guardar y continuar" : "Save and Continue"}
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
           </div>

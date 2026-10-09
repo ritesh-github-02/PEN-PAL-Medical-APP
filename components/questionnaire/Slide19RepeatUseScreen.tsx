@@ -22,22 +22,24 @@ const SLIDE19_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background-color: #f6faee;
-  padding: 1.5rem 2.5rem 0.85rem 2.5rem;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f8ec;
+  padding: 1.25rem 2.5rem 1rem 2.5rem;
   overflow: hidden;
+  gap: clamp(1.75rem, 4.5vh, 2.75rem);
 }
 
 /* Heading */
 .s19-top-section {
   width: 100%;
   text-align: center;
-  margin-top: 0.25rem;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 .s19-heading {
-  font-size: 1.42rem;
+  font-size: 1.55rem;
   line-height: 1.35;
   font-weight: 700;
   color: #142724;
@@ -51,15 +53,14 @@ const SLIDE19_CSS = `
 
 /* Middle Section: Teal Card + Nurse Anna */
 .s19-middle {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 2.5rem;
-  margin: auto 0;
-  padding: 0.5rem 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* Main Rounded Teal Card Container */
@@ -72,7 +73,7 @@ const SLIDE19_CSS = `
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  max-width: 530px;
+  max-width: 560px;
   width: 100%;
   transition: all 0.2s ease;
 }
@@ -246,7 +247,8 @@ const SLIDE19_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0 0.5rem 0;
+  padding: 0;
+  margin: 0;
   flex-shrink: 0;
 }
 

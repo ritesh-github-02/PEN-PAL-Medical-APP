@@ -228,12 +228,13 @@ export function generateAssessmentPDF(data: any): void {
             if (swellingArr.length > 0) {
               const formattedSwelling = isSpanish
                 ? swellingArr.map((d: string) => {
-                    if (d === "Face or eyes" || d === "Face / Eyes") return "Cara u ojos";
-                    if (d === "Lips") return "Labios";
-                    if (d === "Tongue") return "Lengua";
-                    if (d === "Throat") return "Garganta";
+                    if (d === "Face swelling" || d === "Face or eyes" || d === "Face / Eyes") return "Inflamación de la cara";
+                    if (d === "Throat swelling" || d === "Throat") return "Inflamación de la garganta";
+                    if (d === "Lip swelling" || d === "Lips") return "Inflamación de los labios";
+                    if (d === "Tongue swelling" || d === "Tongue") return "Inflamación de la lengua";
                     if (d === "Hands or feet" || d === "Hands / Feet") return "Manos o pies";
-                    if (d === "Unsure" || d.includes("Unsure")) return "No estoy seguro";
+                    if (d === "Unsure" || d.includes("Unsure")) return "No estoy seguro/No lo sé";
+                    if (d.startsWith("Other:")) return d.replace(/^Other:\s*/, "Otro: ");
                     return d;
                   }).join(", ")
                 : swellingArr.join(", ");

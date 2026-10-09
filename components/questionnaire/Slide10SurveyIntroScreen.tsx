@@ -23,21 +23,23 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   background-color: #f4f8ec;
-  padding: 1.5rem 2.25rem 0.85rem 2.25rem;
+  padding: 1.25rem 2.25rem 1rem 2.25rem;
   overflow: hidden;
+  gap: clamp(1.5rem, 4vh, 2.75rem);
 }
 
 /* Middle Content: Nurse Anna (Left) + Large Speech Bubble (Right) */
 .s10b-middle {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;
+  margin: 0;
+  padding: 0;
 }
 
 .s10b-combo {
@@ -45,8 +47,8 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   align-items: flex-end;
   justify-content: center;
   position: relative;
-  width: 700px;
-  height: 350px;
+  width: 730px;
+  height: 365px;
 }
 
 /* Nurse Anna standing on Left, mirrored horizontally to gesture toward the right */
@@ -124,7 +126,8 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 

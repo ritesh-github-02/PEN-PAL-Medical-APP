@@ -23,21 +23,23 @@ const SLIDE8_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   background-color: #f4f8ec;
-  padding: 1.5rem 2.25rem 0.85rem 2.25rem;
+  padding: 1.25rem 2.25rem 1rem 2.25rem;
   overflow: hidden;
+  gap: clamp(1.5rem, 4vh, 2.75rem);
 }
 
 /* Middle Content: Large Speech Bubble + Nurse Anna Combo */
 .s8-middle {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;
+  margin: 0;
+  padding: 0;
 }
 
 .s8-combo {
@@ -45,13 +47,13 @@ const SLIDE8_CSS = `
   align-items: flex-end;
   justify-content: center;
   position: relative;
-  width: 680px;
-  height: 335px;
+  width: 720px;
+  height: 355px;
 }
 
 .s8-bubble {
   position: relative;
-  width: 490px;
+  width: 520px;
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 10px;
@@ -78,9 +80,9 @@ const SLIDE8_CSS = `
   padding: 0 16px;
 }
 .s8-bubble-text {
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.42;
   color: #142724;
   margin: 0;
   display: flex;
@@ -93,9 +95,9 @@ const SLIDE8_CSS = `
 
 .s8-nurse {
   position: relative;
-  width: 118px;
+  width: 125px;
   height: auto;
-  max-height: 250px;
+  max-height: 265px;
   object-fit: contain;
   align-self: flex-end;
   margin-left: -54px;
@@ -117,7 +119,8 @@ const SLIDE8_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 .s8-btn {

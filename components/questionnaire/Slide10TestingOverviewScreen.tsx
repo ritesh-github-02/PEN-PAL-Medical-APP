@@ -24,36 +24,39 @@ const SLIDE10_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   background-color: #f4f8ec;
-  padding: 1.5rem 2.75rem 0.85rem 2.75rem;
+  padding: 1.25rem 2.25rem 1rem 2.25rem;
   overflow: hidden;
+  gap: clamp(1.25rem, 3.5vh, 2.25rem);
 }
 
 /* 1. Main Middle Area: Two-Column Layout (Info Left, Anna + Bubble Right) */
 .s10-main {
-  flex: 1 1 0%;
-  min-height: 0;
+  flex-shrink: 0;
   width: 100%;
+  max-width: 780px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 0 0.5rem;
-  margin: auto 0;
+  justify-content: center;
+  gap: clamp(1.5rem, 3.5vw, 2.75rem);
+  padding: 0;
+  margin: 0 auto;
 }
 
 /* Left Column: Headline, Subtitle, Bullets */
 .s10-left {
-  flex: 1 1 0%;
-  max-width: 58%;
+  flex: 0 1 430px;
+  width: 100%;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .s10-heading {
-  font-size: 1.35rem;
+  font-size: 1.48rem;
   line-height: 1.38;
   font-weight: 700;
   color: #142724;
@@ -66,7 +69,7 @@ const SLIDE10_CSS = `
 }
 
 .s10-subheading {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   line-height: 1.35;
   font-weight: 700;
   color: #142724;
@@ -186,7 +189,8 @@ const SLIDE10_CSS = `
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.25rem 0;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 
@@ -237,11 +241,12 @@ const SLIDE10_CSS = `
     padding: 1rem 1.5rem 0.5rem 1.5rem;
   }
   .s10-main {
-    gap: 1rem;
+    max-width: 640px;
+    gap: 1.25rem;
     padding: 0;
   }
   .s10-left {
-    max-width: 56%;
+    max-width: 360px;
   }
   .s10-heading {
     font-size: 1.15rem;

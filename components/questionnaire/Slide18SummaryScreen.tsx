@@ -25,9 +25,10 @@ const SLIDE18_CSS = `
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #f6faee;
+  background-color: #f4f8ec;
   padding: 0.8rem 2.2rem 0.55rem 2.2rem;
   overflow: hidden;
+  gap: clamp(0.75rem, 2vh, 1.25rem);
 }
 
 /* Centered Content Container */
@@ -155,9 +156,9 @@ const SLIDE18_CSS = `
   justify-content: center;
   gap: 1.6rem;
   width: 100%;
-  margin-top: 0.65rem;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
-  padding: 0.15rem 0;
 }
 
 .s18-btn {
