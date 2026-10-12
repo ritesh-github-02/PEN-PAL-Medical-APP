@@ -614,7 +614,7 @@ export default function PenpalIntervention() {
 
   return (
     <main 
-      className="h-screen h-[100dvh] max-h-[100dvh] w-full max-w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-3.5 relative font-sans bg-[#f4f8e8] overflow-hidden"
+      className="min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col items-center justify-center p-3 sm:p-5 md:p-6 relative font-sans bg-[#f4f8e8] overflow-y-auto overflow-x-hidden"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -635,7 +635,7 @@ export default function PenpalIntervention() {
       <div 
         className="w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300"
         style={{
-          maxWidth: "min(65rem, calc((100dvh - 4.5rem) * 1.553), 100%)",
+          maxWidth: "min(58rem, calc((100dvh - 5rem) * 1.88), 100%)",
         }}
       >
         {/* Header Bar matching old slide: Logo, Step Progress, and Language Switcher */}
@@ -670,8 +670,8 @@ export default function PenpalIntervention() {
           <div 
             className="relative bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2.2rem] md:rounded-[2.5rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full"
             style={{
-              aspectRatio: "16 / 10.3",
-              maxHeight: "calc(100dvh - 4.5rem)",
+              aspectRatio: "16 / 8.5",
+              maxHeight: "min(500px, calc(100dvh - 5rem))",
               height: "auto",
             }}
           >

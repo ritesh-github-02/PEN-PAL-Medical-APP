@@ -26,9 +26,9 @@ const SLIDE2_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.5rem 2rem 1.25rem 2rem;
+  padding: 1rem 1.5rem 0.75rem 1.5rem;
   overflow: hidden;
-  gap: clamp(1.75rem, 4.5vh, 2.85rem);
+  gap: clamp(0.75rem, 2.5vh, 1.75rem);
 }
 
 /* 1. Top Banner Pill */
