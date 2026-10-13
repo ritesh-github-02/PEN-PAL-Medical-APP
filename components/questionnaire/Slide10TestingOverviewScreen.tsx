@@ -27,20 +27,20 @@ const SLIDE10_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.25rem 1rem 2.25rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.25rem, 3.5vh, 2.25rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* 1. Main Middle Area: Two-Column Layout (Info Left, Anna + Bubble Right) */
 .s10-main {
   flex-shrink: 0;
   width: 100%;
-  max-width: 780px;
+  max-width: 760px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1.5rem, 3.5vw, 2.75rem);
+  gap: clamp(1.2rem, 3vw, 2.2rem);
   padding: 0;
   margin: 0 auto;
 }
@@ -56,12 +56,12 @@ const SLIDE10_CSS = `
 }
 
 .s10-heading {
-  font-size: 1.48rem;
-  line-height: 1.38;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  line-height: 1.35;
   font-weight: 700;
   color: #142724;
   letter-spacing: -0.015em;
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 0.85rem 0;
   outline: none;
 }
 .s10-heading:focus-visible {
@@ -69,12 +69,12 @@ const SLIDE10_CSS = `
 }
 
 .s10-subheading {
-  font-size: 1.25rem;
-  line-height: 1.35;
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  line-height: 1.32;
   font-weight: 700;
   color: #142724;
   letter-spacing: -0.01em;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .s10-bullets {
@@ -83,15 +83,15 @@ const SLIDE10_CSS = `
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.55rem;
 }
 
 .s10-bullet-item {
   display: flex;
   align-items: flex-start;
   gap: 0.65rem;
-  font-size: 1.05rem;
-  line-height: 1.4;
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  line-height: 1.35;
   font-weight: 400;
   color: #142724;
 }

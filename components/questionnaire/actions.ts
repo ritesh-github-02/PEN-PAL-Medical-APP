@@ -5,30 +5,75 @@ import { cookies, headers } from 'next/headers';
 import { questionnaireConfig } from '@/config/questionnaire';
 
 // ─────────────────────────────────────────────────────────────────────────────
+// getOrCreateParticipantId (Guarantees DB persistence even during direct browser testing)
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function getOrCreateParticipantId(): Promise<string | null> {
+  const cookieStore = await cookies();
+  let participantId = cookieStore.get('penpal_participant')?.value;
+
+  if (participantId) {
+    const participantExists = await prisma.participant.findUnique({
+      where: { id: participantId },
+      select: { id: true },
+    }).catch(() => null);
+    if (participantExists) return participantId;
+  }
+
+  try {
+    const isProd = process.env.NODE_ENV === 'production';
+    const newParticipant = await prisma.participant.create({
+      data: {
+        groupId: 'INTERVENTION',
+        status: 'ACTIVE',
+        externalId: `TEST-${Date.now().toString().slice(-6)}`,
+      },
+    });
+    participantId = newParticipant.id;
+    cookieStore.set('penpal_participant', participantId, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 2,
+      path: '/',
+    });
+
+    const newSession = await prisma.session.create({
+      data: {
+        participantId,
+        status: 'IN_PROGRESS',
+        startTime: new Date(),
+      },
+    });
+    cookieStore.set('penpal_session', newSession.id, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 2,
+      path: '/',
+    });
+
+    return participantId;
+  } catch (e) {
+    console.error('Participant session creation warning', e);
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // submitAnswer
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function submitAnswer(questionId: string, answerValue: string | string[], timeSpentMs?: number, metadata?: string) {
   const finalValue = typeof answerValue === 'object' ? JSON.stringify(answerValue) : String(answerValue);
-  const cookieStore = await cookies();
-  const participantId = cookieStore.get('penpal_participant')?.value;
+  const participantId = await getOrCreateParticipantId();
 
   if (!participantId) {
-    console.warn('No active participant session found for submitAnswer. Silent fail for preview.');
+    console.warn('Unable to resolve participant for submitAnswer.');
     return;
   }
 
   try {
-    const participantExists = await prisma.participant.findUnique({
-      where: { id: participantId },
-      select: { id: true },
-    }).catch(() => null);
-
-    if (!participantExists) {
-      console.warn('Participant not found for submitAnswer.');
-      return;
-    }
-
     await prisma.questionnaireResponse.upsert({
       where: {
         participantId_questionId: {
@@ -62,19 +107,11 @@ export async function submitAnswer(questionId: string, answerValue: string | str
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function recordSlideTiming(stepId: string, stepIndex: number, durationMs: number, isNewVisit: boolean = false) {
-  const cookieStore = await cookies();
-  const participantId = cookieStore.get('penpal_participant')?.value;
-
-  if (!participantId || !stepId || durationMs < 50) return;
+  if (!stepId || durationMs < 50) return;
+  const participantId = await getOrCreateParticipantId();
+  if (!participantId) return;
 
   try {
-    const participantExists = await prisma.participant.findUnique({
-      where: { id: participantId },
-      select: { id: true },
-    }).catch(() => null);
-
-    if (!participantExists) return;
-
     await prisma.slideMetric.upsert({
       where: {
         participantId_stepId: {

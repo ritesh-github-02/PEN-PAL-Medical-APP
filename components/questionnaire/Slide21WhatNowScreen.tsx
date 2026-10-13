@@ -26,9 +26,9 @@ const SLIDE21_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.5rem 1rem 2.5rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.25rem, 3.5vh, 2.25rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* Centered Content Container */
@@ -52,13 +52,13 @@ const SLIDE21_CSS = `
   background-color: #fff589;
   border: 1.5px solid #142724;
   border-radius: 14px;
-  padding: 0.45rem 1.4rem;
+  padding: 0.35rem 1.2rem;
   box-shadow: 2px 3px 0px rgba(20, 50, 40, 0.2);
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.45rem;
 }
 
 .s21-badge-title {
-  font-size: 1.18rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: #142724;
   line-height: 1.2;
@@ -72,12 +72,12 @@ const SLIDE21_CSS = `
 
 /* Main Heading */
 .s21-heading {
-  font-size: 1.28rem;
+  font-size: clamp(1.02rem, 1.8vw, 1.18rem);
   font-weight: 700;
   line-height: 1.35;
   color: #142724;
   letter-spacing: -0.01em;
-  margin: 0 0 0.65rem 0;
+  margin: 0 0 0.4rem 0;
   text-align: left;
 }
 
@@ -85,10 +85,10 @@ const SLIDE21_CSS = `
 .s21-bullets {
   list-style: none;
   padding: 0;
-  margin: 0 0 0.85rem 0;
+  margin: 0 0 0.5rem 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.3rem;
   width: 100%;
 }
 
@@ -96,15 +96,15 @@ const SLIDE21_CSS = `
   display: flex;
   align-items: flex-start;
   gap: 0.55rem;
-  font-size: 1.05rem;
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
   font-weight: 500;
   color: #142724;
-  line-height: 1.4;
+  line-height: 1.35;
   text-align: left;
 }
 
 .s21-bullet-dot {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   line-height: 1.1;
   color: #142724;
   user-select: none;
@@ -117,7 +117,7 @@ const SLIDE21_CSS = `
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 0.35rem;
+  margin-top: 0.2rem;
   user-select: none;
 }
 
@@ -125,7 +125,7 @@ const SLIDE21_CSS = `
   max-width: 480px;
   width: 100%;
   height: auto;
-  max-height: 220px;
+  max-height: clamp(130px, 18vh, 175px);
   object-fit: contain;
   display: block;
   filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.08));

@@ -27,9 +27,9 @@ const SLIDE5_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.25rem 1rem 2.25rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.25rem, 3.5vh, 2.25rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* Middle Content: Bottle + Nurse Anna Shield + Descriptive Text */
@@ -47,8 +47,8 @@ const SLIDE5_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2.25rem;
-  max-width: 860px;
+  gap: 2rem;
+  max-width: 760px;
   width: 100%;
   margin: 0 auto;
 }
@@ -64,17 +64,17 @@ const SLIDE5_CSS = `
 
 .s5-bottle {
   position: relative;
-  width: 130px;
-  height: 245px;
+  width: 105px;
+  height: 195px;
   flex-shrink: 0;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.06));
 }
 
 .s5-anna {
   position: relative;
-  width: 160px;
-  height: 360px;
+  width: 130px;
+  height: 280px;
   flex-shrink: 0;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
 }
@@ -93,9 +93,9 @@ const SLIDE5_CSS = `
 }
 
 .s5-heading {
-  font-size: 1.62rem;
+  font-size: clamp(1.15rem, 2.2vw, 1.42rem);
   font-weight: 600;
-  line-height: 1.44;
+  line-height: 1.4;
   color: #1e293b;
   margin: 0;
   letter-spacing: -0.015em;

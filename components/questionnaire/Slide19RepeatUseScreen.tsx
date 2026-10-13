@@ -25,9 +25,9 @@ const SLIDE19_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.5rem 1rem 2.5rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.75rem, 4.5vh, 2.75rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* Heading */
@@ -39,7 +39,7 @@ const SLIDE19_CSS = `
   flex-shrink: 0;
 }
 .s19-heading {
-  font-size: 1.55rem;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
   line-height: 1.35;
   font-weight: 700;
   color: #142724;
@@ -58,7 +58,7 @@ const SLIDE19_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2.5rem;
+  gap: 1.75rem;
   margin: 0;
   padding: 0;
 }
@@ -68,7 +68,7 @@ const SLIDE19_CSS = `
   background-color: #8cb2a7;
   border: 1.5px solid #759c92;
   border-radius: 20px;
-  padding: 1.6rem 1.85rem 1.1rem 1.85rem;
+  padding: 1.2rem 1.5rem 0.85rem 1.5rem;
   box-shadow: 0 4px 14px rgba(20, 55, 50, 0.12);
   display: flex;
   flex-direction: column;
@@ -234,7 +234,7 @@ const SLIDE19_CSS = `
 }
 
 .s19-nurse-img {
-  height: 240px;
+  height: clamp(170px, 24vh, 215px);
   width: auto;
   object-fit: contain;
   display: block;

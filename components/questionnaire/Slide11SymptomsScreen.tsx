@@ -27,9 +27,9 @@ const SLIDE11_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.5rem 1rem 2.5rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.25rem, 3.5vh, 2.25rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* Top Heading */
@@ -41,8 +41,8 @@ const SLIDE11_CSS = `
   flex-shrink: 0;
 }
 .s11-heading {
-  font-size: 1.45rem;
-  line-height: 1.38;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  line-height: 1.35;
   font-weight: 700;
   color: #142724;
   letter-spacing: -0.015em;
@@ -61,7 +61,7 @@ const SLIDE11_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.75rem;
+  gap: 1.5rem;
   padding: 0;
   margin: 0 auto;
 }
@@ -73,11 +73,11 @@ const SLIDE11_CSS = `
   max-width: 100%;
   background-color: #84aba0;
   border-radius: 20px;
-  padding: 1.25rem 1.4rem;
+  padding: 0.95rem 1.15rem;
   box-shadow: 0 4px 14px -3px rgba(20, 60, 55, 0.18);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.55rem;
 }
 
 /* Rows of symptom chips */
@@ -332,15 +332,15 @@ const SLIDE11_CSS = `
 }
 
 .s11-nurse {
-  width: 120px;
+  width: 105px;
   height: auto;
-  max-height: 255px;
+  max-height: 220px;
 }
 
 .s11-nurse-img {
   width: 100%;
   height: auto;
-  max-height: 255px;
+  max-height: 220px;
   object-fit: contain;
   display: block;
 }

@@ -27,22 +27,23 @@ const SLIDE3_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.5rem 1rem 2.5rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.5rem, 4vh, 2.75rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* 1. Top Section: Bold Statement */
 .s3-top-section {
   width: 100%;
-  max-width: 44rem;
+  max-width: 42rem;
   padding: 0;
   margin: 0;
+  text-align: center;
   flex-shrink: 0;
 }
 .s3-heading {
-  font-size: 1.55rem;
-  line-height: 1.42;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  line-height: 1.35;
   font-weight: 700;
   color: #142724;
   letter-spacing: -0.015em;
@@ -53,13 +54,13 @@ const SLIDE3_CSS = `
   box-shadow: 0 0 0 2px #236f7a;
 }
 
-/* 2. Below Statement: Speech Bubble + Nurse Anna Combo (aligned to the right) */
+/* 2. Below Statement: Speech Bubble + Nurse Anna Combo */
 .s3-bottom-content-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 44rem;
+  max-width: 42rem;
   flex-shrink: 0;
   margin: 0;
   padding: 0;
@@ -67,17 +68,16 @@ const SLIDE3_CSS = `
 
 .s3-combo {
   position: relative;
-  width: 420px;
-  height: 275px;
+  width: 375px;
+  height: 235px;
   flex-shrink: 0;
-  margin-right: 1.5rem;
 }
 
 .s3-bubble {
   position: absolute;
-  top: 0;
+  top: 5px;
   left: 0;
-  width: 315px;
+  width: 285px;
   z-index: 2;
   filter: drop-shadow(2px 3px 5px rgba(20, 60, 55, 0.18));
 }
@@ -88,10 +88,10 @@ const SLIDE3_CSS = `
 }
 .s3-bubble-text-wrap {
   position: absolute;
-  top: 5%;
-  left: 4%;
-  width: 82%;
-  height: 84%;
+  top: 6%;
+  left: 6%;
+  width: 80%;
+  height: 80%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -101,28 +101,27 @@ const SLIDE3_CSS = `
   padding: 0 10px;
 }
 .s3-bubble-text {
-  font-size: 14.2px;
+  font-size: 13px;
   font-weight: 500;
-  line-height: 1.38;
+  line-height: 1.34;
   color: #152925;
   margin: 0;
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 .s3-nurse {
   position: absolute;
   bottom: 0;
-  right: 8px;
-  width: 112px;
+  right: 6px;
+  width: 105px;
   height: auto;
-  max-height: 245px;
+  max-height: 220px;
   z-index: 1;
 }
 .s3-nurse-img {
   width: 100%;
   height: auto;
-  max-height: 230px;
+  max-height: 220px;
   object-fit: contain;
   display: block;
 }
@@ -286,17 +285,16 @@ export function Slide3EfficacyScreen({
               <p className="s3-bubble-text">
                 {isSpanish ? (
                   <>
-                    <span>{resolvedName} es un medicamento maravilloso,</span>
-                    <span>pero como todos los antibióticos</span>
-                    <span>no funciona bien para los resfriados</span>
-                    <span>comunes o la gripe.</span>
+                    {resolvedName} es un medicamento<br />
+                    maravilloso, pero como todos los<br />
+                    antibióticos no funciona para<br />
+                    los resfriados o la gripe.
                   </>
                 ) : (
                   <>
-                    <span>{resolvedName} is a wonder drug, but</span>
-                    <span>like all antibiotics it doesn&apos;t</span>
-                    <span>work well for common colds</span>
-                    <span>or the flu.</span>
+                    {resolvedName} is a wonder drug, but<br />
+                    like all antibiotics it doesn&apos;t work<br />
+                    well for common colds or the flu.
                   </>
                 )}
               </p>

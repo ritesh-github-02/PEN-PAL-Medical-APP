@@ -27,9 +27,9 @@ const SLIDE4_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.25rem 1rem 2.25rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.5rem, 4vh, 2.75rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* Middle Content: Large Speech Bubble + Nurse Anna Combo */
@@ -45,8 +45,8 @@ const SLIDE4_CSS = `
 
 .s4-combo {
   position: relative;
-  width: 660px;
-  height: 410px;
+  width: 500px;
+  height: 255px;
   max-width: 95%;
   margin: 0 auto;
 }
@@ -55,7 +55,7 @@ const SLIDE4_CSS = `
   position: absolute;
   top: 0;
   left: 0;
-  width: 510px;
+  width: 385px;
   filter: drop-shadow(2px 4px 10px rgba(20, 60, 55, 0.16));
   z-index: 2;
 }
@@ -79,9 +79,9 @@ const SLIDE4_CSS = `
   padding: 0 16px;
 }
 .s4-bubble-text {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.4;
   color: #142724;
   margin: 0;
   display: flex;
@@ -95,15 +95,15 @@ const SLIDE4_CSS = `
 .s4-nurse {
   position: absolute;
   bottom: 0;
-  left: 490px;
-  width: 135px;
+  left: 375px;
+  width: 110px;
   height: auto;
   z-index: 1;
 }
 .s4-nurse-img {
   width: 100%;
   height: auto;
-  max-height: 270px;
+  max-height: 225px;
   object-fit: contain;
   display: block;
 }

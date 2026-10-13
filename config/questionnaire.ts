@@ -69,8 +69,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'single_choice',
     titleEn: "Let's first talk about penicillin. It has lots of names!",
     titleEs: "¡Primero hablemos de la penicilina. ¡Tiene muchos nombres!",
-    audioEn: '/audio/exported/screen1_intro_en.mp3',
-    audioEs: '/audio/exported/screen1_intro_es.mp3',
+    descriptionEn: "Penicillin has lots of names like Penicillin, Pink medicine, Amoxicillin, Amoxicillin Clavulanate, and Augmentin. What do you call it?",
+    descriptionEs: "La penicilina tiene muchos nombres como Penicilina, Medicina rosa, Amoxicilina, Amoxicilina Clavulanato y Augmentin. ¿Cómo lo llamas?",
     required: true,
     nextStepId: 'slide3_efficacy'
   },
@@ -80,6 +80,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'education',
     titleEn: "Many kids have had [name] because it's the best for treating common infections.",
     titleEs: "Muchos niños han tomado [name] porque es el mejor para tratar infecciones comunes.",
+    descriptionEn: "Many kids have had [name] because it's the best for treating common infections.",
+    descriptionEs: "Muchos niños han tomado [name] porque es el mejor para tratar infecciones comunes.",
     required: true,
     nextStepId: 'slide4_barrier'
   },
@@ -89,6 +91,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'education',
     titleEn: "[Name] is one of the best antibiotics. But many kids do not get it because they are believed to be allergic to it.",
     titleEs: "[Name] es uno de los mejores antibióticos. Pero muchos niños no lo reciben porque se cree que son alérgicos a él.",
+    descriptionEn: "[Name] is one of the best antibiotics. But many kids do not get it because they are believed to be allergic to it.",
+    descriptionEs: "[Name] es uno de los mejores antibióticos. Pero muchos niños no lo reciben porque se cree que son alérgicos a él.",
     required: true,
     nextStepId: 'slide5_prevalence'
   },
@@ -120,6 +124,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'education',
     titleEn: "Great job! Now you know what is true about penicillin allergies!",
     titleEs: "¡Buen trabajo! ¡Ahora ya sabe lo que es verdad sobre las alergias a la penicilina!",
+    descriptionEn: "Great job! Now you know what is true about penicillin allergies!",
+    descriptionEs: "¡Buen trabajo! ¡Ahora ya sabe lo que es verdad sobre las alergias a la penicilina!",
     required: true,
     nextStepId: 'slide9_why_it_matters'
   },
@@ -129,6 +135,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'education',
     titleEn: "Why does this matter?",
     titleEs: "¿Por qué es importante esto?",
+    descriptionEn: "When children are labeled allergic to penicillin, they receive second-line antibiotics which can have more side effects, be more expensive, and may not work as well.",
+    descriptionEs: "Cuando a los niños se les etiqueta como alérgicos a la penicilina, reciben antibióticos de segunda línea que pueden tener más efectos secundarios, ser más costosos y no funcionar tan bien.",
     required: true,
     nextStepId: 'slide10_testing'
   },
@@ -233,6 +241,8 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     type: 'education',
     titleEn: "Talk to your child's doctor about [name] allergy testing!",
     titleEs: "¡Hable con el médico de su hijo sobre las pruebas de alergia a [name]!",
+    descriptionEn: "Talk to your child's doctor about allergy testing. Testing can confirm whether your child is truly allergic, so they can safely receive the best medicine when needed.",
+    descriptionEs: "Hable con el médico de su hijo sobre las pruebas de alergia. Las pruebas pueden confirmar si su hijo es realmente alérgico, para que pueda recibir con seguridad el mejor medicamento cuando sea necesario.",
     required: true,
     nextStepId: 'screen7_summary'
   },

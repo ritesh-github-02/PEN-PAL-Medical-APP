@@ -86,14 +86,14 @@ export function Slide6MythTruthScreen({
   return (
     <div
       id="slide-content"
-      className="w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center bg-[#f4f8ec] px-4 sm:px-6 py-3 sm:py-4 overflow-hidden gap-[clamp(1.25rem,3.5vh,2.25rem)]"
+      className="w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center bg-[#f4f8ec] px-3 sm:px-5 py-2 sm:py-3 overflow-hidden gap-[clamp(0.6rem,2vh,1.25rem)]"
     >
-      <div className="max-w-3xl mx-auto w-full shrink-0 flex flex-col justify-center space-y-2.5 sm:space-y-3 m-0">
+      <div className="max-w-3xl mx-auto w-full shrink-0 flex flex-col justify-center space-y-2 sm:space-y-2.5 m-0">
         {/* Heading */}
         <h1
           ref={headingRef}
           tabIndex={-1}
-          className="text-sm sm:text-base md:text-lg font-bold text-slate-900 text-center tracking-tight leading-snug outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] px-2"
+          className="text-xs sm:text-sm md:text-base font-bold text-slate-900 text-center tracking-tight leading-snug outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] px-2"
         >
           {isSpanish
             ? "¿Por qué se piensa que tantos niños tienen alergia a la penicilina cuando no es así? ¡Haga clic en cada cuadro para revelar la verdad!"
@@ -101,7 +101,7 @@ export function Slide6MythTruthScreen({
         </h1>
 
         {/* 4 Interactive Flip Cards */}
-        <div className="space-y-2 sm:space-y-2.5 pt-1">
+        <div className="space-y-1.5 sm:space-y-2 pt-0.5">
           {MYTH_TRUTH_DATA.map((item) => {
             const isRevealed = revealed.includes(item.id);
             const rawText = isRevealed
@@ -115,7 +115,7 @@ export function Slide6MythTruthScreen({
                 type="button"
                 aria-expanded={isRevealed}
                 onClick={() => toggleCard(item.id)}
-                className={`w-full min-h-[44px] px-4 py-2 sm:py-2.5 rounded-xl text-left font-semibold text-xs sm:text-sm md:text-[14.5px] leading-snug transition-all duration-200 shadow-2xs cursor-pointer border focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] active:scale-[0.99] flex items-center justify-between gap-3 ${
+                className={`w-full min-h-[38px] px-3.5 py-1.5 sm:py-2 rounded-xl text-left font-semibold text-xs sm:text-[13px] md:text-[13.5px] leading-snug transition-all duration-200 shadow-2xs cursor-pointer border focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a] active:scale-[0.99] flex items-center justify-between gap-3 ${
                   isRevealed
                     ? "bg-[#b2ded6] border-[#8bc6bb] text-[#132c27]"
                     : "bg-[#fdd2b8] border-[#f4b693] text-[#4a2618] hover:bg-[#fadfcb]"

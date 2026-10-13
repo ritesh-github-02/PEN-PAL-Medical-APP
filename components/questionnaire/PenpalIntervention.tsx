@@ -409,7 +409,7 @@ export default function PenpalIntervention() {
 
     // For informational / non-question screens, record "acknowledged" instead of literal "undefined"
     if (answer === undefined || answer === null || answer === "undefined") {
-      if (["intro", "statistics", "testing_info", "text", "summary", "knowledge_revelation"].includes(currentStep.type)) {
+      if (["intro", "statistics", "testing_info", "text", "summary", "knowledge_revelation", "education"].includes(currentStep.type)) {
         answer = "acknowledged";
       } else {
         answer = "none_selected";
@@ -441,6 +441,9 @@ export default function PenpalIntervention() {
       }
 
       await submitAnswer(currentStep.id, answerPayload, Math.round(currentSlideDwellMs), metadata);
+      if (currentSlideDwellMs > 50) {
+        await recordSlideTiming(currentStep.id, currentStepIndex, currentSlideDwellMs, false).catch(() => {});
+      }
       if (currentStep.id === "screen6_4_resolution" && answers["screen6_4_location"]) {
         await submitAnswer("screen6_4_location", String(answers["screen6_4_location"]), Math.round(currentSlideDwellMs));
       }
@@ -613,8 +616,8 @@ export default function PenpalIntervention() {
   };
 
   return (
-    <main 
-      className="min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col items-center justify-center p-3 sm:p-5 md:p-6 relative font-sans bg-[#f4f8e8] overflow-y-auto overflow-x-hidden"
+    <main
+      className="h-dvh max-h-dvh w-full max-w-full flex flex-col items-center justify-center p-2.5 sm:p-3.5 md:p-4.5 relative font-sans bg-[#f4f8e8] overflow-hidden select-none"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -635,7 +638,7 @@ export default function PenpalIntervention() {
       <div 
         className="w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300"
         style={{
-          maxWidth: "min(58rem, calc((100dvh - 5rem) * 1.88), 100%)",
+          maxWidth: "min(58rem, calc(100vw - 2rem), calc((100dvh - 5.5rem) * (1248 / 661)))",
         }}
       >
         {/* Header Bar matching old slide: Logo, Step Progress, and Language Switcher */}
@@ -663,37 +666,37 @@ export default function PenpalIntervention() {
         </header>
 
         {/* =========================================================================
-            REALISTIC TABLET HARDWARE MOCKUP (LANDSCAPE ORIENTATION)
+            REALISTIC TABLET HARDWARE MOCKUP (LANDSCAPE ORIENTATION - EXACT MASTER RATIO)
             ========================================================================= */}
         <div className="w-full flex items-center justify-center relative">
           {/* Outer Tablet Bezel Frame */}
           <div 
-            className="relative bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2.2rem] md:rounded-[2.5rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full"
+            className="relative bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2rem] md:rounded-[2.4rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full"
             style={{
-              aspectRatio: "16 / 8.5",
-              maxHeight: "min(500px, calc(100dvh - 5rem))",
+              aspectRatio: "1248 / 661",
+              maxHeight: "calc(100dvh - 5.5rem)",
               height: "auto",
             }}
           >
             
-            {/* Left Bezel Camera Array (Landscape Tablet) */}
+            {/* Left Bezel Camera Array (Landscape Tablet) - Perfectly Centered in Left Bezel Width */}
             <div 
-              className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 pointer-events-none select-none z-30"
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3 md:w-3.5 flex flex-col items-center justify-center gap-1 pointer-events-none select-none z-30"
               aria-hidden="true"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
-              <span className="w-2 h-2 rounded-full bg-[#0a0f16] ring-1 ring-[#262f3d] flex items-center justify-center">
-                <span className="w-1 h-1 rounded-full bg-[#1e3c59]/90"></span>
+              <span className="w-1 h-1 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0a0f16] ring-1 ring-[#262f3d] flex items-center justify-center">
+                <span className="w-0.5 h-0.5 rounded-full bg-[#1e3c59]/90"></span>
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
+              <span className="w-1 h-1 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
             </div>
 
             {/* Tablet Inner Screen with Clean Unified Background */}
             <div 
-              className="relative w-full h-full flex-1 min-h-0 rounded-[1.1rem] sm:rounded-[1.5rem] md:rounded-[1.7rem] overflow-hidden shadow-inner flex flex-col justify-center items-center bg-[#f4f8ec]"
+              className="relative w-full h-full flex-1 min-h-0 rounded-[1.1rem] sm:rounded-[1.4rem] md:rounded-[1.6rem] overflow-hidden shadow-inner flex flex-col justify-center items-center bg-[#f4f8ec]"
             >
               {/* Slide Content */}
-              <div className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center overflow-y-auto">
+              <div className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center overflow-hidden">
               {isTerminated ? (
                 <div className="w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center p-6 sm:p-10 text-center bg-[#f4f8ec]">
                   <div className="max-w-xl space-y-4">
@@ -1016,14 +1019,7 @@ export default function PenpalIntervention() {
                     <Slide21WhatNowScreen
                       isSpanish={locale === "es"}
                       medicationName={medicationName}
-                      onNext={() => {
-                        setShowSummary(true);
-                        if (typeof window !== "undefined") {
-                          const sp = new URLSearchParams(window.location.search);
-                          sp.set("report", "true");
-                          window.history.replaceState(null, "", `${window.location.pathname}?${sp.toString()}`);
-                        }
-                      }}
+                      onNext={() => handleNext("acknowledged")}
                       onBack={handleBack}
                       loading={loading}
                       navProps={baseProps}
@@ -1036,8 +1032,24 @@ export default function PenpalIntervention() {
                       participantId={activeToken}
                       onBack={handleBack}
                       onPrint={() => window.print()}
-                      onNavigateToSuccess={() => setShowSuccess(true)}
-                      onNext={() => setShowSuccess(true)}
+                      onNavigateToSuccess={async () => {
+                        try {
+                          await submitAnswer("screen7_summary", "completed", 0);
+                          await completeQuestionnaire();
+                        } catch (e) {
+                          console.warn("Complete sync warning:", e);
+                        }
+                        setShowSuccess(true);
+                      }}
+                      onNext={async () => {
+                        try {
+                          await submitAnswer("screen7_summary", "completed", 0);
+                          await completeQuestionnaire();
+                        } catch (e) {
+                          console.warn("Complete sync warning:", e);
+                        }
+                        setShowSuccess(true);
+                      }}
                     />
                   ) : currentStep.type === "single_choice" ? (
                     <SurveySingleChoice
@@ -1069,9 +1081,10 @@ export default function PenpalIntervention() {
                     stepId={currentStep.id}
                     locale={locale}
                     transcriptText={
-                      locale === "es"
-                        ? `${currentStep.titleEs || ""}. ${currentStep.descriptionEs || ""}`
-                        : `${currentStep.titleEn || ""}. ${currentStep.descriptionEn || ""}`
+                      (locale === "es"
+                        ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
+                        : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
+                      ).replace(/\[name\]/gi, medicationName).trim()
                     }
                   />
                 </div>

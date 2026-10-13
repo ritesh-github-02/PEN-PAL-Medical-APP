@@ -26,9 +26,9 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.25rem 1rem 2.25rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.5rem, 4vh, 2.75rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* Middle Content: Nurse Anna (Left) + Large Speech Bubble (Right) */
@@ -47,20 +47,20 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   align-items: flex-end;
   justify-content: center;
   position: relative;
-  width: 730px;
-  height: 365px;
+  width: 480px;
+  height: 245px;
 }
 
 /* Nurse Anna standing on Left, mirrored horizontally to gesture toward the right */
 .s10b-nurse {
   position: relative;
-  width: 125px;
+  width: 105px;
   height: auto;
-  max-height: 265px;
+  max-height: 220px;
   object-fit: contain;
   align-self: flex-end;
-  margin-right: -42px;
-  margin-bottom: 5px;
+  margin-right: -32px;
+  margin-bottom: 2px;
   z-index: 1;
   flex-shrink: 0;
   transform: scaleX(-1);
@@ -69,7 +69,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
 .s10b-nurse-img {
   width: 100%;
   height: auto;
-  max-height: 265px;
+  max-height: 220px;
   object-fit: contain;
   display: block;
 }
@@ -77,10 +77,10 @@ const SLIDE10_SURVEY_INTRO_CSS = `
 /* Speech Bubble with pointer tail pointing to Anna on the left */
 .s10b-bubble {
   position: relative;
-  width: 505px;
+  width: 375px;
   flex-shrink: 0;
   align-self: flex-start;
-  margin-top: 10px;
+  margin-top: 4px;
   filter: drop-shadow(2px 3px 6px rgba(20, 60, 55, 0.18));
   z-index: 2;
 }
@@ -103,13 +103,13 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   align-items: center;
   text-align: center;
   pointer-events: none;
-  padding: 0 16px;
+  padding: 0 12px;
 }
 
 .s10b-bubble-text {
-  font-size: 19.5px;
+  font-size: 14.5px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.36;
   color: #142724;
   margin: 0;
   display: flex;
@@ -175,27 +175,27 @@ const SLIDE10_SURVEY_INTRO_CSS = `
 /* Tablet & Smaller Screens Scaling */
 @media (max-height: 600px), (max-width: 768px) {
   .s10b-root {
-    padding: 1rem 1.5rem 0.5rem 1.5rem;
+    padding: 0.75rem 1.25rem 0.45rem 1.25rem;
   }
   .s10b-combo {
-    width: 590px;
-    height: 300px;
+    width: 420px;
+    height: 220px;
   }
   .s10b-bubble {
-    width: 430px;
-    margin-top: 8px;
+    width: 330px;
+    margin-top: 4px;
   }
   .s10b-bubble-text {
-    font-size: 16.5px;
-    line-height: 1.35;
+    font-size: 13px;
+    line-height: 1.34;
   }
   .s10b-nurse {
-    width: 105px;
-    max-height: 225px;
-    margin-right: -36px;
+    width: 95px;
+    max-height: 195px;
+    margin-right: -28px;
   }
   .s10b-nurse-img {
-    max-height: 225px;
+    max-height: 195px;
   }
   .s10b-btn {
     padding: 0.35rem 1.6rem;

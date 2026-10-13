@@ -56,16 +56,16 @@ export function Slide9WhyItMattersScreen({
   return (
     <div
       id="slide-content"
-      className="w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center bg-[#f4f8ec] px-4 sm:px-6 py-3 sm:py-4 overflow-hidden gap-[clamp(1.25rem,3.5vh,2.25rem)]"
+      className="w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center bg-[#f4f8ec] px-3 sm:px-5 py-2 sm:py-3 overflow-hidden gap-[clamp(0.6rem,2vh,1.25rem)]"
     >
-      <div className="max-w-3xl mx-auto w-full shrink-0 flex flex-col justify-center space-y-3 sm:space-y-4 m-0">
+      <div className="max-w-3xl mx-auto w-full shrink-0 flex flex-col justify-center space-y-2.5 sm:space-y-3 m-0">
         {/* Yellow Header Badge */}
         <div className="flex justify-start">
-          <div className="inline-block bg-[#fae88a] text-[#132c27] border border-[#d8c85c] px-6 py-1.5 sm:py-2 rounded-full shadow-2xs">
+          <div className="inline-block bg-[#fae88a] text-[#132c27] border border-[#d8c85c] px-5 py-1.5 rounded-full shadow-2xs">
             <h1
               ref={headingRef}
               tabIndex={-1}
-              className="text-sm sm:text-base md:text-lg font-bold tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+              className="text-xs sm:text-sm md:text-base font-bold tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
             >
               {isSpanish ? "¿Por qué es importante esto?" : "Why does this matter?"}
             </h1>
@@ -73,22 +73,22 @@ export function Slide9WhyItMattersScreen({
         </div>
 
         {/* Content: Nurse Anna on Left + Explanatory Bullet List on Right */}
-        <div className="flex items-center gap-6 sm:gap-8 pt-1">
+        <div className="flex items-center gap-5 sm:gap-7 pt-0.5">
           <div className="shrink-0 flex items-center justify-center">
-            <NurseAnna size="md" imgClassName="w-24 sm:w-28 md:w-32 max-h-[220px] object-contain" isDecorative={true} />
+            <NurseAnna size="md" imgClassName="w-20 sm:w-24 md:w-28 max-h-[185px] object-contain" isDecorative={true} />
           </div>
 
-          <div className="space-y-3 flex-1 text-left">
-            <p className="text-sm sm:text-base md:text-[1.1rem] font-bold text-slate-800 leading-snug">
+          <div className="space-y-2 flex-1 text-left">
+            <p className="text-xs sm:text-sm md:text-base font-bold text-slate-800 leading-snug">
               {introText}
             </p>
 
-            <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm md:text-[15px] font-semibold text-slate-700 leading-snug">
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-[13px] md:text-sm font-semibold text-slate-700 leading-snug">
               {rawBullets.map((b, idx) => {
                 const text = resolveMedicineToken(isSpanish ? b.es : b.en, medicationName, isSpanish);
                 return (
-                  <li key={idx} className="flex items-start gap-2.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a] shrink-0 mt-1.5" aria-hidden="true"></span>
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#236f7a] shrink-0 mt-1.5" aria-hidden="true"></span>
                     <span>{text}</span>
                   </li>
                 );

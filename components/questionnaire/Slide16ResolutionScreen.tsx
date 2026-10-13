@@ -25,9 +25,9 @@ const SLIDE16_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 1.25rem 2.5rem 1rem 2.5rem;
+  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(1.75rem, 4.5vh, 2.75rem);
+  gap: clamp(0.6rem, 2vh, 1.25rem);
 }
 
 /* Heading */
@@ -39,7 +39,7 @@ const SLIDE16_CSS = `
   flex-shrink: 0;
 }
 .s16-heading {
-  font-size: 1.55rem;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
   line-height: 1.35;
   font-weight: 700;
   color: #142724;

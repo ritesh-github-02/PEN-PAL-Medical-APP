@@ -25,10 +25,11 @@ export default function AudioPlayer({
   const [duration, setDuration] = useState(0);
   const [showTranscript, setShowTranscript] = useState(false);
 
-  // Reset state when source changes
+  // Reset state when source or step changes
   useEffect(() => {
     setIsPlaying(false);
     setProgress(0);
+    setDuration(0);
     setShowTranscript(false);
 
     if (audioRef.current) {
@@ -36,7 +37,19 @@ export default function AudioPlayer({
       audioRef.current.currentTime = 0;
       if (audioSrc) audioRef.current.load();
     }
-  }, [audioSrc]);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }, [audioSrc, stepId]);
+
+  // Clean up speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   // Close transcript when clicking outside
   useEffect(() => {
@@ -53,24 +66,78 @@ export default function AudioPlayer({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showTranscript]);
 
-  const togglePlayPause = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
+  const speakText = (text: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = locale === 'es' ? 'es-US' : 'en-US';
+    utterance.rate = 0.95;
+
+    // Pick appropriate voice if loaded
+    const voices = window.speechSynthesis.getVoices();
+    const targetLangPrefix = locale === 'es' ? 'es' : 'en';
+    const matchedVoice = voices.find((v) => v.lang.toLowerCase().startsWith(targetLangPrefix));
+    if (matchedVoice) {
+      utterance.voice = matchedVoice;
+    }
+
+    utterance.onend = () => {
       setIsPlaying(false);
-      logInteraction(
-        'AUDIO_PAUSE',
-        { stepId, currentTime: audioRef.current.currentTime },
-        '/intervention/flow'
-      ).catch(() => { });
-    } else {
-      audioRef.current.play();
-      setIsPlaying(true);
-      logInteraction(
-        'AUDIO_PLAY',
-        { stepId, currentTime: audioRef.current.currentTime },
-        '/intervention/flow'
-      ).catch(() => { });
+      logInteraction('AUDIO_COMPLETE', { stepId, mode: 'tts' }, '/intervention/flow').catch(() => {});
+    };
+    utterance.onerror = () => {
+      setIsPlaying(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+    setIsPlaying(true);
+    logInteraction('AUDIO_PLAY', { stepId, mode: 'tts' }, '/intervention/flow').catch(() => {});
+  };
+
+  const togglePlayPause = () => {
+    // 1. If audioSrc is present, prefer pre-recorded audio file
+    if (audioSrc && audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+        logInteraction(
+          'AUDIO_PAUSE',
+          { stepId, currentTime: audioRef.current.currentTime },
+          '/intervention/flow'
+        ).catch(() => {});
+      } else {
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying(true);
+              logInteraction(
+                'AUDIO_PLAY',
+                { stepId, currentTime: audioRef.current?.currentTime ?? 0 },
+                '/intervention/flow'
+              ).catch(() => {});
+            })
+            .catch(() => {
+              // If audio file playback fails (e.g. decode error or not loaded), fallback to TTS
+              if (transcriptText) {
+                speakText(transcriptText);
+              }
+            });
+        }
+      }
+      return;
+    }
+
+    // 2. If no pre-recorded audio file, use SpeechSynthesis to read slide data
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      if (isPlaying) {
+        window.speechSynthesis.cancel();
+        setIsPlaying(false);
+        logInteraction('AUDIO_PAUSE', { stepId, mode: 'tts' }, '/intervention/flow').catch(() => {});
+      } else if (transcriptText) {
+        speakText(transcriptText);
+      }
     }
   };
 
@@ -87,7 +154,7 @@ export default function AudioPlayer({
   const handleEnded = () => {
     setIsPlaying(false);
     setProgress(0);
-    logInteraction('AUDIO_COMPLETE', { stepId }, '/intervention/flow').catch(() => { });
+    logInteraction('AUDIO_COMPLETE', { stepId }, '/intervention/flow').catch(() => {});
   };
 
   const formatTime = (timeInSeconds: number) => {
@@ -97,8 +164,8 @@ export default function AudioPlayer({
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  // If there is no pre-recorded audio file, do not render player
-  if (!audioSrc) return null;
+  // If there's neither audio file nor transcript text, hide player
+  if (!audioSrc && !transcriptText) return null;
 
   return (
     <div
@@ -109,13 +176,15 @@ export default function AudioPlayer({
           : 'Audio narration and caption controls'
       }
     >
-      <audio
-        ref={audioRef}
-        src={audioSrc}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={handleEnded}
-      />
+      {audioSrc && (
+        <audio
+          ref={audioRef}
+          src={audioSrc}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onEnded={handleEnded}
+        />
+      )}
 
       {/* 1. CC (Closed Caption / Transcript) Speech Bubble Button */}
       <div className="relative" ref={transcriptPopoverRef}>
