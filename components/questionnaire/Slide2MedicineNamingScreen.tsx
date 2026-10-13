@@ -343,15 +343,27 @@ const SLIDE2_CSS = `
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    flex: 0 1 200px !important;
-    max-width: 205px !important;
-    min-width: 165px !important;
-    width: 100% !important;
+    flex: 1 1 205px !important;
+    max-width: 225px !important;
+    min-width: 160px !important;
+    width: auto !important;
     z-index: 1 !important;
   }
+  .s2-bubble-text-wrap {
+    top: 10% !important;
+    left: 6% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+  }
   .s2-bubble-text {
-    font-size: 10.5px !important;
+    font-size: 9.8px !important;
     line-height: 1.25 !important;
+    display: block !important;
+  }
+  .s2-bubble-text span {
+    display: inline !important;
   }
   .s2-nurse {
     position: relative !important;
@@ -540,15 +552,19 @@ export function Slide2MedicineNamingScreen({
               <p className="s2-bubble-text">
                 {isSpanish ? (
                   <>
-                    ¡Seleccione cómo lo llama!<br />
-                    Usaremos el nombre que elija<br />
-                    durante nuestro tiempo juntos.
+                    <span>¡Seleccione cómo lo llama! </span>
+                    <span className="hidden md:inline"><br /></span>
+                    <span>Usaremos el nombre que elija </span>
+                    <span className="hidden md:inline"><br /></span>
+                    <span>durante nuestro tiempo juntos.</span>
                   </>
                 ) : (
                   <>
-                    Select what you call it! We&apos;ll<br />
-                    use the name you choose<br />
-                    during our time together.
+                    <span>Select what you call it! </span>
+                    <span className="hidden md:inline"><br /></span>
+                    <span>We&apos;ll use the name you choose </span>
+                    <span className="hidden md:inline"><br /></span>
+                    <span>during our time together.</span>
                   </>
                 )}
               </p>

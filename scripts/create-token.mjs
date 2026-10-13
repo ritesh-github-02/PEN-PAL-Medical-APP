@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import crypto from 'crypto';
 const prisma = new PrismaClient();
 
 async function createToken(tokenName) {
@@ -11,10 +12,13 @@ async function createToken(tokenName) {
       },
     });
 
+    const sha = crypto.createHash('sha256').update(tokenName).digest('hex');
+
     // 2. Create the token linked to that participant
     const token = await prisma.participantToken.create({
       data: {
-        token: tokenName,
+        tokenHash: sha,
+        tokenPayload: tokenName.replace(/^PEN-/, ''),
         participantId: participant.id,
         status: 'VALID',
       },
