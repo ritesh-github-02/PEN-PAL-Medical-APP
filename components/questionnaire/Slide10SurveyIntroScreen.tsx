@@ -235,9 +235,21 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     margin-top: 0;
     z-index: 2;
   }
+  .s10b-bubble-text-wrap {
+    top: 10% !important;
+    left: 17% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+  }
   .s10b-bubble-text {
-    font-size: 11.5px;
-    line-height: 1.25;
+    font-size: 9.6px !important;
+    line-height: 1.24 !important;
+    display: block !important;
+  }
+  .s10b-bubble-text span {
+    display: inline !important;
   }
 }
 `;

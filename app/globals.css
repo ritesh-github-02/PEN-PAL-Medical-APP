@@ -538,22 +538,34 @@ body::-webkit-scrollbar,
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    flex: 1 1 200px !important;
-    max-width: 215px !important;
-    min-width: 155px !important;
+    flex: 1 1 205px !important;
+    max-width: 225px !important;
+    min-width: 160px !important;
     width: auto !important;
     z-index: 1 !important;
   }
   .s2-bubble-text-wrap {
-    top: 7% !important;
-    left: 5% !important;
-    width: 78% !important;
-    height: 80% !important;
-    padding: 0 8px !important;
+    top: 10% !important;
+    left: 6% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    overflow: hidden !important;
   }
   .s2-bubble-text {
-    font-size: 10.5px !important;
+    font-size: 9.6px !important;
     line-height: 1.25 !important;
+    display: block !important;
+    margin: 0 !important;
+  }
+  .s2-bubble-text span {
+    display: inline !important;
   }
   .s2-nurse {
     position: relative !important;
@@ -601,22 +613,34 @@ body::-webkit-scrollbar,
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    flex: 1 1 200px !important;
-    max-width: 215px !important;
-    min-width: 155px !important;
+    flex: 1 1 205px !important;
+    max-width: 225px !important;
+    min-width: 160px !important;
     width: auto !important;
     z-index: 1 !important;
   }
   .s3-bubble-text-wrap {
-    top: 9% !important;
-    left: 5% !important;
-    width: 78% !important;
-    height: 78% !important;
-    padding: 0 10px !important;
+    top: 10% !important;
+    left: 6% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    overflow: hidden !important;
   }
   .s3-bubble-text {
-    font-size: 10px !important;
-    line-height: 1.28 !important;
+    font-size: 9.4px !important;
+    line-height: 1.22 !important;
+    display: block !important;
+    margin: 0 !important;
+  }
+  .s3-bubble-text span {
+    display: inline !important;
   }
   .s3-nurse {
     position: relative !important;
@@ -664,23 +688,31 @@ body::-webkit-scrollbar,
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    flex: 1 1 215px !important;
-    max-width: 235px !important;
+    flex: 1 1 205px !important;
+    max-width: 225px !important;
     min-width: 160px !important;
     width: auto !important;
     z-index: 1 !important;
   }
   .s4-bubble-text-wrap {
-    top: 8% !important;
-    left: 5% !important;
-    width: 78% !important;
-    height: 78% !important;
-    padding: 0 10px !important;
+    top: 10% !important;
+    left: 6% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    overflow: hidden !important;
   }
   .s4-bubble-text {
-    font-size: 10.8px !important;
-    line-height: 1.28 !important;
+    font-size: 9.4px !important;
+    line-height: 1.22 !important;
     display: block !important;
+    margin: 0 !important;
   }
   .s4-bubble-text span {
     display: inline !important;
@@ -777,23 +809,31 @@ body::-webkit-scrollbar,
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    flex: 1 1 215px !important;
-    max-width: 235px !important;
+    flex: 1 1 205px !important;
+    max-width: 225px !important;
     min-width: 160px !important;
     width: auto !important;
     z-index: 1 !important;
   }
   .s8-bubble-text-wrap {
-    top: 8% !important;
-    left: 5% !important;
-    width: 78% !important;
-    height: 78% !important;
-    padding: 0 10px !important;
+    top: 10% !important;
+    left: 6% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    overflow: hidden !important;
   }
   .s8-bubble-text {
-    font-size: 11.5px !important;
-    line-height: 1.28 !important;
+    font-size: 10.5px !important;
+    line-height: 1.25 !important;
     display: block !important;
+    margin: 0 !important;
   }
   .s8-bubble-text span {
     display: inline !important;
@@ -844,23 +884,31 @@ body::-webkit-scrollbar,
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    flex: 1 1 200px !important;
-    max-width: 215px !important;
-    min-width: 155px !important;
+    flex: 1 1 205px !important;
+    max-width: 225px !important;
+    min-width: 160px !important;
     width: auto !important;
     z-index: 1 !important;
   }
   .s10-bubble-text-wrap {
-    top: 7% !important;
-    left: 5% !important;
-    width: 78% !important;
-    height: 80% !important;
-    padding: 0 8px !important;
+    top: 10% !important;
+    left: 6% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    overflow: hidden !important;
   }
   .s10-bubble-text {
-    font-size: 11px !important;
+    font-size: 10.5px !important;
     line-height: 1.25 !important;
     display: block !important;
+    margin: 0 !important;
   }
   .s10-bubble-text span {
     display: inline !important;
@@ -920,23 +968,31 @@ body::-webkit-scrollbar,
     position: relative !important;
     top: auto !important;
     right: auto !important;
-    flex: 1 1 200px !important;
-    max-width: 215px !important;
-    min-width: 155px !important;
+    flex: 1 1 205px !important;
+    max-width: 225px !important;
+    min-width: 160px !important;
     width: auto !important;
     z-index: 1 !important;
   }
   .s10b-bubble-text-wrap {
-    top: 7% !important;
-    left: 15% !important;
-    width: 78% !important;
-    height: 80% !important;
-    padding: 0 8px !important;
+    top: 10% !important;
+    left: 17% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    overflow: hidden !important;
   }
   .s10b-bubble-text {
-    font-size: 10.5px !important;
-    line-height: 1.25 !important;
+    font-size: 9.6px !important;
+    line-height: 1.24 !important;
     display: block !important;
+    margin: 0 !important;
   }
   .s10b-bubble-text span {
     display: inline !important;

@@ -205,15 +205,27 @@ const SLIDE3_CSS = `
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    flex: 0 1 200px !important;
-    max-width: 205px !important;
-    min-width: 165px !important;
-    width: 100% !important;
+    flex: 1 1 205px !important;
+    max-width: 225px !important;
+    min-width: 160px !important;
+    width: auto !important;
     z-index: 1 !important;
   }
+  .s3-bubble-text-wrap {
+    top: 10% !important;
+    left: 6% !important;
+    width: 76% !important;
+    height: 76% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+  }
   .s3-bubble-text {
-    font-size: 10.5px !important;
-    line-height: 1.25 !important;
+    font-size: 9.4px !important;
+    line-height: 1.22 !important;
+    display: block !important;
+  }
+  .s3-bubble-text span {
+    display: inline !important;
   }
   .s3-nurse {
     position: relative !important;
