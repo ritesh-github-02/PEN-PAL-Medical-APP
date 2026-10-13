@@ -205,21 +205,39 @@ const SLIDE10_SURVEY_INTRO_CSS = `
 
 @media (max-width: 640px) {
   .s10b-combo {
-    flex-direction: column-reverse;
-    align-items: center;
+    display: block;
+    position: relative;
     width: 100%;
-    height: auto;
+    max-width: 320px;
+    height: 150px;
+    margin: 0.2rem auto 0 auto;
+    flex-shrink: 0;
   }
   .s10b-nurse {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 70px;
     margin-right: 0;
-    margin-top: 10px;
+    margin-top: 0;
+    z-index: 1;
+  }
+  .s10b-nurse-img {
+    max-height: 145px;
+    width: 100%;
+    object-fit: contain;
   }
   .s10b-bubble {
-    width: 100%;
-    max-width: 380px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 235px;
+    margin-top: 0;
+    z-index: 2;
   }
   .s10b-bubble-text {
-    font-size: 15px;
+    font-size: 11.5px;
+    line-height: 1.25;
   }
 }
 `;
@@ -266,7 +284,9 @@ export function Slide10SurveyIntroScreen({
           {/* Large Vector Speech Bubble with pointer tail pointing to Anna on the left */}
           <div className="s10b-bubble">
             <svg viewBox="0 0 430 260" fill="none" className="s10b-bubble-svg" aria-hidden="true">
+              {/* Desktop pointer tail */}
               <path
+                className="hidden md:inline"
                 d="M 213, 8
                    C 317, 8  404, 56  404, 120
                    C 404, 146  388, 172  360, 189
@@ -283,6 +303,24 @@ export function Slide10SurveyIntroScreen({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
+              {/* Mobile pointer tail: naturally points directly at Nurse Anna's head/face */}
+              <path
+                className="inline md:hidden"
+                d="M 195, 12
+                   C 265, 12  338, 48  364, 93
+                   C 382, 98  405, 107  422, 118
+                   C 400, 136  378, 148  359, 158
+                   C 336, 202  265, 230  195, 230
+                   C 98, 230  20, 182  20, 121
+                   C 20, 60  98, 12  195, 12
+                   Z"
+                transform="translate(430, 0) scale(-1, 1)"
+                fill="#ffffff"
+                stroke="#27707e"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
 
             {/* Centered Speech Text inside oval body */}
@@ -290,14 +328,14 @@ export function Slide10SurveyIntroScreen({
               <h1 ref={headingRef} tabIndex={-1} className="s10b-bubble-text">
                 {isSpanish ? (
                   <>
-                    <span>El siguiente conjunto de preguntas puede</span>
-                    <span>ayudarlo a usted y al médico a decidir</span>
+                    <span>El siguiente conjunto de preguntas puede </span>
+                    <span>ayudarlo a usted y al médico a decidir </span>
                     <span>qué es lo mejor para su hijo.</span>
                   </>
                 ) : (
                   <>
-                    <span>The next set of questions can help</span>
-                    <span>you and the doctor see what&apos;s best</span>
+                    <span>The next set of questions can help </span>
+                    <span>you and the doctor see what&apos;s best </span>
                     <span>for your child.</span>
                   </>
                 )}

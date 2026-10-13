@@ -86,7 +86,7 @@ export function Slide6MythTruthScreen({
   return (
     <div
       id="slide-content"
-      className="w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center bg-[#f4f8ec] px-3 sm:px-5 py-2 sm:py-3 overflow-hidden gap-[clamp(0.6rem,2vh,1.25rem)]"
+      className="s6-root w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center bg-[#f4f8ec] px-3 sm:px-5 py-2 sm:py-3 overflow-hidden gap-[clamp(0.6rem,2vh,1.25rem)]"
     >
       <div className="max-w-3xl mx-auto w-full shrink-0 flex flex-col justify-center space-y-2 sm:space-y-2.5 m-0">
         {/* Heading */}

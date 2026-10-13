@@ -171,28 +171,42 @@ const SLIDE5_CSS = `
 /* Tablet & Smaller Screens Scaling */
 @media (max-height: 600px), (max-width: 768px) {
   .s5-root {
-    padding: 1rem 1.5rem 0.5rem 1.5rem;
+    padding: 0.85rem 1rem 3.5rem 1rem !important;
   }
   .s5-content-wrap {
-    gap: 1.25rem;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+  }
+  .s5-graphics {
+    justify-content: center !important;
+    gap: 0.65rem !important;
   }
   .s5-bottle {
-    width: 96px;
-    height: 180px;
-    margin-bottom: 8px;
+    width: 58px !important;
+    height: 110px !important;
+    margin-bottom: 4px !important;
   }
   .s5-anna {
-    width: 118px;
-    height: 270px;
+    width: 78px !important;
+    height: 155px !important;
+  }
+  .s5-text-wrap {
+    max-width: 320px !important;
+    text-align: center !important;
   }
   .s5-heading {
-    font-size: 1.15rem;
-    line-height: 1.38;
+    font-size: 0.95rem !important;
+    line-height: 1.35 !important;
+  }
+  .s5-nav {
+    margin-top: 0.35rem !important;
+    gap: 1.25rem !important;
   }
   .s5-btn {
-    padding: 0.35rem 1.6rem;
-    min-height: 40px;
-    font-size: 0.85rem;
+    padding: 0.35rem 1.6rem !important;
+    min-height: 38px !important;
+    font-size: 0.85rem !important;
   }
 }
 `;

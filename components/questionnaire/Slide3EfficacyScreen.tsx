@@ -175,40 +175,70 @@ const SLIDE3_CSS = `
 /* Tablet & Smaller Screens Scaling */
 @media (max-height: 600px), (max-width: 768px) {
   .s3-root {
-    padding: 1rem 1.5rem 0.5rem 1.5rem;
+    padding: 0.85rem 1rem 1rem 1rem;
+    overflow-y: auto;
+    height: 100%;
   }
   .s3-top-section {
-    max-width: 32rem;
+    max-width: 100%;
     padding: 0;
     margin: 0;
   }
   .s3-heading {
-    font-size: 1.25rem;
-    line-height: 1.32;
+    font-size: 0.88rem;
+    line-height: 1.3;
+    text-align: center;
   }
   .s3-combo {
-    width: 340px;
-    height: 235px;
-    margin-right: 0.5rem;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    height: auto !important;
+    margin: 0.15rem auto !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
   }
   .s3-bubble {
-    width: 250px;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    flex: 0 1 200px !important;
+    max-width: 205px !important;
+    min-width: 165px !important;
+    width: 100% !important;
+    z-index: 1 !important;
   }
   .s3-bubble-text {
-    font-size: 11.5px;
-    line-height: 1.32;
+    font-size: 10.5px !important;
+    line-height: 1.25 !important;
   }
   .s3-nurse {
-    width: 92px;
-    max-height: 205px;
-    right: 4px;
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    flex: 0 0 72px !important;
+    width: 72px !important;
+    margin-left: -6px !important;
+    margin-top: 0 !important;
+    z-index: 2 !important;
   }
   .s3-nurse-img {
-    max-height: 205px;
+    max-height: 140px !important;
+    width: 100% !important;
+    object-fit: contain !important;
+  }
+  .s3-nav {
+    margin-top: 0.35rem;
+    gap: 1.25rem;
+    z-index: 10;
   }
   .s3-btn {
-    padding: 0.35rem 1.6rem;
-    font-size: 0.85rem;
+    padding: 0.32rem 1.4rem;
+    font-size: 0.82rem;
+    min-height: 38px;
   }
 }
 `;
@@ -263,7 +293,9 @@ export function Slide3EfficacyScreen({
           {/* Custom Vector Speech Bubble with natural round shape and downward pointer tail */}
           <div className="s3-bubble">
             <svg viewBox="0 0 430 260" fill="none" className="s3-bubble-svg">
+              {/* Desktop pointer tail */}
               <path
+                className="hidden md:inline"
                 d="M 213, 8
                    C 317, 8  404, 56  404, 120
                    C 404, 146  388, 172  360, 189
@@ -279,22 +311,42 @@ export function Slide3EfficacyScreen({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
+              {/* Mobile pointer tail: naturally points directly at Nurse Anna's head/face */}
+              <path
+                className="inline md:hidden"
+                d="M 195, 12
+                   C 265, 12  338, 48  364, 93
+                   C 382, 98  405, 107  422, 118
+                   C 400, 136  378, 148  359, 158
+                   C 336, 202  265, 230  195, 230
+                   C 98, 230  20, 182  20, 121
+                   C 20, 60  98, 12  195, 12
+                   Z"
+                fill="#ffffff"
+                stroke="#27707e"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             {/* Centered Speech Text inside oval body */}
             <div className="s3-bubble-text-wrap">
               <p className="s3-bubble-text">
                 {isSpanish ? (
                   <>
-                    {resolvedName} es un medicamento<br />
-                    maravilloso, pero como todos los<br />
-                    antibióticos no funciona para<br />
-                    los resfriados o la gripe.
+                    <span>{resolvedName} es un medicamento maravilloso, </span>
+                    <span className="hidden md:inline"><br /></span>
+                    <span>pero como todos los antibióticos no funciona </span>
+                    <span className="hidden md:inline"><br /></span>
+                    <span>para los resfriados o la gripe.</span>
                   </>
                 ) : (
                   <>
-                    {resolvedName} is a wonder drug, but<br />
-                    like all antibiotics it doesn&apos;t work<br />
-                    well for common colds or the flu.
+                    <span>{resolvedName} is a wonder drug, but </span>
+                    <span className="hidden md:inline"><br /></span>
+                    <span>like all antibiotics it doesn&apos;t work </span>
+                    <span className="hidden md:inline"><br /></span>
+                    <span>well for common colds or the flu.</span>
                   </>
                 )}
               </p>

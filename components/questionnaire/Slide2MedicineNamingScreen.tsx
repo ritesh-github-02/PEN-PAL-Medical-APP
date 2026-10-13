@@ -70,9 +70,19 @@ const SLIDE2_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(2rem, 4vw, 3.5rem);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
   padding: 0 0.5rem;
   margin: 0;
+}
+
+/* Horizontal Row: Bottle on Left, Checkbox List on Right */
+.s2-bottle-options-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 2vw, 1.8rem);
+  flex-shrink: 0;
 }
 
 /* Bottle */
@@ -83,9 +93,9 @@ const SLIDE2_CSS = `
   justify-content: center;
 }
 .s2-bottle {
-  width: 6.25rem;
+  width: 5.5rem;
   height: auto;
-  max-height: 225px;
+  max-height: 190px;
   object-fit: contain;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
   user-select: none;
@@ -274,54 +284,105 @@ const SLIDE2_CSS = `
 /* Tablet & Smaller Screens Scaling */
 @media (max-height: 600px), (max-width: 768px) {
   .s2-middle {
-    gap: 1.5rem;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+  .s2-bottle-options-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+  }
+  .s2-bottle-wrap {
+    flex-shrink: 0 !important;
   }
   .s2-bottle {
-    width: 4.5rem;
-    max-height: 165px;
+    width: 3.25rem !important;
+    max-height: 110px !important;
   }
   .s2-options {
-    gap: 0.65rem;
+    flex: 1 1 auto !important;
+    max-width: 240px !important;
+    gap: 0.35rem !important;
+  }
+  .s2-option {
+    gap: 0.5rem !important;
+    padding: 0.05rem 0 !important;
   }
   .s2-checkbox {
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.15rem !important;
+    height: 1.15rem !important;
   }
   .s2-check-icon {
-    width: 0.95rem;
-    height: 0.95rem;
+    width: 0.85rem !important;
+    height: 0.85rem !important;
   }
   .s2-option-label {
-    font-size: 1.05rem;
+    font-size: 0.88rem !important;
+    line-height: 1.2 !important;
   }
   .s2-combo {
-    width: 300px;
-    height: 220px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    height: auto !important;
+    margin: 0.15rem auto !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
   }
   .s2-bubble {
-    width: 220px;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    flex: 0 1 200px !important;
+    max-width: 205px !important;
+    min-width: 165px !important;
+    width: 100% !important;
+    z-index: 1 !important;
   }
   .s2-bubble-text {
-    font-size: 11.5px;
-    line-height: 1.32;
+    font-size: 10.5px !important;
+    line-height: 1.25 !important;
   }
   .s2-nurse {
-    width: 90px;
-    max-height: 200px;
-    right: 4px;
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    flex: 0 0 72px !important;
+    width: 72px !important;
+    margin-left: -6px !important;
+    margin-top: 0 !important;
+    z-index: 2 !important;
   }
   .s2-nurse-img {
-    max-height: 200px;
+    max-height: 135px !important;
+    width: 100% !important;
+    object-fit: contain !important;
   }
   .s2-banner {
-    padding: 0.4rem 2rem;
+    padding: 0.25rem 1rem !important;
   }
   .s2-heading {
-    font-size: 0.95rem;
+    font-size: 0.82rem !important;
+  }
+  .s2-nav {
+    margin-top: 0.35rem !important;
+    gap: 1.25rem !important;
+    z-index: 10 !important;
   }
   .s2-btn {
-    padding: 0.35rem 1.6rem;
-    font-size: 0.85rem;
+    padding: 0.32rem 1.4rem !important;
+    font-size: 0.82rem !important;
+    min-height: 38px !important;
   }
 }
 `;
@@ -377,65 +438,70 @@ export function Slide2MedicineNamingScreen({
         </div>
       </div>
 
-      {/* 2. Middle Content Row (Bottle + Checkboxes + Speech Bubble & Nurse Anna) */}
+      {/* 2. Middle Content Row (Bottle + Checkboxes in a single horizontal row, plus Speech Bubble & Nurse Anna) */}
       <div className="s2-middle">
-        {/* Pink Amoxicillin Bottle */}
-        <div className="s2-bottle-wrap">
-          <img
-            src="/images/amoxicillin-bottle.png"
-            alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
-            className="s2-bottle"
-          />
-        </div>
+        {/* Horizontal Row: Bottle on Left, Checkboxes on Right */}
+        <div className="s2-bottle-options-row">
+          {/* Pink Amoxicillin Bottle */}
+          <div className="s2-bottle-wrap">
+            <img
+              src="/images/amoxicillin-bottle.png"
+              alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
+              className="s2-bottle"
+            />
+          </div>
 
-        {/* Checkbox Options List */}
-        <div
-          className="s2-options"
-          role="radiogroup"
-          aria-label={isSpanish ? "Seleccione el nombre que usa para el medicamento" : "Select what you call the medicine"}
-        >
-          {MEDICINE_OPTIONS_DISPLAY.map((opt) => {
-            const isChecked = selected === opt.value;
-            const label = isSpanish ? opt.labelEs : opt.labelEn;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                role="radio"
-                aria-checked={isChecked}
-                onClick={() => onSelect(opt.value)}
-                className="s2-option"
-              >
-                <div
-                  className={`s2-checkbox${isChecked ? " s2-checkbox--checked" : ""}`}
-                  aria-hidden="true"
+          {/* Checkbox Options List */}
+          <div
+            className="s2-options"
+            role="radiogroup"
+            aria-label={isSpanish ? "Seleccione el nombre que usa para el medicamento" : "Select what you call the medicine"}
+          >
+            {MEDICINE_OPTIONS_DISPLAY.map((opt) => {
+              const isChecked = selected === opt.value;
+              const label = isSpanish ? opt.labelEs : opt.labelEn;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={isChecked}
+                  onClick={() => onSelect(opt.value)}
+                  className="s2-option"
                 >
-                  {isChecked && (
-                    <svg
-                      className="s2-check-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth="3.5"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
-                <span className={`s2-option-label${isChecked ? " s2-option-label--checked" : ""}`}>
-                  {label}
-                </span>
-              </button>
-            );
-          })}
+                  <div
+                    className={`s2-checkbox${isChecked ? " s2-checkbox--checked" : ""}`}
+                    aria-hidden="true"
+                  >
+                    {isChecked && (
+                      <svg
+                        className="s2-check-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth="3.5"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className={`s2-option-label${isChecked ? " s2-option-label--checked" : ""}`}>
+                    {label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Right Section: Speech Bubble + Nurse Anna Combo */}
+        {/* Right Section / Bottom Combo: Speech Bubble + Nurse Anna Combo */}
         <div className="s2-combo">
           {/* Custom Vector Speech Bubble with natural round shape and downward pointer tail */}
           <div className="s2-bubble">
             <svg viewBox="0 0 430 260" fill="none" className="s2-bubble-svg">
+              {/* Desktop pointer tail */}
               <path
+                className="hidden md:inline"
                 d="M 213, 8
                    C 317, 8  404, 56  404, 120
                    C 404, 146  388, 172  360, 189
@@ -444,6 +510,23 @@ export function Slide2MedicineNamingScreen({
                    C 292, 228  254, 236  213, 236
                    C 109, 236  28, 184  28, 120
                    C 28, 56  109, 8  213, 8
+                   Z"
+                fill="#ffffff"
+                stroke="#27707e"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {/* Mobile pointer tail: naturally points directly at Nurse Anna's head/face */}
+              <path
+                className="inline md:hidden"
+                d="M 195, 12
+                   C 265, 12  338, 48  364, 93
+                   C 382, 98  405, 107  422, 118
+                   C 400, 136  378, 148  359, 158
+                   C 336, 202  265, 230  195, 230
+                   C 98, 230  20, 182  20, 121
+                   C 20, 60  98, 12  195, 12
                    Z"
                 fill="#ffffff"
                 stroke="#27707e"

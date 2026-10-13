@@ -395,22 +395,41 @@ export function Slide10TestingOverviewScreen({
             {/* Round Speech Bubble with pointer tail pointing to Anna's head */}
             <div className="s10-bubble">
               <svg viewBox="0 0 430 260" fill="none" className="s10-bubble-svg" aria-hidden="true">
-                <path
-                  d="M 213, 8
-                     C 317, 8  404, 56  404, 120
-                     C 404, 146  388, 172  360, 189
-                     C 375, 204  392, 222  409, 239
-                     C 390, 241  356, 233  325, 214
-                     C 292, 228  254, 236  213, 236
-                     C 109, 236  28, 184  28, 120
-                     C 28, 56  109, 8  213, 8
-                     Z"
-                  fill="#ffffff"
-                  stroke="#27707e"
-                  strokeWidth="2.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+              {/* Desktop pointer tail */}
+              <path
+                className="hidden md:inline"
+                d="M 213, 8
+                   C 317, 8  404, 56  404, 120
+                   C 404, 146  388, 172  360, 189
+                   C 375, 204  392, 222  409, 239
+                   C 390, 241  356, 233  325, 214
+                   C 292, 228  254, 236  213, 236
+                   C 109, 236  28, 184  28, 120
+                   C 28, 56  109, 8  213, 8
+                   Z"
+                fill="#ffffff"
+                stroke="#27707e"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {/* Mobile pointer tail: naturally points directly at Nurse Anna's head/face */}
+              <path
+                className="inline md:hidden"
+                d="M 195, 12
+                   C 265, 12  338, 48  364, 93
+                   C 382, 98  405, 107  422, 118
+                   C 400, 136  378, 148  359, 158
+                   C 336, 202  265, 230  195, 230
+                   C 98, 230  20, 182  20, 121
+                   C 20, 60  98, 12  195, 12
+                   Z"
+                fill="#ffffff"
+                stroke="#27707e"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
               </svg>
 
               {/* Centered Bubble Speech Text */}
@@ -418,14 +437,14 @@ export function Slide10TestingOverviewScreen({
                 <p className="s10-bubble-text">
                   {isSpanish ? (
                     <>
-                      <span>¡Hable con el</span>
-                      <span>médico de su hijo</span>
+                      <span>¡Hable con el </span>
+                      <span>médico de su hijo </span>
                       <span>sobre las pruebas!</span>
                     </>
                   ) : (
                     <>
-                      <span>Talk to your</span>
-                      <span>child&apos;s doctor</span>
+                      <span>Talk to your </span>
+                      <span>child&apos;s doctor </span>
                       <span>about testing!</span>
                     </>
                   )}

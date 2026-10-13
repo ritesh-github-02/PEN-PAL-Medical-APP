@@ -41,7 +41,7 @@ import enMessages from "@/messages/en.json";
 function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (newLocale: string) => void }) {
   return (
     <div 
-      className="flex items-center gap-1 bg-white/90 border border-slate-200/90 shadow-2xs rounded-full p-1 font-sans no-print"
+      className="flex items-center gap-0.5 sm:gap-1 bg-white/90 border border-slate-200/90 shadow-2xs rounded-full p-0.5 sm:p-1 font-sans no-print shrink-0 whitespace-nowrap"
       role="group"
       aria-label={locale === "es" ? "Seleccionar idioma" : "Language selection"}
     >
@@ -50,7 +50,7 @@ function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (new
         onClick={() => onSwitch("en")}
         aria-pressed={locale === "en"}
         aria-label="Switch language to English"
-        className={`px-3 py-1.5 min-h-[32px] text-xs font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
+        className={`px-2 sm:px-3 py-1 sm:py-1.5 min-h-[28px] sm:min-h-[32px] text-[11px] sm:text-xs font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
           locale === "en"
             ? "bg-[#236f7a] text-white shadow-xs"
             : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -63,7 +63,7 @@ function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (new
         onClick={() => onSwitch("es")}
         aria-pressed={locale === "es"}
         aria-label="Cambiar idioma a Español"
-        className={`px-3 py-1.5 min-h-[32px] text-xs font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
+        className={`px-2 sm:px-3 py-1 sm:py-1.5 min-h-[28px] sm:min-h-[32px] text-[11px] sm:text-xs font-extrabold rounded-full transition-all cursor-pointer flex items-center gap-1 shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] ${
           locale === "es"
             ? "bg-[#236f7a] text-white shadow-xs"
             : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -617,7 +617,7 @@ export default function PenpalIntervention() {
 
   return (
     <main
-      className="intervention-main-shell h-dvh max-h-dvh w-full max-w-full flex flex-col items-center justify-center p-2.5 sm:p-3.5 md:p-4.5 relative font-sans bg-[#f4f8e8] overflow-hidden select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
+      className="intervention-main-shell min-h-dvh w-full max-w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4.5 relative font-sans bg-[#f4f8ec] overflow-hidden md:overflow-y-auto select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -630,29 +630,28 @@ export default function PenpalIntervention() {
       </a>
 
       {/* Decorative ambient background glows with motion-reduce safety */}
-      <div className="no-print print:hidden absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
-      <div className="no-print print:hidden absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
+      <div className="no-print print:hidden absolute inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
+        <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] animate-pulse motion-reduce:animate-none"></div>
+        <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] animate-pulse motion-reduce:animate-none"></div>
+      </div>
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
       <div 
-        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
-        style={{
-          maxWidth: "min(58rem, calc(100vw - 2rem), calc((100dvh - 5.5rem) * (1248 / 661)))",
-        }}
+        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 max-w-[420px] md:max-w-[min(58rem,calc(100vw-2rem),calc((100dvh-5.5rem)*(1248/661)))] print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
       >
         {/* Header Bar matching old slide: Logo, Step Progress, and Language Switcher */}
-        <header className="w-full shrink-0 flex items-center justify-between px-3 sm:px-4 py-1 sm:py-1.5 mb-2 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs no-print">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#236f7a]" aria-hidden="true"></span>
-            <span className="font-black text-xs sm:text-sm tracking-tight text-[#236f7a] font-display">PEN-PAL</span>
-            <span className="text-slate-300 text-xs" aria-hidden="true">|</span>
+        <header className="w-full shrink-0 flex items-center justify-between px-2.5 sm:px-4 py-1 sm:py-1.5 mb-1.5 sm:mb-2 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs no-print">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 whitespace-nowrap">
+            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#236f7a] shrink-0" aria-hidden="true"></span>
+            <span className="font-black text-xs sm:text-sm tracking-tight text-[#236f7a] font-display shrink-0 whitespace-nowrap">PEN-PAL</span>
+            <span className="text-slate-300 text-xs shrink-0" aria-hidden="true">|</span>
             {(() => {
               const activeCount = questionnaireConfig.filter((s) => !s.isTerminal && s.id !== "screen_end").length + 1;
               const displayStep = showSummary ? activeCount : Math.min(currentStepIndex + 1, activeCount);
               return (
                 <span 
-                  className="text-[11px] font-bold text-slate-700"
+                  className="text-[10.5px] sm:text-[11px] font-bold text-slate-700 shrink-0 whitespace-nowrap"
                   aria-label={locale === "es" ? `Progreso: Paso ${displayStep} de ${activeCount}` : `Progress: Step ${displayStep} of ${activeCount}`}
                 >
                   {locale === "es"
@@ -666,22 +665,17 @@ export default function PenpalIntervention() {
         </header>
 
         {/* =========================================================================
-            REALISTIC TABLET HARDWARE MOCKUP (LANDSCAPE ORIENTATION - EXACT MASTER RATIO)
+            SLIDE FRAME (Defined Height & Black Border on Mobile, Mockup on Desktop)
             ========================================================================= */}
         <div className="w-full flex items-center justify-center relative print:block print:w-full print:m-0 print:p-0">
-          {/* Outer Tablet Bezel Frame */}
+          {/* Outer Slide Frame: Standard web card with defined height & black border */}
           <div 
-            className="tablet-mockup-frame relative bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2rem] md:rounded-[2.4rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full print:bg-transparent print:p-0 print:m-0 print:border-none print:rounded-none print:shadow-none print:aspect-auto print:max-h-none print:h-auto print:w-full print:block"
-            style={{
-              aspectRatio: "1248 / 661",
-              maxHeight: "calc(100dvh - 5.5rem)",
-              height: "auto",
-            }}
+            className="tablet-mockup-frame relative bg-[#f4f8ec] md:bg-[#181a1d] p-0 md:p-3.5 rounded-2xl md:rounded-[2.4rem] border-2 border-black md:border-2 md:border-[#2b2e33] shadow-md md:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full print:bg-transparent print:p-0 print:m-0 print:border-none print:rounded-none print:shadow-none print:aspect-auto print:max-h-none print:h-auto print:w-full print:block"
           >
             
-            {/* Left Bezel Camera Array (Landscape Tablet) - Perfectly Centered in Left Bezel Width */}
+            {/* Left Bezel Camera Array (Landscape Tablet) - ONLY visible on desktop/landscape */}
             <div 
-              className="tablet-bezel-camera no-print print:hidden absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3 md:w-3.5 flex flex-col items-center justify-center gap-1 pointer-events-none select-none z-30"
+              className="tablet-bezel-camera hidden md:flex no-print print:hidden absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3 md:w-3.5 flex-col items-center justify-center gap-1 pointer-events-none select-none z-30"
               aria-hidden="true"
             >
               <span className="w-1 h-1 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
@@ -693,10 +687,10 @@ export default function PenpalIntervention() {
 
             {/* Tablet Inner Screen with Clean Unified Background */}
             <div 
-              className="tablet-screen-inner relative w-full h-full flex-1 min-h-0 rounded-[1.1rem] sm:rounded-[1.4rem] md:rounded-[1.6rem] overflow-hidden shadow-inner flex flex-col justify-center items-center bg-[#f4f8ec] print:bg-transparent print:rounded-none print:shadow-none print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0"
+              className="tablet-screen-inner relative w-full h-full flex-1 min-h-0 rounded-2xl md:rounded-[1.6rem] overflow-y-auto md:overflow-hidden border border-[#236f7a]/15 md:border-none shadow-sm md:shadow-inner flex flex-col justify-start md:justify-center items-center bg-[#f4f8ec] print:bg-transparent print:rounded-none print:shadow-none print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0"
             >
               {/* Slide Content */}
-              <div className="tablet-slide-content relative w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center overflow-hidden print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0">
+              <div className="tablet-slide-content relative w-full h-full flex-1 min-h-0 flex flex-col justify-start md:justify-center items-center overflow-y-auto md:overflow-hidden print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0">
               {isTerminated ? (
                 <div className="w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center p-6 sm:p-10 text-center bg-[#f4f8ec]">
                   <div className="max-w-xl space-y-4">
@@ -1075,7 +1069,7 @@ export default function PenpalIntervention() {
 
               {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
               {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary") && (
-                <div className="absolute bottom-3 right-4 sm:bottom-4 sm:right-6 md:bottom-5 md:right-7 z-30">
+                <div className="absolute bottom-2.5 right-3.5 sm:bottom-4 sm:right-6 md:bottom-5 md:right-7 z-30">
                   <AudioPlayer
                     audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
                     stepId={currentStep.id}
@@ -1129,7 +1123,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   return (
     <div
       id="slide-content"
-      className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-6 sm:px-10 md:px-14 lg:px-16 py-4 sm:py-6"
+      className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-4 sm:px-8 md:px-14 lg:px-16 py-3 sm:py-6 pb-12 sm:pb-6 overflow-y-auto"
       style={{
         background: `
           radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
@@ -1140,34 +1134,34 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
         `,
       }}
     >
-      <div className="flex flex-row items-center justify-between gap-4 sm:gap-8 md:gap-12 max-w-4xl w-full my-auto">
-        {/* Left Column: Heading, Subtitle, Copy, and Left-Aligned CTA Button */}
-        <div className="flex-1 space-y-2 sm:space-y-3 md:space-y-4 text-left z-10 max-w-lg">
+      <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 sm:gap-6 md:gap-12 max-w-4xl w-full my-auto text-center md:text-left py-1 px-1">
+        {/* Left Column: Heading, Subtitle, Copy, and CTA Button */}
+        <div className="flex-1 space-y-1.5 sm:space-y-3 md:space-y-4 text-center md:text-left z-10 max-w-lg">
           <div>
-            {/* Golden-Yellow Title with Dark Teal Stroke & Drop Shadow matching Image */}
+            {/* Golden-Yellow Title with Dark Teal Stroke & Drop Shadow */}
             <h1
               ref={headingRef}
               tabIndex={-1}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-black tracking-tight font-display outline-none select-none text-[#ebb016]"
+              className="text-2xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-black tracking-tight font-display outline-none select-none text-[#ebb016]"
               style={{
-                WebkitTextStroke: "1.8px #12403d",
+                WebkitTextStroke: "1.6px #12403d",
                 paintOrder: "stroke fill",
                 textShadow: "0 2px 0 #12403d, 0 3px 2px rgba(18, 64, 61, 0.3)",
               }}
             >
               PEN–PAL
             </h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-[#143e3b] mt-1 sm:mt-1.5 tracking-tight">
+            <p className="text-xs sm:text-base md:text-lg lg:text-xl font-bold text-[#143e3b] mt-0.5 sm:mt-1.5 tracking-tight">
               {introSubtitle}
             </p>
           </div>
 
-          <p className="text-xs sm:text-sm md:text-base lg:text-[1.05rem] font-medium text-[#1c403c] leading-relaxed max-w-xs sm:max-w-sm md:max-w-md pt-1 sm:pt-2">
+          <p className="text-xs sm:text-sm md:text-base lg:text-[1.05rem] font-medium text-[#1c403c] leading-relaxed max-w-xs sm:max-w-sm md:max-w-md mx-auto md:mx-0 pt-0.5 sm:pt-2">
             {mainCopy}
           </p>
 
-          {/* Left-Aligned Pastel Butter-Yellow Pill Button: "Get Started!" */}
-          <div className="pt-3 sm:pt-5">
+          {/* Pastel Butter-Yellow Pill Button: "Get Started!" */}
+          <div className="pt-1.5 sm:pt-4">
             <button
               type="button"
               onClick={() => {
@@ -1175,16 +1169,16 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
                 onNext("yes");
               }}
               disabled={loading}
-              className="px-6 sm:px-7 py-2 sm:py-2.5 rounded-full bg-[#fde989] hover:bg-[#f6df71] text-[#1b3b32] border border-[#dcc65b] font-bold text-xs sm:text-sm md:text-[15px] shadow-xs transition duration-150 active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
+              className="px-6 py-2 sm:px-8 sm:py-3 rounded-full bg-[#fde989] hover:bg-[#f6df71] text-[#1b3b32] border border-[#dcc65b] font-bold text-xs sm:text-base shadow-sm transition duration-150 active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
             >
               {loading ? "..." : (isSpanish ? "¡Comenzar!" : "Get Started!")}
             </button>
           </div>
         </div>
 
-        {/* Right Column: Nurse Anna Illustration (Smaller scale) */}
-        <div className="shrink-0 flex items-center justify-center sm:pr-2 z-10">
-          <NurseAnna size="md" imgClassName="w-20 sm:w-24 md:w-28 lg:w-32 max-h-[160px] sm:max-h-[190px] md:max-h-[220px] object-contain" isDecorative={false} locale={locale} />
+        {/* Right Column: Nurse Anna Illustration (order-first on mobile, order-last on desktop) */}
+        <div className="shrink-0 flex items-center justify-center sm:pr-2 z-10 order-first md:order-last">
+          <NurseAnna size="md" imgClassName="w-20 sm:w-28 md:w-32 lg:w-36 max-h-[135px] sm:max-h-[190px] md:max-h-[220px] object-contain" isDecorative={false} locale={locale} />
         </div>
       </div>
     </div>

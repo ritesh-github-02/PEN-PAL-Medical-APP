@@ -212,7 +212,7 @@ export default function AudioPlayer({
         >
           {/* Custom CC Speech Bubble SVG matching exact UI */}
           <svg
-            className="w-10 h-9 sm:w-11 sm:h-10 transition-transform duration-150 group-hover:scale-105"
+            className="w-8 h-7 sm:w-11 sm:h-10 transition-transform duration-150 group-hover:scale-105"
             viewBox="0 0 42 38"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -310,7 +310,7 @@ export default function AudioPlayer({
           }`}
       >
         <svg
-          className="w-[3.15rem] h-9 sm:w-[3.4rem] sm:h-10 transition-transform duration-150 group-hover:scale-105"
+          className="w-[2.75rem] h-7 sm:w-[3.4rem] sm:h-10 transition-transform duration-150 group-hover:scale-105"
           viewBox="0 0 50 36"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

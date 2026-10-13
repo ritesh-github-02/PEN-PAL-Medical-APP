@@ -56,7 +56,7 @@ export function Slide9WhyItMattersScreen({
   return (
     <div
       id="slide-content"
-      className="w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center bg-[#f4f8ec] px-3 sm:px-5 py-2 sm:py-3 overflow-hidden gap-[clamp(0.6rem,2vh,1.25rem)]"
+      className="s9-root w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center bg-[#f4f8ec] px-3 sm:px-5 py-2 sm:py-3 overflow-hidden gap-[clamp(0.6rem,2vh,1.25rem)]"
     >
       <div className="max-w-3xl mx-auto w-full shrink-0 flex flex-col justify-center space-y-2.5 sm:space-y-3 m-0">
         {/* Yellow Header Badge */}
@@ -73,9 +73,9 @@ export function Slide9WhyItMattersScreen({
         </div>
 
         {/* Content: Nurse Anna on Left + Explanatory Bullet List on Right */}
-        <div className="flex items-center gap-5 sm:gap-7 pt-0.5">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-7 pt-0.5">
           <div className="shrink-0 flex items-center justify-center">
-            <NurseAnna size="md" imgClassName="w-20 sm:w-24 md:w-28 max-h-[185px] object-contain" isDecorative={true} />
+            <NurseAnna size="md" imgClassName="w-16 sm:w-24 md:w-28 max-h-[150px] sm:max-h-[185px] object-contain" isDecorative={true} />
           </div>
 
           <div className="space-y-2 flex-1 text-left">
