@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import { Printer, Download } from "lucide-react";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
 
 const SLIDE18_CSS = `
@@ -162,14 +163,14 @@ const SLIDE18_CSS = `
 }
 
 .s18-btn {
-  padding: 0.36rem 1.9rem;
-  min-height: 36px;
-  min-width: 98px;
+  padding: 0.38rem 1.6rem;
+  min-height: 38px;
+  min-width: 104px;
   border-radius: 9999px;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: #143833;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   outline: none;
   cursor: pointer;
   border: 1px solid #91b5ae;
@@ -178,11 +179,20 @@ const SLIDE18_CSS = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.45rem;
+}
+
+.s18-btn-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  stroke-width: 2.2;
 }
 
 .s18-btn:hover {
   background-color: #9cbdb6;
   transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
 }
 
 .s18-btn:active {
@@ -220,6 +230,12 @@ const SLIDE18_CSS = `
   border-color: #a6bbb5;
 }
 
+/* Print-only elements hidden on screen */
+.s18-print-header,
+.s18-print-footer {
+  display: none;
+}
+
 /* Responsive Scaling */
 @media (max-height: 640px), (max-width: 768px) {
   .s18-root {
@@ -251,9 +267,14 @@ const SLIDE18_CSS = `
     margin-top: 0.35rem;
   }
   .s18-btn {
-    min-height: 32px;
-    padding: 0.28rem 1.5rem;
-    font-size: 0.84rem;
+    min-height: 34px;
+    padding: 0.3rem 1.3rem;
+    font-size: 0.86rem;
+    gap: 0.4rem;
+  }
+  .s18-btn-icon {
+    width: 0.95rem;
+    height: 0.95rem;
   }
 }
 
@@ -265,10 +286,225 @@ const SLIDE18_CSS = `
 }
 
 @media print {
-  @page { size: A4 portrait; margin: 0.5cm; }
-  .s18-nav { display: none !important; }
-  .s18-root { background: white !important; padding: 0 !important; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-shadow: none !important; }
+  @page {
+    size: portrait;
+    margin: 12mm 15mm;
+  }
+
+  .s18-nav,
+  .no-print {
+    display: none !important;
+  }
+
+  .s18-root {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    gap: 0 !important;
+  }
+
+  .s18-content {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Printable Clinical Header */
+  .s18-print-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    border-bottom: 2px solid #142724 !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .s18-print-brand {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  .s18-print-logo {
+    font-size: 18pt !important;
+    font-weight: 900 !important;
+    color: #142724 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1 !important;
+  }
+
+  .s18-print-tagline {
+    font-size: 8.5pt !important;
+    font-weight: 600 !important;
+    color: #3b5a54 !important;
+  }
+
+  .s18-print-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 2px !important;
+  }
+
+  .s18-print-doc-type {
+    font-size: 8.5pt !important;
+    font-weight: 700 !important;
+    color: #142724 !important;
+  }
+
+  .s18-print-date {
+    font-size: 8pt !important;
+    color: #557871 !important;
+  }
+
+  /* "Action Steps for Parents" Badge */
+  .s18-badge {
+    display: inline-block !important;
+    background-color: #fff475 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    border: 1.5px solid #142724 !important;
+    border-radius: 14px !important;
+    padding: 4px 16px !important;
+    box-shadow: none !important;
+    margin-bottom: 12px !important;
+  }
+
+  .s18-badge-title {
+    font-size: 13pt !important;
+    font-weight: 800 !important;
+    color: #142724 !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  /* Numbered Steps Section */
+  .s18-steps-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+
+  .s18-step-line {
+    font-size: 10pt !important;
+    font-weight: 650 !important;
+    color: #142724 !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+  }
+
+  .s18-quote-line {
+    font-size: 9.5pt !important;
+    font-weight: 500 !important;
+    color: #1a3631 !important;
+    line-height: 1.35 !important;
+    margin: 0 0 2px 14px !important;
+  }
+
+  .s18-quote-text {
+    font-style: italic !important;
+    color: #0f172a !important;
+  }
+
+  /* Summary Table */
+  .s18-table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1.5px solid #7da39c !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    margin-bottom: 14px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .s18-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .s18-table tr {
+    border-bottom: 1px solid #90b3ab !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .s18-table tr:last-child {
+    border-bottom: none !important;
+  }
+
+  .s18-table-label {
+    width: 42% !important;
+    background-color: #b0cdc7 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color: #0a1f1b !important;
+    font-size: 9.5pt !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    padding: 8px 12px !important;
+    border-right: 1.5px solid #90b3ab !important;
+    vertical-align: middle !important;
+  }
+
+  .s18-table-value {
+    width: 58% !important;
+    background-color: #ebf4f1 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color: #0a1f1b !important;
+    font-size: 9.5pt !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
+    padding: 8px 12px !important;
+    vertical-align: middle !important;
+  }
+
+  /* Printable Footer */
+  .s18-print-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-top: 1px solid #90b3ab !important;
+    padding-top: 8px !important;
+    margin-top: 12px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .s18-print-footer-text {
+    font-size: 8pt !important;
+    color: #3b5a54 !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+  }
+
+  .s18-print-footer-tag {
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+    color: #143833 !important;
+    white-space: nowrap !important;
+    margin-left: 12px !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-shadow: none !important;
+  }
 }
 `;
 
@@ -481,6 +717,30 @@ export function Slide18SummaryScreen({
 
       {/* Main Centered Content */}
       <div className="s18-content">
+        {/* Printable Clinical Header (Visible ONLY when printing) */}
+        <div className="s18-print-header" aria-hidden="true">
+          <div className="s18-print-brand">
+            <span className="s18-print-logo">PEN-PAL</span>
+            <span className="s18-print-tagline">
+              {isSpanish
+                ? "Estudio Clínico sobre Alergia a la Penicilina en Pediatría"
+                : "Pediatric Penicillin Allergy Evaluation Study"}
+            </span>
+          </div>
+          <div className="s18-print-meta">
+            <span className="s18-print-doc-type">
+              {isSpanish ? "Guía de Discusión Médica y Resumen" : "Doctor Discussion Guide & Summary"}
+            </span>
+            <span className="s18-print-date">
+              {new Date().toLocaleDateString(isSpanish ? "es-US" : "en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+        </div>
+
         {/* 1. Yellow Badge */}
         <div className="s18-badge">
           <h1
@@ -535,23 +795,39 @@ export function Slide18SummaryScreen({
             </tbody>
           </table>
         </div>
+
+        {/* Printable Footer (Visible ONLY when printing) */}
+        <div className="s18-print-footer" aria-hidden="true">
+          <p className="s18-print-footer-text">
+            {isSpanish
+              ? "Entregue esta hoja a su pediatra o médico para evaluar el historial de alergia a la penicilina."
+              : "Please bring this sheet to your child's pediatrician or doctor to discuss penicillin allergy evaluation."}
+          </p>
+          <span className="s18-print-footer-tag">PEN-PAL Medical Study</span>
+        </div>
       </div>
 
       {/* 4. Bottom Centered Navigation (Print & Save) + Close ✕ */}
-      <div className="s18-nav">
+      <div className="s18-nav no-print">
         <button
           type="button"
           onClick={onPrint || (() => window.print())}
           className="s18-btn"
+          aria-label={isSpanish ? "Imprimir hoja de resumen" : "Print summary sheet"}
+          title={isSpanish ? "Imprimir" : "Print"}
         >
-          {isSpanish ? "Imprimir" : "Print"}
+          <Printer className="s18-btn-icon" aria-hidden="true" />
+          <span>{isSpanish ? "Imprimir" : "Print"}</span>
         </button>
         <button
           type="button"
           onClick={handleCompleteAndSave}
           className="s18-btn"
+          aria-label={isSpanish ? "Guardar resumen como PDF" : "Save summary as PDF"}
+          title={isSpanish ? "Guardar" : "Save"}
         >
-          {isSpanish ? "Guardar" : "Save"}
+          <Download className="s18-btn-icon" aria-hidden="true" />
+          <span>{isSpanish ? "Guardar" : "Save"}</span>
         </button>
 
         <button

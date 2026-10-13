@@ -617,7 +617,7 @@ export default function PenpalIntervention() {
 
   return (
     <main
-      className="h-dvh max-h-dvh w-full max-w-full flex flex-col items-center justify-center p-2.5 sm:p-3.5 md:p-4.5 relative font-sans bg-[#f4f8e8] overflow-hidden select-none"
+      className="intervention-main-shell h-dvh max-h-dvh w-full max-w-full flex flex-col items-center justify-center p-2.5 sm:p-3.5 md:p-4.5 relative font-sans bg-[#f4f8e8] overflow-hidden select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -630,13 +630,13 @@ export default function PenpalIntervention() {
       </a>
 
       {/* Decorative ambient background glows with motion-reduce safety */}
-      <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
-      <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
+      <div className="no-print print:hidden absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
+      <div className="no-print print:hidden absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
       <div 
-        className="w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300"
+        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
         style={{
           maxWidth: "min(58rem, calc(100vw - 2rem), calc((100dvh - 5.5rem) * (1248 / 661)))",
         }}
@@ -668,10 +668,10 @@ export default function PenpalIntervention() {
         {/* =========================================================================
             REALISTIC TABLET HARDWARE MOCKUP (LANDSCAPE ORIENTATION - EXACT MASTER RATIO)
             ========================================================================= */}
-        <div className="w-full flex items-center justify-center relative">
+        <div className="w-full flex items-center justify-center relative print:block print:w-full print:m-0 print:p-0">
           {/* Outer Tablet Bezel Frame */}
           <div 
-            className="relative bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2rem] md:rounded-[2.4rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full"
+            className="tablet-mockup-frame relative bg-[#181a1d] p-2.5 sm:p-3 md:p-3.5 rounded-[1.6rem] sm:rounded-[2rem] md:rounded-[2.4rem] border-2 border-[#2b2e33] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full print:bg-transparent print:p-0 print:m-0 print:border-none print:rounded-none print:shadow-none print:aspect-auto print:max-h-none print:h-auto print:w-full print:block"
             style={{
               aspectRatio: "1248 / 661",
               maxHeight: "calc(100dvh - 5.5rem)",
@@ -681,7 +681,7 @@ export default function PenpalIntervention() {
             
             {/* Left Bezel Camera Array (Landscape Tablet) - Perfectly Centered in Left Bezel Width */}
             <div 
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3 md:w-3.5 flex flex-col items-center justify-center gap-1 pointer-events-none select-none z-30"
+              className="tablet-bezel-camera no-print print:hidden absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3 md:w-3.5 flex flex-col items-center justify-center gap-1 pointer-events-none select-none z-30"
               aria-hidden="true"
             >
               <span className="w-1 h-1 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
@@ -693,10 +693,10 @@ export default function PenpalIntervention() {
 
             {/* Tablet Inner Screen with Clean Unified Background */}
             <div 
-              className="relative w-full h-full flex-1 min-h-0 rounded-[1.1rem] sm:rounded-[1.4rem] md:rounded-[1.6rem] overflow-hidden shadow-inner flex flex-col justify-center items-center bg-[#f4f8ec]"
+              className="tablet-screen-inner relative w-full h-full flex-1 min-h-0 rounded-[1.1rem] sm:rounded-[1.4rem] md:rounded-[1.6rem] overflow-hidden shadow-inner flex flex-col justify-center items-center bg-[#f4f8ec] print:bg-transparent print:rounded-none print:shadow-none print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0"
             >
               {/* Slide Content */}
-              <div className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center overflow-hidden">
+              <div className="tablet-slide-content relative w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center overflow-hidden print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0">
               {isTerminated ? (
                 <div className="w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center p-6 sm:p-10 text-center bg-[#f4f8ec]">
                   <div className="max-w-xl space-y-4">
