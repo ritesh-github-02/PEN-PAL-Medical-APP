@@ -1,13 +1,26 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { NurseAnna } from "./NurseAnna";
+import React, { useState, useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 
-const SLIDE8_CSS = `
 /* ==========================================================
-   Slide8MilestoneScreen – Scoped Pixel-Perfect Styles
+   Slide8MilestoneScreen – Scoped Pixel-Perfect Stage Layout
+   Exact Match to User Reference Image (Slide 7 / Milestone):
+   - 896 x 645 scaled stage with background #fafdf3
+   - Hand-drawn speech bubble at left: 156px, top: 79px, width: 524px, height: 320px
+   - Offset drop shadow & subtle paper texture matching original artwork
+   - Centered congratulatory text inside bubble (2 lines):
+     "Great job! Now you know what"
+     "is true about penicillin allergies!"
+   - Nurse Anna illustration standing at left: 602px, top: 184px, width: 180px, height: 366px
+   - Centered Back (left: 352px) & Next (left: 483px) buttons at y = 544px
+   - Single stage audio controls at left: 659px, y = 538px
    ========================================================== */
 
+const STAGE_W = 896;
+const STAGE_H = 645;
+
+const SLIDE8_CSS = `
 .s8-root,
 .s8-root *,
 .s8-root *::before,
@@ -21,45 +34,32 @@ const SLIDE8_CSS = `
   height: 100%;
   flex: 1 1 0%;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f8ec;
-  padding: 0.35rem 0.75rem 0.35rem 0.75rem;
   overflow: hidden;
-  gap: clamp(0.6rem, 2vh, 1.25rem);
-}
-
-/* Middle Content: Large Speech Bubble + Nurse Anna Combo */
-.s8-middle {
-  flex-shrink: 0;
-  width: 100%;
+  background-color: #fafdf3;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0;
-  padding: 0;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #262626;
 }
 
-.s8-combo {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+.s8-stage {
   position: relative;
-  width: 550px;
-  height: 270px;
-  max-width: 95%;
+  width: ${STAGE_W}px;
+  height: ${STAGE_H}px;
+  flex: none;
+  transform-origin: center center;
+  background-color: #fafdf3;
 }
 
+/* ---------- 1. Speech Bubble ---------- */
 .s8-bubble {
-  position: relative;
-  width: 385px;
-  height: 258px;
-  flex-shrink: 0;
-  align-self: flex-start;
-  margin-top: 5px;
-  z-index: 2;
+  position: absolute;
+  left: 156px;
+  top: 79px;
+  width: 524px;
+  height: 320px;
+  z-index: 5;
   pointer-events: none;
 }
 .s8-bubble-svg {
@@ -70,173 +70,128 @@ const SLIDE8_CSS = `
   overflow: visible;
   display: block;
 }
+
 .s8-bubble-text-wrap {
   position: absolute;
-  top: 10%;
-  left: 6%;
-  width: 78%;
-  height: 75%;
+  top: 48px;
+  left: 45px;
+  width: 395px;
+  height: 185px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   text-align: center;
   pointer-events: none;
-  padding: 0 16px;
+  padding: 0 10px;
 }
 .s8-bubble-text {
-  font-size: 15.5px;
+  font-family: inherit;
+  font-size: 21.5px;
   font-weight: 500;
-  line-height: 1.42;
-  color: #1a2e2b;
+  line-height: 1.35;
+  color: #232323;
+  letter-spacing: -0.012em;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  outline: none;
   text-align: center;
+  outline: none;
 }
 .s8-bubble-text:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
+  border-radius: 4px;
 }
 
+/* ---------- 2. Nurse Anna Illustration ---------- */
 .s8-nurse {
-  position: relative;
-  width: 110px;
-  height: auto;
-  max-height: 225px;
-  object-fit: contain;
-  align-self: flex-end;
-  margin-left: -40px;
-  z-index: 3;
-  margin-bottom: 5px;
-  flex-shrink: 0;
+  position: absolute;
+  left: 602px;
+  top: 184px;
+  width: 180px;
+  height: 366px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 .s8-nurse-img {
   width: 100%;
-  height: auto;
-  max-height: 250px;
+  height: 100%;
   object-fit: contain;
+  object-position: bottom center;
   display: block;
 }
 
-/* Bottom Centered Navigation */
-.s8-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  margin: 0;
-  padding: 0;
-  flex-shrink: 0;
+/* ---------- 3. Centered Navigation Buttons (Back & Next) ---------- */
+.s8-nav-back {
+  position: absolute;
+  left: 352px;
+  top: 544px;
+  z-index: 20;
+}
+.s8-nav-next {
+  position: absolute;
+  left: 483px;
+  top: 544px;
+  z-index: 20;
 }
 .s8-btn {
-  padding: 0.45rem 2rem;
+  height: 35px;
   border-radius: 9999px;
-  font-size: 0.95rem;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 500;
-  color: #143833;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   outline: none;
   cursor: pointer;
-  border: none;
+  border: 1.5px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
 }
-.s8-btn:active {
+.s8-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 .s8-btn:focus-visible {
-  box-shadow: 0 0 0 4px #236f7a;
+  box-shadow: 0 0 0 3px #236f7a;
 }
-
 .s8-btn--back {
-  background-color: #adc9c4;
-  border: 1px solid #96bcb5;
-}
-.s8-btn--back:hover {
-  background-color: #9cbdb8;
-}
-
-.s8-btn--next {
-  background-color: #fae88a;
+  width: 64px;
+  background-color: #bddfd8;
+  border-color: #8ab8b0;
   color: #143833;
-  border: 1px solid #d8c85c;
 }
-.s8-btn--next:hover {
-  background-color: #f6df6e;
+.s8-btn--back:hover:not(:disabled) {
+  background-color: #a8d5cc;
+}
+.s8-btn--next {
+  width: 62px;
+  background-color: #fdee8e;
+  border-color: #d4c65e;
+  color: #232323;
+  cursor: pointer;
+}
+.s8-btn--next:hover:not(:disabled) {
+  background-color: #f5e478;
 }
 
-/* Tablet & Smaller Screens Scaling */
-@media (max-height: 600px), (max-width: 768px) {
-  .s8-root {
-    padding: 0.85rem 1rem 1rem 1rem;
-    overflow-y: auto;
-    height: 100%;
-  }
-  .s8-combo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 320px !important;
-    height: auto !important;
-    margin: 0.15rem auto !important;
-    position: relative !important;
-    flex-shrink: 0 !important;
-  }
-  .s8-bubble {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    flex: 1 1 205px !important;
-    max-width: 235px !important;
-    min-width: 160px !important;
-    height: 158px !important;
-    width: auto !important;
-    margin-top: 0 !important;
-    z-index: 1 !important;
-  }
-  .s8-bubble-text-wrap {
-    top: 10% !important;
-    left: 6% !important;
-    width: 78% !important;
-    height: 75% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-  }
-  .s8-bubble-text {
-    font-size: 10.5px !important;
-    line-height: 1.3 !important;
-    display: block !important;
-  }
-  .s8-bubble-text span {
-    display: inline !important;
-  }
-  .s8-nurse {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    flex: 0 0 72px !important;
-    width: 72px !important;
-    margin-left: -6px !important;
-    margin-top: 0 !important;
-    z-index: 2 !important;
-  }
-  .s8-nurse-img {
-    max-height: 145px !important;
-    width: 100% !important;
-    object-fit: contain !important;
-  }
-  .s8-nav {
-    margin-top: 0.35rem;
-    gap: 1.25rem;
-    z-index: 10;
-  }
-  .s8-btn {
-    padding: 0.32rem 1.4rem;
-    font-size: 0.82rem;
-    min-height: 38px;
-  }
+/* ---------- 4. Caption (CC) & Play/Pause Controls ---------- */
+.s8-audio {
+  position: absolute;
+  left: 659px;
+  top: 538px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.s8-audio .audio-cc-btn svg {
+  width: 52px !important;
+  height: 47px !important;
+}
+.s8-audio .audio-play-btn svg {
+  width: 70px !important;
+  height: 47px !important;
 }
 `;
 
@@ -245,6 +200,10 @@ export interface Slide8MilestoneScreenProps {
   onNext: () => void;
   onBack: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
 }
 
 const BUBBLE_PATH =
@@ -301,8 +260,14 @@ export function Slide8MilestoneScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  stepId = "slide8_milestone",
+  locale,
+  transcriptText,
 }: Slide8MilestoneScreenProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -311,106 +276,139 @@ export function Slide8MilestoneScreen({
     return () => clearTimeout(timer);
   }, []);
 
+  // Responsive stage scaling that fits container with zero distortion across all viewports
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w && h) {
+        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+      }
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const spokenText = isSpanish
+    ? "¡Buen trabajo! ¡Ahora ya sabe lo que es verdad sobre las alergias a la penicilina!"
+    : "Great job! Now you know what is true about penicillin allergies!";
+
   return (
-    <div id="slide-content" className="s8-root">
+    <div id="slide-content" className="s8-root" ref={rootRef}>
       <style>{SLIDE8_CSS}</style>
 
-      {/* Middle Content: Large Speech Bubble + Nurse Anna Combo */}
-      <div className="s8-middle">
-        <div className="s8-combo">
-          {/* Hand-drawn Speech Bubble matching Slide 2 exact design */}
-          <div className="s8-bubble">
-            <svg
-              className="s8-bubble-svg"
-              viewBox="0 0 520 340"
-              fill="none"
-              aria-hidden="true"
-            >
-              <defs>
-                <pattern id="s8-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
-                  <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
-                </pattern>
-              </defs>
+      <div className="s8-stage" style={{ transform: `scale(${scale})` }}>
+        {/* 1. Hand-drawn Speech Bubble matching reference design */}
+        <div className="s8-bubble">
+          <svg
+            className="s8-bubble-svg"
+            viewBox="0 0 520 330"
+            fill="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern id="s8-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
+                <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
+              </pattern>
+            </defs>
 
-              {/* Black shadow underneath */}
-              <path
-                d={BUBBLE_PATH}
-                transform="translate(4, 6)"
-                fill="#000000"
-                stroke="#000000"
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeLinejoin="miter"
-                strokeMiterlimit="4"
-              />
-
-              {/* White bubble body */}
-              <path d={BUBBLE_PATH} fill="#ffffff" />
-
-              {/* Subtle paper dot grid texture */}
-              <path d={BUBBLE_PATH} fill="url(#s8-bubble-dots)" />
-
-              {/* Soft teal outline with increased border width */}
-              <path
-                d={BUBBLE_PATH}
-                fill="none"
-                stroke="#8ebfbb"
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeLinejoin="miter"
-                strokeMiterlimit="4"
-              />
-            </svg>
-
-            {/* Centered Speech Text inside oval body */}
-            <div className="s8-bubble-text-wrap">
-              <h1 ref={headingRef} tabIndex={-1} className="s8-bubble-text">
-                {isSpanish ? (
-                  <>
-                    <span>¡Buen trabajo! Ahora ya sabe </span>
-                    <span>lo que es verdad sobre las </span>
-                    <span>alergias a la penicilina!</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Great job! Now you know what </span>
-                    <span>is true about penicillin allergies!</span>
-                  </>
-                )}
-              </h1>
-            </div>
-          </div>
-
-          {/* Nurse Anna standing on bottom-right, head directly under bubble tail */}
-          <div className="s8-nurse">
-            <NurseAnna
-              size="md"
-              imgClassName="s8-nurse-img"
-              isDecorative={true}
-              locale={isSpanish ? "es" : "en"}
+            {/* Black shadow underneath */}
+            <path
+              d={BUBBLE_PATH}
+              transform="translate(4, 5)"
+              fill="#000000"
+              stroke="#000000"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
+
+            {/* White bubble body */}
+            <path d={BUBBLE_PATH} fill="#ffffff" />
+
+            {/* Subtle paper dot grid texture */}
+            <path d={BUBBLE_PATH} fill="url(#s8-bubble-dots)" />
+
+            {/* Soft teal outline */}
+            <path
+              d={BUBBLE_PATH}
+              fill="none"
+              stroke="#94bbb9"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+
+          {/* Centered Speech Text inside oval body */}
+          <div className="s8-bubble-text-wrap">
+            <h1 ref={headingRef} tabIndex={-1} className="s8-bubble-text">
+              {isSpanish ? (
+                <>
+                  ¡Buen trabajo! ¡Ahora ya sabe lo que
+                  <br />
+                  es verdad sobre las alergias a la penicilina!
+                </>
+              ) : (
+                <>
+                  Great job! Now you know what
+                  <br />
+                  is true about penicillin allergies!
+                </>
+              )}
+            </h1>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Centered Navigation Buttons (Back & Next) */}
-      <div className="s8-nav">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={loading}
-          className="s8-btn s8-btn--back"
-        >
-          {isSpanish ? "Atrás" : "Back"}
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={loading}
-          className="s8-btn s8-btn--next"
-        >
-          {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-        </button>
+        {/* 2. Nurse Anna standing next to speech bubble */}
+        <div className="s8-nurse">
+          <img
+            src="/images/nurse-anna.png"
+            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
+            className="s8-nurse-img"
+          />
+        </div>
+
+        {/* 3. Centered Navigation Buttons (Back & Next) */}
+        <div className="s8-nav-back">
+          <button
+            type="button"
+            onClick={onBack}
+            disabled={loading}
+            className="s8-btn s8-btn--back"
+          >
+            {isSpanish ? "Atrás" : "Back"}
+          </button>
+        </div>
+        <div className="s8-nav-next">
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={loading}
+            className="s8-btn s8-btn--next"
+          >
+            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
+          </button>
+        </div>
+
+        {/* 4. Caption (CC) & Play/Pause controls directly at right baseline */}
+        <div className="s8-audio">
+          <AudioPlayer
+            audioSrc={audioSrc}
+            stepId={stepId}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={transcriptText || spokenText}
+            size="large"
+          />
+        </div>
       </div>
     </div>
   );

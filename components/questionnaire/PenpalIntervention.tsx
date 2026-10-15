@@ -835,6 +835,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext()}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "slide8_milestone" ? (
                     <Slide8MilestoneScreen
@@ -842,6 +851,14 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext()}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        locale === "es"
+                          ? (currentStep.titleEs || currentStep.descriptionEs || "¡Buen trabajo! ¡Ahora ya sabe lo que es verdad sobre las alergias a la penicilina!")
+                          : (currentStep.titleEn || currentStep.descriptionEn || "Great job! Now you know what is true about penicillin allergies!")
+                      }
                     />
                   ) : currentStep.id === "slide9_why_it_matters" ? (
                     <Slide9WhyItMattersScreen
@@ -1104,7 +1121,7 @@ export default function PenpalIntervention() {
               </div>
 
               {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
-              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.type !== "statistics" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && currentStep.id !== "slide4_barrier" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics") && (
+              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.type !== "statistics" && currentStep.type !== "knowledge_revelation" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && currentStep.id !== "slide4_barrier" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics" && currentStep.id !== "slide6_myths" && currentStep.id !== "slide8_milestone" && currentStep.id !== "screen3_5_knowledge_test" && currentStep.id !== "screen3_6_all_correct") && (
                 <div className="absolute bottom-2.5 right-3.5 sm:bottom-4 sm:right-6 md:bottom-5 md:right-7 z-30">
                   <AudioPlayer
                     audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
