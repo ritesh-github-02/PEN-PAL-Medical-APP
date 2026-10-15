@@ -9,6 +9,7 @@ interface AudioPlayerProps {
   locale: string;
   transcriptText?: string;
   className?: string;
+  size?: 'normal' | 'large' | 'xl';
 }
 
 export default function AudioPlayer({
@@ -17,6 +18,7 @@ export default function AudioPlayer({
   locale,
   transcriptText = '',
   className = '',
+  size = 'large',
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const transcriptPopoverRef = useRef<HTMLDivElement | null>(null);
@@ -167,6 +169,21 @@ export default function AudioPlayer({
   // If there's neither audio file nor transcript text, hide player
   if (!audioSrc && !transcriptText) return null;
 
+  // Size classes for CC and Play icons
+  const ccSizeClass =
+    size === 'normal'
+      ? 'w-9 h-8 sm:w-11 sm:h-10'
+      : size === 'xl'
+      ? 'w-14 h-12.5 sm:w-[3.9rem] sm:h-[3.5rem]'
+      : 'w-12 h-11 sm:w-[3.45rem] sm:h-[3.15rem]';
+
+  const playSizeClass =
+    size === 'normal'
+      ? 'w-[3rem] h-8 sm:w-[3.6rem] sm:h-10'
+      : size === 'xl'
+      ? 'w-[4.4rem] h-12.5 sm:w-[5.2rem] sm:h-[3.5rem]'
+      : 'w-[3.9rem] h-11 sm:w-[4.65rem] sm:h-[3.15rem]';
+
   return (
     <div
       className={`relative inline-flex items-center gap-2 sm:gap-2.5 z-30 ${className}`}
@@ -207,12 +224,12 @@ export default function AudioPlayer({
                 ? 'Close captions'
                 : 'Open captions'
           }
-          className={`group relative inline-flex items-center justify-center p-0.5 sm:p-1 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${showTranscript ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
+          className={`audio-cc-btn group relative inline-flex items-center justify-center p-0.5 sm:p-1 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${showTranscript ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
             }`}
         >
           {/* Custom CC Speech Bubble SVG matching exact UI */}
           <svg
-            className="w-8 h-7 sm:w-11 sm:h-10 transition-transform duration-150 group-hover:scale-105"
+            className={`${ccSizeClass} transition-transform duration-150 group-hover:scale-105`}
             viewBox="0 0 42 38"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -222,7 +239,7 @@ export default function AudioPlayer({
             <path
               d="M 9 5.5 C 5.5 5.5 4 7.2 4 11 V 19.5 C 4 23.2 5.5 25 9 25 H 12.5 C 13.5 25 14.5 25.8 15.2 27 L 17 30 C 17.8 31.2 19.2 31.2 20 30 L 21.8 27 C 22.5 25.8 23.5 25 24.5 25 H 33 C 36.5 25 38 23.2 38 19.5 V 11 C 38 7.2 36.5 5.5 33 5.5 Z"
               stroke="currentColor"
-              strokeWidth="1.8"
+              strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
@@ -230,12 +247,12 @@ export default function AudioPlayer({
             {/* CC Text inside */}
             <text
               x="21"
-              y="15.2"
+              y="15"
               textAnchor="middle"
               dominantBaseline="central"
               fill="currentColor"
-              fontSize="13"
-              fontWeight="500"
+              fontSize="13.5"
+              fontWeight="600"
               fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
               letterSpacing="0.4px"
             >
@@ -306,11 +323,11 @@ export default function AudioPlayer({
               ? 'Reproducir audio'
               : 'Play audio'
         }
-        className={`group relative inline-flex items-center justify-center p-0.5 sm:p-1 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${isPlaying ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
+        className={`audio-play-btn group relative inline-flex items-center justify-center p-0.5 sm:p-1 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${isPlaying ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
           }`}
       >
         <svg
-          className="w-[2.75rem] h-7 sm:w-[3.4rem] sm:h-10 transition-transform duration-150 group-hover:scale-105"
+          className={`${playSizeClass} transition-transform duration-150 group-hover:scale-105`}
           viewBox="0 0 50 36"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -322,21 +339,21 @@ export default function AudioPlayer({
               <path
                 d="M 5 8.5 C 5 5.5 7.2 4.2 10 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 10 30.2 C 7.2 31.8 5 30.5 5 27.5 Z"
                 stroke="currentColor"
-                strokeWidth="1.8"
+                strokeWidth="2.2"
                 strokeLinejoin="round"
                 fill="none"
               />
               {/* Vertical pause lines inside triangle */}
-              <line x1="13.5" y1="11.5" x2="13.5" y2="24.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              <line x1="19.5" y1="11.5" x2="19.5" y2="24.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <line x1="13.5" y1="11.5" x2="13.5" y2="24.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+              <line x1="19.5" y1="11.5" x2="19.5" y2="24.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
             </>
           ) : (
             <>
-              {/* Rounded Play Triangle - slightly enlarged with thin 1.8px border */}
+              {/* Rounded Play Triangle - bold 2.2px border */}
               <path
                 d="M 5 8.5 C 5 5.5 7.2 4.2 10 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 10 30.2 C 7.2 31.8 5 30.5 5 27.5 Z"
                 stroke="currentColor"
-                strokeWidth="1.8"
+                strokeWidth="2.2"
                 strokeLinejoin="round"
                 fill="none"
               />
@@ -347,8 +364,8 @@ export default function AudioPlayer({
                 textAnchor="middle"
                 dominantBaseline="central"
                 fill="currentColor"
-                fontSize="8.5"
-                fontWeight="500"
+                fontSize="9"
+                fontWeight="600"
                 fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
                 letterSpacing="0.2px"
               >
@@ -361,14 +378,14 @@ export default function AudioPlayer({
           <path
             d="M 33 11 C 37 13.5 37 22.5 33 25"
             stroke="currentColor"
-            strokeWidth="1.8"
+            strokeWidth="2.2"
             strokeLinecap="round"
             className={isPlaying ? "animate-pulse" : ""}
           />
           <path
             d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5"
             stroke="currentColor"
-            strokeWidth="1.8"
+            strokeWidth="2.2"
             strokeLinecap="round"
             className={isPlaying ? "animate-pulse" : ""}
             style={{ animationDelay: isPlaying ? "150ms" : undefined }}

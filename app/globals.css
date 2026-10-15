@@ -339,8 +339,8 @@ body::-webkit-scrollbar,
    ========================================================================== */
 @media (min-width: 768px) {
   .tablet-mockup-frame {
-    aspect-ratio: 1248 / 661;
-    max-height: calc(100dvh - 5.5rem);
+    aspect-ratio: 1000 / 708;
+    max-height: calc(100dvh - 3.5rem);
     height: auto;
   }
 }
@@ -472,124 +472,8 @@ body::-webkit-scrollbar,
     gap: 0.65rem !important;
   }
 
-  /* Slide 2: Medicine naming - Bottle and checkboxes in a single horizontal row */
-  .s2-middle {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    width: 100% !important;
-  }
-  .s2-bottle-options-row {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.75rem !important;
-    width: 100% !important;
-    max-width: 320px !important;
-    margin: 0 auto !important;
-  }
-  .s2-bottle-wrap {
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s2-bottle {
-    width: 3.25rem !important;
-    max-height: 110px !important;
-    object-fit: contain !important;
-  }
-  .s2-options {
-    flex: 1 1 auto !important;
-    width: auto !important;
-    max-width: 240px !important;
-    gap: 0.35rem !important;
-  }
-  .s2-option {
-    gap: 0.5rem !important;
-    padding: 0.05rem 0 !important;
-  }
-  .s2-checkbox {
-    width: 1.15rem !important;
-    height: 1.15rem !important;
-  }
-  .s2-check-icon {
-    width: 0.85rem !important;
-    height: 0.85rem !important;
-  }
-  .s2-option-label {
-    font-size: 0.88rem !important;
-    line-height: 1.2 !important;
-  }
-  .s2-combo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 330px !important;
-    height: auto !important;
-    position: relative !important;
-    margin: 0.2rem auto 0 auto !important;
-    flex-shrink: 0 !important;
-  }
-  .s2-bubble {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    flex: 1 1 205px !important;
-    max-width: 225px !important;
-    min-width: 160px !important;
-    width: auto !important;
-    z-index: 1 !important;
-  }
-  .s2-bubble-text-wrap {
-    top: 10% !important;
-    left: 6% !important;
-    width: 76% !important;
-    height: 76% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    text-align: center !important;
-    overflow: hidden !important;
-  }
-  .s2-bubble-text {
-    font-size: 9.6px !important;
-    line-height: 1.25 !important;
-    display: block !important;
-    margin: 0 !important;
-  }
-  .s2-bubble-text span {
-    display: inline !important;
-  }
-  .s2-nurse {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    flex: 0 0 74px !important;
-    width: 74px !important;
-    margin-left: -5px !important;
-    margin-top: 0 !important;
-    z-index: 2 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s2-nurse-img {
-    max-height: 135px !important;
-    width: 100% !important;
-    object-fit: contain !important;
-  }
-  .s2-nav {
-    margin-top: 0.35rem !important;
-    gap: 1.25rem !important;
-    z-index: 10 !important;
-  }
+  /* Slide 2: Medicine naming self-contained responsive stage styles are scoped in Slide2MedicineNamingScreen.tsx */
+
 
   /* Slide 3: Efficacy */
   .s3-heading {

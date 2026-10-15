@@ -1,14 +1,23 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import Image from "next/image";
+import React, { useRef, useEffect, useState } from "react";
+import AudioPlayer from "./AudioPlayer";
+import { resolveMedicineToken } from "@/lib/token-engine";
 
-const SLIDE5_CSS = `
 /* ==========================================================
-   Slide5PrevalenceScreen – Scoped Pixel-Perfect Styles
-   Matching exact mockup reference (Image 1)
+   Slide5PrevalenceScreen – Scoped Pixel-Perfect Stage Layout
+   Exact Match to User Reference Image 1:
+   - "Did You Know?" yellow rounded badge at top-left
+   - Statement text on left with bold 100 & 95 numbers
+   - Nurse Anna standing on right holding pink medicine bottle
+   - Centered Back (left: 352px) & Next (left: 483px) buttons at y = 544px
+   - Audio player at left: 659px, y = 541px
    ========================================================== */
 
+const STAGE_W = 896;
+const STAGE_H = 645;
+
+const SLIDE5_CSS = `
 .s5-root,
 .s5-root *,
 .s5-root *::before,
@@ -22,192 +31,177 @@ const SLIDE5_CSS = `
   height: 100%;
   flex: 1 1 0%;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f8ec;
-  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
   overflow: hidden;
-  gap: clamp(0.6rem, 2vh, 1.25rem);
+  background-color: #fafdf3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #262626;
 }
 
-/* Middle Content: Bottle + Nurse Anna Shield + Descriptive Text */
-.s5-middle {
-  flex-shrink: 0;
-  width: 100%;
+.s5-stage {
+  position: relative;
+  width: ${STAGE_W}px;
+  height: ${STAGE_H}px;
+  flex: none;
+  transform-origin: center center;
+  background-color: #fafdf3;
+}
+
+/* ---------- 1. "Did You Know?" Yellow Badge (Top Left) ---------- */
+.s5-badge {
+  position: absolute;
+  left: 122px;
+  top: 84px;
+  width: 205px;
+  height: 75px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 16px;
+  background-color: #feff9f;
+  border: 1.8px solid #2b7f8f;
+  border-radius: 22px;
+  box-shadow: 0 4px 6px rgba(34, 105, 118, 0.35);
+  text-align: center;
+}
+.s5-badge-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #232323;
+  outline: none;
+}
+.s5-badge-title:focus-visible {
+  box-shadow: 0 0 0 2px #236f7a;
+}
+
+/* ---------- 2. Statement Text (Left Column) ---------- */
+.s5-text-wrap {
+  position: absolute;
+  left: 121px;
+  top: 230px;
+  width: 405px;
+  max-width: 415px;
   margin: 0;
   padding: 0;
 }
+.s5-heading {
+  font-size: 21.5px;
+  line-height: 1.42;
+  font-weight: 500;
+  color: #232323;
+  margin: 0;
+  letter-spacing: -0.012em;
+  text-align: left;
+  outline: none;
+}
+.s5-heading:focus-visible {
+  box-shadow: 0 0 0 2px #236f7a;
+  border-radius: 4px;
+}
+.s5-bold {
+  font-weight: 800;
+  font-size: 23px;
+  color: #111827;
+}
 
-.s5-content-wrap {
+/* ---------- 3. Nurse Anna holding Pink Bottle (Right) ---------- */
+.s5-nurse {
+  position: absolute;
+  left: 574px;
+  top: 164px;
+  width: 194px;
+  height: 385px;
+  pointer-events: none;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  max-width: 760px;
-  width: 100%;
-  margin: 0 auto;
 }
-
-/* Left Illustration Group: Pink Bottle & Nurse Anna with Shield */
-.s5-graphics {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.s5-bottle {
-  position: relative;
-  width: 105px;
-  height: 195px;
-  flex-shrink: 0;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.06));
-}
-
-.s5-anna {
-  position: relative;
-  width: 130px;
-  height: 280px;
-  flex-shrink: 0;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
-}
-
-.s5-img {
+.s5-nurse-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* Right Content: Main Statement Typography */
-.s5-text-wrap {
-  flex: 1 1 0%;
-  max-width: 480px;
+/* ---------- 4. Centered Navigation Buttons (Back & Next) ---------- */
+.s5-nav-back {
+  position: absolute;
+  left: 352px;
+  top: 544px;
+  z-index: 10;
 }
-
-.s5-heading {
-  font-size: clamp(1.15rem, 2.2vw, 1.42rem);
-  font-weight: 600;
-  line-height: 1.4;
-  color: #1e293b;
-  margin: 0;
-  letter-spacing: -0.015em;
-  outline: none;
+.s5-nav-next {
+  position: absolute;
+  left: 483px;
+  top: 544px;
+  z-index: 10;
 }
-
-.s5-heading:focus-visible {
-  box-shadow: 0 0 0 2px #236f7a;
-  border-radius: 6px;
-}
-
-.s5-bold {
-  font-weight: 800;
-  color: #0f172a;
-}
-
-/* Bottom Centered Navigation */
-.s5-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  margin: 0;
-  padding: 0;
-  flex-shrink: 0;
-}
-
 .s5-btn {
-  padding: 0.45rem 2.25rem;
-  min-height: 44px;
-  min-width: 105px;
+  height: 35px;
+  padding: 0 18px;
   border-radius: 9999px;
-  font-size: 0.95rem;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 500;
-  color: #143833;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   outline: none;
   cursor: pointer;
-  border: none;
-  transition: all 0.15s ease;
+  border: 1.5px solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s ease;
 }
-
-.s5-btn:active {
+.s5-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
-
 .s5-btn:focus-visible {
-  box-shadow: 0 0 0 4px #236f7a;
+  box-shadow: 0 0 0 3px #236f7a;
 }
-
 .s5-btn--back {
-  background-color: #adc9c4;
-  border: 1px solid #96bcb5;
-}
-
-.s5-btn--back:hover {
-  background-color: #9cbdb8;
-}
-
-.s5-btn--next {
-  background-color: #fae88a;
+  min-width: 64px;
+  background-color: #bddfd8;
+  border-color: #8ab8b0;
   color: #143833;
-  border: 1px solid #d8c85c;
+}
+.s5-btn--back:hover:not(:disabled) {
+  background-color: #a8d5cc;
+}
+.s5-btn--next {
+  min-width: 62px;
+  background-color: #fdee8e;
+  border-color: #d4c65e;
+  color: #232323;
+  cursor: pointer;
+}
+.s5-btn--next:hover:not(:disabled) {
+  background-color: #f5e478;
 }
 
-.s5-btn--next:hover {
-  background-color: #f6df6e;
+/* ---------- 5. CC & Play/Pause Controls ---------- */
+.s5-audio {
+  position: absolute;
+  left: 659px;
+  top: 536px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-
-/* Tablet & Smaller Screens Scaling */
-@media (max-height: 600px), (max-width: 768px) {
-  .s5-root {
-    padding: 0.85rem 1rem 3.5rem 1rem !important;
-  }
-  .s5-content-wrap {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 0.55rem !important;
-  }
-  .s5-graphics {
-    justify-content: center !important;
-    gap: 0.65rem !important;
-  }
-  .s5-bottle {
-    width: 58px !important;
-    height: 110px !important;
-    margin-bottom: 4px !important;
-  }
-  .s5-anna {
-    width: 78px !important;
-    height: 155px !important;
-  }
-  .s5-text-wrap {
-    max-width: 320px !important;
-    text-align: center !important;
-  }
-  .s5-heading {
-    font-size: 0.95rem !important;
-    line-height: 1.35 !important;
-  }
-  .s5-nav {
-    margin-top: 0.35rem !important;
-    gap: 1.25rem !important;
-  }
-  .s5-btn {
-    padding: 0.35rem 1.6rem !important;
-    min-height: 38px !important;
-    font-size: 0.85rem !important;
-  }
+.s5-audio .audio-cc-btn svg {
+  width: 52px !important;
+  height: 47px !important;
+}
+.s5-audio .audio-play-btn svg {
+  width: 70px !important;
+  height: 47px !important;
 }
 `;
 
@@ -217,6 +211,10 @@ export interface Slide5PrevalenceScreenProps {
   onNext: () => void;
   onBack: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
 }
 
 export function Slide5PrevalenceScreen({
@@ -225,90 +223,119 @@ export function Slide5PrevalenceScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  stepId,
+  locale,
+  transcriptText,
 }: Slide5PrevalenceScreenProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      headingRef.current?.focus();
-    }, 50);
+    const timer = setTimeout(() => headingRef.current?.focus(), 50);
     return () => clearTimeout(timer);
   }, []);
 
-  const medicineToken = medicationName && medicationName.trim()
+  // Responsive stage scaling that fits container with zero distortion across all viewports
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w && h) {
+        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+      }
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const resolvedName = medicationName && medicationName.trim()
     ? medicationName
-    : (isSpanish ? "[nombre]" : "[name]");
+    : (isSpanish ? "la penicilina" : "[name]");
+
+  const titleText = isSpanish
+    ? `La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con alergia a ${resolvedName}, 95 pueden tomar ${resolvedName} sin tener una reacción.`
+    : `Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with a ${resolvedName} allergy, 95 can take ${resolvedName} without having a reaction.`;
 
   return (
-    <div id="slide-content" className="s5-root">
+    <div id="slide-content" className="s5-root" ref={rootRef}>
       <style>{SLIDE5_CSS}</style>
 
-      {/* Middle Content: Graphics (Bottle + Anna with Shield) + Statement Text */}
-      <div className="s5-middle">
-        <div className="s5-content-wrap">
-          {/* Graphics: Pink Amoxicillin Bottle & Nurse Anna holding 95% shield */}
-          <div className="s5-graphics">
-            <div className="s5-bottle">
-              <Image
-                src="/images/amoxicillin-bottle.png"
-                alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
-                fill
-                unoptimized
-                priority
-                className="s5-img"
-              />
-            </div>
-            <div className="s5-anna">
-              <Image
-                src="/images/nurse-anna-95-shield.png"
-                alt={
-                  isSpanish
-                    ? "Enfermera Anna sosteniendo escudo: El 95% de los niños pueden tomarlo de forma segura"
-                    : "Nurse Anna holding shield: 95% of kids can take it safely"
-                }
-                fill
-                unoptimized
-                priority
-                className="s5-img"
-              />
-            </div>
-          </div>
-
-          {/* Right: Main Statement Typography */}
-          <div className="s5-text-wrap">
-            <h1 ref={headingRef} tabIndex={-1} className="s5-heading">
-              {isSpanish ? (
-                <>
-                  La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada <strong className="s5-bold">100</strong> niños con alergia a {medicineToken}, <strong className="s5-bold">95</strong> pueden tomar {medicineToken} sin tener ninguna reacción.
-                </>
-              ) : (
-                <>
-                  Most people who think they are allergic to penicillin can safely take it. Out of <strong className="s5-bold">100</strong> kids with a {medicineToken} allergy, <strong className="s5-bold">95</strong> can take {medicineToken} without having a reaction.
-                </>
-              )}
-            </h1>
-          </div>
+      <div className="s5-stage" style={{ transform: `scale(${scale})` }}>
+        {/* 1. "Did You Know?" Yellow Badge */}
+        <div className="s5-badge">
+          <h2 tabIndex={-1} className="s5-badge-title">
+            {isSpanish ? "¿Sabías que...?" : "Did You Know?"}
+          </h2>
         </div>
-      </div>
 
-      {/* Bottom Centered Navigation Buttons (Back & Next) */}
-      <div className="s5-nav">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={loading}
-          className="s5-btn s5-btn--back"
-        >
-          {isSpanish ? "Atrás" : "Back"}
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={loading}
-          className="s5-btn s5-btn--next"
-        >
-          {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-        </button>
+        {/* 2. Statement Text on Left */}
+        <div className="s5-text-wrap">
+          <h1 ref={headingRef} tabIndex={-1} className="s5-heading">
+            {isSpanish ? (
+              <>
+                La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada <strong className="s5-bold">100</strong> niños con una alergia a {resolvedName}, <strong className="s5-bold">95</strong> pueden tomar {resolvedName} sin tener una reacción.
+              </>
+            ) : (
+              <>
+                Most people who think they are allergic to penicillin can safely take it. Out of <strong className="s5-bold">100</strong> kids with a {resolvedName} allergy, <strong className="s5-bold">95</strong> can take {resolvedName} without having a reaction.
+              </>
+            )}
+          </h1>
+        </div>
+
+        {/* 3. Nurse Anna holding Pink Medicine Bottle on Right */}
+        <div className="s5-nurse">
+          <img
+            src="/images/nurse-anna-holding-bottle.png"
+            alt={isSpanish ? "La enfermera Anna sosteniendo un frasco de medicina" : "Nurse Anna holding a pink medicine bottle"}
+            className="s5-nurse-img"
+            draggable={false}
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* 4. Centered Navigation Buttons (Back & Next) */}
+        <div className="s5-nav-back">
+          <button
+            type="button"
+            onClick={onBack}
+            disabled={loading}
+            className="s5-btn s5-btn--back"
+          >
+            {isSpanish ? "Atrás" : "Back"}
+          </button>
+        </div>
+        <div className="s5-nav-next">
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={loading}
+            className="s5-btn s5-btn--next"
+          >
+            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
+          </button>
+        </div>
+
+        {/* 5. Caption (CC) & Play/Pause controls directly at right baseline */}
+        <div className="s5-audio">
+          <AudioPlayer
+            audioSrc={audioSrc}
+            stepId={stepId || "slide5_prevalence"}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={transcriptText || titleText}
+            size="large"
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,13 +1,24 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { NurseAnna } from "./NurseAnna";
+import React, { useRef, useEffect, useState } from "react";
+import AudioPlayer from "./AudioPlayer";
 
-const SLIDE2_CSS = `
 /* ==========================================================
-   Slide2MedicineNamingScreen – Scoped Pixel-Perfect Styles
+   Slide2MedicineNamingScreen
+   Pixel-perfect match to Image 2 (iPad mockup 896 x 645):
+   - Yellow banner centered at top
+   - Pink Amoxicillin bottle on left
+   - Checkboxes aligned vertically with bottle top & bottom
+   - Speech bubble with tail pointing to Nurse Anna's head
+   - Nurse Anna standing on right
+   - Back and Next buttons centered at y = 544px
+   - CC & Play/Pause controls at y = 541px directly below Nurse Anna
    ========================================================== */
 
+const STAGE_W = 750;
+const STAGE_H = 515;
+
+const SLIDE2_CSS = `
 .s2-root,
 .s2-root *,
 .s2-root *::before,
@@ -21,381 +32,275 @@ const SLIDE2_CSS = `
   height: 100%;
   flex: 1 1 0%;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f8ec;
-  padding: 1rem 1.5rem 0.75rem 1.5rem;
   overflow: hidden;
-  gap: clamp(0.75rem, 2.5vh, 1.75rem);
+  background-color: #fafdf3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #262626;
 }
 
-/* 1. Top Banner Pill */
-.s2-banner-wrap {
-  display: flex;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 100%;
-  padding: 0;
-  margin: 0;
+.s2-stage {
+  position: relative;
+  width: ${STAGE_W}px;
+  height: ${STAGE_H}px;
+  flex: none;
+  transform-origin: center center;
+  background-color: #fafdf3;
 }
+
+/* ---------- 1. Yellow banner ---------- */
 .s2-banner {
-  display: inline-block;
-  background-color: #fef794;
-  color: #132623;
-  border: 2.5px solid #296a63;
-  padding: 0.55rem 2.85rem;
+  position: absolute;
+  left: 20px;
+  top: 16px;
+  width: 710px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  background-color: #feff9f;
+  border: 1.8px solid #2b7f8f;
   border-radius: 28px;
-  box-shadow: 0 5px 14px -2px rgba(20, 60, 55, 0.22);
+  box-shadow: 0 4px 6px rgba(34, 105, 118, 0.35);
   text-align: center;
-  max-width: 44rem;
 }
 .s2-heading {
-  font-size: 1.25rem;
-  line-height: 1.35;
-  font-weight: 700;
-  letter-spacing: -0.015em;
   margin: 0;
+  font-size: 21.5px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #232323;
+  white-space: nowrap;
   outline: none;
 }
 .s2-heading:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
 }
 
-/* 2. Middle Row */
-.s2-middle {
-  flex-shrink: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1.5rem, 3vw, 2.5rem);
-  padding: 0 0.5rem;
-  margin: 0;
-}
-
-/* Horizontal Row: Bottle on Left, Checkbox List on Right */
-.s2-bottle-options-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1rem, 2vw, 1.8rem);
-  flex-shrink: 0;
-}
-
-/* Bottle */
-.s2-bottle-wrap {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* ---------- 2. Bottle (decreased slightly and vertically centered with options) ---------- */
 .s2-bottle {
-  width: 5.5rem;
-  height: auto;
-  max-height: 190px;
+  position: absolute;
+  left: 28px;
+  top: 180px;
+  width: 107px;
+  height: 172px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
   user-select: none;
-  image-rendering: -webkit-optimize-contrast;
+  -webkit-user-drag: none;
 }
 
-/* Checkbox Options */
+/* ---------- 3. Options (centered vertically between banner and navigation) ---------- */
 .s2-options {
-  flex-shrink: 0;
+  position: absolute;
+  left: 155px;
+  top: 168px;
   display: flex;
   flex-direction: column;
-  gap: 1.05rem;
+  gap: 14px;
 }
 .s2-option {
   display: flex;
   align-items: center;
-  gap: 1.05rem;
-  padding: 0.15rem 0;
-  text-align: left;
-  cursor: pointer;
+  gap: 14px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
   background: transparent;
   border: none;
   outline: none;
-  border-radius: 6px;
-  transition: all 0.15s ease;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
 }
-.s2-option:focus-visible {
-  box-shadow: 0 0 0 2px #236f7a;
+.s2-option:focus-visible .s2-checkbox {
+  box-shadow: 0 0 0 3px #236f7a;
 }
-
 .s2-checkbox {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
-  border-radius: 3px;
-  border: 2px solid #386e68;
-  background-color: #cbd8d4;
+  background-color: #d9d9d9;
+  border: 2px solid #55939e;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 .s2-option:hover .s2-checkbox:not(.s2-checkbox--checked) {
-  border-color: #20524d;
+  border-color: #3b7c89;
+  background-color: #e2e2e2;
 }
 .s2-checkbox--checked {
-  background-color: #226a63;
-  border-color: #174f49;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: #2b7f8f;
+  border-color: #1f6672;
 }
 .s2-check-icon {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 18px;
+  height: 18px;
   color: #ffffff;
 }
-
 .s2-option-label {
-  font-size: 1.28rem;
-  line-height: 1.2;
+  font-size: 21.5px;
+  line-height: 1.25;
   font-weight: 400;
-  color: #152925;
+  color: #242c30;
+  white-space: nowrap;
   user-select: none;
-  transition: color 0.15s ease;
-}
-.s2-option:hover .s2-option-label {
-  color: #0f221e;
 }
 .s2-option-label--checked {
   font-weight: 600;
-  color: #0d1e1a;
+  color: #141414;
 }
 
-/* Right Section: Speech Bubble + Nurse Anna Combo */
-.s2-combo {
-  position: relative;
-  width: 365px;
-  height: 260px;
-  flex-shrink: 0;
-}
-
+/* ---------- 4. Speech bubble ---------- */
 .s2-bubble {
   position: absolute;
-  top: 5px;
-  left: 0;
+  left: 385px;
+  top: 105px;
   width: 270px;
-  z-index: 2;
-  filter: drop-shadow(2px 3px 5px rgba(20, 60, 55, 0.18));
+  height: 178px;
+  pointer-events: none;
+  z-index: 1;
 }
 .s2-bubble-svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
-  display: block;
+  height: 100%;
+  overflow: visible;
 }
 .s2-bubble-text-wrap {
   position: absolute;
-  top: 5%;
-  left: 5%;
-  width: 82%;
-  height: 84%;
+  top: 45%;
+  left: 48%;
+  transform: translate(-50%, -50%);
+  width: 78%;
+  max-width: 215px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   text-align: center;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
   pointer-events: none;
-  padding: 0 10px;
 }
 .s2-bubble-text {
-  font-size: 14.2px;
-  font-weight: 500;
-  line-height: 1.4;
-  color: #152925;
   margin: 0;
+  padding: 0;
+  width: 100%;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: #1a2e2b;
+  text-align: center;
 }
 
+/* ---------- 5. Nurse Anna ---------- */
 .s2-nurse {
   position: absolute;
-  bottom: 0;
-  right: 6px;
-  width: 110px;
-  height: auto;
-  max-height: 245px;
-  z-index: 1;
+  left: 600px;
+  top: 240px;
+  width: 112px;
+  height: 210px;
+  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .s2-nurse-img {
   width: 100%;
-  height: auto;
-  max-height: 245px;
+  height: 100%;
   object-fit: contain;
   display: block;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* 3. Navigation Bar */
-.s2-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  padding: 0;
-  flex-shrink: 0;
-  margin: 0;
+/* ---------- 6. Centered Navigation Buttons (Back & Next) ---------- */
+.s2-nav-back {
+  position: absolute;
+  left: 285px;
+  top: 462px;
+  z-index: 10;
+}
+.s2-nav-next {
+  position: absolute;
+  left: 415px;
+  top: 462px;
+  z-index: 10;
 }
 .s2-btn {
-  padding: 0.45rem 2rem;
+  height: 35px;
+  padding: 0 18px;
   border-radius: 9999px;
-  font-size: 0.95rem;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 500;
-  color: #143833;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   outline: none;
   cursor: pointer;
-  border: none;
+  border: 1.5px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
 }
-.s2-btn:active {
+.s2-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 .s2-btn:focus-visible {
-  box-shadow: 0 0 0 4px #236f7a;
+  box-shadow: 0 0 0 3px #236f7a;
 }
-
 .s2-btn--back {
-  background-color: #adc9c4;
-  border: 1px solid #96bcb5;
+  min-width: 64px;
+  background-color: #bddfd8;
+  border-color: #8ab8b0;
+  color: #143833;
 }
-.s2-btn--back:hover {
-  background-color: #9cbdb8;
+.s2-btn--back:hover:not(:disabled) {
+  background-color: #a8d5cc;
 }
-
 .s2-btn--next {
-  background-color: rgba(250, 232, 138, 0.75);
-  color: rgba(20, 56, 51, 0.7);
-  border: 1px solid rgba(216, 200, 92, 0.7);
+  min-width: 62px;
+  background-color: #fdee8e;
+  border-color: #d4c65e;
+  color: #232323;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 .s2-btn--next-enabled {
-  background-color: #fae88a;
-  color: #143833;
-  border: 1px solid #d8c85c;
+  opacity: 1;
   cursor: pointer;
 }
 .s2-btn--next-enabled:hover {
-  background-color: #f6df6e;
+  background-color: #f5e478;
 }
 
-/* Tablet & Smaller Screens Scaling */
-@media (max-height: 600px), (max-width: 768px) {
-  .s2-middle {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    width: 100% !important;
-  }
-  .s2-bottle-options-row {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.75rem !important;
-    width: 100% !important;
-    max-width: 320px !important;
-    margin: 0 auto !important;
-  }
-  .s2-bottle-wrap {
-    flex-shrink: 0 !important;
-  }
-  .s2-bottle {
-    width: 3.25rem !important;
-    max-height: 110px !important;
-  }
-  .s2-options {
-    flex: 1 1 auto !important;
-    max-width: 240px !important;
-    gap: 0.35rem !important;
-  }
-  .s2-option {
-    gap: 0.5rem !important;
-    padding: 0.05rem 0 !important;
-  }
-  .s2-checkbox {
-    width: 1.15rem !important;
-    height: 1.15rem !important;
-  }
-  .s2-check-icon {
-    width: 0.85rem !important;
-    height: 0.85rem !important;
-  }
-  .s2-option-label {
-    font-size: 0.88rem !important;
-    line-height: 1.2 !important;
-  }
-  .s2-combo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 320px !important;
-    height: auto !important;
-    margin: 0.15rem auto !important;
-    position: relative !important;
-    flex-shrink: 0 !important;
-  }
-  .s2-bubble {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    flex: 1 1 205px !important;
-    max-width: 225px !important;
-    min-width: 160px !important;
-    width: auto !important;
-    z-index: 1 !important;
-  }
-  .s2-bubble-text-wrap {
-    top: 10% !important;
-    left: 6% !important;
-    width: 76% !important;
-    height: 76% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-  }
-  .s2-bubble-text {
-    font-size: 9.8px !important;
-    line-height: 1.25 !important;
-    display: block !important;
-  }
-  .s2-bubble-text span {
-    display: inline !important;
-  }
-  .s2-nurse {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    flex: 0 0 72px !important;
-    width: 72px !important;
-    margin-left: -6px !important;
-    margin-top: 0 !important;
-    z-index: 2 !important;
-  }
-  .s2-nurse-img {
-    max-height: 135px !important;
-    width: 100% !important;
-    object-fit: contain !important;
-  }
-  .s2-banner {
-    padding: 0.25rem 1rem !important;
-  }
-  .s2-heading {
-    font-size: 0.82rem !important;
-  }
-  .s2-nav {
-    margin-top: 0.35rem !important;
-    gap: 1.25rem !important;
-    z-index: 10 !important;
-  }
-  .s2-btn {
-    padding: 0.32rem 1.4rem !important;
-    font-size: 0.82rem !important;
-    min-height: 38px !important;
-  }
+/* ---------- 7. CC & Play/Pause Controls directly below Nurse Anna ---------- */
+.s2-audio {
+  position: absolute;
+  left: 600px;
+  top: 456px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.s2-audio .audio-cc-btn svg {
+  width: 52px !important;
+  height: 47px !important;
+}
+.s2-audio .audio-play-btn svg {
+  width: 70px !important;
+  height: 47px !important;
 }
 `;
 
@@ -406,6 +311,10 @@ export interface Slide2MedicineNamingScreenProps {
   onNext: () => void;
   onBack: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
 }
 
 export const MEDICINE_OPTIONS_DISPLAY = [
@@ -416,6 +325,56 @@ export const MEDICINE_OPTIONS_DISPLAY = [
   { value: "Augmentin", labelEn: "Augmentin", labelEs: "Augmentin" },
 ];
 
+/* Hand-drawn style bubble body + sharp tail matching Image 2 exactly */
+const BUBBLE_PATH =
+  "M 397.9,283.4 " +
+  "C 395.8,284.6 391.2,287.9 385.1,290.7 " +
+  "C 379.0,293.4 369.2,297.5 361.3,299.9 " +
+  "C 353.4,302.3 345.2,303.8 337.6,305.3 " +
+  "C 330.0,306.8 322.6,307.8 315.6,309.0 " +
+  "C 308.6,310.2 302.5,312.1 295.5,312.7 " +
+  "C 288.5,313.3 280.6,312.4 273.6,312.7 " +
+  "C 266.6,313.0 260.2,314.5 253.5,314.5 " +
+  "C 246.8,314.5 240.1,313.3 233.4,312.7 " +
+  "C 226.7,312.1 220.6,311.4 213.3,310.8 " +
+  "C 206.0,310.2 197.2,310.2 189.6,309.0 " +
+  "C 182.0,307.8 175.5,305.3 167.6,303.5 " +
+  "C 159.7,301.7 150.3,300.8 142.1,298.0 " +
+  "C 133.9,295.3 126.8,291.3 118.3,287.0 " +
+  "C 109.8,282.7 99.7,277.9 90.9,272.4 " +
+  "C 82.1,266.9 73.8,261.1 65.3,254.1 " +
+  "C 56.8,247.1 46.8,239.2 39.8,230.3 " +
+  "C 32.8,221.5 27.0,211.4 23.3,201.0 " +
+  "C 19.6,190.6 18.1,179.0 17.8,168.0 " +
+  "C 17.5,157.0 19.1,146.0 21.5,135.0 " +
+  "C 23.9,124.0 27.2,111.9 32.4,102.1 " +
+  "C 37.6,92.3 44.6,84.0 52.5,76.4 " +
+  "C 60.4,68.8 70.5,62.1 79.9,56.3 " +
+  "C 89.4,50.5 99.8,45.6 109.2,41.6 " +
+  "C 118.7,37.6 127.5,35.2 136.6,32.5 " +
+  "C 145.7,29.8 155.5,27.0 164.0,25.2 " +
+  "C 172.5,23.4 179.8,22.4 187.7,21.5 " +
+  "C 195.6,20.6 203.9,20.3 211.5,19.7 " +
+  "C 219.1,19.1 226.4,18.1 233.4,17.8 " +
+  "C 240.4,17.5 245.9,17.5 253.5,17.8 " +
+  "C 261.1,18.1 271.2,19.1 279.1,19.7 " +
+  "C 287.0,20.3 293.7,20.6 301.0,21.5 " +
+  "C 308.3,22.4 315.6,24.0 322.9,25.2 " +
+  "C 330.2,26.4 337.0,27.0 344.9,28.8 " +
+  "C 352.8,30.6 362.0,33.4 370.5,36.1 " +
+  "C 379.0,38.9 387.2,41.6 396.0,45.3 " +
+  "C 404.8,49.0 414.9,52.9 423.4,58.1 " +
+  "C 431.9,63.3 438.7,69.7 447.2,76.4 " +
+  "C 455.7,83.1 466.7,90.2 474.6,98.4 " +
+  "C 482.5,106.7 490.4,115.8 494.7,125.9 " +
+  "C 499.0,136.0 501.1,147.8 500.2,158.8 " +
+  "C 499.3,169.8 493.8,181.4 489.2,191.8 " +
+  "C 484.6,202.2 480.4,211.0 472.8,221.1 " +
+  "C 465.2,231.2 448.4,247.0 443.5,252.2 " +
+  "L 485.6,314.5 " +
+  "L 397.9,283.4 " +
+  "Z";
+
 export function Slide2MedicineNamingScreen({
   isSpanish,
   selected,
@@ -423,24 +382,43 @@ export function Slide2MedicineNamingScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  stepId = "slide2_naming",
+  locale,
+  transcriptText,
 }: Slide2MedicineNamingScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      headingRef.current?.focus();
-    }, 50);
+    const timer = setTimeout(() => headingRef.current?.focus(), 50);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Responsive stage scaling that fits container with zero distortion
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w && h) setScale(Math.min(w / STAGE_W, h / STAGE_H));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
   }, []);
 
   const nextEnabled = !!selected && !loading;
 
   return (
-    <div id="slide-content" className="s2-root">
+    <div id="slide-content" className="s2-root" ref={rootRef}>
       <style>{SLIDE2_CSS}</style>
 
-      {/* 1. Top Yellow Banner Pill */}
-      <div className="s2-banner-wrap">
+      <div className="s2-stage" style={{ transform: `scale(${scale})` }}>
+        {/* 1. Banner */}
         <div className="s2-banner">
           <h1 ref={headingRef} tabIndex={-1} className="s2-heading">
             {isSpanish
@@ -448,159 +426,151 @@ export function Slide2MedicineNamingScreen({
               : "Let's first talk about penicillin. It has lots of names!"}
           </h1>
         </div>
-      </div>
 
-      {/* 2. Middle Content Row (Bottle + Checkboxes in a single horizontal row, plus Speech Bubble & Nurse Anna) */}
-      <div className="s2-middle">
-        {/* Horizontal Row: Bottle on Left, Checkboxes on Right */}
-        <div className="s2-bottle-options-row">
-          {/* Pink Amoxicillin Bottle */}
-          <div className="s2-bottle-wrap">
-            <img
-              src="/images/amoxicillin-bottle.png"
-              alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
-              className="s2-bottle"
-            />
-          </div>
+        {/* 2. Bottle */}
+        <img
+          src="/images/amoxicillin-bottle.png"
+          alt={isSpanish ? "Frasco de amoxicilina rosa" : "Pink amoxicillin suspension bottle"}
+          className="s2-bottle"
+          draggable={false}
+        />
 
-          {/* Checkbox Options List */}
-          <div
-            className="s2-options"
-            role="radiogroup"
-            aria-label={isSpanish ? "Seleccione el nombre que usa para el medicamento" : "Select what you call the medicine"}
+        {/* 3. Options */}
+        <div
+          className="s2-options"
+          role="radiogroup"
+          aria-label={isSpanish ? "Seleccione el nombre que usa para el medicamento" : "Select what you call the medicine"}
+        >
+          {MEDICINE_OPTIONS_DISPLAY.map((opt) => {
+            const isChecked = selected === opt.value;
+            const label = isSpanish ? opt.labelEs : opt.labelEn;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={isChecked}
+                onClick={() => onSelect(opt.value)}
+                className="s2-option"
+              >
+                <div className={`s2-checkbox${isChecked ? " s2-checkbox--checked" : ""}`} aria-hidden="true">
+                  {isChecked && (
+                    <svg className="s2-check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <span className={`s2-option-label${isChecked ? " s2-option-label--checked" : ""}`}>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 4. Speech bubble matching Image 1 exact shape and black shadow */}
+        <div className="s2-bubble">
+          <svg
+            className="s2-bubble-svg"
+            viewBox="0 0 520 340"
+            fill="none"
+            aria-hidden="true"
           >
-            {MEDICINE_OPTIONS_DISPLAY.map((opt) => {
-              const isChecked = selected === opt.value;
-              const label = isSpanish ? opt.labelEs : opt.labelEn;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={isChecked}
-                  onClick={() => onSelect(opt.value)}
-                  className="s2-option"
-                >
-                  <div
-                    className={`s2-checkbox${isChecked ? " s2-checkbox--checked" : ""}`}
-                    aria-hidden="true"
-                  >
-                    {isChecked && (
-                      <svg
-                        className="s2-check-icon"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth="3.5"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className={`s2-option-label${isChecked ? " s2-option-label--checked" : ""}`}>
-                    {label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+            <defs>
+              <pattern id="s2-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
+                <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
+              </pattern>
+            </defs>
 
-        {/* Right Section / Bottom Combo: Speech Bubble + Nurse Anna Combo */}
-        <div className="s2-combo">
-          {/* Custom Vector Speech Bubble with natural round shape and downward pointer tail */}
-          <div className="s2-bubble">
-            <svg viewBox="0 0 430 260" fill="none" className="s2-bubble-svg">
-              {/* Desktop pointer tail */}
-              <path
-                className="hidden md:inline"
-                d="M 213, 8
-                   C 317, 8  404, 56  404, 120
-                   C 404, 146  388, 172  360, 189
-                   C 375, 204  392, 222  409, 239
-                   C 390, 241  356, 233  325, 214
-                   C 292, 228  254, 236  213, 236
-                   C 109, 236  28, 184  28, 120
-                   C 28, 56  109, 8  213, 8
-                   Z"
-                fill="#ffffff"
-                stroke="#27707e"
-                strokeWidth="2.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Mobile pointer tail: naturally points directly at Nurse Anna's head/face */}
-              <path
-                className="inline md:hidden"
-                d="M 195, 12
-                   C 265, 12  338, 48  364, 93
-                   C 382, 98  405, 107  422, 118
-                   C 400, 136  378, 148  359, 158
-                   C 336, 202  265, 230  195, 230
-                   C 98, 230  20, 182  20, 121
-                   C 20, 60  98, 12  195, 12
-                   Z"
-                fill="#ffffff"
-                stroke="#27707e"
-                strokeWidth="2.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            {/* Centered Speech Text inside oval body */}
-            <div className="s2-bubble-text-wrap">
-              <p className="s2-bubble-text">
-                {isSpanish ? (
-                  <>
-                    <span>¡Seleccione cómo lo llama! </span>
-                    <span className="hidden md:inline"><br /></span>
-                    <span>Usaremos el nombre que elija </span>
-                    <span className="hidden md:inline"><br /></span>
-                    <span>durante nuestro tiempo juntos.</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Select what you call it! </span>
-                    <span className="hidden md:inline"><br /></span>
-                    <span>We&apos;ll use the name you choose </span>
-                    <span className="hidden md:inline"><br /></span>
-                    <span>during our time together.</span>
-                  </>
-                )}
-              </p>
-            </div>
-          </div>
-
-          {/* Nurse Anna Illustration standing on bottom-right, head directly under bubble tail */}
-          <div className="s2-nurse">
-            <NurseAnna
-              size="md"
-              imgClassName="s2-nurse-img"
-              isDecorative={true}
-              locale={isSpanish ? "es" : "en"}
+            {/* Black shadow underneath */}
+            <path
+              d={BUBBLE_PATH}
+              transform="translate(4, 6)"
+              fill="#000000"
+              stroke="#000000"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="miter"
+              strokeMiterlimit="4"
             />
+
+            {/* White bubble body */}
+            <path d={BUBBLE_PATH} fill="#ffffff" />
+
+            {/* Subtle paper dot grid texture */}
+            <path d={BUBBLE_PATH} fill="url(#s2-bubble-dots)" />
+
+            {/* Soft teal outline with increased border width */}
+            <path
+              d={BUBBLE_PATH}
+              fill="none"
+              stroke="#8ebfbb"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="miter"
+              strokeMiterlimit="4"
+            />
+          </svg>
+
+          <div className="s2-bubble-text-wrap">
+            <p className="s2-bubble-text">
+              {isSpanish ? (
+                <span>
+                  ¡Seleccione cómo lo llama!
+                  <br />
+                  Usaremos el nombre que elija
+                  <br />
+                  durante nuestro tiempo juntos.
+                </span>
+              ) : (
+                <span>
+                  Select what you call it! We&apos;ll
+                  <br />
+                  use the name you choose
+                  <br />
+                  during our time together.
+                </span>
+              )}
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}
-      <div className="s2-nav">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={loading}
-          className="s2-btn s2-btn--back"
-        >
-          {isSpanish ? "Atrás" : "Back"}
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!selected || loading}
-          className={`s2-btn s2-btn--next${nextEnabled ? " s2-btn--next-enabled" : ""}`}
-        >
-          {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-        </button>
+        {/* 5. Nurse Anna */}
+        <div className="s2-nurse">
+          <img
+            src="/images/nurse-anna.png"
+            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
+            className="s2-nurse-img"
+            draggable={false}
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* 6. Centered Navigation Buttons (Back & Next) */}
+        <div className="s2-nav-back">
+          <button type="button" onClick={onBack} disabled={loading} className="s2-btn s2-btn--back">
+            {isSpanish ? "Atrás" : "Back"}
+          </button>
+        </div>
+        <div className="s2-nav-next">
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!selected || loading}
+            className={`s2-btn s2-btn--next${nextEnabled ? " s2-btn--next-enabled" : ""}`}
+          >
+            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
+          </button>
+        </div>
+
+        {/* 7. Caption (CC) & Play/Pause controls directly below Nurse Anna */}
+        <div className="s2-audio">
+          <AudioPlayer
+            audioSrc={audioSrc}
+            stepId={stepId}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={transcriptText}
+            size="large"
+          />
+        </div>
       </div>
     </div>
   );

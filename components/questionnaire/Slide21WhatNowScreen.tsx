@@ -26,7 +26,7 @@ const SLIDE21_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
+  padding: 0.35rem 0.75rem 0.35rem 0.75rem;
   overflow: hidden;
   gap: clamp(0.6rem, 2vh, 1.25rem);
 }
@@ -35,7 +35,7 @@ const SLIDE21_CSS = `
 .s21-content {
   flex-shrink: 0;
   width: 100%;
-  max-width: 720px;
+  max-width: 780px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;

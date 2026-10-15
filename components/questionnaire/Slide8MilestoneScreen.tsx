@@ -26,7 +26,7 @@ const SLIDE8_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
+  padding: 0.35rem 0.75rem 0.35rem 0.75rem;
   overflow: hidden;
   gap: clamp(0.6rem, 2vh, 1.25rem);
 }
@@ -47,31 +47,35 @@ const SLIDE8_CSS = `
   align-items: flex-end;
   justify-content: center;
   position: relative;
-  width: 520px;
-  height: 250px;
+  width: 550px;
+  height: 270px;
   max-width: 95%;
 }
 
 .s8-bubble {
   position: relative;
-  width: 390px;
+  width: 385px;
+  height: 258px;
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 5px;
-  filter: drop-shadow(2px 4px 10px rgba(20, 60, 55, 0.18));
   z-index: 2;
+  pointer-events: none;
 }
 .s8-bubble-svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  overflow: visible;
   display: block;
 }
 .s8-bubble-text-wrap {
   position: absolute;
-  top: 5%;
-  left: 5%;
-  width: 82%;
-  height: 84%;
+  top: 10%;
+  left: 6%;
+  width: 78%;
+  height: 75%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -81,14 +85,15 @@ const SLIDE8_CSS = `
   padding: 0 16px;
 }
 .s8-bubble-text {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.38;
-  color: #142724;
+  font-size: 15.5px;
+  font-weight: 500;
+  line-height: 1.42;
+  color: #1a2e2b;
   margin: 0;
   display: flex;
   flex-direction: column;
   outline: none;
+  text-align: center;
 }
 .s8-bubble-text:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
@@ -102,7 +107,7 @@ const SLIDE8_CSS = `
   object-fit: contain;
   align-self: flex-end;
   margin-left: -40px;
-  z-index: 1;
+  z-index: 3;
   margin-bottom: 5px;
   flex-shrink: 0;
 }
@@ -184,8 +189,9 @@ const SLIDE8_CSS = `
     top: auto !important;
     left: auto !important;
     flex: 1 1 205px !important;
-    max-width: 225px !important;
+    max-width: 235px !important;
     min-width: 160px !important;
+    height: 158px !important;
     width: auto !important;
     margin-top: 0 !important;
     z-index: 1 !important;
@@ -193,14 +199,14 @@ const SLIDE8_CSS = `
   .s8-bubble-text-wrap {
     top: 10% !important;
     left: 6% !important;
-    width: 76% !important;
-    height: 76% !important;
+    width: 78% !important;
+    height: 75% !important;
     padding: 2px 8px !important;
     box-sizing: border-box !important;
   }
   .s8-bubble-text {
     font-size: 10.5px !important;
-    line-height: 1.25 !important;
+    line-height: 1.3 !important;
     display: block !important;
   }
   .s8-bubble-text span {
@@ -241,6 +247,55 @@ export interface Slide8MilestoneScreenProps {
   loading?: boolean;
 }
 
+const BUBBLE_PATH =
+  "M 397.9,283.4 " +
+  "C 395.8,284.6 391.2,287.9 385.1,290.7 " +
+  "C 379.0,293.4 369.2,297.5 361.3,299.9 " +
+  "C 353.4,302.3 345.2,303.8 337.6,305.3 " +
+  "C 330.0,306.8 322.6,307.8 315.6,309.0 " +
+  "C 308.6,310.2 302.5,312.1 295.5,312.7 " +
+  "C 288.5,313.3 280.6,312.4 273.6,312.7 " +
+  "C 266.6,313.0 260.2,314.5 253.5,314.5 " +
+  "C 246.8,314.5 240.1,313.3 233.4,312.7 " +
+  "C 226.7,312.1 220.6,311.4 213.3,310.8 " +
+  "C 206.0,310.2 197.2,310.2 189.6,309.0 " +
+  "C 182.0,307.8 175.5,305.3 167.6,303.5 " +
+  "C 159.7,301.7 150.3,300.8 142.1,298.0 " +
+  "C 133.9,295.3 126.8,291.3 118.3,287.0 " +
+  "C 109.8,282.7 99.7,277.9 90.9,272.4 " +
+  "C 82.1,266.9 73.8,261.1 65.3,254.1 " +
+  "C 56.8,247.1 46.8,239.2 39.8,230.3 " +
+  "C 32.8,221.5 27.0,211.4 23.3,201.0 " +
+  "C 19.6,190.6 18.1,179.0 17.8,168.0 " +
+  "C 17.5,157.0 19.1,146.0 21.5,135.0 " +
+  "C 23.9,124.0 27.2,111.9 32.4,102.1 " +
+  "C 37.6,92.3 44.6,84.0 52.5,76.4 " +
+  "C 60.4,68.8 70.5,62.1 79.9,56.3 " +
+  "C 89.4,50.5 99.8,45.6 109.2,41.6 " +
+  "C 118.7,37.6 127.5,35.2 136.6,32.5 " +
+  "C 145.7,29.8 155.5,27.0 164.0,25.2 " +
+  "C 172.5,23.4 179.8,22.4 187.7,21.5 " +
+  "C 195.6,20.6 203.9,20.3 211.5,19.7 " +
+  "C 219.1,19.1 226.4,18.1 233.4,17.8 " +
+  "C 240.4,17.5 245.9,17.5 253.5,17.8 " +
+  "C 261.1,18.1 271.2,19.1 279.1,19.7 " +
+  "C 287.0,20.3 293.7,20.6 301.0,21.5 " +
+  "C 308.3,22.4 315.6,24.0 322.9,25.2 " +
+  "C 330.2,26.4 337.0,27.0 344.9,28.8 " +
+  "C 352.8,30.6 362.0,33.4 370.5,36.1 " +
+  "C 379.0,38.9 387.2,41.6 396.0,45.3 " +
+  "C 404.8,49.0 414.9,52.9 423.4,58.1 " +
+  "C 431.9,63.3 438.7,69.7 447.2,76.4 " +
+  "C 455.7,83.1 466.7,90.2 474.6,98.4 " +
+  "C 482.5,106.7 490.4,115.8 494.7,125.9 " +
+  "C 499.0,136.0 501.1,147.8 500.2,158.8 " +
+  "C 499.3,169.8 493.8,181.4 489.2,191.8 " +
+  "C 484.6,202.2 480.4,211.0 472.8,221.1 " +
+  "C 465.2,231.2 448.4,247.0 443.5,252.2 " +
+  "L 485.6,314.5 " +
+  "L 397.9,283.4 " +
+  "Z";
+
 export function Slide8MilestoneScreen({
   isSpanish,
   onNext,
@@ -263,45 +318,50 @@ export function Slide8MilestoneScreen({
       {/* Middle Content: Large Speech Bubble + Nurse Anna Combo */}
       <div className="s8-middle">
         <div className="s8-combo">
-          {/* Custom Large Vector Speech Bubble with natural round shape and downward pointer tail */}
+          {/* Hand-drawn Speech Bubble matching Slide 2 exact design */}
           <div className="s8-bubble">
-            <svg viewBox="0 0 430 260" fill="none" className="s8-bubble-svg">
-              {/* Desktop pointer tail */}
+            <svg
+              className="s8-bubble-svg"
+              viewBox="0 0 520 340"
+              fill="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <pattern id="s8-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
+                  <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
+                </pattern>
+              </defs>
+
+              {/* Black shadow underneath */}
               <path
-                className="hidden md:inline"
-                d="M 213, 8
-                   C 317, 8  404, 56  404, 120
-                   C 404, 146  388, 172  360, 189
-                   C 375, 204  392, 222  409, 239
-                   C 390, 241  356, 233  325, 214
-                   C 292, 228  254, 236  213, 236
-                   C 109, 236  28, 184  28, 120
-                   C 28, 56  109, 8  213, 8
-                   Z"
-                fill="#ffffff"
-                stroke="#27707e"
-                strokeWidth="2.8"
+                d={BUBBLE_PATH}
+                transform="translate(4, 6)"
+                fill="#000000"
+                stroke="#000000"
+                strokeWidth="8"
                 strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinejoin="miter"
+                strokeMiterlimit="4"
               />
-              {/* Mobile pointer tail: naturally points directly at Nurse Anna's head/face */}
+
+              {/* White bubble body */}
+              <path d={BUBBLE_PATH} fill="#ffffff" />
+
+              {/* Subtle paper dot grid texture */}
+              <path d={BUBBLE_PATH} fill="url(#s8-bubble-dots)" />
+
+              {/* Soft teal outline with increased border width */}
               <path
-                className="inline md:hidden"
-                d="M 195, 12
-                   C 265, 12  338, 48  364, 93
-                   C 382, 98  405, 107  422, 118
-                   C 400, 136  378, 148  359, 158
-                   C 336, 202  265, 230  195, 230
-                   C 98, 230  20, 182  20, 121
-                   C 20, 60  98, 12  195, 12
-                   Z"
-                fill="#ffffff"
-                stroke="#27707e"
-                strokeWidth="2.8"
+                d={BUBBLE_PATH}
+                fill="none"
+                stroke="#8ebfbb"
+                strokeWidth="8"
                 strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinejoin="miter"
+                strokeMiterlimit="4"
               />
             </svg>
+
             {/* Centered Speech Text inside oval body */}
             <div className="s8-bubble-text-wrap">
               <h1 ref={headingRef} tabIndex={-1} className="s8-bubble-text">

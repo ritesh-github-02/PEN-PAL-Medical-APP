@@ -617,7 +617,7 @@ export default function PenpalIntervention() {
 
   return (
     <main
-      className="intervention-main-shell min-h-dvh w-full max-w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4.5 relative font-sans bg-[#f4f8ec] overflow-hidden md:overflow-y-auto select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
+      className="intervention-main-shell min-h-dvh w-full max-w-full flex flex-col items-center justify-center p-1.5 sm:p-2 md:p-2.5 relative font-sans bg-[#f4f8ec] overflow-hidden md:overflow-y-auto select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -638,7 +638,7 @@ export default function PenpalIntervention() {
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
       <div 
-        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 max-w-[420px] md:max-w-[min(58rem,calc(100vw-2rem),calc((100dvh-5.5rem)*(1248/661)))] print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
+        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 max-w-[420px] md:max-w-[min(64rem,calc(100vw-1.5rem),calc((100dvh-3.5rem)*(1000/708)))] print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
       >
         {/* Header Bar matching old slide: Logo, Step Progress, and Language Switcher */}
         <header className="w-full shrink-0 flex items-center justify-between px-2.5 sm:px-4 py-1 sm:py-1.5 mb-1.5 sm:mb-2 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs no-print">
@@ -756,6 +756,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext(answers["medicationName"] || answers["screen2_naming"])}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "slide3_efficacy" ? (
                     <Slide3EfficacyScreen
@@ -764,6 +773,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext()}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "slide4_barrier" ? (
                     <Slide4AllergyBarrierScreen
@@ -772,6 +790,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext()}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "slide5_prevalence" || currentStep.id === "screen2_statistics" ? (
                     <Slide5PrevalenceScreen
@@ -780,6 +807,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext()}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "slide6_myths" || currentStep.id === "screen3_5_knowledge_test" || currentStep.id === "screen3_6_all_correct" ? (
                     <Slide6MythTruthScreen
@@ -1068,7 +1104,7 @@ export default function PenpalIntervention() {
               </div>
 
               {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
-              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary") && (
+              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.type !== "statistics" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && currentStep.id !== "slide4_barrier" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics") && (
                 <div className="absolute bottom-2.5 right-3.5 sm:bottom-4 sm:right-6 md:bottom-5 md:right-7 z-30">
                   <AudioPlayer
                     audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
@@ -2861,7 +2897,7 @@ function SurveySingleChoice({
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   const isSpanish = navProps.locale === "es";
   return (
-    <div id="slide-content" className="w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-4 sm:p-8 md:p-10 overflow-y-auto">
+    <div id="slide-content" className="w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-3 sm:p-4.5 md:p-5 overflow-y-auto">
       <div className="flex flex-row items-center justify-between gap-3 sm:gap-6">
         <div className="space-y-4 flex-1 min-w-0 max-w-2xl pb-2 text-left min-h-[10rem]">
           <h2 
