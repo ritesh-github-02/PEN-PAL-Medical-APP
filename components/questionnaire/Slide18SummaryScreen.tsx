@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { Printer, Download } from "lucide-react";
+import React, { useRef, useEffect, useState } from "react";
+import { Printer, Download, Loader2 } from "lucide-react";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
+import { toPng } from "html-to-image";
+import { submitAnswer, completeQuestionnaire } from "./actions";
 
 const SLIDE18_CSS = `
 /* ==========================================================
@@ -155,7 +157,7 @@ const SLIDE18_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.6rem;
+  gap: 1.25rem;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -163,9 +165,8 @@ const SLIDE18_CSS = `
 }
 
 .s18-btn {
-  padding: 0.38rem 1.6rem;
+  padding: 0.38rem 1.35rem;
   min-height: 38px;
-  min-width: 104px;
   border-radius: 9999px;
   font-size: 0.92rem;
   font-weight: 600;
@@ -180,6 +181,7 @@ const SLIDE18_CSS = `
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
+  white-space: nowrap;
 }
 
 .s18-btn-icon {
@@ -265,12 +267,14 @@ const SLIDE18_CSS = `
   }
   .s18-nav {
     margin-top: 0.35rem;
+    gap: 0.6rem !important;
+    flex-wrap: wrap !important;
   }
   .s18-btn {
     min-height: 34px;
-    padding: 0.3rem 1.3rem;
-    font-size: 0.86rem;
-    gap: 0.4rem;
+    padding: 0.3rem 0.95rem;
+    font-size: 0.82rem;
+    gap: 0.35rem;
   }
   .s18-btn-icon {
     width: 0.95rem;
@@ -530,6 +534,9 @@ export function Slide18SummaryScreen({
   onNext,
 }: Slide18SummaryScreenProps) {
   const summaryTitleRef = useRef<HTMLHeadingElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [isSavingPicture, setIsSavingPicture] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -675,35 +682,79 @@ export function Slide18SummaryScreen({
     },
   ];
 
-  const handleCompleteAndSave = () => {
-    generateAssessmentPDF({
-      locale: isSpanish ? "es" : "en",
-      answers,
-      participantId: participantId || activeToken,
-      symptoms: symptomsFormatted,
-      age: ageFormatted,
-      onset: onsetFormatted,
-      medicalCare: answers?.screen6_4_resolution || "None",
-      resolution: resolutionFormatted,
-      repeatUse: repeatUseFormatted,
-      summarySections: tableRows.map((r, i) => ({
-        id: `row-${i}`,
-        label: r.label,
-        value: r.value,
-      })),
-      steps: [
-        isSpanish
-          ? "Hable con el médico de su hijo sobre la alergia en su próxima visita."
-          : "Talk to your child's doctor about the allergy at their next visit.",
-        isSpanish
-          ? "Comparta fotos de la reacción de su hijo con el médico."
-          : "Share pictures of your child's reaction with the doctor.",
-        isSpanish
-          ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
-          : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}.`,
-      ],
-    });
+  const handleSaveAsPicture = async () => {
+    if (isSavingPicture) return;
+    setIsSavingPicture(true);
 
+    try {
+      const element = cardRef.current;
+      if (!element) return;
+
+      const dataUrl = await toPng(element, {
+        quality: 0.98,
+        pixelRatio: 2,
+        backgroundColor: "#f4f8ec",
+        filter: (node) => {
+          if (node instanceof HTMLElement && node.classList.contains("no-print")) {
+            return false;
+          }
+          return true;
+        },
+      });
+
+      const filename = isSpanish
+        ? `PEN-PAL-Resumen-Acciones-${effectiveMedName || "Alergia"}.png`
+        : `PEN-PAL-Action-Steps-${effectiveMedName || "Allergy"}.png`;
+
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+
+      // Persist completion status in the background
+      submitAnswer("screen7_summary", "completed", 0).catch(() => {});
+      completeQuestionnaire().catch(() => {});
+    } catch (err) {
+      console.error("Failed to capture PNG screenshot:", err);
+      // Fallback: generate PDF if canvas export fails
+      generateAssessmentPDF({
+        locale: isSpanish ? "es" : "en",
+        answers,
+        participantId: participantId || activeToken,
+        symptoms: symptomsFormatted,
+        age: ageFormatted,
+        onset: onsetFormatted,
+        medicalCare: answers?.screen6_4_resolution || "None",
+        resolution: resolutionFormatted,
+        repeatUse: repeatUseFormatted,
+        summarySections: tableRows.map((r, i) => ({
+          id: `row-${i}`,
+          label: r.label,
+          value: r.value,
+        })),
+        steps: [
+          isSpanish
+            ? "Hable con el médico de su hijo sobre la alergia en su próxima visita."
+            : "Talk to your child's doctor about the allergy at their next visit.",
+          isSpanish
+            ? "Comparta fotos de la reacción de su hijo con el médico."
+            : "Share pictures of your child's reaction with the doctor.",
+          isSpanish
+            ? `Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
+            : `Give the table below to your child's doctor. This says what happened when your child took ${effectiveMedName}.`,
+        ],
+      });
+    } finally {
+      setIsSavingPicture(false);
+    }
+  };
+
+  const handleClose = () => {
     if (onNavigateToSuccess) {
       onNavigateToSuccess();
     } else if (onNext) {
@@ -712,7 +763,7 @@ export function Slide18SummaryScreen({
   };
 
   return (
-    <div id="slide-content" className="s18-root">
+    <div id="slide-content" className="s18-root" ref={cardRef}>
       <style>{SLIDE18_CSS}</style>
 
       {/* Main Centered Content */}
@@ -831,18 +882,35 @@ export function Slide18SummaryScreen({
         </button>
         <button
           type="button"
-          onClick={handleCompleteAndSave}
-          className="s18-btn"
-          aria-label={isSpanish ? "Guardar resumen como PDF" : "Save summary as PDF"}
-          title={isSpanish ? "Guardar" : "Save"}
+          onClick={handleSaveAsPicture}
+          disabled={isSavingPicture}
+          className={`s18-btn${isSavingPicture ? " opacity-80 cursor-wait" : ""}`}
+          aria-label={isSpanish ? "Guardar resumen como imagen PNG" : "Save summary as picture PNG"}
+          title={isSpanish ? "Guardar como imagen" : "Save as Picture"}
         >
-          <Download className="s18-btn-icon" aria-hidden="true" />
-          <span>{isSpanish ? "Guardar" : "Save"}</span>
+          {isSavingPicture ? (
+            <Loader2 className="s18-btn-icon animate-spin" aria-hidden="true" />
+          ) : (
+            <Download className="s18-btn-icon" aria-hidden="true" />
+          )}
+          <span>
+            {isSavingPicture
+              ? isSpanish
+                ? "Guardando..."
+                : "Saving..."
+              : saveSuccess
+              ? isSpanish
+                ? "¡Guardado!"
+                : "Saved!"
+              : isSpanish
+              ? "Guardar como imagen"
+              : "Save as Picture"}
+          </span>
         </button>
 
         <button
           type="button"
-          onClick={handleCompleteAndSave}
+          onClick={handleClose}
           aria-label={isSpanish ? "Cerrar" : "Close"}
           title={isSpanish ? "Cerrar" : "Close"}
           className="s18-close-btn"
