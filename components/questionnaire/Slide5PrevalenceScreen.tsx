@@ -2,17 +2,15 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
-import { resolveMedicineToken } from "@/lib/token-engine";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
    Slide5PrevalenceScreen – Scoped Pixel-Perfect Stage Layout
-   Exact Match to User Reference Image 1:
-   - "Did You Know?" yellow rounded badge at top-left
-   - Statement text on left with bold 100 & 95 numbers
+   - Yellow "Did You Know?" pill badge at top-left
+   - Statement text with prominent bold 100 & 95 statistics
    - Nurse Anna standing on right holding pink medicine bottle
-   - Centered Back (left: 352px) & Next (left: 483px) buttons at y = 544px
-   - Audio player at left: 659px, y = 541px
+   - Standardized bottom-pinned SlideNavigationButtons
+   - Integrated AudioPlayer narration controls
    ========================================================== */
 
 const STAGE_W = 750;
@@ -53,19 +51,20 @@ const SLIDE5_CSS = `
 /* ---------- 1. "Did You Know?" Yellow Badge (Top Left) ---------- */
 .s5-badge {
   position: absolute;
-  left: 41px;
-  top: 8px;
-  width: 205px;
-  height: 75px;
-  display: flex;
+  left: 44px;
+  top: 18px;
+  min-width: 204px;
+  height: 72px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 16px;
+  padding: 0 24px;
   background-color: #feff9f;
   border: 1.8px solid #2b7f8f;
   border-radius: 22px;
   box-shadow: 0 4px 6px rgba(34, 105, 118, 0.35);
   text-align: center;
+  z-index: 5;
 }
 .s5-badge-title {
   margin: 0;
@@ -83,19 +82,21 @@ const SLIDE5_CSS = `
 /* ---------- 2. Statement Text (Left Column) ---------- */
 .s5-text-wrap {
   position: absolute;
-  left: 40px;
-  top: 154px;
-  width: 405px;
-  max-width: 415px;
+  left: 44px;
+  top: 122px;
+  width: 440px;
+  max-width: 450px;
   margin: 0;
   padding: 0;
+  z-index: 5;
 }
 .s5-heading {
   font-size: 21.5px;
-  line-height: 1.42;
+  line-height: 1.44;
   font-weight: 500;
   color: #232323;
   margin: 0;
+  padding: 0;
   letter-spacing: -0.012em;
   text-align: left;
   outline: none;
@@ -110,15 +111,15 @@ const SLIDE5_CSS = `
   color: #111827;
 }
 
-/* ---------- 3. Nurse Anna holding Pink Bottle (Right) ---------- */
+/* ---------- 3. Nurse Anna standing on Right holding bottle ---------- */
 .s5-nurse {
   position: absolute;
-  left: 493px;
-  top: 88px;
-  width: 194px;
-  height: 385px;
+  left: 495px;
+  top: 32px;
+  width: 205px;
+  height: 410px;
   pointer-events: none;
-  z-index: 2;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -130,66 +131,13 @@ const SLIDE5_CSS = `
   display: block;
   user-select: none;
   -webkit-user-drag: none;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
 }
 
-/* ---------- 4. Centered Navigation Buttons (Back & Next) ---------- */
-.s5-nav-back {
-  position: absolute;
-  left: 271px;
-  top: 468px;
-  z-index: 10;
-}
-.s5-nav-next {
-  position: absolute;
-  left: 402px;
-  top: 468px;
-  z-index: 10;
-}
-.s5-btn {
-  height: 35px;
-  padding: 0 18px;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-.s5-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-.s5-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-.s5-btn--back {
-  min-width: 64px;
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
-  color: #143833;
-}
-.s5-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
-}
-.s5-btn--next {
-  min-width: 62px;
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
-  cursor: pointer;
-}
-.s5-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
-}
-
-/* ---------- 5. CC & Play/Pause Controls ---------- */
+/* ---------- 4. Caption & Play/Pause Controls ---------- */
 .s5-audio {
   position: absolute;
-  left: 568px;
+  left: 565px;
   top: 444px;
   z-index: 20;
   display: flex;
@@ -215,7 +163,6 @@ const SLIDE5_CSS = `
     -webkit-overflow-scrolling: touch !important;
     height: auto !important;
     min-height: auto !important;
-    flex: none !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
@@ -242,18 +189,14 @@ const SLIDE5_CSS = `
     position: static !important;
     left: auto !important;
     top: auto !important;
-    width: 175px !important;
-    height: 48px !important;
-    border-radius: 18px !important;
+    min-width: 170px !important;
+    height: 46px !important;
+    border-radius: 16px !important;
     margin: 2px auto 12px auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 12px !important;
+    padding: 0 16px !important;
   }
   .s5-badge-title {
-    font-size: 17.5px !important;
-    line-height: 1.2 !important;
+    font-size: 16px !important;
   }
   .s5-text-wrap {
     position: static !important;
@@ -261,44 +204,29 @@ const SLIDE5_CSS = `
     top: auto !important;
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 0 8px 0 !important;
-    padding: 0 4px !important;
+    margin: 0 0 10px 0 !important;
+    padding: 0 !important;
   }
   .s5-heading {
-    font-size: 15px !important;
-    line-height: 1.4 !important;
-    font-weight: 500 !important;
+    font-size: 15.5px !important;
+    line-height: 1.38 !important;
     text-align: center !important;
-    color: #232323 !important;
   }
   .s5-bold {
-    font-weight: 800 !important;
-    font-size: 16.5px !important;
-    color: #111827 !important;
+    font-size: 17px !important;
   }
   .s5-nurse {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: 120px !important;
-    height: 180px !important;
+    width: 130px !important;
+    height: 210px !important;
     margin: 4px auto 0 auto !important;
-    z-index: 2 !important;
-    pointer-events: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s5-nurse-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
   }
   .s5-audio {
     position: relative !important;
-    right: auto !important;
-    bottom: auto !important;
     left: auto !important;
+    bottom: auto !important;
     top: auto !important;
     margin: 8px auto 0 auto !important;
     z-index: 25 !important;
@@ -316,6 +244,102 @@ const SLIDE5_CSS = `
     height: 34px !important;
   }
 }
+
+/* Tablet Portrait Enhancements (481px to 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .s5-stage {
+    max-width: 440px !important;
+  }
+  .s5-badge {
+    min-width: 190px !important;
+    height: 52px !important;
+  }
+  .s5-badge-title {
+    font-size: 18px !important;
+  }
+  .s5-heading {
+    font-size: 17px !important;
+  }
+  .s5-bold {
+    font-size: 19px !important;
+  }
+  .s5-nurse {
+    width: 150px !important;
+    height: 240px !important;
+  }
+}
+
+/* ==========================================================
+   Mobile & Tablet Landscape Layout (< 520px height)
+   ========================================================== */
+@media (orientation: landscape) and (max-height: 520px) {
+  .s5-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0.5rem 1rem 3.5rem 1rem !important;
+  }
+  .s5-stage {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important;
+    width: 100% !important;
+    max-width: 680px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s5-badge {
+    position: static !important;
+    min-width: 160px !important;
+    height: 42px !important;
+    margin-bottom: 8px !important;
+    padding: 0 14px !important;
+  }
+  .s5-badge-title {
+    font-size: 15px !important;
+  }
+  .s5-text-wrap {
+    position: static !important;
+    width: 60% !important;
+    margin: 0 !important;
+  }
+  .s5-heading {
+    font-size: 14.5px !important;
+    line-height: 1.34 !important;
+    text-align: left !important;
+  }
+  .s5-bold {
+    font-size: 16px !important;
+  }
+  .s5-nurse {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100px !important;
+    height: 180px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .s5-audio {
+    position: absolute !important;
+    right: 12px !important;
+    bottom: 8px !important;
+    left: auto !important;
+    top: auto !important;
+    margin: 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
 `;
 
 export interface Slide5PrevalenceScreenProps {
@@ -331,7 +355,7 @@ export interface Slide5PrevalenceScreenProps {
 }
 
 export function Slide5PrevalenceScreen({
-  isSpanish,
+  isSpanish = false,
   medicationName,
   onNext,
   onBack,
@@ -350,7 +374,7 @@ export function Slide5PrevalenceScreen({
     return () => clearTimeout(timer);
   }, []);
 
-  // Responsive stage scaling that fits container with zero distortion across all viewports
+  // Responsive stage scaling that fits container with zero distortion across viewports
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -377,65 +401,86 @@ export function Slide5PrevalenceScreen({
     };
   }, []);
 
-  const resolvedName = medicationName && medicationName.trim()
-    ? medicationName
-    : (isSpanish ? "la penicilina" : "[name]");
+  const medicine = medicationName && medicationName.trim()
+    ? medicationName.trim()
+    : (isSpanish ? "la amoxicilina" : "amoxicillin");
+  const article = /^[aeiou]/i.test(medicine) ? "an" : "a";
 
-  const titleText = isSpanish
-    ? `La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con alergia a ${resolvedName}, 95 pueden tomar ${resolvedName} sin tener una reacción.`
-    : `Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with a ${resolvedName} allergy, 95 can take ${resolvedName} without having a reaction.`;
+  const titleEnglish = (
+    <>
+      Most people who think they are allergic to penicillin can safely take it. Out of{" "}
+      <strong className="s5-bold">100</strong> kids with {article} {medicine} allergy,{" "}
+      <strong className="s5-bold">95</strong> can take {medicine} without having a reaction.
+    </>
+  );
+
+  const titleSpanish = (
+    <>
+      La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada{" "}
+      <strong className="s5-bold">100</strong> niños con una alergia a {medicine},{" "}
+      <strong className="s5-bold">95</strong> pueden tomar {medicine} sin tener una reacción.
+    </>
+  );
+
+  const plainHeadingText = transcriptText || (isSpanish
+    ? `La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con una alergia a ${medicine}, 95 pueden tomar ${medicine} sin tener una reacción.`
+    : `Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with ${article} ${medicine} allergy, 95 can take ${medicine} without having a reaction.`);
 
   return (
-    <div id="slide-content" className="s5-root" ref={rootRef}>
-      <style>{SLIDE5_CSS}</style>
+    <div
+      id="slide-content"
+      className="s5-root"
+      ref={rootRef}
+      role="region"
+      aria-roledescription="slide"
+      aria-labelledby="slide5-heading"
+    >
+      <style dangerouslySetInnerHTML={{ __html: SLIDE5_CSS }} />
 
       <div className="s5-stage" style={{ transform: `scale(${scale})` }}>
         {/* 1. "Did You Know?" Yellow Badge */}
-        <div className="s5-badge">
-          <h2 tabIndex={-1} className="s5-badge-title">
+        <div className="s5-badge" role="presentation">
+          <span className="s5-badge-title">
             {isSpanish ? "¿Sabías que...?" : "Did You Know?"}
-          </h2>
+          </span>
         </div>
 
-        {/* 2. Statement Text on Left */}
+        {/* 2. Statement Text on Left Column */}
         <div className="s5-text-wrap">
-          <h1 ref={headingRef} tabIndex={-1} className="s5-heading">
-            {isSpanish ? (
-              <>
-                La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada <strong className="s5-bold">100</strong> niños con una alergia a {resolvedName}, <strong className="s5-bold">95</strong> pueden tomar {resolvedName} sin tener una reacción.
-              </>
-            ) : (
-              <>
-                Most people who think they are allergic to penicillin can safely take it. Out of <strong className="s5-bold">100</strong> kids with a {resolvedName} allergy, <strong className="s5-bold">95</strong> can take {resolvedName} without having a reaction.
-              </>
-            )}
+          <h1
+            id="slide5-heading"
+            ref={headingRef}
+            tabIndex={-1}
+            className="s5-heading"
+          >
+            {isSpanish ? titleSpanish : titleEnglish}
           </h1>
         </div>
 
-        {/* 3. Nurse Anna holding Pink Medicine Bottle on Right */}
+        {/* 3. Nurse Anna standing on Right holding bottle */}
         <div className="s5-nurse">
           <img
             src="/images/nurse-anna-holding-bottle.png"
-            alt={isSpanish ? "La enfermera Anna sosteniendo un frasco de medicina" : "Nurse Anna holding a pink medicine bottle"}
+            alt={isSpanish ? "Ilustración de la enfermera Anna sosteniendo el frasco" : "Nurse Anna holding medicine bottle"}
             className="s5-nurse-img"
             draggable={false}
             aria-hidden="true"
           />
         </div>
 
-        {/* 5. Caption (CC) & Play/Pause controls directly at right baseline */}
+        {/* 4. Caption (CC) & Play/Pause Controls */}
         <div className="s5-audio">
           <AudioPlayer
             audioSrc={audioSrc}
             stepId={stepId || "slide5_prevalence"}
             locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={transcriptText || titleText}
+            transcriptText={plainHeadingText}
             size="large"
           />
         </div>
       </div>
 
-      {/* 4. Centered Navigation Buttons (Back & Next) */}
+      {/* 5. Standardized Navigation Buttons (Back & Next) pinned at slide bottom */}
       <SlideNavigationButtons
         onBack={onBack}
         onNext={onNext}
