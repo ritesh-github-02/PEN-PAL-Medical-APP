@@ -1,14 +1,36 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { NurseAnna } from "./NurseAnna";
+import React, { useState, useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import { resolveMedicineToken } from "@/lib/token-engine";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
-const SLIDE10_CSS = `
 /* ==========================================================
-   Slide10TestingOverviewScreen – Scoped Pixel-Perfect Styles
+   Slide10TestingOverviewScreen – Scoped Pixel-Perfect Stage Layout
+   Exact Match to User Reference Image (Slide 9 / Testing Overview):
+   - 896 x 645 scaled stage with background #fafdf3
+   - Left-side Content (left: 104px, top: 86px, width: 485px):
+     1. Intro text (3 lines):
+        "There's a test that your child's doctor can perform.
+         This test can determine if your child can safely take penicillin."
+     2. Bold subheading:
+        "Testing is safe and done in the office"
+     3. 3 Bullet points with solid black circular dots:
+        • For the test, kids take [name] by mouth and are monitored in a doctor's office for about an hour.
+        • Kids can help decide whether they want to take [name] as a liquid or chewable tablet.
+        • Fortunately, kids tend to like the way [name] tastes!
+   - Right-side Speech Bubble (left: 590px, top: 96px, width: 236px, height: 165px):
+     "Talk to your child's doctor about testing!"
+   - Nurse Anna on the right (left: 652px, top: 250px, width: 156px, height: 310px):
+     Natural illustration pointing toward the left side at the bullet points
+   - Centered Back (left: 352px) & Next (left: 483px) buttons at y = 544px
+   - Single stage audio controls at left: 659px, y = 538px
    ========================================================== */
 
+const STAGE_W = 750;
+const STAGE_H = 530;
+
+const SLIDE10_CSS = `
 .s10-root,
 .s10-root *,
 .s10-root *::before,
@@ -22,115 +44,101 @@ const SLIDE10_CSS = `
   height: 100%;
   flex: 1 1 0%;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f8ec;
-  padding: 0.35rem 0.75rem 0.35rem 0.75rem;
   overflow: hidden;
-  gap: clamp(0.6rem, 2vh, 1.25rem);
-}
-
-/* 1. Main Middle Area: Two-Column Layout (Info Left, Anna + Bubble Right) */
-.s10-main {
-  flex-shrink: 0;
-  width: 100%;
-  max-width: 820px;
+  background-color: #fafdf3;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1.2rem, 3vw, 2.2rem);
-  padding: 0;
-  margin: 0 auto;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #232323;
 }
 
-/* Left Column: Headline, Subtitle, Bullets */
+.s10-stage {
+  position: relative;
+  width: ${STAGE_W}px;
+  height: ${STAGE_H}px;
+  flex: none;
+  transform-origin: center center;
+  background-color: #fafdf3;
+}
+
+/* ---------- 1. Left-Side Information Area ---------- */
 .s10-left {
-  flex: 0 1 430px;
-  width: 100%;
-  max-width: 440px;
+  position: absolute;
+  left: 32px;
+  top: 82px;
+  width: 456px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  z-index: 10;
 }
 
 .s10-heading {
-  font-size: clamp(1.1rem, 2vw, 1.3rem);
-  line-height: 1.35;
-  font-weight: 700;
-  color: #142724;
-  letter-spacing: -0.015em;
-  margin: 0 0 0.85rem 0;
+  margin: 0 0 16px 0;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.38;
+  color: #232323;
+  letter-spacing: -0.01em;
+  text-align: left;
   outline: none;
 }
 .s10-heading:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
+  border-radius: 4px;
 }
 
 .s10-subheading {
-  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
-  line-height: 1.32;
+  margin: 0 0 16px 0;
+  font-family: inherit;
+  font-size: 20px;
   font-weight: 700;
-  color: #142724;
+  line-height: 1.32;
+  color: #232323;
   letter-spacing: -0.01em;
-  margin: 0 0 0.5rem 0;
+  text-align: left;
 }
 
 .s10-bullets {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 16px;
 }
 
 .s10-bullet-item {
   display: flex;
   align-items: flex-start;
-  gap: 0.65rem;
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
-  line-height: 1.35;
-  font-weight: 400;
-  color: #142724;
+  gap: 12px;
+  font-family: inherit;
+  font-size: 18.5px;
+  font-weight: 500;
+  line-height: 1.38;
+  color: #232323;
+  letter-spacing: -0.01em;
+  text-align: left;
 }
 
 .s10-bullet-dot {
   width: 6.5px;
   height: 6.5px;
   border-radius: 50%;
-  background-color: #142724;
-  margin-top: 0.45rem;
+  background-color: #232323;
   flex-shrink: 0;
+  margin-top: 9px;
 }
 
-.s10-bullet-text {
-  flex: 1;
-}
-
-/* Right Column: Speech Bubble + Nurse Anna Combo */
-.s10-right {
-  flex-shrink: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.s10-combo {
-  position: relative;
-  width: 330px;
-  height: 360px;
-  flex-shrink: 0;
-}
-
+/* ---------- 2. Right-Side Speech Bubble ---------- */
 .s10-bubble {
   position: absolute;
-  top: 10px;
-  left: 0;
-  width: 260px;
-  height: 175px;
-  z-index: 2;
+  left: 510px;
+  top: 29px;
+  width: 236px;
+  height: 165px;
+  z-index: 5;
   pointer-events: none;
 }
 
@@ -145,173 +153,121 @@ const SLIDE10_CSS = `
 
 .s10-bubble-text-wrap {
   position: absolute;
-  top: 10%;
-  left: 6%;
-  width: 78%;
-  height: 75%;
+  top: 25px;
+  left: 18px;
+  width: 195px;
+  height: 98px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   text-align: center;
   pointer-events: none;
-  padding: 0 10px;
+  padding: 0 4px;
 }
 
 .s10-bubble-text {
-  font-size: 14.5px;
-  font-weight: 500;
-  line-height: 1.36;
-  color: #1a2e2b;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #232323;
+  letter-spacing: -0.01em;
   margin: 0;
-  display: flex;
-  flex-direction: column;
   text-align: center;
 }
 
+/* ---------- 3. Nurse Anna Illustration (Standing on Right) ---------- */
 .s10-nurse {
   position: absolute;
-  bottom: 0;
-  right: 12px;
-  width: 115px;
-  height: auto;
-  max-height: 245px;
-  z-index: 1;
+  left: 572px;
+  top: 141px;
+  width: 127px;
+  height: 310px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
-
 .s10-nurse-img {
   width: 100%;
-  height: auto;
-  max-height: 245px;
+  height: 100%;
   object-fit: contain;
+  object-position: bottom center;
   display: block;
 }
 
-/* 2. Bottom Centered Navigation Bar */
-.s10-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  margin: 0;
-  padding: 0;
-  flex-shrink: 0;
+/* ---------- 4. Centered Navigation Buttons (Back & Next) ---------- */
+.s10-nav-back {
+  position: absolute;
+  left: 272px;
+  top: 462px;
+  z-index: 20;
 }
-
+.s10-nav-next {
+  position: absolute;
+  left: 403px;
+  top: 462px;
+  z-index: 20;
+}
 .s10-btn {
-  padding: 0.45rem 2rem;
-  min-height: 44px;
-  min-width: 100px;
+  height: 35px;
   border-radius: 9999px;
-  font-size: 0.95rem;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 500;
-  color: #143833;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   outline: none;
   cursor: pointer;
-  border: none;
-  transition: all 0.15s ease;
+  border: 1.5px solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s ease;
 }
-.s10-btn:active {
+.s10-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 .s10-btn:focus-visible {
-  box-shadow: 0 0 0 4px #236f7a;
+  box-shadow: 0 0 0 3px #236f7a;
 }
-
 .s10-btn--back {
-  background-color: #adc9c4;
-  border: 1px solid #96bcb5;
-}
-.s10-btn--back:hover {
-  background-color: #9cbdb8;
-}
-
-.s10-btn--next {
-  background-color: #fae88a;
+  width: 64px;
+  background-color: #bddfd8;
+  border-color: #8ab8b0;
   color: #143833;
-  border: 1px solid #d8c85c;
 }
-.s10-btn--next:hover {
-  background-color: #f6df6e;
+.s10-btn--back:hover:not(:disabled) {
+  background-color: #a8d5cc;
 }
-
-/* Tablet & Smaller Screens Scaling */
-@media (max-height: 650px), (max-width: 820px) {
-  .s10-root {
-    padding: 1rem 1.5rem 0.5rem 1.5rem;
-  }
-  .s10-main {
-    max-width: 640px;
-    gap: 1.25rem;
-    padding: 0;
-  }
-  .s10-left {
-    max-width: 360px;
-  }
-  .s10-heading {
-    font-size: 1.15rem;
-    margin-bottom: 0.85rem;
-  }
-  .s10-subheading {
-    font-size: 1.05rem;
-    margin-bottom: 0.55rem;
-  }
-  .s10-bullets {
-    gap: 0.6rem;
-  }
-  .s10-bullet-item {
-    font-size: 0.95rem;
-    line-height: 1.35;
-  }
-  .s10-combo {
-    width: 290px;
-    height: 310px;
-  }
-  .s10-bubble {
-    width: 225px;
-    height: 152px;
-    top: 5px;
-  }
-  .s10-bubble-text {
-    font-size: 12.5px;
-    line-height: 1.3;
-  }
-  .s10-nurse {
-    width: 95px;
-    max-height: 210px;
-    right: 8px;
-  }
-  .s10-nurse-img {
-    max-height: 210px;
-  }
-  .s10-btn {
-    padding: 0.35rem 1.6rem;
-    font-size: 0.85rem;
-    min-height: 40px;
-  }
+.s10-btn--next {
+  width: 62px;
+  background-color: #fdee8e;
+  border-color: #d4c65e;
+  color: #232323;
+  cursor: pointer;
+}
+.s10-btn--next:hover:not(:disabled) {
+  background-color: #f5e478;
 }
 
-@media (max-width: 640px) {
-  .s10-root {
-    overflow-y: auto;
-    height: auto;
-    min-height: 100%;
-  }
-  .s10-main {
-    flex-direction: column;
-    align-items: center;
-  }
-  .s10-left {
-    max-width: 100%;
-    width: 100%;
-  }
-  .s10-right {
-    margin-top: 1rem;
-  }
+/* ---------- 5. Caption (CC) & Play/Pause Controls ---------- */
+.s10-audio {
+  position: absolute;
+  left: 579px;
+  top: 454px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.s10-audio .audio-cc-btn svg {
+  width: 52px !important;
+  height: 47px !important;
+}
+.s10-audio .audio-play-btn svg {
+  width: 70px !important;
+  height: 47px !important;
 }
 `;
 
@@ -321,6 +277,10 @@ export interface Slide10TestingOverviewScreenProps {
   onNext: () => void;
   onBack: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
 }
 
 const BUBBLE_PATH =
@@ -378,14 +338,40 @@ export function Slide10TestingOverviewScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  stepId = "slide10_testing",
+  locale,
+  transcriptText,
 }: Slide10TestingOverviewScreenProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       headingRef.current?.focus();
     }, 50);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w && h) {
+        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+      }
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   const rawIntro = isSpanish
@@ -411,16 +397,22 @@ export function Slide10TestingOverviewScreen({
     },
   ];
 
-  const introText = resolveMedicineToken(rawIntro, medicationName, isSpanish);
-  const subtitleText = resolveMedicineToken(rawSubtitle, medicationName, isSpanish);
+  const introText = medicationName
+    ? resolveMedicineToken(rawIntro, medicationName, isSpanish)
+    : rawIntro;
+
+  const subtitleText = medicationName
+    ? resolveMedicineToken(rawSubtitle, medicationName, isSpanish)
+    : rawSubtitle;
+
+  const spokenText = `${introText}. ${subtitleText}`;
 
   return (
-    <div id="slide-content" className="s10-root">
+    <div id="slide-content" className="s10-root" ref={rootRef}>
       <style>{SLIDE10_CSS}</style>
 
-      {/* 1. Main Two-Column Row (Left text & bullets, Right Speech Bubble + Nurse Anna) */}
-      <div className="s10-main">
-        {/* Left Column: Heading, Subheading & Bullets */}
+      <div className="s10-stage" style={{ transform: `scale(${scale})` }}>
+        {/* 1. Left-Side Information Column */}
         <div className="s10-left">
           <h1 ref={headingRef} tabIndex={-1} className="s10-heading">
             {introText}
@@ -432,116 +424,114 @@ export function Slide10TestingOverviewScreen({
 
           <ul className="s10-bullets">
             {rawBullets.map((b, idx) => {
-              const text = resolveMedicineToken(isSpanish ? b.es : b.en, medicationName, isSpanish);
+              const raw = isSpanish ? b.es : b.en;
+              const text = medicationName
+                ? resolveMedicineToken(raw, medicationName, isSpanish)
+                : raw;
               return (
                 <li key={idx} className="s10-bullet-item">
                   <span className="s10-bullet-dot" aria-hidden="true" />
-                  <span className="s10-bullet-text">{text}</span>
+                  <span>{text}</span>
                 </li>
               );
             })}
           </ul>
         </div>
 
-        {/* Right Column: Speech Bubble + Nurse Anna Combo */}
-        <div className="s10-right">
-          <div className="s10-combo">
-            {/* Hand-drawn Speech Bubble matching Slide 2 exact design */}
-            <div className="s10-bubble">
-              <svg
-                className="s10-bubble-svg"
-                viewBox="0 0 520 340"
-                fill="none"
-                aria-hidden="true"
-              >
-                <defs>
-                  <pattern id="s10-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
-                    <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
-                  </pattern>
-                </defs>
+        {/* 2. Right-Side Speech Bubble */}
+        <div className="s10-bubble">
+          <svg
+            className="s10-bubble-svg"
+            viewBox="0 0 520 330"
+            fill="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern id="s10-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
+                <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
+              </pattern>
+            </defs>
 
-                {/* Black shadow underneath */}
-                <path
-                  d={BUBBLE_PATH}
-                  transform="translate(4, 6)"
-                  fill="#000000"
-                  stroke="#000000"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeLinejoin="miter"
-                  strokeMiterlimit="4"
-                />
+            {/* Black shadow underneath */}
+            <path
+              d={BUBBLE_PATH}
+              transform="translate(4, 5)"
+              fill="#000000"
+              stroke="#000000"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
 
-                {/* White bubble body */}
-                <path d={BUBBLE_PATH} fill="#ffffff" />
+            {/* White bubble body */}
+            <path d={BUBBLE_PATH} fill="#ffffff" />
 
-                {/* Subtle paper dot grid texture */}
-                <path d={BUBBLE_PATH} fill="url(#s10-bubble-dots)" />
+            {/* Subtle paper dot grid texture */}
+            <path d={BUBBLE_PATH} fill="url(#s10-bubble-dots)" />
 
-                {/* Soft teal outline with increased border width */}
-                <path
-                  d={BUBBLE_PATH}
-                  fill="none"
-                  stroke="#8ebfbb"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeLinejoin="miter"
-                  strokeMiterlimit="4"
-                />
-              </svg>
+            {/* Soft teal outline */}
+            <path
+              d={BUBBLE_PATH}
+              fill="none"
+              stroke="#94bbb9"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
 
-              {/* Centered Bubble Speech Text */}
-              <div className="s10-bubble-text-wrap">
-                <p className="s10-bubble-text">
-                  {isSpanish ? (
-                    <>
-                      <span>¡Hable con el </span>
-                      <span>médico de su hijo </span>
-                      <span>sobre las pruebas!</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Talk to your </span>
-                      <span>child&apos;s doctor </span>
-                      <span>about testing!</span>
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-
-            {/* Nurse Anna Illustration standing on right, head directly under bubble tail */}
-            <div className="s10-nurse">
-              <NurseAnna
-                size="md"
-                imgClassName="s10-nurse-img"
-                isDecorative={true}
-                locale={isSpanish ? "es" : "en"}
-              />
-            </div>
+          {/* Centered Speech Text inside bubble */}
+          <div className="s10-bubble-text-wrap">
+            <p className="s10-bubble-text">
+              {isSpanish ? (
+                <>
+                  ¡Hable con el
+                  <br />
+                  médico de su hijo
+                  <br />
+                  sobre las pruebas!
+                </>
+              ) : (
+                <>
+                  Talk to your
+                  <br />
+                  child&apos;s doctor
+                  <br />
+                  about testing!
+                </>
+              )}
+            </p>
           </div>
+        </div>
+
+        {/* 3. Nurse Anna standing on the right, gesturing toward the left */}
+        <div className="s10-nurse">
+          <img
+            src="/images/nurse-anna.png"
+            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
+            className="s10-nurse-img"
+          />
+        </div>
+
+        {/* 5. Caption (CC) & Play/Pause controls directly at right baseline */}
+        <div className="s10-audio">
+          <AudioPlayer
+            audioSrc={audioSrc}
+            stepId={stepId}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={transcriptText || spokenText}
+            size="large"
+          />
         </div>
       </div>
 
-      {/* 2. Bottom Centered Navigation Buttons (Back & Next) */}
-      <div className="s10-nav">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={loading}
-          className="s10-btn s10-btn--back"
-        >
-          {isSpanish ? "Atrás" : "Back"}
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={loading}
-          className="s10-btn s10-btn--next"
-        >
-          {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-        </button>
-      </div>
+      {/* 4. Centered Navigation Buttons (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+      />
     </div>
   );
 }

@@ -1,13 +1,26 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { NurseAnna } from "./NurseAnna";
+import React, { useRef, useEffect, useState } from "react";
+import AudioPlayer from "./AudioPlayer";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
-const SLIDE10_SURVEY_INTRO_CSS = `
 /* ==========================================================
-   Slide10SurveyIntroScreen – Scoped Pixel-Perfect Styles
+   Slide10SurveyIntroScreen – Scoped Pixel-Perfect Stage Layout
+   Exact Match to User Reference Image:
+   - 750 x 530 scaled stage with background #fafdf3
+   - Nurse Anna on the LEFT (/images/nurse-anna-explaining.png)
+     gesturing with her right hand toward the speech bubble
+   - Hand-drawn speech bubble on the RIGHT with tail pointing
+     down-left toward Nurse Anna, solid black drop shadow (+4px, +5px)
+     and soft teal outline (#82b0ad)
+   - Centered Back (#bddfd8) and Next (#fdee8e) pill buttons at y = 462px
+   - Compact AudioPlayer (CC & Play/Pause) at bottom-right (y = 454px)
    ========================================================== */
 
+const STAGE_W = 750;
+const STAGE_H = 530;
+
+const SLIDE10_SURVEY_INTRO_CSS = `
 .s10b-root,
 .s10b-root *,
 .s10b-root *::before,
@@ -21,241 +34,153 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   height: 100%;
   flex: 1 1 0%;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f8ec;
-  padding: 0.35rem 0.75rem 0.35rem 0.75rem;
   overflow: hidden;
-  gap: clamp(0.6rem, 2vh, 1.25rem);
-}
-
-/* Middle Content: Nurse Anna (Left) + Large Speech Bubble (Right) */
-.s10b-middle {
-  flex-shrink: 0;
-  width: 100%;
+  background-color: #fafdf3;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0;
-  padding: 0;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #232323;
 }
 
-.s10b-combo {
+.s10b-stage {
+  position: relative;
+  width: ${STAGE_W}px;
+  height: ${STAGE_H}px;
+  flex: none;
+  transform-origin: center center;
+  background-color: #fafdf3;
+}
+
+/* ---------- 1. Nurse Anna on the LEFT ---------- */
+.s10b-nurse {
+  position: absolute;
+  left: 125px;
+  top: 198px;
+  width: 120px;
+  height: 242px;
+  z-index: 10;
+  pointer-events: none;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  position: relative;
-  width: 530px;
-  height: 268px;
 }
-
-/* Nurse Anna standing on Left, mirrored horizontally to gesture toward the right */
-.s10b-nurse {
-  position: relative;
-  width: 115px;
-  height: auto;
-  max-height: 240px;
-  object-fit: contain;
-  align-self: flex-end;
-  margin-right: -32px;
-  margin-bottom: 2px;
-  z-index: 1;
-  flex-shrink: 0;
-  transform: scaleX(-1);
-}
-
 .s10b-nurse-img {
   width: 100%;
-  height: auto;
-  max-height: 240px;
+  height: 100%;
   object-fit: contain;
+  object-position: bottom center;
   display: block;
 }
 
+/* ---------- 2. Speech Bubble on the RIGHT ---------- */
 .s10b-bubble {
-  position: relative;
-  width: 388px;
-  height: 260px;
-  flex-shrink: 0;
-  align-self: flex-start;
-  margin-top: 4px;
-  z-index: 2;
+  position: absolute;
+  left: 232px;
+  top: 50px;
+  width: 440px;
+  height: 288px;
+  z-index: 5;
   pointer-events: none;
 }
-
 .s10b-bubble-svg {
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 100%;
+  height: 93%;
   overflow: visible;
   display: block;
 }
-
 .s10b-bubble-text-wrap {
   position: absolute;
-  top: 10%;
-  left: 16%;
-  width: 78%;
-  height: 75%;
+  top: 14%;
+  left: 15%;
+  width: 76%;
+  height: 68%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
   pointer-events: none;
-  padding: 0 14px;
 }
-
 .s10b-bubble-text {
-  font-size: 14.5px;
-  font-weight: 500;
-  line-height: 1.42;
-  color: #1a2e2b;
   margin: 0;
-  display: flex;
-  flex-direction: column;
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #232323;
+  letter-spacing: -0.012em;
+  text-align: left;
   outline: none;
-  text-align: center;
 }
 .s10b-bubble-text:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
+  border-radius: 4px;
 }
 
-/* Bottom Centered Navigation */
+/* ---------- 3. Centered Navigation Buttons (Back & Next) ---------- */
 .s10b-nav {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 462px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  margin: 0;
-  padding: 0;
-  flex-shrink: 0;
+  gap: 22px;
+  z-index: 20;
 }
-
 .s10b-btn {
-  padding: 0.45rem 2rem;
-  min-height: 44px;
-  min-width: 100px;
+  height: 35px;
+  padding: 0 18px;
   border-radius: 9999px;
-  font-size: 0.95rem;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 500;
-  color: #143833;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   outline: none;
   cursor: pointer;
-  border: none;
-  transition: all 0.15s ease;
+  border: 1.5px solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s ease;
 }
-.s10b-btn:active {
+.s10b-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 .s10b-btn:focus-visible {
-  box-shadow: 0 0 0 4px #236f7a;
+  box-shadow: 0 0 0 3px #236f7a;
 }
-
 .s10b-btn--back {
-  background-color: #adc9c4;
-  border: 1px solid #96bcb5;
-}
-.s10b-btn--back:hover {
-  background-color: #9cbdb8;
-}
-
-.s10b-btn--next {
-  background-color: #fae88a;
+  min-width: 64px;
+  background-color: #bddfd8;
+  border-color: #8ab8b0;
   color: #143833;
-  border: 1px solid #d8c85c;
 }
-.s10b-btn--next:hover {
-  background-color: #f6df6e;
+.s10b-btn--back:hover:not(:disabled) {
+  background-color: #a8d5cc;
 }
-
-/* Tablet & Smaller Screens Scaling */
-@media (max-height: 600px), (max-width: 768px) {
-  .s10b-root {
-    padding: 0.75rem 1.25rem 0.45rem 1.25rem;
-  }
-  .s10b-combo {
-    width: 420px;
-    height: 220px;
-  }
-  .s10b-bubble {
-    width: 330px;
-    margin-top: 4px;
-  }
-  .s10b-bubble-text {
-    font-size: 13px;
-    line-height: 1.34;
-  }
-  .s10b-nurse {
-    width: 95px;
-    max-height: 195px;
-    margin-right: -28px;
-  }
-  .s10b-nurse-img {
-    max-height: 195px;
-  }
-  .s10b-btn {
-    padding: 0.35rem 1.6rem;
-    font-size: 0.85rem;
-  }
+.s10b-btn--next {
+  min-width: 62px;
+  background-color: #fdee8e;
+  border-color: #d4c65e;
+  color: #232323;
+  cursor: pointer;
+}
+.s10b-btn--next:hover:not(:disabled) {
+  background-color: #f5e478;
 }
 
-@media (max-width: 640px) {
-  .s10b-combo {
-    display: block;
-    position: relative;
-    width: 100%;
-    max-width: 320px;
-    height: 150px;
-    margin: 0.2rem auto 0 auto;
-    flex-shrink: 0;
-  }
-  .s10b-nurse {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 70px;
-    margin-right: 0;
-    margin-top: 0;
-    z-index: 1;
-  }
-  .s10b-nurse-img {
-    max-height: 145px;
-    width: 100%;
-    object-fit: contain;
-  }
-  .s10b-bubble {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 235px;
-    height: 158px;
-    margin-top: 0;
-    z-index: 2;
-  }
-  .s10b-bubble-text-wrap {
-    top: 10% !important;
-    left: 16% !important;
-    width: 78% !important;
-    height: 75% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-  }
-  .s10b-bubble-text {
-    font-size: 10px !important;
-    line-height: 1.28 !important;
-    display: block !important;
-  }
-  .s10b-bubble-text span {
-    display: inline !important;
-  }
+/* ---------- 4. Caption (CC) & Play/Pause Controls ---------- */
+.s10b-audio {
+  position: absolute;
+  left: 585px;
+  top: 454px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 `;
 
@@ -264,55 +189,61 @@ export interface Slide10SurveyIntroScreenProps {
   onNext: () => void;
   onBack: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
 }
 
+/* Exact horizontally mirrored version of Slide 2 speech bubble
+   Tail points down-left directly toward Nurse Anna's hand */
 const BUBBLE_PATH =
-  "M 397.9,283.4 " +
-  "C 395.8,284.6 391.2,287.9 385.1,290.7 " +
-  "C 379.0,293.4 369.2,297.5 361.3,299.9 " +
-  "C 353.4,302.3 345.2,303.8 337.6,305.3 " +
-  "C 330.0,306.8 322.6,307.8 315.6,309.0 " +
-  "C 308.6,310.2 302.5,312.1 295.5,312.7 " +
-  "C 288.5,313.3 280.6,312.4 273.6,312.7 " +
-  "C 266.6,313.0 260.2,314.5 253.5,314.5 " +
-  "C 246.8,314.5 240.1,313.3 233.4,312.7 " +
-  "C 226.7,312.1 220.6,311.4 213.3,310.8 " +
-  "C 206.0,310.2 197.2,310.2 189.6,309.0 " +
-  "C 182.0,307.8 175.5,305.3 167.6,303.5 " +
-  "C 159.7,301.7 150.3,300.8 142.1,298.0 " +
-  "C 133.9,295.3 126.8,291.3 118.3,287.0 " +
-  "C 109.8,282.7 99.7,277.9 90.9,272.4 " +
-  "C 82.1,266.9 73.8,261.1 65.3,254.1 " +
-  "C 56.8,247.1 46.8,239.2 39.8,230.3 " +
-  "C 32.8,221.5 27.0,211.4 23.3,201.0 " +
-  "C 19.6,190.6 18.1,179.0 17.8,168.0 " +
-  "C 17.5,157.0 19.1,146.0 21.5,135.0 " +
-  "C 23.9,124.0 27.2,111.9 32.4,102.1 " +
-  "C 37.6,92.3 44.6,84.0 52.5,76.4 " +
-  "C 60.4,68.8 70.5,62.1 79.9,56.3 " +
-  "C 89.4,50.5 99.8,45.6 109.2,41.6 " +
-  "C 118.7,37.6 127.5,35.2 136.6,32.5 " +
-  "C 145.7,29.8 155.5,27.0 164.0,25.2 " +
-  "C 172.5,23.4 179.8,22.4 187.7,21.5 " +
-  "C 195.6,20.6 203.9,20.3 211.5,19.7 " +
-  "C 219.1,19.1 226.4,18.1 233.4,17.8 " +
-  "C 240.4,17.5 245.9,17.5 253.5,17.8 " +
-  "C 261.1,18.1 271.2,19.1 279.1,19.7 " +
-  "C 287.0,20.3 293.7,20.6 301.0,21.5 " +
-  "C 308.3,22.4 315.6,24.0 322.9,25.2 " +
-  "C 330.2,26.4 337.0,27.0 344.9,28.8 " +
-  "C 352.8,30.6 362.0,33.4 370.5,36.1 " +
-  "C 379.0,38.9 387.2,41.6 396.0,45.3 " +
-  "C 404.8,49.0 414.9,52.9 423.4,58.1 " +
-  "C 431.9,63.3 438.7,69.7 447.2,76.4 " +
-  "C 455.7,83.1 466.7,90.2 474.6,98.4 " +
-  "C 482.5,106.7 490.4,115.8 494.7,125.9 " +
-  "C 499.0,136.0 501.1,147.8 500.2,158.8 " +
-  "C 499.3,169.8 493.8,181.4 489.2,191.8 " +
-  "C 484.6,202.2 480.4,211.0 472.8,221.1 " +
-  "C 465.2,231.2 448.4,247.0 443.5,252.2 " +
-  "L 485.6,314.5 " +
-  "L 397.9,283.4 " +
+  "M 122.1,283.4 " +
+  "C 124.2,284.6 128.8,287.9 134.9,290.7 " +
+  "C 141.0,293.4 150.8,297.5 158.7,299.9 " +
+  "C 166.6,302.3 174.8,303.8 182.4,305.3 " +
+  "C 190.0,306.8 197.4,307.8 204.4,309.0 " +
+  "C 211.4,310.2 217.5,312.1 224.5,312.7 " +
+  "C 231.5,313.3 239.4,312.4 246.4,312.7 " +
+  "C 253.4,313.0 259.8,314.5 266.5,314.5 " +
+  "C 273.2,314.5 279.9,313.3 286.6,312.7 " +
+  "C 293.3,312.1 299.4,311.4 306.7,310.8 " +
+  "C 314.0,310.2 322.8,310.2 330.4,309.0 " +
+  "C 338.0,307.8 344.5,305.3 352.4,303.5 " +
+  "C 360.3,301.7 369.7,300.8 377.9,298.0 " +
+  "C 386.1,295.3 393.2,291.3 401.7,287.0 " +
+  "C 410.2,282.7 420.3,277.9 429.1,272.4 " +
+  "C 437.9,266.9 446.2,261.1 454.7,254.1 " +
+  "C 463.2,247.1 473.2,239.2 480.2,230.3 " +
+  "C 487.2,221.5 493.0,211.4 496.7,201.0 " +
+  "C 500.4,190.6 501.9,179.0 502.2,168.0 " +
+  "C 502.5,157.0 500.9,146.0 498.5,135.0 " +
+  "C 496.1,124.0 492.8,111.9 487.6,102.1 " +
+  "C 482.4,92.3 475.4,84.0 467.5,76.4 " +
+  "C 459.6,68.8 449.5,62.1 440.1,56.3 " +
+  "C 430.6,50.5 420.2,45.6 410.8,41.6 " +
+  "C 401.3,37.6 392.5,35.2 383.4,32.5 " +
+  "C 374.3,29.8 364.5,27.0 356.0,25.2 " +
+  "C 347.5,23.4 340.2,22.4 332.3,21.5 " +
+  "C 324.4,20.6 316.1,20.3 308.5,19.7 " +
+  "C 300.9,19.1 293.6,18.1 286.6,17.8 " +
+  "C 279.6,17.5 274.1,17.5 266.5,17.8 " +
+  "C 258.9,18.1 248.8,19.1 240.9,19.7 " +
+  "C 233.0,20.3 226.3,20.6 219.0,21.5 " +
+  "C 211.7,22.4 204.4,24.0 197.1,25.2 " +
+  "C 189.8,26.4 183.0,27.0 175.1,28.8 " +
+  "C 167.2,30.6 158.0,33.4 149.5,36.1 " +
+  "C 141.0,38.9 132.8,41.6 124.0,45.3 " +
+  "C 115.2,49.0 105.1,52.9 96.6,58.1 " +
+  "C 88.1,63.3 81.3,69.7 72.8,76.4 " +
+  "C 64.3,83.1 53.3,90.2 45.4,98.4 " +
+  "C 37.5,106.7 29.6,115.8 25.3,125.9 " +
+  "C 21.0,136.0 18.9,147.8 19.8,158.8 " +
+  "C 20.7,169.8 26.2,181.4 30.8,191.8 " +
+  "C 35.4,202.2 39.6,211.0 47.2,221.1 " +
+  "C 54.8,231.2 71.6,247.0 76.5,252.2 " +
+  "L 34.4,314.5 " +
+  "L 122.1,283.4 " +
   "Z";
 
 export function Slide10SurveyIntroScreen({
@@ -320,120 +251,139 @@ export function Slide10SurveyIntroScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  stepId = "screen6_survey_intro",
+  locale,
+  transcriptText,
 }: Slide10SurveyIntroScreenProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      headingRef.current?.focus();
-    }, 50);
+    const timer = setTimeout(() => headingRef.current?.focus(), 50);
     return () => clearTimeout(timer);
   }, []);
 
+  // Responsive stage scaling that fits container with zero distortion
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w && h) setScale(Math.min(w / STAGE_W, h / STAGE_H));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
-    <div id="slide-content" className="s10b-root">
+    <div id="slide-content" className="s10b-root" ref={rootRef}>
       <style>{SLIDE10_SURVEY_INTRO_CSS}</style>
 
-      {/* Middle Content: Nurse Anna (Left) + Large Speech Bubble (Right) */}
-      <div className="s10b-middle">
-        <div className="s10b-combo">
-          {/* Nurse Anna standing on Left, mirrored to gesture toward speech bubble */}
-          <div className="s10b-nurse">
-            <NurseAnna
-              size="md"
-              imgClassName="s10b-nurse-img"
-              isDecorative={true}
-              locale={isSpanish ? "es" : "en"}
+      <div className="s10b-stage" style={{ transform: `scale(${scale})` }}>
+        {/* 1. Nurse Anna standing on Left gesturing to the right */}
+        <div className="s10b-nurse">
+          <img
+            src="/images/nurse-anna-explaining.png"
+            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
+            className="s10b-nurse-img"
+          />
+        </div>
+
+        {/* 2. Speech Bubble on Right with tail pointing down-left toward Anna */}
+        <div className="s10b-bubble">
+          <svg
+            className="s10b-bubble-svg"
+            viewBox="0 0 520 340"
+            fill="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern
+                id="s10b-bubble-dots"
+                width="18"
+                height="18"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
+              </pattern>
+            </defs>
+
+            {/* Solid black offset drop shadow (+4px right, +5px down) */}
+            <path
+              d={BUBBLE_PATH}
+              transform="translate(4, 5)"
+              fill="#000000"
+              stroke="#000000"
+              strokeWidth="3.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-          </div>
 
-          {/* Hand-drawn Speech Bubble matching Slide 2 exact design, mirrored toward Anna on Left */}
-          <div className="s10b-bubble">
-            <svg
-              className="s10b-bubble-svg"
-              viewBox="0 0 520 340"
+            {/* White bubble body */}
+            <path d={BUBBLE_PATH} fill="#ffffff" />
+
+            {/* Paper dot grid texture */}
+            <path d={BUBBLE_PATH} fill="url(#s10b-bubble-dots)" />
+
+            {/* Soft teal outline */}
+            <path
+              d={BUBBLE_PATH}
               fill="none"
-              aria-hidden="true"
-            >
-              <defs>
-                <pattern id="s10b-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
-                  <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
-                </pattern>
-              </defs>
+              stroke="#82b0ad"
+              strokeWidth="3.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
 
-              <g transform="translate(520, 0) scale(-1, 1)">
-                {/* Black shadow underneath */}
-                <path
-                  d={BUBBLE_PATH}
-                  transform="translate(-4, 6)"
-                  fill="#000000"
-                  stroke="#000000"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeLinejoin="miter"
-                  strokeMiterlimit="4"
-                />
-
-                {/* White bubble body */}
-                <path d={BUBBLE_PATH} fill="#ffffff" />
-
-                {/* Subtle paper dot grid texture */}
-                <path d={BUBBLE_PATH} fill="url(#s10b-bubble-dots)" />
-
-                {/* Soft teal outline with increased border width */}
-                <path
-                  d={BUBBLE_PATH}
-                  fill="none"
-                  stroke="#8ebfbb"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeLinejoin="miter"
-                  strokeMiterlimit="4"
-                />
-              </g>
-            </svg>
-
-            {/* Centered Speech Text inside oval body */}
-            <div className="s10b-bubble-text-wrap">
-              <h1 ref={headingRef} tabIndex={-1} className="s10b-bubble-text">
-                {isSpanish ? (
-                  <>
-                    <span>El siguiente conjunto de preguntas puede </span>
-                    <span>ayudarlo a usted y al médico a decidir </span>
-                    <span>qué es lo mejor para su hijo.</span>
-                  </>
-                ) : (
-                  <>
-                    <span>The next set of questions can help </span>
-                    <span>you and the doctor see what&apos;s best </span>
-                    <span>for your child.</span>
-                  </>
-                )}
-              </h1>
-            </div>
+          {/* Left-aligned Speech Text matching reference image */}
+          <div className="s10b-bubble-text-wrap">
+            <h1 ref={headingRef} tabIndex={-1} className="s10b-bubble-text">
+              {isSpanish ? (
+                <span>
+                  El siguiente conjunto de preguntas puede
+                  <br />
+                  ayudarlo a usted y al médico a decidir
+                  <br />
+                  qué es lo mejor para su hijo.
+                </span>
+              ) : (
+                <span>
+                  The next set of questions can help
+                  <br />
+                  you and the doctor see what&apos;s best
+                  <br />
+                  for your child.
+                </span>
+              )}
+            </h1>
           </div>
+        </div>
+
+        {/* 4. Compact CC & Play/Pause controls directly at bottom-right baseline */}
+        <div className="s10b-audio">
+          <AudioPlayer
+            audioSrc={audioSrc}
+            stepId={stepId}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={transcriptText}
+            size="small"
+          />
         </div>
       </div>
 
-      {/* Bottom Centered Navigation Buttons (Back & Next) */}
-      <div className="s10b-nav">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={loading}
-          className="s10b-btn s10b-btn--back"
-        >
-          {isSpanish ? "Atrás" : "Back"}
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={loading}
-          className="s10b-btn s10b-btn--next"
-        >
-          {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-        </button>
-      </div>
+      {/* 3. Centered Navigation Buttons (Back & Next matching Slide 1, 2, 3) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+      />
     </div>
   );
 }

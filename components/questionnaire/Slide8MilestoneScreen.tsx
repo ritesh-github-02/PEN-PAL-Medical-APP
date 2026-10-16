@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import AudioPlayer from "./AudioPlayer";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
    Slide8MilestoneScreen – Scoped Pixel-Perfect Stage Layout
@@ -17,8 +18,8 @@ import AudioPlayer from "./AudioPlayer";
    - Single stage audio controls at left: 659px, y = 538px
    ========================================================== */
 
-const STAGE_W = 896;
-const STAGE_H = 645;
+const STAGE_W = 750;
+const STAGE_H = 530;
 
 const SLIDE8_CSS = `
 .s8-root,
@@ -55,10 +56,10 @@ const SLIDE8_CSS = `
 /* ---------- 1. Speech Bubble ---------- */
 .s8-bubble {
   position: absolute;
-  left: 156px;
-  top: 79px;
-  width: 524px;
-  height: 320px;
+  left: 55px;
+  top: 10px;
+  width: 476px;
+  height: 315px;
   z-index: 5;
   pointer-events: none;
 }
@@ -73,10 +74,10 @@ const SLIDE8_CSS = `
 
 .s8-bubble-text-wrap {
   position: absolute;
-  top: 48px;
-  left: 45px;
-  width: 395px;
-  height: 185px;
+  top: 45px;
+  left: 36px;
+  width: 360px;
+  height: 175px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,9 +88,9 @@ const SLIDE8_CSS = `
 }
 .s8-bubble-text {
   font-family: inherit;
-  font-size: 21.5px;
+  font-size: 21px;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.36;
   color: #232323;
   letter-spacing: -0.012em;
   margin: 0;
@@ -104,8 +105,8 @@ const SLIDE8_CSS = `
 /* ---------- 2. Nurse Anna Illustration ---------- */
 .s8-nurse {
   position: absolute;
-  left: 602px;
-  top: 184px;
+  left: 515px;
+  top: 83px;
   width: 180px;
   height: 366px;
   z-index: 10;
@@ -125,14 +126,14 @@ const SLIDE8_CSS = `
 /* ---------- 3. Centered Navigation Buttons (Back & Next) ---------- */
 .s8-nav-back {
   position: absolute;
-  left: 352px;
-  top: 544px;
+  left: 257px;
+  top: 462px;
   z-index: 20;
 }
 .s8-nav-next {
   position: absolute;
-  left: 483px;
-  top: 544px;
+  left: 388px;
+  top: 462px;
   z-index: 20;
 }
 .s8-btn {
@@ -178,8 +179,8 @@ const SLIDE8_CSS = `
 /* ---------- 4. Caption (CC) & Play/Pause Controls ---------- */
 .s8-audio {
   position: absolute;
-  left: 659px;
-  top: 538px;
+  left: 564px;
+  top: 454px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -377,28 +378,6 @@ export function Slide8MilestoneScreen({
           />
         </div>
 
-        {/* 3. Centered Navigation Buttons (Back & Next) */}
-        <div className="s8-nav-back">
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={loading}
-            className="s8-btn s8-btn--back"
-          >
-            {isSpanish ? "Atrás" : "Back"}
-          </button>
-        </div>
-        <div className="s8-nav-next">
-          <button
-            type="button"
-            onClick={onNext}
-            disabled={loading}
-            className="s8-btn s8-btn--next"
-          >
-            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
-
         {/* 4. Caption (CC) & Play/Pause controls directly at right baseline */}
         <div className="s8-audio">
           <AudioPlayer
@@ -410,6 +389,14 @@ export function Slide8MilestoneScreen({
           />
         </div>
       </div>
+
+      {/* 3. Centered Navigation Buttons (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+      />
     </div>
   );
 }

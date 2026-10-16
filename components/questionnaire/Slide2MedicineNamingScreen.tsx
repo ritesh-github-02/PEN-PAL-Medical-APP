@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
    Slide2MedicineNamingScreen
@@ -16,7 +17,7 @@ import AudioPlayer from "./AudioPlayer";
    ========================================================== */
 
 const STAGE_W = 750;
-const STAGE_H = 515;
+const STAGE_H = 530;
 
 const SLIDE2_CSS = `
 .s2-root,
@@ -483,13 +484,12 @@ export function Slide2MedicineNamingScreen({
             {/* Black shadow underneath */}
             <path
               d={BUBBLE_PATH}
-              transform="translate(4, 6)"
+              transform="translate(4, 5)"
               fill="#000000"
               stroke="#000000"
-              strokeWidth="8"
+              strokeWidth="5"
               strokeLinecap="round"
-              strokeLinejoin="miter"
-              strokeMiterlimit="4"
+              strokeLinejoin="round"
             />
 
             {/* White bubble body */}
@@ -498,15 +498,14 @@ export function Slide2MedicineNamingScreen({
             {/* Subtle paper dot grid texture */}
             <path d={BUBBLE_PATH} fill="url(#s2-bubble-dots)" />
 
-            {/* Soft teal outline with increased border width */}
+            {/* Soft teal outline */}
             <path
               d={BUBBLE_PATH}
               fill="none"
               stroke="#8ebfbb"
-              strokeWidth="8"
+              strokeWidth="5"
               strokeLinecap="round"
-              strokeLinejoin="miter"
-              strokeMiterlimit="4"
+              strokeLinejoin="round"
             />
           </svg>
 
@@ -544,23 +543,6 @@ export function Slide2MedicineNamingScreen({
           />
         </div>
 
-        {/* 6. Centered Navigation Buttons (Back & Next) */}
-        <div className="s2-nav-back">
-          <button type="button" onClick={onBack} disabled={loading} className="s2-btn s2-btn--back">
-            {isSpanish ? "Atrás" : "Back"}
-          </button>
-        </div>
-        <div className="s2-nav-next">
-          <button
-            type="button"
-            onClick={onNext}
-            disabled={!selected || loading}
-            className={`s2-btn s2-btn--next${nextEnabled ? " s2-btn--next-enabled" : ""}`}
-          >
-            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
-
         {/* 7. Caption (CC) & Play/Pause controls directly below Nurse Anna */}
         <div className="s2-audio">
           <AudioPlayer
@@ -572,6 +554,15 @@ export function Slide2MedicineNamingScreen({
           />
         </div>
       </div>
+
+      {/* 6. Centered Navigation Buttons (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+        nextDisabled={!selected || loading}
+      />
     </div>
   );
 }

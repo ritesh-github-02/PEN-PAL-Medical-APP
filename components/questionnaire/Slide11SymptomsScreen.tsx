@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NurseAnna } from "./NurseAnna";
 import { resolveMedicineToken } from "@/lib/token-engine";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 const SLIDE11_CSS = `
 /* ==========================================================
@@ -27,9 +28,9 @@ const SLIDE11_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
+  padding: 0.85rem 1.8rem 4.5rem 1.8rem;
   overflow: hidden;
-  gap: clamp(0.6rem, 2vh, 1.25rem);
+  gap: clamp(0.5rem, 1.8vh, 1rem);
 }
 
 /* Top Heading */
@@ -347,70 +348,77 @@ const SLIDE11_CSS = `
 
 /* Bottom Centered Navigation */
 .s11-nav {
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  padding: 0;
-  margin: 0;
-  flex-shrink: 0;
+  gap: 22px;
+  z-index: 20;
+}
+@media (max-width: 640px) {
+  .s11-nav {
+    bottom: 14px;
+    gap: 16px;
+  }
 }
 
 .s11-btn {
-  padding: 0.45rem 2rem;
-  min-height: 44px;
-  min-width: 100px;
+  height: 35px;
+  padding: 0 18px;
   border-radius: 9999px;
-  font-size: 0.95rem;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 500;
-  color: #143833;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   outline: none;
   cursor: pointer;
-  border: none;
-  transition: all 0.15s ease;
+  border: 1.5px solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s ease;
 }
-.s11-btn:active {
+.s11-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 .s11-btn:focus-visible {
-  box-shadow: 0 0 0 4px #236f7a;
+  box-shadow: 0 0 0 3px #236f7a;
 }
 
 .s11-btn--back {
-  background-color: #adc9c4;
-  border: 1px solid #96bcb5;
+  min-width: 64px;
+  background-color: #bddfd8;
+  border-color: #8ab8b0;
+  color: #143833;
 }
-.s11-btn--back:hover {
-  background-color: #9cbdb8;
+.s11-btn--back:hover:not(:disabled) {
+  background-color: #a8d5cc;
 }
 
 .s11-btn--next {
-  background-color: #fae88a;
-  color: #143833;
-  border: 1px solid #d8c85c;
+  min-width: 62px;
+  background-color: #fdee8e;
+  border-color: #d4c65e;
+  color: #232323;
 }
-.s11-btn--next:hover {
-  background-color: #f6df6e;
+.s11-btn--next:hover:not(:disabled) {
+  background-color: #f5e478;
 }
 
 .s11-btn--disabled {
-  background-color: rgba(250, 232, 138, 0.5);
-  color: rgba(20, 56, 51, 0.45);
-  border-color: rgba(216, 200, 92, 0.45);
+  opacity: 0.55;
   cursor: not-allowed;
 }
 .s11-btn--disabled:hover {
-  background-color: rgba(250, 232, 138, 0.5);
+  background-color: #fdee8e;
 }
 
 /* Tablet & Smaller Screens Scaling */
 @media (max-height: 650px), (max-width: 820px) {
   .s11-root {
-    padding: 1rem 1.5rem 0.5rem 1.5rem;
+    padding: 0.85rem 1.5rem 4.5rem 1.5rem;
   }
   .s11-top-section,
   .s11-middle {
@@ -435,11 +443,6 @@ const SLIDE11_CSS = `
   }
   .s11-nurse-img {
     max-height: 215px;
-  }
-  .s11-btn {
-    padding: 0.35rem 1.6rem;
-    font-size: 0.85rem;
-    min-height: 40px;
   }
 }
 
@@ -837,24 +840,14 @@ export function Slide11SymptomsScreen({
       </div>
 
       {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}
-      <div className="s11-nav">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={loading}
-          className="s11-btn s11-btn--back"
-        >
-          {isSpanish ? "Atrás" : "Back"}
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!isNextEnabled || loading}
-          className={`s11-btn s11-btn--next${!isNextEnabled || loading ? " s11-btn--disabled" : ""}`}
-        >
-          {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-        </button>
-      </div>
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+        nextDisabled={!isNextEnabled || loading}
+        variant="flow"
+      />
 
       {/* ========================================================================= */}
       {/* MODAL 11B (Figma 7-1-1): Rash Sub-types Branching Modal */}

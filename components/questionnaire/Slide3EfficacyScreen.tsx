@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
 import { resolveMedicineToken } from "@/lib/token-engine";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
    Slide3EfficacyScreen – Scoped Pixel-Perfect Stage Layout
@@ -15,8 +16,8 @@ import { resolveMedicineToken } from "@/lib/token-engine";
    - Single CC & Play/Pause controls directly below Nurse Anna at y = 541px
    ========================================================== */
 
-const STAGE_W = 896;
-const STAGE_H = 645;
+const STAGE_W = 750;
+const STAGE_H = 530;
 
 const SLIDE3_CSS = `
 .s3-root,
@@ -53,8 +54,8 @@ const SLIDE3_CSS = `
 /* ---------- 1. Left-aligned Statement Heading (4 lines matching exact reference image) ---------- */
 .s3-heading {
   position: absolute;
-  left: 136px;
-  top: 104px;
+  left: 48px;
+  top: 18px;
   width: 510px;
   max-width: 515px;
   margin: 0;
@@ -74,8 +75,8 @@ const SLIDE3_CSS = `
 /* ---------- 2. Speech Bubble on Right (tail lands directly on Anna's head) ---------- */
 .s3-bubble {
   position: absolute;
-  left: 434px;
-  top: 182px;
+  left: 346px;
+  top: 96px;
   width: 292px;
   height: 192px;
   pointer-events: none;
@@ -127,8 +128,8 @@ const SLIDE3_CSS = `
 /* ---------- 3. Nurse Anna standing on Right ---------- */
 .s3-nurse {
   position: absolute;
-  left: 672px;
-  top: 308px;
+  left: 584px;
+  top: 222px;
   width: 112px;
   height: 211px;
   pointer-events: none;
@@ -149,14 +150,14 @@ const SLIDE3_CSS = `
 /* ---------- 4. Centered Navigation Buttons (Back & Next) ---------- */
 .s3-nav-back {
   position: absolute;
-  left: 352px;
-  top: 544px;
+  left: 264px;
+  top: 458px;
   z-index: 10;
 }
 .s3-nav-next {
   position: absolute;
-  left: 483px;
-  top: 544px;
+  left: 395px;
+  top: 458px;
   z-index: 10;
 }
 .s3-btn {
@@ -203,8 +204,8 @@ const SLIDE3_CSS = `
 /* ---------- 5. CC & Play/Pause Controls directly below Nurse Anna ---------- */
 .s3-audio {
   position: absolute;
-  left: 659px;
-  top: 536px;
+  left: 571px;
+  top: 450px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -363,13 +364,12 @@ export function Slide3EfficacyScreen({
             {/* Black shadow underneath */}
             <path
               d={BUBBLE_PATH}
-              transform="translate(4, 6)"
+              transform="translate(4, 5)"
               fill="#000000"
               stroke="#000000"
-              strokeWidth="8"
+              strokeWidth="5"
               strokeLinecap="round"
-              strokeLinejoin="miter"
-              strokeMiterlimit="4"
+              strokeLinejoin="round"
             />
 
             {/* White bubble body */}
@@ -378,15 +378,14 @@ export function Slide3EfficacyScreen({
             {/* Subtle paper dot grid texture */}
             <path d={BUBBLE_PATH} fill="url(#s3-bubble-dots)" />
 
-            {/* Soft teal outline with increased border width */}
+            {/* Soft teal outline */}
             <path
               d={BUBBLE_PATH}
               fill="none"
               stroke="#8ebfbb"
-              strokeWidth="8"
+              strokeWidth="5"
               strokeLinecap="round"
-              strokeLinejoin="miter"
-              strokeMiterlimit="4"
+              strokeLinejoin="round"
             />
           </svg>
 
@@ -423,28 +422,6 @@ export function Slide3EfficacyScreen({
           />
         </div>
 
-        {/* 4. Centered Navigation Buttons (Back & Next) */}
-        <div className="s3-nav-back">
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={loading}
-            className="s3-btn s3-btn--back"
-          >
-            {isSpanish ? "Atrás" : "Back"}
-          </button>
-        </div>
-        <div className="s3-nav-next">
-          <button
-            type="button"
-            onClick={onNext}
-            disabled={loading}
-            className="s3-btn s3-btn--next"
-          >
-            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
-
         {/* 5. Caption (CC) & Play/Pause controls directly below Nurse Anna */}
         <div className="s3-audio">
           <AudioPlayer
@@ -456,6 +433,14 @@ export function Slide3EfficacyScreen({
           />
         </div>
       </div>
+
+      {/* 4. Centered Navigation Buttons (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+      />
     </div>
   );
 }

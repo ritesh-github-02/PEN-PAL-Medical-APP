@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import AudioPlayer from "./AudioPlayer";
 import { resolveMedicineToken } from "@/lib/token-engine";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
    Slide6MythTruthScreen – Scoped Pixel-Perfect Stage Layout
@@ -15,8 +16,8 @@ import { resolveMedicineToken } from "@/lib/token-engine";
    - Single audio player at left: 659px, y = 538px
    ========================================================== */
 
-const STAGE_W = 896;
-const STAGE_H = 645;
+const STAGE_W = 750;
+const STAGE_H = 530;
 
 const SLIDE6_CSS = `
 .s6-root,
@@ -53,8 +54,8 @@ const SLIDE6_CSS = `
 /* ---------- 1. Question Heading ---------- */
 .s6-heading {
   position: absolute;
-  left: 107px;
-  top: 97px;
+  left: 34px;
+  top: 15px;
   width: 682px;
   margin: 0;
   padding: 0;
@@ -74,8 +75,8 @@ const SLIDE6_CSS = `
 /* ---------- 2. 4 Myth Cards Stack ---------- */
 .s6-cards {
   position: absolute;
-  left: 107px;
-  top: 165px;
+  left: 34px;
+  top: 83px;
   width: 682px;
   display: flex;
   flex-direction: column;
@@ -148,14 +149,14 @@ const SLIDE6_CSS = `
 /* ---------- 3. Centered Navigation Buttons (Back & Next) ---------- */
 .s6-nav-back {
   position: absolute;
-  left: 352px;
-  top: 544px;
+  left: 279px;
+  top: 462px;
   z-index: 10;
 }
 .s6-nav-next {
   position: absolute;
-  left: 483px;
-  top: 544px;
+  left: 410px;
+  top: 462px;
   z-index: 10;
 }
 .s6-btn {
@@ -201,8 +202,8 @@ const SLIDE6_CSS = `
 /* ---------- 4. Caption (CC) & Play/Pause Controls ---------- */
 .s6-audio {
   position: absolute;
-  left: 659px;
-  top: 538px;
+  left: 586px;
+  top: 456px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -382,28 +383,6 @@ export function Slide6MythTruthScreen({
           })}
         </div>
 
-        {/* 3. Centered Navigation Buttons (Back & Next) */}
-        <div className="s6-nav-back">
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={loading}
-            className="s6-btn s6-btn--back"
-          >
-            {isSpanish ? "Atrás" : "Back"}
-          </button>
-        </div>
-        <div className="s6-nav-next">
-          <button
-            type="button"
-            onClick={onNext}
-            disabled={loading}
-            className="s6-btn s6-btn--next"
-          >
-            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
-
         {/* 4. Caption (CC) & Play/Pause controls directly at right baseline */}
         <div className="s6-audio">
           <AudioPlayer
@@ -415,6 +394,14 @@ export function Slide6MythTruthScreen({
           />
         </div>
       </div>
+
+      {/* 3. Centered Navigation Buttons (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+      />
     </div>
   );
 }

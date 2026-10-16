@@ -807,8 +807,18 @@ export function Slide18SummaryScreen({
         </div>
       </div>
 
-      {/* 4. Bottom Centered Navigation (Print & Save) + Close ✕ */}
+      {/* 4. Bottom Centered Navigation (Back, Print & Save) + Close ✕ */}
       <div className="s18-nav no-print">
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="slide-nav-btn slide-nav-btn--back"
+            aria-label={isSpanish ? "Atrás" : "Back"}
+          >
+            {isSpanish ? "Atrás" : "Back"}
+          </button>
+        )}
         <button
           type="button"
           onClick={onPrint || (() => window.print())}

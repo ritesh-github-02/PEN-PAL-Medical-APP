@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect } from "react";
 import { resolveMedicineToken } from "@/lib/token-engine";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 const SLIDE12_CSS = `
 /* ==========================================================
@@ -26,9 +27,9 @@ const SLIDE12_CSS = `
   justify-content: center;
   align-items: center;
   background-color: #f4f8ec;
-  padding: 0.85rem 1.8rem 0.6rem 1.8rem;
+  padding: 0.85rem 1.8rem 4.5rem 1.8rem;
   overflow: hidden;
-  gap: clamp(0.6rem, 2vh, 1.25rem);
+  gap: clamp(0.5rem, 1.8vh, 1rem);
 }
 
 /* Heading */
@@ -175,68 +176,77 @@ const SLIDE12_CSS = `
 
 /* Navigation Bar */
 .s12-nav {
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  padding: 0;
-  margin: 0;
-  flex-shrink: 0;
+  gap: 22px;
+  z-index: 20;
+}
+@media (max-width: 640px) {
+  .s12-nav {
+    bottom: 14px;
+    gap: 16px;
+  }
 }
 
 .s12-btn {
-  padding: 0.45rem 2.2rem;
-  min-height: 42px;
-  min-width: 104px;
+  height: 35px;
+  padding: 0 18px;
   border-radius: 9999px;
-  font-size: 0.95rem;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 500;
-  color: #143833;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   outline: none;
   cursor: pointer;
-  border: none;
-  transition: all 0.15s ease;
+  border: 1.5px solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s ease;
 }
-.s12-btn:active {
+.s12-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 .s12-btn:focus-visible {
-  box-shadow: 0 0 0 4px #236f7a;
+  box-shadow: 0 0 0 3px #236f7a;
 }
 
 .s12-btn--back {
-  background-color: #adcbc7;
-  border: 1px solid #94b9b4;
+  min-width: 64px;
+  background-color: #bddfd8;
+  border-color: #8ab8b0;
+  color: #143833;
 }
-.s12-btn--back:hover {
-  background-color: #9cbdb8;
+.s12-btn--back:hover:not(:disabled) {
+  background-color: #a8d5cc;
 }
 
 .s12-btn--next {
-  background-color: #fae98f;
-  color: #143833;
-  border: 1px solid #dac85e;
+  min-width: 62px;
+  background-color: #fdee8e;
+  border-color: #d4c65e;
+  color: #232323;
 }
-.s12-btn--next:hover {
-  background-color: #f7e37b;
+.s12-btn--next:hover:not(:disabled) {
+  background-color: #f5e478;
 }
 
 .s12-btn--disabled {
-  background-color: rgba(250, 233, 143, 0.5);
-  color: rgba(20, 56, 51, 0.45);
-  border-color: rgba(218, 200, 94, 0.45);
+  opacity: 0.55;
   cursor: not-allowed;
-  box-shadow: none;
+}
+.s12-btn--disabled:hover {
+  background-color: #fdee8e;
 }
 
 /* Tablet & Mobile Scaling */
 @media (max-height: 700px), (max-width: 860px) {
   .s12-root {
-    padding: 1rem 1.75rem 0.5rem 1.75rem;
+    padding: 0.85rem 1.75rem 4.5rem 1.75rem;
   }
   .s12-heading {
     font-size: 1.25rem;
@@ -526,24 +536,14 @@ export function Slide12AgeCohortScreen({
       </div>
 
       {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}
-      <div className="s12-nav">
-        <button
-          type="button"
-          onClick={handleBackClick}
-          disabled={isLoading}
-          className="s12-btn s12-btn--back"
-        >
-          {isSpanish ? "Atrás" : "Back"}
-        </button>
-        <button
-          type="button"
-          onClick={handleNextClick}
-          disabled={!isNextEnabled}
-          className={`s12-btn s12-btn--next${!isNextEnabled ? " s12-btn--disabled" : ""}`}
-        >
-          {isLoading ? "..." : isSpanish ? "Siguiente" : "Next"}
-        </button>
-      </div>
+      <SlideNavigationButtons
+        onBack={handleBackClick}
+        onNext={handleNextClick}
+        isSpanish={isSpanish}
+        loading={isLoading}
+        nextDisabled={!isNextEnabled}
+        variant="flow"
+      />
     </div>
   );
 }

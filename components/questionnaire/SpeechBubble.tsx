@@ -87,13 +87,12 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
             <g transform="translate(520, 0) scale(-1, 1)">
               <path
                 d={BUBBLE_PATH}
-                transform="translate(-4, 6)"
+                transform="translate(-4, 5)"
                 fill="#000000"
                 stroke="#000000"
-                strokeWidth="8"
+                strokeWidth="5"
                 strokeLinecap="round"
-                strokeLinejoin="miter"
-                strokeMiterlimit="4"
+                strokeLinejoin="round"
               />
               <path d={BUBBLE_PATH} fill="#ffffff" />
               <path d={BUBBLE_PATH} fill="url(#speech-bubble-dots)" />
@@ -101,23 +100,21 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                 d={BUBBLE_PATH}
                 fill="none"
                 stroke={borderColor}
-                strokeWidth="8"
+                strokeWidth="5"
                 strokeLinecap="round"
-                strokeLinejoin="miter"
-                strokeMiterlimit="4"
+                strokeLinejoin="round"
               />
             </g>
           ) : (
             <>
               <path
                 d={BUBBLE_PATH}
-                transform="translate(4, 6)"
+                transform="translate(4, 5)"
                 fill="#000000"
                 stroke="#000000"
-                strokeWidth="8"
+                strokeWidth="5"
                 strokeLinecap="round"
-                strokeLinejoin="miter"
-                strokeMiterlimit="4"
+                strokeLinejoin="round"
               />
               <path d={BUBBLE_PATH} fill="#ffffff" />
               <path d={BUBBLE_PATH} fill="url(#speech-bubble-dots)" />
@@ -125,10 +122,9 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                 d={BUBBLE_PATH}
                 fill="none"
                 stroke={borderColor}
-                strokeWidth="8"
+                strokeWidth="5"
                 strokeLinecap="round"
-                strokeLinejoin="miter"
-                strokeMiterlimit="4"
+                strokeLinejoin="round"
               />
             </>
           )}

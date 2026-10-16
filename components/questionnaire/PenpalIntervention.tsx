@@ -35,6 +35,7 @@ import { Slide16ResolutionScreen } from "./Slide16ResolutionScreen";
 import { Slide19RepeatUseScreen } from "./Slide19RepeatUseScreen";
 import { Slide21WhatNowScreen } from "./Slide21WhatNowScreen";
 import { Slide18SummaryScreen } from "./Slide18SummaryScreen";
+import { SlideNavigationButtons } from "./SlideNavigationButtons";
 import esMessages from "@/messages/es.json";
 import enMessages from "@/messages/en.json";
 
@@ -617,7 +618,7 @@ export default function PenpalIntervention() {
 
   return (
     <main
-      className="intervention-main-shell min-h-dvh w-full max-w-full flex flex-col items-center justify-center p-1.5 sm:p-2 md:p-2.5 relative font-sans bg-[#f4f8ec] overflow-hidden md:overflow-y-auto select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
+      className="intervention-main-shell h-dvh max-h-dvh w-full max-w-full flex flex-col items-center justify-center p-1.5 sm:p-2 md:p-2.5 relative font-sans bg-[#f4f8ec] overflow-hidden select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -638,7 +639,7 @@ export default function PenpalIntervention() {
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
       <div 
-        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 max-w-[420px] md:max-w-[min(64rem,calc(100vw-1.5rem),calc((100dvh-3.5rem)*(1000/708)))] print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
+        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 max-w-[420px] md:max-w-[min(64rem,calc(100vw-1.5rem),calc((100dvh-5.75rem)*(1000/708)))] print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
       >
         {/* Header Bar matching old slide: Logo, Step Progress, and Language Switcher */}
         <header className="w-full shrink-0 flex items-center justify-between px-2.5 sm:px-4 py-1 sm:py-1.5 mb-1.5 sm:mb-2 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs no-print">
@@ -665,29 +666,16 @@ export default function PenpalIntervention() {
         </header>
 
         {/* =========================================================================
-            SLIDE FRAME (Defined Height & Black Border on Mobile, Mockup on Desktop)
+            SLIDE FRAME (Clean Presentation Card without Black Border)
             ========================================================================= */}
         <div className="w-full flex items-center justify-center relative print:block print:w-full print:m-0 print:p-0">
-          {/* Outer Slide Frame: Standard web card with defined height & black border */}
+          {/* Outer Slide Frame: Clean presentation card with consistent light background and no black border */}
           <div 
-            className="tablet-mockup-frame relative bg-[#f4f8ec] md:bg-[#181a1d] p-0 md:p-3.5 rounded-2xl md:rounded-[2.4rem] border-2 border-black md:border-2 md:border-[#2b2e33] shadow-md md:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] flex flex-col mx-auto w-full print:bg-transparent print:p-0 print:m-0 print:border-none print:rounded-none print:shadow-none print:aspect-auto print:max-h-none print:h-auto print:w-full print:block"
+            className="tablet-mockup-frame relative bg-[#f4f8ec] p-0 rounded-2xl md:rounded-[2rem] border-0 shadow-md md:shadow-lg flex flex-col mx-auto w-full print:bg-transparent print:p-0 print:m-0 print:border-none print:rounded-none print:shadow-none print:aspect-auto print:max-h-none print:h-auto print:w-full print:block overflow-hidden"
           >
-            
-            {/* Left Bezel Camera Array (Landscape Tablet) - ONLY visible on desktop/landscape */}
+            {/* Slide Inner Screen with Clean Unified Background */}
             <div 
-              className="tablet-bezel-camera hidden md:flex no-print print:hidden absolute left-0 top-1/2 -translate-y-1/2 w-2.5 sm:w-3 md:w-3.5 flex-col items-center justify-center gap-1 pointer-events-none select-none z-30"
-              aria-hidden="true"
-            >
-              <span className="w-1 h-1 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0a0f16] ring-1 ring-[#262f3d] flex items-center justify-center">
-                <span className="w-0.5 h-0.5 rounded-full bg-[#1e3c59]/90"></span>
-              </span>
-              <span className="w-1 h-1 rounded-full bg-[#0d0f12] border border-[#272a30]"></span>
-            </div>
-
-            {/* Tablet Inner Screen with Clean Unified Background */}
-            <div 
-              className="tablet-screen-inner relative w-full h-full flex-1 min-h-0 rounded-2xl md:rounded-[1.6rem] overflow-y-auto md:overflow-hidden border border-[#236f7a]/15 md:border-none shadow-sm md:shadow-inner flex flex-col justify-start md:justify-center items-center bg-[#f4f8ec] print:bg-transparent print:rounded-none print:shadow-none print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0"
+              className="tablet-screen-inner relative w-full h-full flex-1 min-h-0 rounded-2xl md:rounded-[2rem] overflow-y-auto md:overflow-hidden border-0 shadow-none flex flex-col justify-start md:justify-center items-center bg-[#f4f8ec] print:bg-transparent print:rounded-none print:shadow-none print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0"
             >
               {/* Slide Content */}
               <div className="tablet-slide-content relative w-full h-full flex-1 min-h-0 flex flex-col justify-start md:justify-center items-center overflow-y-auto md:overflow-hidden print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0">
@@ -867,6 +855,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext()}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "slide10_testing" || currentStep.id === "screen4_testing" ? (
                     <Slide10TestingOverviewScreen
@@ -875,6 +872,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext()}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "screen6_survey_intro" || currentStep.id === "slide10_survey_intro" ? (
                     <Slide10SurveyIntroScreen
@@ -882,6 +888,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext()}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "screen6_1_symptoms" ? (
                     <Slide11SymptomsScreen
@@ -1121,12 +1136,13 @@ export default function PenpalIntervention() {
               </div>
 
               {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
-              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.type !== "statistics" && currentStep.type !== "knowledge_revelation" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && currentStep.id !== "slide4_barrier" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics" && currentStep.id !== "slide6_myths" && currentStep.id !== "slide8_milestone" && currentStep.id !== "screen3_5_knowledge_test" && currentStep.id !== "screen3_6_all_correct") && (
-                <div className="absolute bottom-2.5 right-3.5 sm:bottom-4 sm:right-6 md:bottom-5 md:right-7 z-30">
+              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.type !== "statistics" && currentStep.type !== "knowledge_revelation" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && currentStep.id !== "slide4_barrier" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics" && currentStep.id !== "slide6_myths" && currentStep.id !== "slide8_milestone" && currentStep.id !== "slide9_why_it_matters" && currentStep.id !== "slide10_testing" && currentStep.id !== "screen4_testing" && currentStep.id !== "screen3_5_knowledge_test" && currentStep.id !== "screen3_6_all_correct" && currentStep.id !== "screen6_survey_intro" && currentStep.id !== "slide10_survey_intro") && (
+                <div className="absolute bottom-[14px] md:bottom-[22px] right-4 sm:right-5 md:right-7 z-30 flex items-center">
                   <AudioPlayer
                     audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
                     stepId={currentStep.id}
                     locale={locale}
+                    size="small"
                     transcriptText={
                       (locale === "es"
                         ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
@@ -1147,20 +1163,16 @@ export default function PenpalIntervention() {
 
 // ============ Shared Components ============
 
-function NavigationFooter({ onNext, loading, t, locale }: Omit<BaseScreenProps, 'title' | 'content' | 'description' | 'onBack'> & { locale?: string; onBack?: () => void }) {
+function NavigationFooter({ onNext, onBack, loading, locale }: Omit<BaseScreenProps, 'title' | 'content' | 'description'> & { locale?: string; onBack?: () => void }) {
   const isSpanish = locale === "es";
   return (
-    <div className="flex justify-center items-center pt-4 mt-4 border-t border-slate-300/40">
-      <button
-        type="button"
-        onClick={() => onNext()}
-        disabled={loading}
-        aria-label={isSpanish ? "Continuar al siguiente paso" : "Continue to next step"}
-        className="px-8 py-2 text-xs font-bold uppercase tracking-widest transition-all duration-250 flex items-center justify-center bg-[#82bdad] hover:bg-[#71ad9d] text-[#193630] rounded-full hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-sm no-print font-sans border border-[#71ad9d]"
-      >
-        {loading ? "..." : (isSpanish ? "Siguiente" : t("next"))}
-      </button>
-    </div>
+    <SlideNavigationButtons
+      onBack={onBack}
+      onNext={() => onNext()}
+      isSpanish={isSpanish}
+      loading={loading}
+      variant="flow"
+    />
   );
 }
 
@@ -1281,7 +1293,7 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
   const isKnowledgeTest = options[0]?.value?.startsWith("curing_");
 
   return (
-    <div id="slide-content" className="w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-4 sm:p-6 md:p-8 overflow-y-auto">
+    <div id="slide-content" className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-4 sm:p-6 md:p-8 pb-16 overflow-y-auto">
       <div className="flex flex-row gap-2 sm:gap-6 items-center justify-between">
         <div className="flex-1 min-w-0 max-w-3xl pb-2">
           {/* 1. Heading & Subtitle Outside Fieldset (Eliminates Double Title Announcement) */}
@@ -1440,28 +1452,25 @@ function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navP
         <NurseAnna size="md" isDecorative={true} />
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-2 mt-3 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={() => {
-            const trimmedOther = otherText.trim();
-            const customVal = trimmedOther
-              ? (isSpanish ? "Otro: " + trimmedOther : "Other: " + trimmedOther)
-              : "Other";
+      {/* Centered Navigation (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={navProps.onBack}
+        onNext={() => {
+          const trimmedOther = otherText.trim();
+          const customVal = trimmedOther
+            ? (isSpanish ? "Otro: " + trimmedOther : "Other: " + trimmedOther)
+            : "Other";
 
-            const hasOther = (selected || []).some((s: string) => s === "Other" || s.startsWith("Other:") || s === "Otro" || s.startsWith("Otro:"));
-            const cleanList = (selected || []).filter((v: string) => v !== "Other" && !v.startsWith("Other:") && v !== "Otro" && !v.startsWith("Otro:"));
-            const finalSelected = hasOther ? [...cleanList, customVal] : cleanList;
+          const hasOther = (selected || []).some((s: string) => s === "Other" || s.startsWith("Other:") || s === "Otro" || s.startsWith("Otro:"));
+          const cleanList = (selected || []).filter((v: string) => v !== "Other" && !v.startsWith("Other:") && v !== "Otro" && !v.startsWith("Otro:"));
+          const finalSelected = hasOther ? [...cleanList, customVal] : cleanList;
 
-            navProps.onNext(finalSelected);
-          }}
-          disabled={navProps.loading}
-          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-xs transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
-        </button>
-      </div>
+          navProps.onNext(finalSelected);
+        }}
+        isSpanish={isSpanish}
+        loading={navProps.loading}
+        variant="flow"
+      />
     </div>
   );
 }
@@ -1568,7 +1577,7 @@ export function Slide10MedicalCareScreen(props: any) {
       <div 
         id="slide-content"
         aria-hidden={showBranchModal ? true : undefined}
-        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative min-h-0 overflow-y-auto w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
+        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative min-h-0 overflow-y-auto w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6 pb-16"
       >
         <div className="mb-6">
           {/* Main heading with ref and tabIndex={-1} for VoiceOver capture */}
@@ -1645,21 +1654,15 @@ export function Slide10MedicalCareScreen(props: any) {
           </div>
         </div>
 
-        {/* Parent Next Button */}
-        <div className="flex justify-center pt-6 mt-4 border-t border-slate-200/60">
-          <button
-            type="button"
-            disabled={!selected || (selected === "Yes" && !locationSelected)}
-            onClick={() => navProps.onNext(selected)}
-            className={`px-12 py-3 min-h-[44px] font-bold text-sm sm:text-base rounded-full transition shadow-sm flex items-center justify-center ${
-              selected && (selected !== "Yes" || locationSelected)
-                ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
-            }`}
-          >
-            {isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
+        {/* Navigation (Back & Next) */}
+        <SlideNavigationButtons
+          onBack={navProps.onBack}
+          onNext={() => navProps.onNext(selected)}
+          nextDisabled={!selected || (selected === "Yes" && !locationSelected)}
+          isSpanish={isSpanish}
+          loading={navProps.loading}
+          variant="flow"
+        />
       </div>
 
       {/* =========================================================================
@@ -1829,7 +1832,7 @@ export function Slide11MedicationScreen(props: any) {
       <div 
         id="slide-content"
         aria-hidden={showBranchModal ? true : undefined}
-        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative min-h-0 overflow-y-auto w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
+        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative min-h-0 overflow-y-auto w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6 pb-16"
       >
         <div className="mb-6">
           {/* Main heading with ref and tabIndex={-1} for VoiceOver capture */}
@@ -1917,21 +1920,15 @@ export function Slide11MedicationScreen(props: any) {
           </div>
         </div>
 
-        {/* Parent Next Button */}
-        <div className="flex justify-center pt-6 mt-4 border-t border-slate-200/60">
-          <button
-            type="button"
-            disabled={!selected || (selected === "With medication" && (!medicineSelected || !routeSelected))}
-            onClick={() => navProps.onNext(selected)}
-            className={`px-12 py-3 min-h-[44px] font-bold text-sm sm:text-base rounded-full transition shadow-sm flex items-center justify-center ${
-              selected && (selected !== "With medication" || (medicineSelected && routeSelected))
-                ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
-            }`}
-          >
-            {isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
+        {/* Navigation (Back & Next) */}
+        <SlideNavigationButtons
+          onBack={navProps?.onBack}
+          onNext={() => navProps.onNext(selected)}
+          nextDisabled={!selected || (selected === "With medication" && (!medicineSelected || !routeSelected))}
+          isSpanish={isSpanish}
+          loading={navProps?.loading}
+          variant="flow"
+        />
       </div>
 
       {/* =========================================================================
@@ -2168,7 +2165,7 @@ export function Slide12RepeatUseScreen(props: any) {
       <div 
         id="slide-content"
         aria-hidden={showYetAgainModal ? true : undefined}
-        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative min-h-0 overflow-y-auto w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6"
+        className="bg-[#f4f8e8] border border-slate-200/60 rounded-3xl shadow-lg relative min-h-0 overflow-y-auto w-full max-w-4xl mx-auto flex flex-col justify-between p-4 sm:p-6 pb-16"
       >
         <div className="mb-6">
           {/* Main heading with ref and tabIndex={-1} for VoiceOver capture */}
@@ -2246,21 +2243,15 @@ export function Slide12RepeatUseScreen(props: any) {
           </div>
         </div>
 
-        {/* Parent Next Button */}
-        <div className="flex justify-center pt-6 mt-4 border-t border-slate-200/60">
-          <button
-            type="button"
-            disabled={!selected || (selected === "Yes" && !reactionDetailSelected)}
-            onClick={() => navProps.onNext(selected)}
-            className={`px-12 py-3 min-h-[44px] font-bold text-sm sm:text-base rounded-full transition shadow-sm flex items-center justify-center ${
-              selected && (selected !== "Yes" || reactionDetailSelected)
-                ? "bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent"
-            }`}
-          >
-            {isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
+        {/* Navigation (Back & Next) */}
+        <SlideNavigationButtons
+          onBack={navProps?.onBack}
+          onNext={() => navProps.onNext(selected)}
+          nextDisabled={!selected || (selected === "Yes" && !reactionDetailSelected)}
+          isSpanish={isSpanish}
+          loading={navProps?.loading}
+          variant="flow"
+        />
       </div>
 
       {/* =========================================================================
@@ -2424,7 +2415,7 @@ function SurveySingleChoice({
   };
 
   return (
-    <div id="slide-content" className="w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-4 sm:p-6 md:p-8 overflow-y-auto">
+    <div id="slide-content" className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-4 sm:p-6 md:p-8 pb-16 overflow-y-auto">
       <div className="flex flex-row gap-2 sm:gap-6 items-center justify-between">
         <div className="flex-1 min-w-0 max-w-3xl pb-2">
           {/* 1. Heading & Description Outside Fieldset (WCAG 2.4.3 Focus Target) */}
@@ -2569,17 +2560,14 @@ function SurveySingleChoice({
         <NurseAnna size="md" isDecorative={true} />
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={() => navProps.onNext(selected)}
-          disabled={navProps.loading}
-          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
-        </button>
-      </div>
+      {/* Navigation (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={navProps.onBack}
+        onNext={() => navProps.onNext(selected)}
+        isSpanish={isSpanish}
+        loading={navProps.loading}
+        variant="flow"
+      />
 
       {/* Branch Modal for Slide 10: Where did your child get medical care? */}
       {showBranchModal && stepId === "screen6_4_resolution" && (
@@ -2914,7 +2902,7 @@ function SurveySingleChoice({
 function TextScreen({ title, description, content, ...navProps }: BaseScreenProps) {
   const isSpanish = navProps.locale === "es";
   return (
-    <div id="slide-content" className="w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-3 sm:p-4.5 md:p-5 overflow-y-auto">
+    <div id="slide-content" className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-between bg-[#f4f8ec] p-3 sm:p-4.5 md:p-5 pb-16 overflow-y-auto">
       <div className="flex flex-row items-center justify-between gap-3 sm:gap-6">
         <div className="space-y-4 flex-1 min-w-0 max-w-2xl pb-2 text-left min-h-[10rem]">
           <h2 
@@ -2933,17 +2921,14 @@ function TextScreen({ title, description, content, ...navProps }: BaseScreenProp
         <NurseAnna size="md" isDecorative={true} />
       </div>
 
-      {/* Centered Yellow Next Button */}
-      <div className="flex justify-center pt-3 mt-4 border-t border-slate-300/40">
-        <button
-          type="button"
-          onClick={() => navProps.onNext()}
-          disabled={navProps.loading}
-          className="px-8 py-2 min-h-[44px] bg-[#f0d411] hover:bg-[#e1c504] text-[#1f382f] border border-[#e0c406] rounded-full font-bold text-sm transition shadow-sm active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-        >
-          {navProps.loading ? "..." : (isSpanish ? "Siguiente" : navProps.t("next"))}
-        </button>
-      </div>
+      {/* Navigation (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={navProps.onBack}
+        onNext={() => navProps.onNext()}
+        isSpanish={isSpanish}
+        loading={navProps.loading}
+        variant="flow"
+      />
     </div>
   );
 }

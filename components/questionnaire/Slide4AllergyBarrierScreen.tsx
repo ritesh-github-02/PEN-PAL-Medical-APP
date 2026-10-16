@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
 import { resolveMedicineToken } from "@/lib/token-engine";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
    Slide4AllergyBarrierScreen – Scoped Pixel-Perfect Stage Layout
@@ -14,8 +15,8 @@ import { resolveMedicineToken } from "@/lib/token-engine";
    - Single CC & Play/Pause controls directly at left: 659px, y = 541px
    ========================================================== */
 
-const STAGE_W = 896;
-const STAGE_H = 645;
+const STAGE_W = 750;
+const STAGE_H = 530;
 
 const SLIDE4_CSS = `
 .s4-root,
@@ -52,8 +53,8 @@ const SLIDE4_CSS = `
 /* ---------- 1. Nurse Anna standing on Left (Mirrored horizontally) ---------- */
 .s4-nurse {
   position: absolute;
-  left: 180px;
-  top: 272px;
+  left: 70px;
+  top: 191px;
   width: 195px;
   height: 268px;
   pointer-events: none;
@@ -75,8 +76,8 @@ const SLIDE4_CSS = `
 /* ---------- 2. Speech Bubble on Right (Tail pointing left toward Anna) ---------- */
 .s4-bubble {
   position: absolute;
-  left: 285px;
-  top: 95px;
+  left: 175px;
+  top: 14px;
   width: 490px;
   height: 300px;
   pointer-events: none;
@@ -134,14 +135,14 @@ const SLIDE4_CSS = `
 /* ---------- 3. Centered Navigation Buttons (Back & Next) ---------- */
 .s4-nav-back {
   position: absolute;
-  left: 352px;
-  top: 544px;
+  left: 242px;
+  top: 463px;
   z-index: 10;
 }
 .s4-nav-next {
   position: absolute;
-  left: 483px;
-  top: 544px;
+  left: 373px;
+  top: 463px;
   z-index: 10;
 }
 .s4-btn {
@@ -188,8 +189,8 @@ const SLIDE4_CSS = `
 /* ---------- 4. CC & Play/Pause Controls ---------- */
 .s4-audio {
   position: absolute;
-  left: 659px;
-  top: 536px;
+  left: 549px;
+  top: 455px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -350,13 +351,12 @@ export function Slide4AllergyBarrierScreen({
             {/* Black shadow underneath */}
             <path
               d={BUBBLE_PATH_LEFT}
-              transform="translate(4, 6)"
+              transform="translate(4, 5)"
               fill="#000000"
               stroke="#000000"
-              strokeWidth="8"
+              strokeWidth="5"
               strokeLinecap="round"
-              strokeLinejoin="miter"
-              strokeMiterlimit="4"
+              strokeLinejoin="round"
             />
 
             {/* White bubble body */}
@@ -365,15 +365,14 @@ export function Slide4AllergyBarrierScreen({
             {/* Subtle paper dot grid texture */}
             <path d={BUBBLE_PATH_LEFT} fill="url(#s4-bubble-dots)" />
 
-            {/* Soft teal outline with 8px border width */}
+            {/* Soft teal outline */}
             <path
               d={BUBBLE_PATH_LEFT}
               fill="none"
               stroke="#8ebfbb"
-              strokeWidth="8"
+              strokeWidth="5"
               strokeLinecap="round"
-              strokeLinejoin="miter"
-              strokeMiterlimit="4"
+              strokeLinejoin="round"
             />
           </svg>
 
@@ -399,28 +398,6 @@ export function Slide4AllergyBarrierScreen({
           </div>
         </div>
 
-        {/* 3. Centered Navigation Buttons (Back & Next) */}
-        <div className="s4-nav-back">
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={loading}
-            className="s4-btn s4-btn--back"
-          >
-            {isSpanish ? "Atrás" : "Back"}
-          </button>
-        </div>
-        <div className="s4-nav-next">
-          <button
-            type="button"
-            onClick={onNext}
-            disabled={loading}
-            className="s4-btn s4-btn--next"
-          >
-            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
-
         {/* 4. Caption (CC) & Play/Pause controls directly at right baseline */}
         <div className="s4-audio">
           <AudioPlayer
@@ -432,6 +409,14 @@ export function Slide4AllergyBarrierScreen({
           />
         </div>
       </div>
+
+      {/* 3. Centered Navigation Buttons (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+      />
     </div>
   );
 }

@@ -9,7 +9,7 @@ interface AudioPlayerProps {
   locale: string;
   transcriptText?: string;
   className?: string;
-  size?: 'normal' | 'large' | 'xl';
+  size?: 'small' | 'compact' | 'normal' | 'large' | 'xl';
 }
 
 export default function AudioPlayer({
@@ -170,15 +170,20 @@ export default function AudioPlayer({
   if (!audioSrc && !transcriptText) return null;
 
   // Size classes for CC and Play icons
+  const isCompact = size === 'small' || size === 'compact';
   const ccSizeClass =
-    size === 'normal'
+    isCompact
+      ? 'w-[36px] h-[32px] sm:w-[39px] sm:h-[35px]'
+      : size === 'normal'
       ? 'w-9 h-8 sm:w-11 sm:h-10'
       : size === 'xl'
       ? 'w-14 h-12.5 sm:w-[3.9rem] sm:h-[3.5rem]'
       : 'w-12 h-11 sm:w-[3.45rem] sm:h-[3.15rem]';
 
   const playSizeClass =
-    size === 'normal'
+    isCompact
+      ? 'w-[48px] h-[32px] sm:w-[52px] sm:h-[35px]'
+      : size === 'normal'
       ? 'w-[3rem] h-8 sm:w-[3.6rem] sm:h-10'
       : size === 'xl'
       ? 'w-[4.4rem] h-12.5 sm:w-[5.2rem] sm:h-[3.5rem]'
@@ -186,7 +191,7 @@ export default function AudioPlayer({
 
   return (
     <div
-      className={`relative inline-flex items-center gap-2 sm:gap-2.5 z-30 ${className}`}
+      className={`relative inline-flex items-center ${isCompact ? 'gap-1.5 sm:gap-2' : 'gap-2 sm:gap-2.5'} z-30 ${className}`}
       aria-label={
         locale === 'es'
           ? 'Controles de narración de audio y subtítulos'
@@ -224,7 +229,7 @@ export default function AudioPlayer({
                 ? 'Close captions'
                 : 'Open captions'
           }
-          className={`audio-cc-btn group relative inline-flex items-center justify-center p-0.5 sm:p-1 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${showTranscript ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
+          className={`audio-cc-btn group relative inline-flex items-center justify-center ${isCompact ? 'p-0.5' : 'p-0.5 sm:p-1'} rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${showTranscript ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
             }`}
         >
           {/* Custom CC Speech Bubble SVG matching exact UI */}
@@ -323,7 +328,7 @@ export default function AudioPlayer({
               ? 'Reproducir audio'
               : 'Play audio'
         }
-        className={`audio-play-btn group relative inline-flex items-center justify-center p-0.5 sm:p-1 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${isPlaying ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
+        className={`audio-play-btn group relative inline-flex items-center justify-center ${isCompact ? 'p-0.5' : 'p-0.5 sm:p-1'} rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${isPlaying ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
           }`}
       >
         <svg

@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
 import { resolveMedicineToken } from "@/lib/token-engine";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
    Slide5PrevalenceScreen – Scoped Pixel-Perfect Stage Layout
@@ -14,8 +15,8 @@ import { resolveMedicineToken } from "@/lib/token-engine";
    - Audio player at left: 659px, y = 541px
    ========================================================== */
 
-const STAGE_W = 896;
-const STAGE_H = 645;
+const STAGE_W = 750;
+const STAGE_H = 530;
 
 const SLIDE5_CSS = `
 .s5-root,
@@ -52,8 +53,8 @@ const SLIDE5_CSS = `
 /* ---------- 1. "Did You Know?" Yellow Badge (Top Left) ---------- */
 .s5-badge {
   position: absolute;
-  left: 122px;
-  top: 84px;
+  left: 41px;
+  top: 8px;
   width: 205px;
   height: 75px;
   display: flex;
@@ -82,8 +83,8 @@ const SLIDE5_CSS = `
 /* ---------- 2. Statement Text (Left Column) ---------- */
 .s5-text-wrap {
   position: absolute;
-  left: 121px;
-  top: 230px;
+  left: 40px;
+  top: 154px;
   width: 405px;
   max-width: 415px;
   margin: 0;
@@ -112,8 +113,8 @@ const SLIDE5_CSS = `
 /* ---------- 3. Nurse Anna holding Pink Bottle (Right) ---------- */
 .s5-nurse {
   position: absolute;
-  left: 574px;
-  top: 164px;
+  left: 493px;
+  top: 88px;
   width: 194px;
   height: 385px;
   pointer-events: none;
@@ -134,14 +135,14 @@ const SLIDE5_CSS = `
 /* ---------- 4. Centered Navigation Buttons (Back & Next) ---------- */
 .s5-nav-back {
   position: absolute;
-  left: 352px;
-  top: 544px;
+  left: 271px;
+  top: 468px;
   z-index: 10;
 }
 .s5-nav-next {
   position: absolute;
-  left: 483px;
-  top: 544px;
+  left: 402px;
+  top: 468px;
   z-index: 10;
 }
 .s5-btn {
@@ -188,8 +189,8 @@ const SLIDE5_CSS = `
 /* ---------- 5. CC & Play/Pause Controls ---------- */
 .s5-audio {
   position: absolute;
-  left: 659px;
-  top: 536px;
+  left: 578px;
+  top: 460px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -304,28 +305,6 @@ export function Slide5PrevalenceScreen({
           />
         </div>
 
-        {/* 4. Centered Navigation Buttons (Back & Next) */}
-        <div className="s5-nav-back">
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={loading}
-            className="s5-btn s5-btn--back"
-          >
-            {isSpanish ? "Atrás" : "Back"}
-          </button>
-        </div>
-        <div className="s5-nav-next">
-          <button
-            type="button"
-            onClick={onNext}
-            disabled={loading}
-            className="s5-btn s5-btn--next"
-          >
-            {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
-          </button>
-        </div>
-
         {/* 5. Caption (CC) & Play/Pause controls directly at right baseline */}
         <div className="s5-audio">
           <AudioPlayer
@@ -337,6 +316,14 @@ export function Slide5PrevalenceScreen({
           />
         </div>
       </div>
+
+      {/* 4. Centered Navigation Buttons (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isSpanish}
+        loading={loading}
+      />
     </div>
   );
 }
