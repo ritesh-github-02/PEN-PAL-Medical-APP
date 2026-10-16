@@ -3,16 +3,21 @@
 import React, { useRef, useEffect } from "react";
 import { resolveMedicineToken } from "@/lib/token-engine";
 import { SlideNavigationButtons } from "./SlideNavigationButtons";
+import AudioPlayer from "./AudioPlayer";
 
-const SLIDE21_CSS = `
 /* ==========================================================
    Slide21WhatNowScreen – Pixel-Perfect Styles Matching Figma UI
-   - Large prominent yellow "What Now?" pill badge
+   (Figma Screen 17: "What Now?")
+   - Prominent yellow "What Now?" pill badge (#feff9f)
    - Bold, clear doctor consultation heading & benefits bullets
    - High-impact, generously sized doctor consultation illustration
-   - Responsive scaling with clean mobile adaptation
+   - Desktop: Clean vertical column with centered artwork
+   - Mobile Portrait: Balanced proportional typography and illustration
+   - Mobile Landscape: Side-by-side split row (text column on left, artwork on right)
+   - Standardized SlideNavigationButtons pinned at bottom
    ========================================================== */
 
+const SLIDE21_CSS = `
 .s21-root,
 .s21-root *,
 .s21-root *::before,
@@ -31,16 +36,15 @@ const SLIDE21_CSS = `
   justify-content: flex-start;
   align-items: center;
   background-color: #fafdf3;
-  padding: clamp(0.75rem, 2.2vh, 1.75rem) clamp(1.25rem, 3.5vw, 3rem) 4.5rem clamp(1.25rem, 3.5vw, 3rem);
-  overflow: hidden;
+  padding: 32px 48px 72px 48px;
+  overflow-y: auto;
+  overflow-x: hidden;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   color: #232323;
 }
 
-/* Centered Content Container */
-.s21-content {
-  flex: 1 1 auto;
-  min-height: 0;
+/* Main Content Area */
+.s21-content-wrap {
   width: 100%;
   max-width: 820px;
   margin: 0 auto;
@@ -48,31 +52,39 @@ const SLIDE21_CSS = `
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
-/* "What Now?" Yellow Badge (Matching Figma Specification) */
+.s21-text-col {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Yellow Badge */
 .s21-badge {
+  width: 195px;
+  height: 62px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background-color: #feff9f;
-  border: 2px solid #2b7f8f;
+  border: 1.8px solid #2b7f8f;
   border-radius: 22px;
-  padding: 0.7rem 2.5rem;
-  min-height: 58px;
   box-shadow: 0 4px 6px rgba(34, 105, 118, 0.35);
-  margin-bottom: clamp(0.5rem, 1.5vh, 0.9rem);
+  margin-bottom: 16px;
   flex-shrink: 0;
 }
 
 .s21-badge-title {
-  font-size: clamp(1.3rem, 2.3vw, 1.48rem);
+  font-size: 23px;
   font-weight: 700;
-  color: #1a2e2b;
-  line-height: 1.2;
+  color: #232323;
+  letter-spacing: -0.01em;
   margin: 0;
-  letter-spacing: -0.015em;
+  line-height: 1;
   outline: none;
 }
 
@@ -81,157 +93,196 @@ const SLIDE21_CSS = `
   border-radius: 4px;
 }
 
-/* Main Heading */
+/* Heading Statement */
 .s21-heading {
-  font-size: clamp(1.12rem, 2.1vw, 1.35rem);
+  font-size: 22.5px;
   font-weight: 700;
+  color: #232323;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.012em;
   line-height: 1.35;
-  color: #1a2e2b;
-  letter-spacing: -0.01em;
-  margin: 0 0 clamp(0.35rem, 1.2vh, 0.65rem) 0;
   text-align: left;
-  flex-shrink: 0;
 }
 
 /* Bullet Points */
 .s21-bullets {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 clamp(0.4rem, 1.3vh, 0.75rem) 0;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.35rem, 1vh, 0.55rem);
+  margin: 0 0 10px 0;
+  padding-left: 22px;
+  list-style-type: disc;
   width: 100%;
-  flex-shrink: 0;
 }
 
 .s21-bullet-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  font-size: clamp(0.94rem, 1.55vw, 1.06rem);
-  font-weight: 500;
+  font-size: 19px;
+  line-height: 1.45;
   color: #232323;
-  line-height: 1.42;
+  margin-bottom: 6px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   text-align: left;
 }
 
-.s21-bullet-dot {
-  font-size: 1.15rem;
-  line-height: 1.2;
-  color: #1a2e2b;
-  user-select: none;
-  flex-shrink: 0;
-}
-
-/* Illustration Container & Large Doctor Consultation Image */
+/* Doctor Consultation Illustration */
 .s21-illustration-wrap {
   width: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: clamp(0.35rem, 1.2vh, 0.75rem);
-  user-select: none;
+  margin-top: 2px;
+  flex: 1 1 auto;
 }
 
 .s21-illustration-img {
-  width: min(580px, 100%);
-  max-width: 580px;
-  height: auto;
-  max-height: clamp(240px, 39vh, 325px);
+  width: 480px;
+  max-width: 100%;
+  height: 275px;
+  max-height: 38vh;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 4px 14px rgba(20, 50, 45, 0.08));
 }
 
-/* Mobile & Small Screen Adaptations */
+/* Audio Controls Position */
+.s21-audio {
+  position: absolute;
+  right: 28px;
+  bottom: 20px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.s21-audio .audio-cc-btn svg {
+  width: 44px !important;
+  height: 38px !important;
+}
+
+.s21-audio .audio-play-btn svg {
+  width: 58px !important;
+  height: 38px !important;
+}
+
+/* ==========================================================
+   Mobile Portrait Mode (< 768px)
+   ========================================================== */
 @media (max-width: 767px) {
   .s21-root {
-    height: auto !important;
-    min-height: auto !important;
-    flex: none !important;
+    padding: 16px 16px 72px 16px !important;
     overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
-    gap: 0.4rem !important;
+    -webkit-overflow-scrolling: touch !important;
   }
-
-  .s21-content {
+  .s21-content-wrap {
     max-width: 100% !important;
-    width: 100% !important;
-    align-items: flex-start !important;
-    flex: none !important;
   }
-
   .s21-badge {
-    padding: 0.55rem 1.6rem !important;
-    min-height: 48px !important;
-    border-radius: 18px !important;
-    margin-bottom: 0.6rem !important;
+    width: 140px !important;
+    height: 46px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 3px 5px rgba(34, 105, 118, 0.3) !important;
+    margin-bottom: 12px !important;
   }
-
   .s21-badge-title {
-    font-size: 1.18rem !important;
+    font-size: 17px !important;
   }
-
   .s21-heading {
-    font-size: 1.05rem !important;
-    line-height: 1.35 !important;
-    margin-bottom: 0.55rem !important;
+    font-size: 16.5px !important;
+    line-height: 1.32 !important;
+    margin: 0 0 10px 0 !important;
   }
-
   .s21-bullets {
-    gap: 0.45rem !important;
-    margin-bottom: 0.65rem !important;
+    margin: 0 0 10px 0 !important;
+    padding-left: 18px !important;
   }
-
   .s21-bullet-item {
-    font-size: 0.88rem !important;
+    font-size: 14px !important;
     line-height: 1.4 !important;
-    gap: 0.45rem !important;
+    margin-bottom: 6px !important;
   }
-
-  .s21-bullet-dot {
-    font-size: 1rem !important;
-  }
-
   .s21-illustration-wrap {
-    flex: none !important;
-    margin-top: 0.45rem !important;
-    width: 100% !important;
+    margin-top: 8px !important;
+    max-height: 240px !important;
   }
-
   .s21-illustration-img {
-    max-width: 350px !important;
-    max-height: 200px !important;
-    margin: 0 auto !important;
+    max-width: 100% !important;
+    max-height: 215px !important;
+    height: auto !important;
+  }
+  .s21-audio {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 8px auto 0 auto !important;
+    justify-content: center !important;
+  }
+  .s21-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s21-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
   }
 }
 
-@media (max-height: 700px) and (min-width: 768px) {
+/* ==========================================================
+   Mobile Landscape Mode (< 520px height) - Split Screen Row
+   ========================================================== */
+@media (orientation: landscape) and (max-height: 520px) {
   .s21-root {
-    padding: 0.65rem 1.75rem 4.2rem 1.75rem;
+    padding: 10px 20px 65px 20px !important;
+    overflow-y: auto !important;
+  }
+  .s21-content-wrap {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+  }
+  .s21-text-col {
+    flex: 1 1 50% !important;
+    width: 50% !important;
+    justify-content: center !important;
   }
   .s21-badge {
-    padding: 0.45rem 1.75rem;
-    min-height: 48px;
-    margin-bottom: 0.45rem;
+    width: 130px !important;
+    height: 38px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 4px rgba(34, 105, 118, 0.3) !important;
+    margin-bottom: 8px !important;
   }
   .s21-badge-title {
-    font-size: 1.25rem;
+    font-size: 15px !important;
   }
   .s21-heading {
-    font-size: 1.15rem;
-    margin-bottom: 0.35rem;
+    font-size: 15px !important;
+    line-height: 1.25 !important;
+    margin: 0 0 6px 0 !important;
+  }
+  .s21-bullets {
+    margin: 0 !important;
+    padding-left: 16px !important;
   }
   .s21-bullet-item {
-    font-size: 0.95rem;
+    font-size: 12.5px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 4px !important;
+  }
+  .s21-illustration-wrap {
+    flex: 1 1 50% !important;
+    width: 50% !important;
+    max-height: 200px !important;
+    margin-top: 0 !important;
   }
   .s21-illustration-img {
-    max-height: clamp(180px, 30vh, 230px);
-    max-width: 520px;
+    max-width: 100% !important;
+    max-height: 190px !important;
+    height: auto !important;
+  }
+  .s21-audio {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 4px auto 0 auto !important;
   }
 }
 `;
@@ -248,6 +299,10 @@ export interface Slide21WhatNowScreenProps {
     loading?: boolean;
     headingRef?: React.RefObject<HTMLHeadingElement | null>;
   };
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
 }
 
 export function Slide21WhatNowScreen({
@@ -257,6 +312,10 @@ export function Slide21WhatNowScreen({
   onBack,
   loading = false,
   navProps,
+  audioSrc,
+  stepId = "slide21_what_now",
+  locale,
+  transcriptText,
 }: Slide21WhatNowScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
 
@@ -268,13 +327,13 @@ export function Slide21WhatNowScreen({
   }, []);
 
   const rawTitle = isSpanish
-    ? "¡Hable con el médico de su hijo sobre las pruebas de alergia a [name]!"
-    : "Talk to your child's doctor about [name] allergy testing!";
+    ? "¡Hable con el médico de su hijo sobre la prueba de alergia a [name]!"
+    : "Talk to your child’s doctor about [name] allergy testing!";
 
   const rawBullets = [
     {
-      en: "The test can help you learn the truth about your child's past reaction.",
-      es: "La prueba puede ayudarle a saber la verdad sobre la reacción pasada de su hijo.",
+      en: "The test can help you learn the truth about your child’s past reaction.",
+      es: "La prueba puede ayudarle a conocer la verdad sobre la reacción pasada de su hijo.",
     },
     {
       en: "The test may help your child get better medicine in the future.",
@@ -302,41 +361,46 @@ export function Slide21WhatNowScreen({
 
   const isLoading = loading || navProps?.loading || false;
 
+  const spokenText = `${isSpanish ? "Qué sigue ahora. " : "What Now? "}${titleText}. ${rawBullets
+    .map((b) => resolveMedicineToken(isSpanish ? b.es : b.en, medicationName, isSpanish))
+    .join(" ")}`;
+
   return (
     <div id="slide-content" className="s21-root">
       <style>{SLIDE21_CSS}</style>
 
-      {/* Main Centered Content */}
-      <div className="s21-content">
-        {/* Yellow "What Now?" Badge */}
-        <div className="s21-badge">
-          <h1
-            ref={headingRef}
-            tabIndex={-1}
-            id="slide21-title"
-            className="s21-badge-title"
-          >
-            {isSpanish ? "¿Qué sigue ahora?" : "What Now?"}
+      {/* Main Content Area */}
+      <main className="s21-content-wrap">
+        <div className="s21-text-col">
+          {/* Yellow Badge */}
+          <div className="s21-badge">
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              id="slide21-title"
+              className="s21-badge-title"
+            >
+              {isSpanish ? "¿Qué sigue ahora?" : "What Now?"}
+            </h2>
+          </div>
+
+          {/* Heading Statement */}
+          <h1 className="s21-heading">
+            {titleText}
           </h1>
+
+          {/* Bullet Points */}
+          <ul className="s21-bullets" aria-label={titleText}>
+            {rawBullets.map((b, idx) => {
+              const text = resolveMedicineToken(isSpanish ? b.es : b.en, medicationName, isSpanish);
+              return (
+                <li key={idx} className="s21-bullet-item">
+                  {text}
+                </li>
+              );
+            })}
+          </ul>
         </div>
-
-        {/* Heading */}
-        <h2 className="s21-heading">
-          {titleText}
-        </h2>
-
-        {/* Bullet Points */}
-        <ul className="s21-bullets" aria-label={titleText}>
-          {rawBullets.map((b, idx) => {
-            const text = resolveMedicineToken(isSpanish ? b.es : b.en, medicationName, isSpanish);
-            return (
-              <li key={idx} className="s21-bullet-item">
-                <span className="s21-bullet-dot" aria-hidden="true">•</span>
-                <span>{text}</span>
-              </li>
-            );
-          })}
-        </ul>
 
         {/* Doctor Consultation Illustration */}
         <div className="s21-illustration-wrap" aria-hidden="true">
@@ -348,17 +412,30 @@ export function Slide21WhatNowScreen({
                 : "Mother and daughter consulting with pediatrician about allergy testing"
             }
             className="s21-illustration-img"
+            draggable={false}
           />
         </div>
-      </div>
+      </main>
 
-      {/* Centered Bottom Navigation (Back & Next) */}
+      {/* Caption (CC) & Play/Pause Controls (if audio is configured) */}
+      {audioSrc && (
+        <div className="s21-audio">
+          <AudioPlayer
+            audioSrc={audioSrc}
+            stepId={stepId}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={transcriptText || spokenText}
+            size="large"
+          />
+        </div>
+      )}
+
+      {/* Standardized Navigation Buttons (Back & Next) pinned at bottom */}
       <SlideNavigationButtons
         onBack={handleBackClick}
         onNext={handleNextClick}
         isSpanish={isSpanish}
         loading={isLoading}
-        variant="flow"
       />
     </div>
   );

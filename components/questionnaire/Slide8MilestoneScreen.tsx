@@ -5,21 +5,28 @@ import AudioPlayer from "./AudioPlayer";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
-   Slide8MilestoneScreen – Scoped Pixel-Perfect Stage Layout
-   Exact Match to User Reference Image (Slide 7 / Milestone):
-   - 896 x 645 scaled stage with background #fafdf3
-   - Hand-drawn speech bubble at left: 156px, top: 79px, width: 524px, height: 320px
-   - Offset drop shadow & subtle paper texture matching original artwork
-   - Centered congratulatory text inside bubble (2 lines):
-     "Great job! Now you know what"
-     "is true about penicillin allergies!"
-   - Nurse Anna illustration standing at left: 602px, top: 184px, width: 180px, height: 366px
-   - Centered Back (left: 352px) & Next (left: 483px) buttons at y = 544px
-   - Single stage audio controls at left: 659px, y = 538px
+   Slide8MilestoneScreen – Improved Speech Bubble & Responsive Layout
+   - Milestone celebration: "Great job! Now you know what is true about penicillin allergies!"
+   - Speech bubble on left sweeping rightward toward Nurse Anna standing on right
+   - Clean cubic Bezier contour with rightward tail & faint paper dot grid
+   - Desktop: Flex row layout (bubble order: 1, Nurse Anna order: 2)
+   - Mobile portrait: Stacked flow (bubble on top, Anna below, audio controls, navigation)
+   - Mobile & tablet landscape: Streamlined horizontal layout
    ========================================================== */
 
 const STAGE_W = 750;
 const STAGE_H = 530;
+
+/* Clean cubic Bezier contour with rightward tail sweeping toward Anna */
+const BUBBLE_PATH_RIGHT =
+  "M 232 28 " +
+  "C 350 28, 436 74, 436 150 " +
+  "C 436 190, 412 220, 376 236 " +
+  "C 412 250, 466 270, 494 282 " +
+  "C 456 290, 395 292, 342 275 " +
+  "C 302 288, 255 294, 205 294 " +
+  "C 110 294, 38 240, 38 160 " +
+  "C 38 78, 115 28, 232 28 Z";
 
 const SLIDE8_CSS = `
 .s8-root,
@@ -51,18 +58,26 @@ const SLIDE8_CSS = `
   flex: none;
   transform-origin: center center;
   background-color: #fafdf3;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
 }
 
-/* ---------- 1. Speech Bubble ---------- */
+/* ---------- 1. Speech Bubble on Left (Tail pointing right toward Anna) ---------- */
 .s8-bubble {
-  position: absolute;
-  left: 55px;
-  top: 10px;
-  width: 476px;
-  height: 315px;
-  z-index: 5;
+  position: relative;
+  width: 510px;
+  aspect-ratio: 540 / 350;
+  flex-shrink: 0;
+  filter: drop-shadow(2.5px 3.5px 0px #1a3532);
+  margin-right: -10px;
+  order: 1;
   pointer-events: none;
+  z-index: 5;
 }
+
 .s8-bubble-svg {
   position: absolute;
   inset: 0;
@@ -74,122 +89,89 @@ const SLIDE8_CSS = `
 
 .s8-bubble-text-wrap {
   position: absolute;
-  top: 45px;
-  left: 36px;
-  width: 360px;
-  height: 175px;
+  top: 45%;
+  left: 44%;
+  transform: translate(-50%, -50%);
+  width: 72%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  pointer-events: none;
-  padding: 0 10px;
-}
-.s8-bubble-text {
-  font-family: inherit;
-  font-size: 21px;
-  font-weight: 500;
-  line-height: 1.36;
-  color: #232323;
-  letter-spacing: -0.012em;
+  padding: 0;
   margin: 0;
-  text-align: center;
-  outline: none;
+  box-sizing: border-box;
+  pointer-events: none;
 }
+
+.s8-bubble-text {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
+  font-size: 21.5px;
+  line-height: 1.42;
+  font-weight: 700;
+  color: #232323;
+  text-align: center;
+  letter-spacing: -0.012em;
+  outline: none;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 .s8-bubble-text:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
   border-radius: 4px;
 }
 
-/* ---------- 2. Nurse Anna Illustration ---------- */
-.s8-nurse {
-  position: absolute;
-  left: 515px;
-  top: 83px;
-  width: 180px;
-  height: 366px;
-  z-index: 10;
-  pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+.s8-bubble-line {
+  display: block;
+  text-align: center;
+  margin: 0 auto;
+  width: 100%;
 }
+
+/* ---------- 2. Nurse Anna standing on Right ---------- */
+.s8-nurse {
+  position: relative;
+  width: 175px;
+  height: 355px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -10px;
+  order: 2;
+  pointer-events: none;
+  z-index: 10;
+}
+
 .s8-nurse-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: bottom center;
   display: block;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* ---------- 3. Centered Navigation Buttons (Back & Next) ---------- */
-.s8-nav-back {
-  position: absolute;
-  left: 257px;
-  top: 462px;
-  z-index: 20;
-}
-.s8-nav-next {
-  position: absolute;
-  left: 388px;
-  top: 462px;
-  z-index: 20;
-}
-.s8-btn {
-  height: 35px;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-.s8-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-.s8-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-.s8-btn--back {
-  width: 64px;
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
-  color: #143833;
-}
-.s8-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
-}
-.s8-btn--next {
-  width: 62px;
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
-  cursor: pointer;
-}
-.s8-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
-}
-
-/* ---------- 4. Caption (CC) & Play/Pause Controls ---------- */
+/* ---------- 3. Caption (CC) & Play/Pause Controls ---------- */
 .s8-audio {
   position: absolute;
-  left: 564px;
+  left: 565px;
   top: 444px;
   z-index: 20;
   display: flex;
   align-items: center;
   gap: 8px;
 }
+
 .s8-audio .audio-cc-btn svg {
   width: 52px !important;
   height: 47px !important;
 }
+
 .s8-audio .audio-play-btn svg {
   width: 70px !important;
   height: 47px !important;
@@ -227,15 +209,19 @@ const SLIDE8_CSS = `
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
+    gap: 0 !important;
   }
   .s8-bubble {
+    order: 1 !important;
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: 295px !important;
-    max-width: 95% !important;
-    height: 185px !important;
-    margin: 12px auto 0 auto !important;
+    width: 100% !important;
+    max-width: 330px !important;
+    aspect-ratio: 540 / 350 !important;
+    height: auto !important;
+    margin: 4px auto 0 auto !important;
+    filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
     pointer-events: none !important;
   }
@@ -247,11 +233,11 @@ const SLIDE8_CSS = `
   }
   .s8-bubble-text-wrap {
     position: absolute !important;
-    top: 44% !important;
-    left: 47% !important;
+    top: 45% !important;
+    left: 44% !important;
     transform: translate(-50%, -50%) !important;
-    width: 78% !important;
-    max-width: 235px !important;
+    width: 74% !important;
+    max-width: 250px !important;
     padding: 0 !important;
     margin: 0 !important;
     display: flex !important;
@@ -261,22 +247,21 @@ const SLIDE8_CSS = `
     text-align: center !important;
   }
   .s8-bubble-text {
-    font-size: 15.5px !important;
+    font-size: 14.5px !important;
     line-height: 1.4 !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     color: #232323 !important;
     text-align: center !important;
     letter-spacing: -0.012em !important;
   }
   .s8-nurse {
+    order: 2 !important;
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: 100px !important;
-    height: 165px !important;
-    margin-top: -30px !important;
-    margin-left: auto !important;
-    margin-right: 20px !important;
+    width: 130px !important;
+    height: 220px !important;
+    margin: -10px auto 0 auto !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -287,8 +272,10 @@ const SLIDE8_CSS = `
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
+    transform: none !important;
   }
   .s8-audio {
+    order: 3 !important;
     position: relative !important;
     left: auto !important;
     bottom: auto !important;
@@ -309,6 +296,107 @@ const SLIDE8_CSS = `
     height: 34px !important;
   }
 }
+
+/* Tablet Portrait Enhancements (481px to 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .s8-stage {
+    max-width: 430px !important;
+  }
+  .s8-bubble {
+    max-width: 390px !important;
+  }
+  .s8-bubble-text-wrap {
+    max-width: 300px !important;
+  }
+  .s8-bubble-text {
+    font-size: 16px !important;
+  }
+  .s8-nurse {
+    width: 145px !important;
+    height: 245px !important;
+  }
+}
+
+/* ==========================================================
+   Mobile & Tablet Landscape Layout (< 520px height)
+   ========================================================== */
+@media (orientation: landscape) and (max-height: 520px) {
+  .s8-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0.5rem 1rem 3.5rem 1rem !important;
+  }
+  .s8-stage {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 680px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s8-bubble {
+    order: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 320px !important;
+    aspect-ratio: 540 / 350 !important;
+    margin: 0 !important;
+    filter: drop-shadow(2px 3px 0px #1a3532) !important;
+    flex-shrink: 0 !important;
+  }
+  .s8-bubble-text-wrap {
+    width: 78% !important;
+  }
+  .s8-bubble-text {
+    font-size: 13.5px !important;
+    line-height: 1.35 !important;
+  }
+  .s8-nurse {
+    order: 2 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 110px !important;
+    height: 200px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s8-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .s8-audio {
+    order: 3 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  .s8-audio .audio-cc-btn svg {
+    width: 34px !important;
+    height: 30px !important;
+  }
+  .s8-audio .audio-play-btn svg {
+    width: 44px !important;
+    height: 30px !important;
+  }
+}
 `;
 
 export interface Slide8MilestoneScreenProps {
@@ -321,55 +409,6 @@ export interface Slide8MilestoneScreenProps {
   locale?: string;
   transcriptText?: string;
 }
-
-const BUBBLE_PATH =
-  "M 397.9,283.4 " +
-  "C 395.8,284.6 391.2,287.9 385.1,290.7 " +
-  "C 379.0,293.4 369.2,297.5 361.3,299.9 " +
-  "C 353.4,302.3 345.2,303.8 337.6,305.3 " +
-  "C 330.0,306.8 322.6,307.8 315.6,309.0 " +
-  "C 308.6,310.2 302.5,312.1 295.5,312.7 " +
-  "C 288.5,313.3 280.6,312.4 273.6,312.7 " +
-  "C 266.6,313.0 260.2,314.5 253.5,314.5 " +
-  "C 246.8,314.5 240.1,313.3 233.4,312.7 " +
-  "C 226.7,312.1 220.6,311.4 213.3,310.8 " +
-  "C 206.0,310.2 197.2,310.2 189.6,309.0 " +
-  "C 182.0,307.8 175.5,305.3 167.6,303.5 " +
-  "C 159.7,301.7 150.3,300.8 142.1,298.0 " +
-  "C 133.9,295.3 126.8,291.3 118.3,287.0 " +
-  "C 109.8,282.7 99.7,277.9 90.9,272.4 " +
-  "C 82.1,266.9 73.8,261.1 65.3,254.1 " +
-  "C 56.8,247.1 46.8,239.2 39.8,230.3 " +
-  "C 32.8,221.5 27.0,211.4 23.3,201.0 " +
-  "C 19.6,190.6 18.1,179.0 17.8,168.0 " +
-  "C 17.5,157.0 19.1,146.0 21.5,135.0 " +
-  "C 23.9,124.0 27.2,111.9 32.4,102.1 " +
-  "C 37.6,92.3 44.6,84.0 52.5,76.4 " +
-  "C 60.4,68.8 70.5,62.1 79.9,56.3 " +
-  "C 89.4,50.5 99.8,45.6 109.2,41.6 " +
-  "C 118.7,37.6 127.5,35.2 136.6,32.5 " +
-  "C 145.7,29.8 155.5,27.0 164.0,25.2 " +
-  "C 172.5,23.4 179.8,22.4 187.7,21.5 " +
-  "C 195.6,20.6 203.9,20.3 211.5,19.7 " +
-  "C 219.1,19.1 226.4,18.1 233.4,17.8 " +
-  "C 240.4,17.5 245.9,17.5 253.5,17.8 " +
-  "C 261.1,18.1 271.2,19.1 279.1,19.7 " +
-  "C 287.0,20.3 293.7,20.6 301.0,21.5 " +
-  "C 308.3,22.4 315.6,24.0 322.9,25.2 " +
-  "C 330.2,26.4 337.0,27.0 344.9,28.8 " +
-  "C 352.8,30.6 362.0,33.4 370.5,36.1 " +
-  "C 379.0,38.9 387.2,41.6 396.0,45.3 " +
-  "C 404.8,49.0 414.9,52.9 423.4,58.1 " +
-  "C 431.9,63.3 438.7,69.7 447.2,76.4 " +
-  "C 455.7,83.1 466.7,90.2 474.6,98.4 " +
-  "C 482.5,106.7 490.4,115.8 494.7,125.9 " +
-  "C 499.0,136.0 501.1,147.8 500.2,158.8 " +
-  "C 499.3,169.8 493.8,181.4 489.2,191.8 " +
-  "C 484.6,202.2 480.4,211.0 472.8,221.1 " +
-  "C 465.2,231.2 448.4,247.0 443.5,252.2 " +
-  "L 485.6,314.5 " +
-  "L 397.9,283.4 " +
-  "Z";
 
 export function Slide8MilestoneScreen({
   isSpanish,
@@ -402,6 +441,12 @@ export function Slide8MilestoneScreen({
       if (w && h) {
         if (typeof window !== "undefined" && window.innerWidth < 768) {
           setScale(1);
+        } else if (
+          typeof window !== "undefined" &&
+          window.innerHeight < 520 &&
+          window.innerWidth > window.innerHeight
+        ) {
+          setScale(1);
         } else {
           const safeW = Math.max(0, w - 24);
           const safeH = Math.max(0, h - 36);
@@ -428,45 +473,34 @@ export function Slide8MilestoneScreen({
       <style>{SLIDE8_CSS}</style>
 
       <div className="s8-stage" style={{ transform: `scale(${scale})` }}>
-        {/* 1. Hand-drawn Speech Bubble matching reference design */}
+        {/* 1. Speech Bubble on Left with smooth Bezier curve & drop shadow */}
         <div className="s8-bubble">
           <svg
             className="s8-bubble-svg"
-            viewBox="0 0 520 330"
+            viewBox="0 0 540 350"
             fill="none"
             aria-hidden="true"
           >
             <defs>
-              <pattern id="s8-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
-                <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
+              <pattern id="s8-card-dot-pattern" width="16" height="16" patternUnits="userSpaceOnUse">
+                <circle cx="8" cy="8" r="0.75" fill="#cadada" opacity="0.6" />
               </pattern>
             </defs>
 
-            {/* Black shadow underneath */}
+            {/* Smooth Bezier Silhouette sweeping rightward toward Anna */}
             <path
-              d={BUBBLE_PATH}
-              transform="translate(4, 5)"
-              fill="#000000"
-              stroke="#000000"
-              strokeWidth="5"
-              strokeLinecap="round"
+              d={BUBBLE_PATH_RIGHT}
+              fill="#ffffff"
+              stroke="#7baea9"
+              strokeWidth="3"
               strokeLinejoin="round"
+              strokeLinecap="round"
             />
 
-            {/* White bubble body */}
-            <path d={BUBBLE_PATH} fill="#ffffff" />
-
-            {/* Subtle paper dot grid texture */}
-            <path d={BUBBLE_PATH} fill="url(#s8-bubble-dots)" />
-
-            {/* Soft teal outline */}
+            {/* Faint Paper Dot Grid Overlay */}
             <path
-              d={BUBBLE_PATH}
-              fill="none"
-              stroke="#94bbb9"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              d={BUBBLE_PATH_RIGHT}
+              fill="url(#s8-card-dot-pattern)"
             />
           </svg>
 
@@ -475,31 +509,31 @@ export function Slide8MilestoneScreen({
             <h1 ref={headingRef} tabIndex={-1} className="s8-bubble-text">
               {isSpanish ? (
                 <>
-                  ¡Buen trabajo! ¡Ahora ya sabe lo que
-                  <br />
-                  es verdad sobre las alergias a la penicilina!
+                  <span className="s8-bubble-line">¡Buen trabajo! ¡Ahora ya sabe lo que</span>
+                  <span className="s8-bubble-line">es verdad sobre las alergias a la penicilina!</span>
                 </>
               ) : (
                 <>
-                  Great job! Now you know what
-                  <br />
-                  is true about penicillin allergies!
+                  <span className="s8-bubble-line">Great job! Now you know what</span>
+                  <span className="s8-bubble-line">is true about penicillin allergies!</span>
                 </>
               )}
             </h1>
           </div>
         </div>
 
-        {/* 2. Nurse Anna standing next to speech bubble */}
+        {/* 2. Nurse Anna standing on Right gesturing toward bubble */}
         <div className="s8-nurse">
           <img
             src="/images/nurse-anna.png"
-            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
+            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
             className="s8-nurse-img"
+            draggable={false}
+            aria-hidden="true"
           />
         </div>
 
-        {/* 4. Caption (CC) & Play/Pause controls directly at right baseline */}
+        {/* 3. Caption (CC) & Play/Pause Controls */}
         <div className="s8-audio">
           <AudioPlayer
             audioSrc={audioSrc}
@@ -511,7 +545,7 @@ export function Slide8MilestoneScreen({
         </div>
       </div>
 
-      {/* 3. Centered Navigation Buttons (Back & Next) */}
+      {/* 4. Standardized Navigation Buttons (Back & Next) pinned at bottom */}
       <SlideNavigationButtons
         onBack={onBack}
         onNext={onNext}
