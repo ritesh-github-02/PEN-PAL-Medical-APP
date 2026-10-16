@@ -66,14 +66,14 @@ const SLIDE3_CSS = `
 /* ---------- 1. Left-aligned Statement Heading ---------- */
 .s3-heading {
   position: absolute;
-  left: 44px;
-  top: 22px;
-  width: 445px;
-  max-width: 450px;
+  left: 42px;
+  top: 64px;
+  width: 365px;
+  max-width: 375px;
   margin: 0;
   padding: 0;
   text-align: left;
-  font-size: 21px;
+  font-size: 20px;
   line-height: 1.4;
   font-weight: 700;
   letter-spacing: -0.012em;
@@ -87,10 +87,10 @@ const SLIDE3_CSS = `
 /* ---------- 2. Speech Bubble on Right (Tail landing on Anna's hair) ---------- */
 .s3-bubble-wrap {
   position: absolute;
-  left: 360px;
-  top: 36px;
-  width: 340px;
-  height: 224px;
+  left: 418px;
+  top: 38px;
+  width: 290px;
+  height: 191px;
   filter: drop-shadow(2.5px 3.5px 0px #1a3532);
   z-index: 5;
   pointer-events: none;
@@ -110,7 +110,7 @@ const SLIDE3_CSS = `
   left: 48%;
   transform: translate(-50%, -50%);
   width: 76%;
-  max-width: 230px;
+  max-width: 205px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -122,8 +122,8 @@ const SLIDE3_CSS = `
 .s3-bubble-text {
   margin: 0;
   padding: 0;
-  font-size: 13.5px;
-  line-height: 1.44;
+  font-size: 12.2px;
+  line-height: 1.42;
   font-weight: 500;
   color: #1a2e2b;
   text-align: center;
@@ -140,10 +140,10 @@ const SLIDE3_CSS = `
 /* ---------- 3. Nurse Anna standing with hair under bubble tail ---------- */
 .s3-nurse-wrap {
   position: absolute;
-  left: 562px;
-  top: 212px;
-  width: 134px;
-  height: 258px;
+  left: 596px;
+  top: 194px;
+  width: 114px;
+  height: 220px;
   z-index: 10;
   pointer-events: none;
   display: flex;
@@ -238,8 +238,8 @@ const SLIDE3_CSS = `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: 290px !important;
-    height: 190px !important;
+    width: 260px !important;
+    height: 172px !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
   }
@@ -247,19 +247,19 @@ const SLIDE3_CSS = `
     top: 39% !important;
     left: 48% !important;
     width: 76% !important;
-    max-width: 195px !important;
+    max-width: 185px !important;
   }
   .s3-bubble-text {
-    font-size: 12px !important;
-    line-height: 1.38 !important;
+    font-size: 11px !important;
+    line-height: 1.36 !important;
   }
   .s3-nurse-wrap {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: 108px !important;
-    height: 190px !important;
-    margin-top: -24px !important;
+    width: 95px !important;
+    height: 170px !important;
+    margin-top: -18px !important;
     margin-left: auto !important;
     margin-right: 28px !important;
   }
@@ -291,22 +291,22 @@ const SLIDE3_CSS = `
     max-width: 440px !important;
   }
   .s3-heading {
-    font-size: 16.5px !important;
+    font-size: 16px !important;
   }
   .s3-bubble-wrap {
-    width: 320px !important;
-    height: 210px !important;
+    width: 285px !important;
+    height: 188px !important;
   }
   .s3-bubble-text-wrap {
-    max-width: 220px !important;
+    max-width: 200px !important;
   }
   .s3-bubble-text {
-    font-size: 13px !important;
+    font-size: 12px !important;
   }
   .s3-nurse-wrap {
-    width: 120px !important;
-    height: 215px !important;
-    margin-top: -26px !important;
+    width: 108px !important;
+    height: 195px !important;
+    margin-top: -22px !important;
   }
 }
 
