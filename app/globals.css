@@ -341,7 +341,7 @@ body::-webkit-scrollbar,
 .slide-nav-stage,
 .slide-nav-flow {
   position: absolute !important;
-  bottom: 22px !important;
+  bottom: clamp(16px, 3vh, 22px) !important;
   left: 0 !important;
   right: 0 !important;
   top: auto !important;
@@ -466,9 +466,9 @@ body::-webkit-scrollbar,
   /* Clean slide frame on mobile viewports without black border */
   .tablet-mockup-frame {
     aspect-ratio: auto !important;
-    height: calc(100dvh - 4.5rem) !important;
-    max-height: 720px !important;
-    min-height: 480px !important;
+    height: auto !important;
+    max-height: calc(100dvh - 4.25rem) !important;
+    min-height: auto !important;
     width: 100% !important;
     max-width: 420px !important;
     margin: 0 auto !important;
@@ -494,7 +494,10 @@ body::-webkit-scrollbar,
     box-shadow: none !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
+    height: auto !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: none !important;
     width: 100% !important;
     background: transparent !important;
     display: flex !important;
@@ -506,7 +509,10 @@ body::-webkit-scrollbar,
   .tablet-slide-content {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
+    height: auto !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: none !important;
     width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
@@ -517,14 +523,17 @@ body::-webkit-scrollbar,
   .slide-nav,
   .slide-nav-stage,
   .slide-nav-flow {
-    position: absolute !important;
-    bottom: 14px !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     top: auto !important;
-    margin: 0 auto !important;
+    margin: 1rem auto 0.25rem auto !important;
     gap: 12px !important;
     width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
     z-index: 30 !important;
   }
 
@@ -536,7 +545,7 @@ body::-webkit-scrollbar,
     min-width: 72px !important;
   }
 
-  /* All slide roots fit cleanly within defined height with scrolling protection */
+  /* All slide roots fit cleanly within defined height with zero empty bottom space */
   .s2-root,
   .s3-root,
   .s4-root,
@@ -557,27 +566,27 @@ body::-webkit-scrollbar,
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
-    min-height: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 0.85rem 0.75rem 4.75rem 0.75rem !important;
-    gap: 0.65rem !important;
+    padding: 0.85rem 0.75rem 0.85rem 0.75rem !important;
+    gap: 0.5rem !important;
   }
 
   .s18-root {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
-    min-height: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 0.85rem 0.75rem 4.75rem 0.75rem !important;
+    padding: 0.85rem 0.75rem 1rem 0.75rem !important;
     gap: 0.65rem !important;
   }
 

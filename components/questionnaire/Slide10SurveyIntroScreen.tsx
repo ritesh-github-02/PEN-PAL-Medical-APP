@@ -175,8 +175,8 @@ const SLIDE10_SURVEY_INTRO_CSS = `
 /* ---------- 4. Caption (CC) & Play/Pause Controls ---------- */
 .s10b-audio {
   position: absolute;
-  left: 585px;
-  top: 454px;
+  left: 570px;
+  top: 444px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -199,13 +199,14 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
-    min-height: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    flex: none !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
+    padding: 0.85rem 0.85rem 1rem 0.85rem !important;
     gap: 0 !important;
   }
   .s10b-stage {
@@ -287,14 +288,16 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   }
   .s10b-audio {
     order: 3 !important;
-    position: absolute !important;
-    right: 14px !important;
-    bottom: 20px !important;
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
     left: auto !important;
     top: auto !important;
+    margin: 8px auto 0 auto !important;
     z-index: 25 !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 8px !important;
   }
   .s10b-audio .audio-cc-btn svg {
@@ -397,17 +400,23 @@ export function Slide10SurveyIntroScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        if (w < 768) {
+        if (typeof window !== "undefined" && window.innerWidth < 768) {
           setScale(1);
         } else {
-          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+          const safeW = Math.max(0, w - 24);
+          const safeH = Math.max(0, h - 36);
+          setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
         }
       }
     };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   return (

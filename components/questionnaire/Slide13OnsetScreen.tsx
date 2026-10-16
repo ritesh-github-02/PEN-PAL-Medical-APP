@@ -266,7 +266,7 @@ const SLIDE13_CSS = `
 /* Responsive Scaling */
 @media (max-height: 700px), (max-width: 860px) {
   .s13-root {
-    padding: 0.85rem 1.75rem 4.5rem 1.75rem;
+    padding: 0.85rem 1.75rem 1rem 1.75rem;
   }
   .s13-heading {
     font-size: 1.25rem;

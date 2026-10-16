@@ -246,7 +246,7 @@ const SLIDE12_CSS = `
 /* Tablet & Mobile Scaling */
 @media (max-height: 700px), (max-width: 860px) {
   .s12-root {
-    padding: 0.85rem 1.75rem 4.5rem 1.75rem;
+    padding: 0.85rem 1.75rem 1rem 1.75rem;
   }
   .s12-heading {
     font-size: 1.25rem;
@@ -294,7 +294,9 @@ const SLIDE12_CSS = `
   .s12-root {
     overflow-y: auto;
     height: auto;
-    min-height: 100%;
+    min-height: auto;
+    flex: none;
+    padding: 0.85rem 0.75rem 1rem 0.75rem !important;
   }
   .s12-cohorts-grid {
     flex-wrap: wrap;

@@ -208,9 +208,9 @@ const SLIDE2_CSS = `
 .s2-nurse {
   position: absolute;
   left: 600px;
-  top: 240px;
+  top: 236px;
   width: 112px;
-  height: 210px;
+  height: 206px;
   pointer-events: none;
   z-index: 2;
   display: flex;
@@ -288,8 +288,8 @@ const SLIDE2_CSS = `
 /* ---------- 7. CC & Play/Pause Controls directly below Nurse Anna ---------- */
 .s2-audio {
   position: absolute;
-  left: 600px;
-  top: 456px;
+  left: 580px;
+  top: 444px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -312,13 +312,14 @@ const SLIDE2_CSS = `
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
-    min-height: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    flex: none !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 0.75rem 0.75rem 4.5rem 0.75rem !important;
+    padding: 0.85rem 0.85rem 1rem 0.85rem !important;
     gap: 0 !important;
   }
   .s2-stage {
@@ -415,13 +416,15 @@ const SLIDE2_CSS = `
     object-fit: contain !important;
   }
   .s2-audio {
-    position: absolute !important;
-    left: 8px !important;
-    bottom: 12px !important;
+    position: relative !important;
+    left: auto !important;
+    bottom: auto !important;
     top: auto !important;
+    margin: 8px auto 0 auto !important;
     z-index: 25 !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 8px !important;
   }
   .s2-audio .audio-cc-btn svg {
@@ -527,7 +530,7 @@ export function Slide2MedicineNamingScreen({
     return () => clearTimeout(timer);
   }, []);
 
-  // Responsive stage scaling that fits container with zero distortion
+  // Responsive stage scaling that fits container with zero distortion across all viewports
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -535,17 +538,23 @@ export function Slide2MedicineNamingScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        if (w < 768) {
+        if (typeof window !== "undefined" && window.innerWidth < 768) {
           setScale(1);
         } else {
-          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+          const safeW = Math.max(0, w - 24);
+          const safeH = Math.max(0, h - 36);
+          setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
         }
       }
     };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   const nextEnabled = !!selected && !loading;

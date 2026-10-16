@@ -6,7 +6,11 @@ import { SlideNavigationButtons } from "./SlideNavigationButtons";
 
 const SLIDE21_CSS = `
 /* ==========================================================
-   Slide21WhatNowScreen – Pixel-Perfect Styles Matching Target UI
+   Slide21WhatNowScreen – Pixel-Perfect Styles Matching Figma UI
+   - Large prominent yellow "What Now?" pill badge
+   - Bold, clear doctor consultation heading & benefits bullets
+   - High-impact, generously sized doctor consultation illustration
+   - Responsive scaling with clean mobile adaptation
    ========================================================== */
 
 .s21-root,
@@ -24,216 +28,210 @@ const SLIDE21_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  background-color: #f4f8ec;
-  padding: 0.35rem 0.75rem 4.5rem 0.75rem;
+  background-color: #fafdf3;
+  padding: clamp(0.75rem, 2.2vh, 1.75rem) clamp(1.25rem, 3.5vw, 3rem) 4.5rem clamp(1.25rem, 3.5vw, 3rem);
   overflow: hidden;
-  gap: clamp(0.5rem, 1.8vh, 1rem);
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #232323;
 }
 
 /* Centered Content Container */
 .s21-content {
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
-  max-width: 780px;
+  max-width: 820px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
   padding: 0;
 }
 
-/* "What Now?" Yellow Badge */
+/* "What Now?" Yellow Badge (Matching Figma Specification) */
 .s21-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #fff589;
-  border: 1.5px solid #142724;
-  border-radius: 14px;
-  padding: 0.35rem 1.2rem;
-  box-shadow: 2px 3px 0px rgba(20, 50, 40, 0.2);
-  margin-bottom: 0.45rem;
+  background-color: #feff9f;
+  border: 2px solid #2b7f8f;
+  border-radius: 22px;
+  padding: 0.7rem 2.5rem;
+  min-height: 58px;
+  box-shadow: 0 4px 6px rgba(34, 105, 118, 0.35);
+  margin-bottom: clamp(0.5rem, 1.5vh, 0.9rem);
+  flex-shrink: 0;
 }
 
 .s21-badge-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #142724;
+  font-size: clamp(1.3rem, 2.3vw, 1.48rem);
+  font-weight: 700;
+  color: #1a2e2b;
   line-height: 1.2;
   margin: 0;
+  letter-spacing: -0.015em;
   outline: none;
 }
 
 .s21-badge-title:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
+  border-radius: 4px;
 }
 
 /* Main Heading */
 .s21-heading {
-  font-size: clamp(1.02rem, 1.8vw, 1.18rem);
+  font-size: clamp(1.12rem, 2.1vw, 1.35rem);
   font-weight: 700;
   line-height: 1.35;
-  color: #142724;
+  color: #1a2e2b;
   letter-spacing: -0.01em;
-  margin: 0 0 0.4rem 0;
+  margin: 0 0 clamp(0.35rem, 1.2vh, 0.65rem) 0;
   text-align: left;
+  flex-shrink: 0;
 }
 
 /* Bullet Points */
 .s21-bullets {
   list-style: none;
   padding: 0;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 clamp(0.4rem, 1.3vh, 0.75rem) 0;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: clamp(0.35rem, 1vh, 0.55rem);
   width: 100%;
+  flex-shrink: 0;
 }
 
 .s21-bullet-item {
   display: flex;
   align-items: flex-start;
-  gap: 0.55rem;
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  gap: 0.65rem;
+  font-size: clamp(0.94rem, 1.55vw, 1.06rem);
   font-weight: 500;
-  color: #142724;
-  line-height: 1.35;
+  color: #232323;
+  line-height: 1.42;
   text-align: left;
 }
 
 .s21-bullet-dot {
-  font-size: 1.1rem;
-  line-height: 1.1;
-  color: #142724;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  color: #1a2e2b;
   user-select: none;
   flex-shrink: 0;
 }
 
-/* Illustration Container */
+/* Illustration Container & Large Doctor Consultation Image */
 .s21-illustration-wrap {
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 0.2rem;
+  margin-top: clamp(0.35rem, 1.2vh, 0.75rem);
   user-select: none;
 }
 
 .s21-illustration-img {
-  max-width: 480px;
-  width: 100%;
+  width: min(580px, 100%);
+  max-width: 580px;
   height: auto;
-  max-height: clamp(130px, 18vh, 175px);
+  max-height: clamp(240px, 39vh, 325px);
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.08));
+  filter: drop-shadow(0 4px 14px rgba(20, 50, 45, 0.08));
 }
 
-/* Navigation Bar */
-.s21-nav {
-  position: absolute;
-  bottom: 22px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  z-index: 20;
-}
-@media (max-width: 640px) {
-  .s21-nav {
-    bottom: 14px;
-    gap: 16px;
+/* Mobile & Small Screen Adaptations */
+@media (max-width: 767px) {
+  .s21-root {
+    height: auto !important;
+    min-height: auto !important;
+    flex: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .s21-content {
+    max-width: 100% !important;
+    width: 100% !important;
+    align-items: flex-start !important;
+    flex: none !important;
+  }
+
+  .s21-badge {
+    padding: 0.55rem 1.6rem !important;
+    min-height: 48px !important;
+    border-radius: 18px !important;
+    margin-bottom: 0.6rem !important;
+  }
+
+  .s21-badge-title {
+    font-size: 1.18rem !important;
+  }
+
+  .s21-heading {
+    font-size: 1.05rem !important;
+    line-height: 1.35 !important;
+    margin-bottom: 0.55rem !important;
+  }
+
+  .s21-bullets {
+    gap: 0.45rem !important;
+    margin-bottom: 0.65rem !important;
+  }
+
+  .s21-bullet-item {
+    font-size: 0.88rem !important;
+    line-height: 1.4 !important;
+    gap: 0.45rem !important;
+  }
+
+  .s21-bullet-dot {
+    font-size: 1rem !important;
+  }
+
+  .s21-illustration-wrap {
+    flex: none !important;
+    margin-top: 0.45rem !important;
+    width: 100% !important;
+  }
+
+  .s21-illustration-img {
+    max-width: 350px !important;
+    max-height: 200px !important;
+    margin: 0 auto !important;
   }
 }
 
-.s21-btn {
-  height: 35px;
-  padding: 0 18px;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-.s21-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-.s21-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-
-.s21-btn--back {
-  min-width: 64px;
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
-  color: #143833;
-}
-.s21-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
-}
-
-.s21-btn--next {
-  min-width: 62px;
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
-}
-.s21-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
-}
-
-.s21-btn--disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-.s21-btn--disabled:hover {
-  background-color: #fdee8e;
-}
-
-/* Responsive Scaling */
-@media (max-height: 700px), (max-width: 860px) {
+@media (max-height: 700px) and (min-width: 768px) {
   .s21-root {
-    padding: 0.85rem 1.75rem 4.5rem 1.75rem;
+    padding: 0.65rem 1.75rem 4.2rem 1.75rem;
   }
   .s21-badge {
-    padding: 0.35rem 1.15rem;
-    margin-bottom: 0.6rem;
+    padding: 0.45rem 1.75rem;
+    min-height: 48px;
+    margin-bottom: 0.45rem;
   }
   .s21-badge-title {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
   }
   .s21-heading {
     font-size: 1.15rem;
-    margin-bottom: 0.45rem;
+    margin-bottom: 0.35rem;
   }
   .s21-bullet-item {
     font-size: 0.95rem;
   }
   .s21-illustration-img {
-    max-height: 180px;
-    max-width: 410px;
-  }
-  .s21-btn {
-    padding: 0.38rem 1.8rem;
-    font-size: 0.9rem;
-    min-height: 38px;
-  }
-}
-
-@media (max-width: 600px) {
-  .s21-illustration-img {
-    max-height: 140px;
+    max-height: clamp(180px, 30vh, 230px);
+    max-width: 520px;
   }
 }
 `;

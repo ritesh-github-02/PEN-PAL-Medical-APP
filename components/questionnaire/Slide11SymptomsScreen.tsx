@@ -418,7 +418,7 @@ const SLIDE11_CSS = `
 /* Tablet & Smaller Screens Scaling */
 @media (max-height: 650px), (max-width: 820px) {
   .s11-root {
-    padding: 0.85rem 1.5rem 4.5rem 1.5rem;
+    padding: 0.85rem 1.25rem 1rem 1.25rem;
   }
   .s11-top-section,
   .s11-middle {
@@ -450,7 +450,9 @@ const SLIDE11_CSS = `
   .s11-root {
     overflow-y: auto;
     height: auto;
-    min-height: 100%;
+    min-height: auto;
+    flex: none;
+    padding: 0.85rem 0.75rem 1rem 0.75rem !important;
   }
   .s11-middle {
     flex-direction: column;

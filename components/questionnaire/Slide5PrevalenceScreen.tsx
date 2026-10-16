@@ -189,8 +189,8 @@ const SLIDE5_CSS = `
 /* ---------- 5. CC & Play/Pause Controls ---------- */
 .s5-audio {
   position: absolute;
-  left: 578px;
-  top: 460px;
+  left: 568px;
+  top: 444px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -213,13 +213,14 @@ const SLIDE5_CSS = `
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
-    min-height: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    flex: none !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
+    padding: 0.85rem 0.85rem 1rem 0.85rem !important;
     gap: 0 !important;
   }
   .s5-stage {
@@ -294,14 +295,16 @@ const SLIDE5_CSS = `
     object-fit: contain !important;
   }
   .s5-audio {
-    position: absolute !important;
-    right: 12px !important;
-    bottom: 12px !important;
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
     left: auto !important;
     top: auto !important;
+    margin: 8px auto 0 auto !important;
     z-index: 25 !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 8px !important;
   }
   .s5-audio .audio-cc-btn svg {
@@ -355,10 +358,12 @@ export function Slide5PrevalenceScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        if (w < 768) {
+        if (typeof window !== "undefined" && window.innerWidth < 768) {
           setScale(1);
         } else {
-          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+          const safeW = Math.max(0, w - 24);
+          const safeH = Math.max(0, h - 36);
+          setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
         }
       }
     };

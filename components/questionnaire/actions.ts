@@ -8,20 +8,58 @@ import { questionnaireConfig } from '@/config/questionnaire';
 // getOrCreateParticipantId (Guarantees DB persistence even during direct browser testing)
 // ─────────────────────────────────────────────────────────────────────────────
 
+let lastDbFailureTime = 0;
+const DB_FAILURE_COOLDOWN_MS = 60000;
+
 async function getOrCreateParticipantId(): Promise<string | null> {
   const cookieStore = await cookies();
   let participantId = cookieStore.get('penpal_participant')?.value;
 
   if (participantId) {
-    const participantExists = await prisma.participant.findUnique({
-      where: { id: participantId },
-      select: { id: true },
-    }).catch(() => null);
-    if (participantExists) return participantId;
+    if (participantId.startsWith('OFFLINE-') || participantId.startsWith('TEST-')) {
+      return participantId;
+    }
+    if (Date.now() - lastDbFailureTime > DB_FAILURE_COOLDOWN_MS) {
+      try {
+        const participantExists = await prisma.participant.findUnique({
+          where: { id: participantId },
+          select: { id: true },
+        });
+        if (participantExists) return participantId;
+      } catch {
+        lastDbFailureTime = Date.now();
+        return participantId;
+      }
+    } else {
+      return participantId;
+    }
+  }
+
+  const isProd = process.env.NODE_ENV === 'production';
+
+  // If database was recently unreachable, use offline fallback ID immediately
+  if (Date.now() - lastDbFailureTime < DB_FAILURE_COOLDOWN_MS) {
+    const offlineId = `OFFLINE-${Date.now().toString().slice(-6)}`;
+    try {
+      cookieStore.set('penpal_participant', offlineId, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 2,
+        path: '/',
+      });
+      cookieStore.set('penpal_session', `SESSION-${offlineId}`, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 2,
+        path: '/',
+      });
+    } catch {}
+    return offlineId;
   }
 
   try {
-    const isProd = process.env.NODE_ENV === 'production';
     const newParticipant = await prisma.participant.create({
       data: {
         groupId: 'INTERVENTION',
@@ -54,9 +92,36 @@ async function getOrCreateParticipantId(): Promise<string | null> {
     });
 
     return participantId;
-  } catch (e) {
-    console.error('Participant session creation warning', e);
-    return null;
+  } catch (e: any) {
+    lastDbFailureTime = Date.now();
+    const isConnError =
+      e?.code === 'P1001' ||
+      e?.name === 'PrismaClientInitializationError' ||
+      e?.message?.includes?.("Can't reach database server");
+
+    // Provide graceful offline fallback ID
+    const offlineId = `OFFLINE-${Date.now().toString().slice(-6)}`;
+    try {
+      cookieStore.set('penpal_participant', offlineId, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 2,
+        path: '/',
+      });
+      cookieStore.set('penpal_session', `SESSION-${offlineId}`, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 2,
+        path: '/',
+      });
+    } catch {}
+
+    if (!isConnError) {
+      console.warn('Participant session creation warning:', e?.message || e);
+    }
+    return offlineId;
   }
 }
 
@@ -68,8 +133,7 @@ export async function submitAnswer(questionId: string, answerValue: string | str
   const finalValue = typeof answerValue === 'object' ? JSON.stringify(answerValue) : String(answerValue);
   const participantId = await getOrCreateParticipantId();
 
-  if (!participantId) {
-    console.warn('Unable to resolve participant for submitAnswer.');
+  if (!participantId || participantId.startsWith('OFFLINE-')) {
     return;
   }
 
@@ -109,7 +173,7 @@ export async function submitAnswer(questionId: string, answerValue: string | str
 export async function recordSlideTiming(stepId: string, stepIndex: number, durationMs: number, isNewVisit: boolean = false) {
   if (!stepId || durationMs < 50) return;
   const participantId = await getOrCreateParticipantId();
-  if (!participantId) return;
+  if (!participantId || participantId.startsWith('OFFLINE-')) return;
 
   try {
     await prisma.slideMetric.upsert({
