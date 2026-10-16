@@ -5,11 +5,11 @@ import { NurseAnna } from "./NurseAnna";
 import { resolveMedicineToken } from "@/lib/token-engine";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
-const SLIDE11_CSS = `
 /* ==========================================================
    Slide11SymptomsScreen – Scoped Pixel-Perfect Styles
    ========================================================== */
 
+const SLIDE11_CSS = `
 .s11-root,
 .s11-root *,
 .s11-root *::before,
@@ -346,75 +346,6 @@ const SLIDE11_CSS = `
   display: block;
 }
 
-/* Bottom Centered Navigation */
-.s11-nav {
-  position: absolute;
-  bottom: 22px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  z-index: 20;
-}
-@media (max-width: 640px) {
-  .s11-nav {
-    bottom: 14px;
-    gap: 16px;
-  }
-}
-
-.s11-btn {
-  height: 35px;
-  padding: 0 18px;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-.s11-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-.s11-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-
-.s11-btn--back {
-  min-width: 64px;
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
-  color: #143833;
-}
-.s11-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
-}
-
-.s11-btn--next {
-  min-width: 62px;
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
-}
-.s11-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
-}
-
-.s11-btn--disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-.s11-btn--disabled:hover {
-  background-color: #fdee8e;
-}
-
 /* Tablet & Smaller Screens Scaling */
 @media (max-height: 650px), (max-width: 820px) {
   .s11-root {
@@ -446,24 +377,146 @@ const SLIDE11_CSS = `
   }
 }
 
+/* ==========================================================
+   Mobile-First Enhanced Responsive Layout (<= 640px)
+   ========================================================== */
 @media (max-width: 640px) {
   .s11-root {
-    overflow-y: auto;
-    height: auto;
-    min-height: auto;
-    flex: none;
-    padding: 0.85rem 0.75rem 1rem 0.75rem !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    padding: 0.75rem 0.75rem 5.5rem 0.75rem !important;
+    gap: 0.65rem !important;
   }
+
+  .s11-top-section {
+    padding: 0 0.25rem;
+  }
+
+  .s11-heading {
+    font-size: 1rem;
+    line-height: 1.32;
+    text-align: left;
+  }
+
   .s11-middle {
     flex-direction: column;
     align-items: center;
+    gap: 0.75rem;
+    width: 100%;
   }
+
   .s11-card {
     max-width: 100%;
     width: 100%;
+    padding: 0.85rem 0.75rem;
+    border-radius: 16px;
+    gap: 0.45rem;
   }
+
+  .s11-chip-row {
+    gap: 0.4rem;
+  }
+
+  .s11-chip {
+    padding: 0.38rem 0.65rem;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    border-radius: 8px;
+    white-space: normal;
+    text-align: left;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  /* Row 5: Stack Other describe input and Unsure chip vertically */
+  .s11-row-bottom {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    margin-top: 0.35rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .s11-other-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .s11-other-label {
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .s11-other-input {
+    width: 100%;
+    min-width: 0;
+    font-size: 0.82rem;
+  }
+
+  .s11-row-bottom .s11-chip {
+    align-self: flex-start;
+  }
+
+  /* Nurse Anna sizing on mobile */
   .s11-right {
-    margin-top: 1rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .s11-nurse {
+    width: 75px;
+    max-height: 130px;
+  }
+
+  .s11-nurse-img {
+    max-height: 130px;
+  }
+
+  /* Modal 11C (Swelling) Mobile Overrides */
+  .s11-swelling-dialog {
+    padding: 1.25rem 1rem 1rem 1rem;
+    border-radius: 20px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    gap: 0.75rem;
+  }
+
+  .s11-swelling-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .s11-swelling-btn {
+    width: 100%;
+    text-align: center;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.88rem;
+    min-height: 42px;
+  }
+
+  .s11-swelling-other {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+  }
+
+  .s11-swelling-other-input {
+    width: 100%;
   }
 }
 `;
@@ -548,9 +601,9 @@ export function Slide11SymptomsScreen({
 }: Slide11SymptomsScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const modalHeadingRef = useRef<HTMLHeadingElement | null>(null);
-  const modalTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const modalTriggerRef = useRef<HTMLElement | null>(null);
 
-  const swellingTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const swellingTriggerRef = useRef<HTMLElement | null>(null);
   const swellingFirstBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const [symptoms, setSymptoms] = useState<string[]>(selectedSymptoms);
@@ -613,7 +666,7 @@ export function Slide11SymptomsScreen({
     };
   }, [swellingModalOpen]);
 
-  const toggleSymptom = (val: string, e?: React.MouseEvent<HTMLButtonElement>) => {
+  const toggleSymptom = (val: string, e?: React.MouseEvent<HTMLElement>) => {
     let updated: string[];
     if (val === "Unsure") {
       updated = symptoms.includes("Unsure") ? [] : ["Unsure"];
@@ -732,7 +785,7 @@ export function Slide11SymptomsScreen({
           <span
             onClick={(e) => {
               e.stopPropagation();
-              modalTriggerRef.current = e.currentTarget as any;
+              modalTriggerRef.current = e.currentTarget;
               setRashModalOpen(true);
             }}
             className="s11-chip-edit"
@@ -746,7 +799,7 @@ export function Slide11SymptomsScreen({
           <span
             onClick={(e) => {
               e.stopPropagation();
-              swellingTriggerRef.current = e.currentTarget as any;
+              swellingTriggerRef.current = e.currentTarget;
               setSwellingModalOpen(true);
             }}
             className="s11-chip-edit"
@@ -762,7 +815,7 @@ export function Slide11SymptomsScreen({
 
   return (
     <div id="slide-content" className="s11-root">
-      <style>{SLIDE11_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: SLIDE11_CSS }} />
 
       {/* 1. Main Heading */}
       <div className="s11-top-section">
@@ -861,7 +914,7 @@ export function Slide11SymptomsScreen({
           aria-labelledby="modal-11b-heading"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         >
-          <div className="bg-white rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-3xl p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="space-y-1">
               <h2
                 id="modal-11b-heading"
