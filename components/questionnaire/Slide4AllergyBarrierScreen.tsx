@@ -282,6 +282,108 @@ const SLIDE4_CSS = `
     height: 34px !important;
   }
 }
+
+/* Tablet Portrait Enhancements (481px to 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .s4-stage {
+    max-width: 430px !important;
+  }
+  .s4-bubble {
+    max-width: 390px !important;
+  }
+  .s4-bubble-text-wrap {
+    max-width: 300px !important;
+  }
+  .s4-bubble-text {
+    font-size: 16px !important;
+  }
+  .s4-nurse {
+    width: 135px !important;
+    height: 225px !important;
+  }
+}
+
+/* ==========================================================
+   Mobile & Tablet Landscape Layout (< 520px height)
+   ========================================================== */
+@media (orientation: landscape) and (max-height: 520px) {
+  .s4-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0.5rem 1rem 3.5rem 1rem !important;
+  }
+  .s4-stage {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 680px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s4-nurse {
+    order: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100px !important;
+    height: 185px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s4-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: scaleX(-1) !important;
+  }
+  .s4-bubble {
+    order: 2 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 320px !important;
+    aspect-ratio: 510 / 315 !important;
+    margin: 0 !important;
+    filter: drop-shadow(2px 3px 0px #1a3532) !important;
+    flex-shrink: 0 !important;
+  }
+  .s4-bubble-text-wrap {
+    width: 82% !important;
+  }
+  .s4-bubble-text {
+    font-size: 13.5px !important;
+    line-height: 1.35 !important;
+  }
+  .s4-audio {
+    order: 3 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  .s4-audio .audio-cc-btn svg {
+    width: 34px !important;
+    height: 30px !important;
+  }
+  .s4-audio .audio-play-btn svg {
+    width: 44px !important;
+    height: 30px !important;
+  }
+}
 `;
 
 export interface Slide4AllergyBarrierScreenProps {
@@ -325,6 +427,12 @@ export function Slide4AllergyBarrierScreen({
       const h = el.clientHeight;
       if (w && h) {
         if (typeof window !== "undefined" && window.innerWidth < 768) {
+          setScale(1);
+        } else if (
+          typeof window !== "undefined" &&
+          window.innerHeight < 520 &&
+          window.innerWidth > window.innerHeight
+        ) {
           setScale(1);
         } else {
           const safeW = Math.max(0, w - 24);
