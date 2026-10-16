@@ -204,6 +204,128 @@ const SLIDE4_CSS = `
   width: 70px !important;
   height: 47px !important;
 }
+
+/* ==========================================================
+   Mobile-First Responsive Layout (< 768px)
+   ========================================================== */
+@media (max-width: 767px) {
+  .s4-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
+    gap: 0 !important;
+  }
+  .s4-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s4-bubble {
+    order: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 305px !important;
+    max-width: 98% !important;
+    height: 195px !important;
+    margin: 10px auto 0 auto !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+  .s4-bubble-svg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .s4-bubble-text-wrap {
+    position: absolute !important;
+    top: 48% !important;
+    left: 52% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 80% !important;
+    max-width: 255px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .s4-bubble-text {
+    font-size: 15px !important;
+    line-height: 1.4 !important;
+    font-weight: 700 !important;
+    color: #232323 !important;
+    text-align: center !important;
+    letter-spacing: -0.012em !important;
+  }
+  .s4-bubble-line {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  .s4-nurse {
+    order: 2 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 95px !important;
+    height: 160px !important;
+    margin-top: -30px !important;
+    margin-right: auto !important;
+    margin-left: 20px !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s4-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: scaleX(-1) !important;
+  }
+  .s4-audio {
+    order: 3 !important;
+    position: absolute !important;
+    right: 14px !important;
+    bottom: 20px !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 25 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .s4-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s4-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
+  }
+}
 `;
 
 export interface Slide4AllergyBarrierScreenProps {
@@ -295,7 +417,11 @@ export function Slide4AllergyBarrierScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        if (w < 768) {
+          setScale(1);
+        } else {
+          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        }
       }
     };
     update();

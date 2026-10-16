@@ -269,6 +269,141 @@ const SLIDE10_CSS = `
   width: 70px !important;
   height: 47px !important;
 }
+
+/* ==========================================================
+   Mobile-First Responsive Layout (< 768px)
+   ========================================================== */
+@media (max-width: 767px) {
+  .s10-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.75rem 0.75rem 4.5rem 0.75rem !important;
+    gap: 0 !important;
+  }
+  .s10-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s10-left {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 4px !important;
+  }
+  .s10-heading {
+    font-size: 13.5px !important;
+    line-height: 1.35 !important;
+    margin: 0 0 6px 0 !important;
+    text-align: left !important;
+  }
+  .s10-subheading {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+    margin: 0 0 8px 0 !important;
+    text-align: left !important;
+  }
+  .s10-bullets {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .s10-bullet-item {
+    font-size: 12.5px !important;
+    line-height: 1.35 !important;
+    gap: 8px !important;
+  }
+  .s10-bullet-dot {
+    width: 6px !important;
+    height: 6px !important;
+    min-width: 6px !important;
+    margin-top: 5px !important;
+  }
+  .s10-bubble {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 220px !important;
+    height: 105px !important;
+    margin: 6px auto 0 auto !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+  .s10-bubble-text-wrap {
+    position: absolute !important;
+    top: 45% !important;
+    left: 48% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 78% !important;
+    max-width: 175px !important;
+  }
+  .s10-bubble-text {
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+  }
+  .s10-nurse {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 75px !important;
+    height: 120px !important;
+    margin-top: -15px !important;
+    margin-left: auto !important;
+    margin-right: 25px !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s10-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .s10-audio {
+    position: absolute !important;
+    left: 10px !important;
+    bottom: 12px !important;
+    top: auto !important;
+    z-index: 25 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .s10-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s10-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
+  }
+}
 `;
 
 export interface Slide10TestingOverviewScreenProps {
@@ -361,7 +496,11 @@ export function Slide10TestingOverviewScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        if (w < 768) {
+          setScale(1);
+        } else {
+          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        }
       }
     };
     update();

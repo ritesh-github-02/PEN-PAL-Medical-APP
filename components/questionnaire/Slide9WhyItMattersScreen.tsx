@@ -230,6 +230,136 @@ const SLIDE9_CSS = `
   width: 70px !important;
   height: 47px !important;
 }
+
+/* ==========================================================
+   Mobile-First Responsive Layout (< 768px)
+   ========================================================== */
+@media (max-width: 767px) {
+  .s9-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.75rem 0.75rem 4.5rem 0.75rem !important;
+    gap: 0 !important;
+  }
+  .s9-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s9-badge {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: auto !important;
+    min-width: 200px !important;
+    max-width: 90% !important;
+    height: auto !important;
+    min-height: 46px !important;
+    padding: 8px 16px !important;
+    border-radius: 16px !important;
+    margin: 0 auto 10px auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s9-badge-title {
+    font-size: 16px !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+  }
+  .s9-content {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 10px 0 !important;
+    padding: 0 4px !important;
+  }
+  .s9-intro {
+    font-size: 13.5px !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
+    color: #232323 !important;
+    margin: 0 0 8px 0 !important;
+    text-align: left !important;
+  }
+  .s9-bullets {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+  .s9-bullet-item {
+    font-size: 12.5px !important;
+    line-height: 1.35 !important;
+    gap: 8px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+  }
+  .s9-bullet-dot {
+    width: 6px !important;
+    height: 6px !important;
+    min-width: 6px !important;
+    margin-top: 5px !important;
+  }
+  .s9-nurse {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 80px !important;
+    height: 130px !important;
+    margin: 2px auto 0 auto !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s9-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .s9-audio {
+    position: absolute !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 25 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .s9-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s9-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
+  }
+}
 `;
 
 export interface Slide9WhyItMattersScreenProps {
@@ -274,7 +404,11 @@ export function Slide9WhyItMattersScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        if (w < 768) {
+          setScale(1);
+        } else {
+          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        }
       }
     };
     update();

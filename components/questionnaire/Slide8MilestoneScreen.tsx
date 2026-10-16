@@ -194,6 +194,118 @@ const SLIDE8_CSS = `
   width: 70px !important;
   height: 47px !important;
 }
+
+/* ==========================================================
+   Mobile-First Responsive Layout (< 768px)
+   ========================================================== */
+@media (max-width: 767px) {
+  .s8-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
+    gap: 0 !important;
+  }
+  .s8-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s8-bubble {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 295px !important;
+    max-width: 95% !important;
+    height: 185px !important;
+    margin: 12px auto 0 auto !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+  .s8-bubble-svg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .s8-bubble-text-wrap {
+    position: absolute !important;
+    top: 44% !important;
+    left: 47% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 78% !important;
+    max-width: 235px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .s8-bubble-text {
+    font-size: 15.5px !important;
+    line-height: 1.4 !important;
+    font-weight: 600 !important;
+    color: #232323 !important;
+    text-align: center !important;
+    letter-spacing: -0.012em !important;
+  }
+  .s8-nurse {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100px !important;
+    height: 165px !important;
+    margin-top: -30px !important;
+    margin-left: auto !important;
+    margin-right: 20px !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s8-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .s8-audio {
+    position: absolute !important;
+    left: 10px !important;
+    bottom: 15px !important;
+    top: auto !important;
+    z-index: 25 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .s8-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s8-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
+  }
+}
 `;
 
 export interface Slide8MilestoneScreenProps {
@@ -285,7 +397,11 @@ export function Slide8MilestoneScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        if (w < 768) {
+          setScale(1);
+        } else {
+          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        }
       }
     };
     update();

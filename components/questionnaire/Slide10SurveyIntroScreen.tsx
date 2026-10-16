@@ -182,6 +182,130 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   align-items: center;
   gap: 8px;
 }
+.s10b-audio .audio-cc-btn svg {
+  width: 52px !important;
+  height: 47px !important;
+}
+.s10b-audio .audio-play-btn svg {
+  width: 70px !important;
+  height: 47px !important;
+}
+
+/* ==========================================================
+   Mobile-First Responsive Layout (< 768px)
+   ========================================================== */
+@media (max-width: 767px) {
+  .s10b-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
+    gap: 0 !important;
+  }
+  .s10b-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s10b-bubble {
+    order: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 295px !important;
+    max-width: 95% !important;
+    height: 185px !important;
+    margin: 10px auto 0 auto !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+  .s10b-bubble-svg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .s10b-bubble-text-wrap {
+    position: absolute !important;
+    top: 46% !important;
+    left: 52% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 78% !important;
+    max-width: 235px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .s10b-bubble-text {
+    font-size: 15px !important;
+    line-height: 1.4 !important;
+    font-weight: 600 !important;
+    color: #232323 !important;
+    text-align: center !important;
+    letter-spacing: -0.012em !important;
+  }
+  .s10b-nurse {
+    order: 2 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 95px !important;
+    height: 155px !important;
+    margin-top: -30px !important;
+    margin-right: auto !important;
+    margin-left: 20px !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s10b-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .s10b-audio {
+    order: 3 !important;
+    position: absolute !important;
+    right: 14px !important;
+    bottom: 20px !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 25 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .s10b-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s10b-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
+  }
+}
 `;
 
 export interface Slide10SurveyIntroScreenProps {
@@ -272,7 +396,13 @@ export function Slide10SurveyIntroScreen({
     const update = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
-      if (w && h) setScale(Math.min(w / STAGE_W, h / STAGE_H));
+      if (w && h) {
+        if (w < 768) {
+          setScale(1);
+        } else {
+          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        }
+      }
     };
     update();
     const ro = new ResizeObserver(update);

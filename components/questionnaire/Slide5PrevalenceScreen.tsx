@@ -204,6 +204,115 @@ const SLIDE5_CSS = `
   width: 70px !important;
   height: 47px !important;
 }
+
+/* ==========================================================
+   Mobile-First Responsive Layout (< 768px)
+   ========================================================== */
+@media (max-width: 767px) {
+  .s5-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
+    gap: 0 !important;
+  }
+  .s5-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s5-badge {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 175px !important;
+    height: 48px !important;
+    border-radius: 18px !important;
+    margin: 2px auto 12px auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 12px !important;
+  }
+  .s5-badge-title {
+    font-size: 17.5px !important;
+    line-height: 1.2 !important;
+  }
+  .s5-text-wrap {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 4px !important;
+  }
+  .s5-heading {
+    font-size: 15px !important;
+    line-height: 1.4 !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    color: #232323 !important;
+  }
+  .s5-bold {
+    font-weight: 800 !important;
+    font-size: 16.5px !important;
+    color: #111827 !important;
+  }
+  .s5-nurse {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 120px !important;
+    height: 180px !important;
+    margin: 4px auto 0 auto !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s5-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .s5-audio {
+    position: absolute !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 25 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .s5-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s5-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
+  }
+}
 `;
 
 export interface Slide5PrevalenceScreenProps {
@@ -246,7 +355,11 @@ export function Slide5PrevalenceScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        if (w < 768) {
+          setScale(1);
+        } else {
+          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        }
       }
     };
     update();

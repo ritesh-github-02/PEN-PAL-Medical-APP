@@ -219,6 +219,138 @@ const SLIDE3_CSS = `
   width: 70px !important;
   height: 47px !important;
 }
+
+/* ==========================================================
+   Mobile-First Responsive Layout (< 768px)
+   ========================================================== */
+@media (max-width: 767px) {
+  .s3-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.85rem 0.85rem 4.5rem 0.85rem !important;
+    gap: 0 !important;
+  }
+  .s3-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s3-heading {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 15px !important;
+    line-height: 1.35 !important;
+    font-weight: 700 !important;
+    text-align: left !important;
+    color: #232323 !important;
+    margin: 0 0 10px 0 !important;
+    padding: 0 4px !important;
+  }
+  .s3-bubble {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 285px !important;
+    max-width: 95% !important;
+    height: 172px !important;
+    margin: 4px auto 0 auto !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+  .s3-bubble-svg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .s3-bubble-text-wrap {
+    position: absolute !important;
+    top: 45% !important;
+    left: 48% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 78% !important;
+    max-width: 228px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .s3-bubble-text {
+    font-size: 13.5px !important;
+    line-height: 1.4 !important;
+    font-weight: 500 !important;
+    color: #1a2e2b !important;
+    text-align: center !important;
+    display: block !important;
+    margin: 0 !important;
+  }
+  .s3-bubble-line {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  .s3-nurse {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 95px !important;
+    height: 160px !important;
+    margin-top: -30px !important;
+    margin-left: auto !important;
+    margin-right: 20px !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s3-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .s3-audio {
+    position: absolute !important;
+    left: 8px !important;
+    bottom: 12px !important;
+    top: auto !important;
+    z-index: 25 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .s3-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s3-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
+  }
+}
 `;
 
 export interface Slide3EfficacyScreenProps {
@@ -310,7 +442,11 @@ export function Slide3EfficacyScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        if (w < 768) {
+          setScale(1);
+        } else {
+          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        }
       }
     };
     update();

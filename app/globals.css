@@ -466,10 +466,11 @@ body::-webkit-scrollbar,
   /* Clean slide frame on mobile viewports without black border */
   .tablet-mockup-frame {
     aspect-ratio: auto !important;
-    height: 520px !important;
-    max-height: calc(100dvh - 5.5rem) !important;
+    height: calc(100dvh - 4.5rem) !important;
+    max-height: 720px !important;
+    min-height: 480px !important;
     width: 100% !important;
-    max-width: 410px !important;
+    max-width: 420px !important;
     margin: 0 auto !important;
     padding: 0 !important;
     background: #f4f8ec !important;
@@ -478,6 +479,8 @@ body::-webkit-scrollbar,
     box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08) !important;
     position: relative !important;
     overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
     flex-shrink: 0 !important;
   }
 
@@ -496,7 +499,7 @@ body::-webkit-scrollbar,
     background: transparent !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     align-items: center !important;
   }
 
@@ -507,7 +510,7 @@ body::-webkit-scrollbar,
     width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     align-items: center !important;
   }
 
@@ -558,9 +561,9 @@ body::-webkit-scrollbar,
     min-height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     align-items: center !important;
-    padding: 0.85rem 0.75rem 3.5rem 0.75rem !important;
+    padding: 0.85rem 0.75rem 4.75rem 0.75rem !important;
     gap: 0.65rem !important;
   }
 
@@ -574,439 +577,151 @@ body::-webkit-scrollbar,
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 0.85rem 0.75rem 1.5rem 0.75rem !important;
+    padding: 0.85rem 0.75rem 4.75rem 0.75rem !important;
     gap: 0.65rem !important;
   }
 
   /* Slide 2: Medicine naming self-contained responsive stage styles are scoped in Slide2MedicineNamingScreen.tsx */
-
-
-  /* Slide 3: Efficacy */
-  .s3-heading {
-    font-size: 0.88rem !important;
-    line-height: 1.3 !important;
-    text-align: center !important;
-  }
-  .s3-combo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 330px !important;
-    height: auto !important;
-    position: relative !important;
-    margin: 0.2rem auto 0 auto !important;
-    flex-shrink: 0 !important;
-  }
-  .s3-bubble {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    flex: 1 1 205px !important;
-    max-width: 225px !important;
-    min-width: 160px !important;
-    width: auto !important;
-    z-index: 1 !important;
-  }
-  .s3-bubble-text-wrap {
-    top: 10% !important;
-    left: 6% !important;
-    width: 76% !important;
-    height: 76% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    text-align: center !important;
-    overflow: hidden !important;
-  }
-  .s3-bubble-text {
-    font-size: 9.4px !important;
-    line-height: 1.22 !important;
-    display: block !important;
-    margin: 0 !important;
-  }
-  .s3-bubble-text span {
-    display: inline !important;
-  }
-  .s3-nurse {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    flex: 0 0 74px !important;
-    width: 74px !important;
-    margin-left: -5px !important;
-    margin-top: 0 !important;
-    z-index: 2 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s3-nurse-img {
-    max-height: 135px !important;
-    width: 100% !important;
-    object-fit: contain !important;
-  }
-  .s3-nav {
-    margin-top: 0.35rem !important;
-    gap: 1.25rem !important;
-    z-index: 10 !important;
-  }
-
-  /* Slide 4: Allergy Barrier */
-  .s4-heading {
-    font-size: 0.88rem !important;
-    line-height: 1.3 !important;
-    text-align: center !important;
-  }
-  .s4-combo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 345px !important;
-    height: auto !important;
-    position: relative !important;
-    margin: 0.2rem auto 0 auto !important;
-    flex-shrink: 0 !important;
-  }
-  .s4-bubble {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    flex: 1 1 205px !important;
-    max-width: 225px !important;
-    min-width: 160px !important;
-    width: auto !important;
-    z-index: 1 !important;
-  }
-  .s4-bubble-text-wrap {
-    top: 10% !important;
-    left: 6% !important;
-    width: 76% !important;
-    height: 76% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    text-align: center !important;
-    overflow: hidden !important;
-  }
-  .s4-bubble-text {
-    font-size: 9.4px !important;
-    line-height: 1.22 !important;
-    display: block !important;
-    margin: 0 !important;
-  }
-  .s4-bubble-text span {
-    display: inline !important;
-  }
-  .s4-nurse {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    left: auto !important;
-    top: auto !important;
-    flex: 0 0 80px !important;
-    width: 80px !important;
-    margin-left: -5px !important;
-    margin-top: 0 !important;
-    z-index: 2 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s4-nurse-img {
-    max-height: 145px !important;
-    width: 100% !important;
-    object-fit: contain !important;
-  }
-  .s4-nav {
-    margin-top: 0.35rem !important;
-    gap: 1.25rem !important;
-    z-index: 10 !important;
-  }
-
-  /* Slide 5: Prevalence */
-  .s5-content-wrap {
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    gap: 0.55rem !important;
-  }
-  .s5-graphics {
-    justify-content: center !important;
-    gap: 0.65rem !important;
-  }
-  .s5-bottle {
-    width: 58px !important;
-    height: 110px !important;
-    margin-bottom: 4px !important;
-  }
-  .s5-anna {
-    width: 78px !important;
-    height: 155px !important;
-  }
-  .s5-text-wrap {
-    max-width: 320px !important;
-    text-align: center !important;
-  }
-  .s5-heading {
-    font-size: 0.95rem !important;
-    line-height: 1.35 !important;
-  }
-  .s5-nav {
-    margin-top: 0.35rem !important;
-    gap: 1.25rem !important;
-    z-index: 10 !important;
-  }
-  .s5-btn {
-    padding: 0.35rem 1.6rem !important;
-    min-height: 38px !important;
-    font-size: 0.85rem !important;
-  }
-
-  /* Slide 6: Myths & Truth */
-  .s6-root {
-    justify-content: center !important;
-  }
-  .s6-root h1 {
-    font-size: 0.88rem !important;
-    line-height: 1.32 !important;
-    padding: 0 !important;
-  }
-
-  /* Slide 8: Milestone */
-  .s8-combo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 345px !important;
-    height: auto !important;
-    position: relative !important;
-    margin: 0.2rem auto 0 auto !important;
-    flex-shrink: 0 !important;
-  }
-  .s8-bubble {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    flex: 1 1 205px !important;
-    max-width: 225px !important;
-    min-width: 160px !important;
-    width: auto !important;
-    z-index: 1 !important;
-  }
-  .s8-bubble-text-wrap {
-    top: 10% !important;
-    left: 6% !important;
-    width: 76% !important;
-    height: 76% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    text-align: center !important;
-    overflow: hidden !important;
-  }
-  .s8-bubble-text {
-    font-size: 10.5px !important;
-    line-height: 1.25 !important;
-    display: block !important;
-    margin: 0 !important;
-  }
-  .s8-bubble-text span {
-    display: inline !important;
-  }
-  .s8-nurse {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    flex: 0 0 80px !important;
-    width: 80px !important;
-    margin-left: -5px !important;
-    margin-top: 0 !important;
-    z-index: 2 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s8-nurse-img {
-    max-height: 145px !important;
-    width: 100% !important;
-    object-fit: contain !important;
-  }
-
-  /* Slide 9: Why It Matters */
-  .s9-root {
-    justify-content: center !important;
-  }
-
-  /* Slide 10: Testing overview */
-  .s10-main {
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-  }
-  .s10-combo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 330px !important;
-    height: auto !important;
-    position: relative !important;
-    margin: 0.2rem auto 0 auto !important;
-    flex-shrink: 0 !important;
-  }
-  .s10-bubble {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    flex: 1 1 205px !important;
-    max-width: 225px !important;
-    min-width: 160px !important;
-    width: auto !important;
-    z-index: 1 !important;
-  }
-  .s10-bubble-text-wrap {
-    top: 10% !important;
-    left: 6% !important;
-    width: 76% !important;
-    height: 76% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    text-align: center !important;
-    overflow: hidden !important;
-  }
-  .s10-bubble-text {
-    font-size: 10.5px !important;
-    line-height: 1.25 !important;
-    display: block !important;
-    margin: 0 !important;
-  }
-  .s10-bubble-text span {
-    display: inline !important;
-  }
-  .s10-nurse {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    flex: 0 0 74px !important;
-    width: 74px !important;
-    margin-left: -5px !important;
-    margin-top: 0 !important;
-    z-index: 2 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s10-nurse-img {
-    max-height: 135px !important;
-    width: 100% !important;
-    object-fit: contain !important;
-  }
-
-  /* Slide 10b: Survey Intro */
-  .s10b-combo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 330px !important;
-    height: auto !important;
-    position: relative !important;
-    margin: 0.2rem auto 0 auto !important;
-    flex-shrink: 0 !important;
-  }
-  .s10b-nurse {
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    flex: 0 0 74px !important;
-    width: 74px !important;
-    margin-right: -5px !important;
-    margin-left: 0 !important;
-    margin-top: 0 !important;
-    z-index: 2 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s10b-nurse-img {
-    max-height: 135px !important;
-    width: 100% !important;
-    object-fit: contain !important;
-  }
-  .s10b-bubble {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    flex: 1 1 205px !important;
-    max-width: 225px !important;
-    min-width: 160px !important;
-    width: auto !important;
-    z-index: 1 !important;
-  }
-  .s10b-bubble-text-wrap {
-    top: 10% !important;
-    left: 17% !important;
-    width: 76% !important;
-    height: 76% !important;
-    padding: 2px 8px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    text-align: center !important;
-    overflow: hidden !important;
-  }
-  .s10b-bubble-text {
-    font-size: 9.6px !important;
-    line-height: 1.24 !important;
-    display: block !important;
-    margin: 0 !important;
-  }
-  .s10b-bubble-text span {
-    display: inline !important;
-  }
+  /* Slide 3: Efficacy self-contained responsive stage styles are scoped in Slide3EfficacyScreen.tsx */
+  /* Slide 4: Allergy Barrier self-contained responsive stage styles are scoped in Slide4AllergyBarrierScreen.tsx */
+  /* Slide 5: Prevalence self-contained responsive stage styles are scoped in Slide5PrevalenceScreen.tsx */
+  /* Slide 6: Myths & Truth self-contained responsive stage styles are scoped in Slide6MythTruthScreen.tsx */
+  /* Slide 8: Milestone self-contained responsive stage styles are scoped in Slide8MilestoneScreen.tsx */
+  /* Slide 9: Why It Matters self-contained responsive stage styles are scoped in Slide9WhyItMattersScreen.tsx */
+  /* Slide 10: Testing overview self-contained responsive stage styles are scoped in Slide10TestingOverviewScreen.tsx */
+  /* Slide 10b: Survey Intro self-contained responsive stage styles are scoped in Slide10SurveyIntroScreen.tsx */
 
   /* Slide 11: Symptoms */
   .s11-middle {
     flex-direction: column !important;
     align-items: center !important;
     width: 100% !important;
+    gap: 0.55rem !important;
   }
   .s11-card {
     max-width: 100% !important;
     width: 100% !important;
+    padding: 0.75rem 0.85rem !important;
+  }
+  .s11-chip {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.78rem !important;
+  }
+  .s11-other-label, .s11-other-input {
+    font-size: 0.78rem !important;
+  }
+  .s11-right {
+    display: none !important;
+  }
+  .s11-nurse {
+    display: none !important;
   }
 
   /* Slide 12: Age cohorts */
   .s12-cohorts-grid {
+    display: flex !important;
     flex-wrap: wrap !important;
     justify-content: center !important;
+    align-items: flex-end !important;
+    gap: 0.45rem 0.75rem !important;
+    width: 100% !important;
   }
   .s12-cohort-col {
-    flex: 1 1 42% !important;
+    flex: 0 0 46% !important;
     max-width: 48% !important;
+  }
+  .s12-cohort-img-wrap {
+    height: 65px !important;
+  }
+  .s12-cohort-img {
+    max-height: 65px !important;
+  }
+  .s12-cohort-pill {
+    padding: 0.35rem 0.5rem !important;
+    min-height: 32px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Survey Slide Navigation vs AudioPlayer Collision Prevention */
+  .s11-root .slide-nav,
+  .s12-root .slide-nav,
+  .s13-root .slide-nav,
+  .s14-root .slide-nav,
+  .s16-root .slide-nav,
+  .s19-root .slide-nav,
+  .s21-root .slide-nav {
+    padding-right: 76px !important;
+    padding-left: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Slide 13, 14, 16, 19: Survey questions */
+  .s13-middle, .s14-middle, .s16-middle, .s19-middle {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+  }
+  .s13-card, .s14-card, .s16-card, .s19-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0.95rem 1rem !important;
+  }
+
+  /* Slide 13: 2x2 grid for the 4 onset duration options */
+  .s13-options-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+  }
+  .s13-option-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 44px !important;
+    flex: none !important;
+    font-size: 0.85rem !important;
+    white-space: normal !important;
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.45rem 0.65rem !important;
+  }
+
+  /* Slide 14, 16, 19: Vertical clean stack of option cards */
+  .s14-options-row, .s16-options-row, .s19-options-row {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+  .s14-option-btn, .s16-option-btn, .s19-option-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 42px !important;
+    flex: none !important;
+    font-size: 0.88rem !important;
+    white-space: normal !important;
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .s13-nurse-wrap, .s14-nurse-wrap, .s16-nurse-wrap, .s19-nurse-wrap {
+    max-height: 85px !important;
+    width: 70px !important;
+    margin: 2px auto !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  .s13-nurse-img, .s14-nurse-img, .s16-nurse-img, .s19-nurse-img {
+    max-height: 85px !important;
+    height: 85px !important;
+    width: auto !important;
   }
 
   /* Slide 18: Summary Screen */

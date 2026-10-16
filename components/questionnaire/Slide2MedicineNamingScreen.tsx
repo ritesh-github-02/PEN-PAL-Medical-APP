@@ -303,6 +303,136 @@ const SLIDE2_CSS = `
   width: 70px !important;
   height: 47px !important;
 }
+
+/* ==========================================================
+   Mobile-First Responsive Layout (< 768px)
+   ========================================================== */
+@media (max-width: 767px) {
+  .s2-root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.75rem 0.75rem 4.5rem 0.75rem !important;
+    gap: 0 !important;
+  }
+  .s2-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .s2-banner {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 46px !important;
+    padding: 8px 12px !important;
+    border-radius: 16px !important;
+    margin: 0 0 8px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s2-heading {
+    white-space: normal !important;
+    font-size: 14.5px !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+  }
+  .s2-bottle {
+    display: none !important;
+  }
+  .s2-options {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    margin: 4px 0 10px 0 !important;
+  }
+  .s2-option {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    min-height: 38px !important;
+    height: auto !important;
+    padding: 6px 12px !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #c2ded7 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  }
+  .s2-option:active {
+    background-color: #e5f4ef !important;
+  }
+  .s2-option-label {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #1a2e2b !important;
+  }
+  .s2-checkbox {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+  }
+  .s2-bubble {
+    display: none !important;
+  }
+  .s2-nurse {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 75px !important;
+    height: 120px !important;
+    margin: 2px auto 0 auto !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+  }
+  .s2-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+  .s2-audio {
+    position: absolute !important;
+    left: 8px !important;
+    bottom: 12px !important;
+    top: auto !important;
+    z-index: 25 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .s2-audio .audio-cc-btn svg {
+    width: 38px !important;
+    height: 34px !important;
+  }
+  .s2-audio .audio-play-btn svg {
+    width: 48px !important;
+    height: 34px !important;
+  }
+}
 `;
 
 export interface Slide2MedicineNamingScreenProps {
@@ -404,7 +534,13 @@ export function Slide2MedicineNamingScreen({
     const update = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
-      if (w && h) setScale(Math.min(w / STAGE_W, h / STAGE_H));
+      if (w && h) {
+        if (w < 768) {
+          setScale(1);
+        } else {
+          setScale(Math.min(w / STAGE_W, h / STAGE_H));
+        }
+      }
     };
     update();
     const ro = new ResizeObserver(update);
