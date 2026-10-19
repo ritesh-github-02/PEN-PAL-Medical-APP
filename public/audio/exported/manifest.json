@@ -4,14 +4,14 @@
     "screenIndex": 1,
     "locale": "en",
     "filename": "screen1_intro_en.mp3",
-    "text": "PEN-PAL. Parents Engaged in Penicillin Allergies. This is nurse Anna. Anna is giving information about allergies to penicillin in kids. Do you want to know more?"
+    "text": "PEN-PAL. Parents engaged in penicillin allergies. Hi, I'm Nurse Anna. Let's talk about penicillin allergies in kids. Get started."
   },
   {
     "stepId": "screen1_intro",
     "screenIndex": 1,
     "locale": "es",
     "filename": "screen1_intro_es.mp3",
-    "text": "PEN-PAL. Padres Involucrados en Alergias a la Penicilina. Esta es la enfermera Anna. Anna está brindando información sobre alergias a la penicilina en niños. ¿Quieres saber más?"
+    "text": "PEN-PAL. Padres Involucrados en Alergias a la Penicilina. ¡Hola! Soy la enfermera Anna. Hablemos sobre las alergias a la penicilina en los niños. ¡Comenzar!"
   },
   {
     "stepId": "screen2_statistics",

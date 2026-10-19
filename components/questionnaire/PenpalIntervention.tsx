@@ -737,6 +737,13 @@ export default function PenpalIntervention() {
                       {...baseProps}
                       onAnswer={handleAnswer}
                       onNoBranching={() => setIsTerminated(true)}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      transcriptText={
+                        locale === "es"
+                          ? "PEN-PAL. Padres Involucrados en Alergias a la Penicilina. ¡Hola! Soy la enfermera Anna. Hablemos sobre las alergias a la penicilina en los niños. ¡Comenzar!"
+                          : "PEN-PAL. Parents engaged in penicillin allergies. Hi, I'm Nurse Anna. Let's talk about penicillin allergies in kids. Get started."
+                      }
                     />
                   ) : currentStep.id === "slide2_naming" ? (
                     <Slide2MedicineNamingScreen
@@ -1148,7 +1155,7 @@ export default function PenpalIntervention() {
               </div>
 
               {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
-              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.type !== "statistics" && currentStep.type !== "knowledge_revelation" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && currentStep.id !== "slide4_barrier" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics" && currentStep.id !== "slide6_myths" && currentStep.id !== "slide8_milestone" && currentStep.id !== "slide9_why_it_matters" && currentStep.id !== "slide10_testing" && currentStep.id !== "screen4_testing" && currentStep.id !== "screen3_5_knowledge_test" && currentStep.id !== "screen3_6_all_correct" && currentStep.id !== "screen6_survey_intro" && currentStep.id !== "slide10_survey_intro") && (
+              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.type !== "statistics" && currentStep.type !== "knowledge_revelation" && currentStep.id !== "screen1_intro" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && currentStep.id !== "slide4_barrier" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics" && currentStep.id !== "slide6_myths" && currentStep.id !== "slide8_milestone" && currentStep.id !== "slide9_why_it_matters" && currentStep.id !== "slide10_testing" && currentStep.id !== "screen4_testing" && currentStep.id !== "screen3_5_knowledge_test" && currentStep.id !== "screen3_6_all_correct" && currentStep.id !== "screen6_survey_intro" && currentStep.id !== "slide10_survey_intro") && (
                 <div className="absolute bottom-[14px] md:bottom-[22px] right-4 sm:right-5 md:right-7 z-30 flex items-center">
                   <AudioPlayer
                     audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
@@ -1190,7 +1197,26 @@ function NavigationFooter({ onNext, onBack, loading, locale }: Omit<BaseScreenPr
 
 // ============ Screen Components ============
 
-function IntroScreen({ title, description, content, onNext, onAnswer, loading, t, locale, headingRef }: BaseScreenProps & { onAnswer: (val: string) => void; onNoBranching?: () => void }) {
+function IntroScreen({
+  title,
+  description,
+  content,
+  onNext,
+  onAnswer,
+  loading,
+  t,
+  locale,
+  headingRef,
+  audioSrc,
+  stepId,
+  transcriptText,
+}: BaseScreenProps & {
+  onAnswer: (val: string) => void;
+  onNoBranching?: () => void;
+  audioSrc?: string;
+  stepId?: string;
+  transcriptText?: string;
+}) {
   const isSpanish = locale === "es";
   const introSubtitle = description || (isSpanish ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
   const mainCopy = isSpanish
@@ -1200,7 +1226,7 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
   return (
     <div
       id="slide-content"
-      className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-4 sm:px-8 md:px-14 lg:px-16 py-3 sm:py-6 pb-12 sm:pb-6 overflow-y-auto"
+      className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-4 sm:px-8 md:px-14 lg:px-16 py-3 sm:py-6 pb-14 sm:pb-6 overflow-y-auto"
       style={{
         background: `
           radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
@@ -1257,6 +1283,17 @@ function IntroScreen({ title, description, content, onNext, onAnswer, loading, t
         <div className="shrink-0 flex items-center justify-center sm:pr-2 z-10 order-first md:order-last">
           <NurseAnna size="md" imgClassName="w-20 sm:w-28 md:w-32 lg:w-36 max-h-[135px] sm:max-h-[190px] md:max-h-[220px] object-contain" isDecorative={false} locale={locale} />
         </div>
+      </div>
+
+      {/* Bottom-Right Audio (CC & Play/Pause) Controls */}
+      <div className="absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-25 flex items-center">
+        <AudioPlayer
+          audioSrc={audioSrc}
+          stepId={stepId || "screen1_intro"}
+          locale={locale || (isSpanish ? "es" : "en")}
+          transcriptText={transcriptText}
+          size="large"
+        />
       </div>
     </div>
   );
