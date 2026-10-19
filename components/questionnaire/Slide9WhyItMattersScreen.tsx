@@ -383,7 +383,7 @@ export function Slide9WhyItMattersScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
+  audioSrc = isSpanish ? "/audio/exported/slide9_why_it_matters_es.mp3" : "/audio/exported/slide9_why_it_matters_en.mp3",
   stepId = "slide9_why_it_matters",
   locale,
   transcriptText,
@@ -504,7 +504,12 @@ export function Slide9WhyItMattersScreen({
             audioSrc={audioSrc}
             stepId={stepId}
             locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={transcriptText || `${badgeTitle}. ${introText}`}
+            transcriptText={
+              transcriptText ||
+              (isSpanish
+                ? "Why does this matter? Cuando un niño necesita antibióticos y se cree que tiene alergia a la penicilina, recibe diferentes antibióticos que tienen más probabilidades de causar diarrea u otros efectos secundarios, cuestan más que la penicilina, tienen peor sabor que la penicilina y pueden hacer que una infección sea más difícil de tratar en el futuro."
+                : "Why does this matter? When a child needs antibiotics and is believed to have an allergy to penicillin, they receive different antibiotics that: are more likely to cause diarrhea or other side effects, cost more than penicillin, taste worse than penicillin, may make an infection harder to treat in the future.")
+            }
             size="large"
           />
         </div>

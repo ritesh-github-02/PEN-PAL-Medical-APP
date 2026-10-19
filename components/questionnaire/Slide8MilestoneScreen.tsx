@@ -418,7 +418,7 @@ export function Slide8MilestoneScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
+  audioSrc = isSpanish ? "/audio/exported/slide8_milestone_es.mp3" : "/audio/exported/slide8_milestone_en.mp3",
   stepId = "slide8_milestone",
   locale,
   transcriptText,

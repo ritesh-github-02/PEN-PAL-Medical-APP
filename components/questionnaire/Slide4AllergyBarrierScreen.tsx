@@ -402,8 +402,8 @@ export function Slide4AllergyBarrierScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
-  stepId,
+  audioSrc = isSpanish ? "/audio/exported/slide4_barrier_es.mp3" : "/audio/exported/slide4_barrier_en.mp3",
+  stepId = "slide4_barrier",
   locale,
   transcriptText,
 }: Slide4AllergyBarrierScreenProps) {

@@ -476,7 +476,7 @@ export function Slide10TestingOverviewScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
+  audioSrc = isSpanish ? "/audio/exported/screen4_testing_es.mp3" : "/audio/exported/screen4_testing_en.mp3",
   stepId = "slide10_testing",
   locale,
   transcriptText,
@@ -549,7 +549,9 @@ export function Slide10TestingOverviewScreen({
     ? resolveMedicineToken(rawSubtitle, medicationName, isSpanish)
     : rawSubtitle;
 
-  const spokenText = `${introText}. ${subtitleText}`;
+  const spokenText = isSpanish
+    ? `¡Hable con el médico de su hijo sobre las pruebas! ${introText}. ${subtitleText}. ${rawBullets.map((b) => resolveMedicineToken(b.es, medicationName, isSpanish)).join(" ")}`
+    : `Talk to your child's doctor about testing. ${introText}. ${subtitleText}. ${rawBullets.map((b) => resolveMedicineToken(b.en, medicationName, isSpanish)).join(" ")}`;
 
   return (
     <div id="slide-content" className="s10-root" ref={rootRef}>

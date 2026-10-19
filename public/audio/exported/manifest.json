@@ -14,88 +14,137 @@
     "text": "PEN-PAL. Padres Involucrados en Alergias a la Penicilina. ¡Hola! Soy la enfermera Anna. Hablemos sobre las alergias a la penicilina en los niños. ¡Comenzar!"
   },
   {
-    "stepId": "screen2_statistics",
+    "stepId": "slide2_naming",
     "screenIndex": 2,
+    "locale": "en",
+    "filename": "slide2_naming_en.mp3",
+    "text": "Let's first talk about penicillin. It has lots of names. Select what you call it. We'll use the name you choose during our time together. Penicillin. Amoxicillin. Pink medicine. Amoxicillin-clavulanate. Augmentin. Back button. Next button."
+  },
+  {
+    "stepId": "slide2_naming",
+    "screenIndex": 2,
+    "locale": "es",
+    "filename": "slide2_naming_es.mp3",
+    "text": "Primero hablemos de la penicilina. Tiene muchos nombres. Seleccione cómo lo llama. Usaremos el nombre que elija durante nuestro tiempo juntos. Penicilina, Amoxicilina, Medicina rosa, Amoxicilina-clavulanato, Augmentin. Botón atrás, Botón siguiente."
+  },
+  {
+    "stepId": "slide3_efficacy",
+    "screenIndex": 3,
+    "locale": "en",
+    "filename": "slide3_efficacy_en.mp3",
+    "text": "Many kids have had penicillin because it's the best for treating common ear, sinus, and throat infections. It is also one of the best antibiotics in adults, too. Penicillin is a wonder drug, but like all antibiotics, it doesn't work well for common colds or the flu."
+  },
+  {
+    "stepId": "slide4_barrier",
+    "screenIndex": 4,
+    "locale": "en",
+    "filename": "slide4_barrier_en.mp3",
+    "text": "Penicillin is one of the best antibiotics, but many kids do not get it because they are believed to be allergic to it."
+  },
+  {
+    "stepId": "slide5_prevalence",
+    "screenIndex": 5,
     "locale": "en",
     "filename": "screen2_statistics_en.mp3",
-    "text": "Most kids who are told they are allergic to penicillin (amoxicillin) can safely take it. Out of 100 kids who are said to have a penicillin (amoxicillin) allergy"
+    "text": "Did you know? Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with a penicillin allergy, 95 can take penicillin without having a reaction."
   },
   {
-    "stepId": "screen2_statistics",
-    "screenIndex": 2,
+    "stepId": "slide5_prevalence",
+    "screenIndex": 5,
     "locale": "es",
     "filename": "screen2_statistics_es.mp3",
-    "text": "La mayoría de los niños a los que se les dice que son alérgicos a la penicilina (amoxicilina) pueden tomarla de manera segura. De cada 100 niños que se dice que tienen alergia a la penicilina (amoxicilina)"
+    "text": "¿Sabías que...? La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con alergia a la penicilina, 95 pueden tomarla sin presentar una reacción."
   },
   {
-    "stepId": "screen3_5_knowledge_test",
-    "screenIndex": 3,
+    "stepId": "slide6_myths",
+    "screenIndex": 6,
     "locale": "en",
     "filename": "screen3_5_knowledge_test_en.mp3",
-    "text": "What is true about penicillin?. Test your knowledge!. Options: 1. It is the best at curing many illnesses in kids and adults. 2. It has less side-effects than other antibiotics. 3. Kids tend to like the way it tastes, like bubblegum!. 4. It is cheaper than other antibiotics."
+    "text": "Why are so many kids thought to have a penicillin allergy when they don't? Click each box to reveal the truth. Myth 1: If a child gets a rash when taking penicillin, it means they are allergic to penicillin? Truth: A rash does not always mean an allergy. Rashes are common in kids, especially when they are sick. The underlying illness may have caused the rash. Myth 2: If a child gets a bellyache or has diarrhea while taking penicillin, it means they are allergic to penicillin? Truth: Bellyaches and diarrhea are common side effects of antibiotics. Myth 3: If a parent is allergic to penicillin, their child will be too? Truth: A penicillin allergy is not passed down from a parent to child. Myth 4: If a child has a penicillin allergy, they will always have it? Truth: A child may outgrow their allergy to penicillin."
   },
   {
-    "stepId": "screen3_5_knowledge_test",
-    "screenIndex": 3,
+    "stepId": "slide6_myths",
+    "screenIndex": 6,
     "locale": "es",
     "filename": "screen3_5_knowledge_test_es.mp3",
-    "text": "¿Qué es cierto sobre la penicilina?. ¡Ponga a prueba sus conocimientos!. Opciones: 1. Es lo mejor para curar muchas enfermedades en niños y adultos. 2. Tiene menos efectos secundarios que otros antibióticos. 3. ¡A los niños les gusta cómo sabe, como el chicle!. 4. Es más barata que otros antibióticos."
+    "text": "¿Por qué se piensa que tantos niños tienen alergia a la penicilina cuando no es así? Haga clic en cada casilla para revelar la verdad."
+  },
+  {
+    "stepId": "slide8_milestone",
+    "screenIndex": 8,
+    "locale": "en",
+    "filename": "slide8_milestone_en.mp3",
+    "text": "Great job! Now, you know what is true about penicillin allergies."
+  },
+  {
+    "stepId": "slide9_why_it_matters",
+    "screenIndex": 9,
+    "locale": "en",
+    "filename": "slide9_why_it_matters_en.mp3",
+    "text": "Why does this matter? When a child needs antibiotics and is believed to have an allergy to penicillin, they receive different antibiotics that: are more likely to cause diarrhea or other side effects, cost more than penicillin, taste worse than penicillin, may make an infection harder to treat in the future."
+  },
+  {
+    "stepId": "slide9_why_it_matters",
+    "screenIndex": 9,
+    "locale": "es",
+    "filename": "slide9_why_it_matters_es.mp3",
+    "text": "¿Por qué es importante esto? Cuando un niño necesita antibióticos y se cree que tiene alergia a la penicilina, recibe diferentes antibióticos que tienen más probabilidades de causar diarrea u otros efectos secundarios, cuestan más que la penicilina, tienen peor sabor que la penicilina y pueden hacer que una infección sea más difícil de tratar en el futuro."
   },
   {
     "stepId": "screen4_testing",
-    "screenIndex": 4,
+    "screenIndex": 10,
     "locale": "en",
     "filename": "screen4_testing_en.mp3",
-    "text": "Talk to the doctor about your child's allergy!. Doctors can check to see if your child's reaction was just a side-effect and not an allergy. There is also a simple test that can tell if your child has an allergy.     For the test, kids swallow medicine.     Sometimes, kids also take medicine through a skin prick. If your child can safely take penicillin, they are not allergic."
+    "text": "Talk to your child's doctor about testing. There's a test that your child's doctor can perform. This test can determine if your child can safely take penicillin. Testing is safe and done in the office. For the test, kids take penicillin by mouth and are monitored in a doctor's office for about an hour. And kids can help decide whether they want to take penicillin as a liquid or chewable tablet. Fortunately, kids tend to like the way penicillin tastes."
   },
   {
     "stepId": "screen4_testing",
-    "screenIndex": 4,
+    "screenIndex": 10,
     "locale": "es",
     "filename": "screen4_testing_es.mp3",
-    "text": "¡Hable con el médico sobre la alergia de su hijo!. Los médicos pueden comprobar si la reacción de su hijo fue solo un efecto secundario y no una alergia. También hay una prueba simple que puede saber si su hijo tiene una alergia. * Para la prueba, los niños tragan medicamentos. * A veces, los niños también toman medicamentos a través de un pinchazo en la piel. Si su hijo puede tomar penicilina de manera segura, no es alérgico."
+    "text": "¡Hable con el médico de su hijo sobre las pruebas! Hay una prueba que el médico de su hijo puede realizar. Esta prueba puede determinar si su hijo puede tomar penicilina de manera segura. Las pruebas son seguras y se realizan en el consultorio. Para la prueba, los niños toman penicilina por vía oral y se les monitorea en el consultorio médico durante aproximadamente una hora. Los niños pueden ayudar a decidir si quieren tomar penicilina en forma líquida o en tabletas masticables. ¡Afortunadamente, a los niños les suele gustar el sabor de la penicilina!"
   },
   {
     "stepId": "screen6_survey_intro",
-    "screenIndex": 5,
+    "screenIndex": 11,
     "locale": "en",
     "filename": "screen6_survey_intro_en.mp3",
     "text": "The next set of questions can help you and the doctor see what's best for your child."
   },
   {
     "stepId": "screen6_survey_intro",
-    "screenIndex": 5,
+    "screenIndex": 11,
     "locale": "es",
     "filename": "screen6_survey_intro_es.mp3",
     "text": "El siguiente conjunto de preguntas puede ayudarlo a usted y al médico a decidir qué es lo mejor para su hijo."
   },
   {
     "stepId": "screen6_1_symptoms",
-    "screenIndex": 6,
+    "screenIndex": 12,
     "locale": "en",
     "filename": "screen6_1_symptoms_en.mp3",
-    "text": "Select what happened when your child was said to be allergic to penicillin. Options: 1. Rash. 2. Swelling. 3. Fainting or dizziness. 4. Itchiness. 5. Throat tightness. 6. Shortness of breath or hard time breathing. 7. Fever (new fever or worse fever). 8. Belly pain. 9. Diarrhea. 10. Joint pain. 11. Wanted to throw up or threw up. 12. Muscle aches. 13. Other: Please describe ________. 14. Unsure/I don't know"
+    "text": "Select what happened when your child was said to be allergic to penicillin. Rash, Swelling, Fainting or dizziness, Itchiness, Throat tightness, Shortness of breath or hard time breathing, Fever (new fever or worse fever), Belly pain, Diarrhea, Joint pain, Wanted to throw up or threw up, Muscle aches, Other (please describe), Unsure/I don't know."
   },
   {
     "stepId": "screen6_1_symptoms",
-    "screenIndex": 6,
+    "screenIndex": 12,
     "locale": "es",
     "filename": "screen6_1_symptoms_es.mp3",
-    "text": "Seleccione lo que sucedió cuando se le dijo que su hijo era alérgico a la penicilina. Opciones: 1. Sarpullido. 2. Inflamación. 3. Desmayos o mareos. 4. Picazón. 5. Opresión en la garganta. 6. Falta de aire o dificultad para respirar. 7. Fiebre (aparición de fiebre o empeoramiento de la fiebre). 8. Dolor abdominal. 9. Diarrea. 10. Dolor en articulaciones. 11. Ganas de vomitar o vomitó. 12. Dolores musculares. 13. Otro: por favor describa. 14. No estoy seguro/ No lo sé"
+    "text": "Seleccione lo que sucedió cuando se le dijo que su hijo era alérgico a la penicilina. Sarpullido, Hinchazón, Desmayo o mareo, Picazón, Opresión en la garganta, Dificultad para respirar, Fiebre, Dolor de estómago, Diarrea, Dolor en las articulaciones, Vómito, Dolores musculares, Otro, No estoy seguro/No lo sé."
   },
   {
     "stepId": "screen6_2_timing",
-    "screenIndex": 7,
+    "screenIndex": 13,
     "locale": "en",
     "filename": "screen6_2_timing_en.mp3",
-    "text": "How old was your child when the reaction happened?. At what age did your child have the reaction to penicillin (amoxicillin)?"
+    "text": "How old was your child when they had a reaction to penicillin? Baby: up to 12 months, Toddler: 1 to 3 years, School-aged: 4 to 12 years, Teen: 13 to 17 years, Adult: 18+ years."
   },
   {
     "stepId": "screen6_2_timing",
-    "screenIndex": 7,
+    "screenIndex": 13,
     "locale": "es",
     "filename": "screen6_2_timing_es.mp3",
-    "text": "¿Qué edad tenía su hijo cuando ocurrió la reacción?. ¿A qué edad tuvo su hijo la reacción a la penicilina (amoxicilina)?"
+    "text": "¿Qué edad tenía su hijo cuando tuvo una reacción a la penicilina? Bebé: hasta 12 meses, Niño pequeño: 1 a 3 años, Edad escolar: 4 a 12 años, Adolescente: 13 a 17 años, Adulto: más de 18 años."
   },
   {
     "stepId": "screen6_3_onset",

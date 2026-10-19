@@ -360,8 +360,8 @@ export function Slide5PrevalenceScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
-  stepId,
+  audioSrc = isSpanish ? "/audio/exported/screen2_statistics_es.mp3" : "/audio/exported/screen2_statistics_en.mp3",
+  stepId = "slide5_prevalence",
   locale,
   transcriptText,
 }: Slide5PrevalenceScreenProps) {
@@ -423,8 +423,8 @@ export function Slide5PrevalenceScreen({
   );
 
   const plainHeadingText = transcriptText || (isSpanish
-    ? `La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con una alergia a ${medicine}, 95 pueden tomar ${medicine} sin tener una reacción.`
-    : `Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with ${article} ${medicine} allergy, 95 can take ${medicine} without having a reaction.`);
+    ? `¿Sabías que...? La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con una alergia a ${medicine}, 95 pueden tomar ${medicine} sin tener una reacción.`
+    : `Did you know? Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with ${article} ${medicine} allergy, 95 can take ${medicine} without having a reaction.`);
 
   return (
     <div

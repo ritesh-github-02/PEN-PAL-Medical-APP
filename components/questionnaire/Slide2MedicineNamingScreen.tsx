@@ -571,7 +571,7 @@ export function Slide2MedicineNamingScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
+  audioSrc = isSpanish ? "/audio/exported/slide2_naming_es.mp3" : "/audio/exported/slide2_naming_en.mp3",
   stepId = "slide2_naming",
   locale,
   transcriptText,
@@ -752,7 +752,12 @@ export function Slide2MedicineNamingScreen({
             audioSrc={audioSrc}
             stepId={stepId}
             locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={transcriptText}
+            transcriptText={
+              transcriptText ||
+              (isSpanish
+                ? "Primero hablemos de la penicilina. Tiene muchos nombres. Seleccione cómo lo llama. Usaremos el nombre que elija durante nuestro tiempo juntos. Penicilina, Amoxicilina, Medicina rosa, Amoxicilina-clavulanato, Augmentin. Botón atrás, Botón siguiente."
+                : "Let's first talk about penicillin. It has lots of names. Select what you call it. We'll use the name you choose during our time together. Penicillin. Amoxicillin. Pink medicine. Amoxicillin-clavulanate. Augmentin. Back button. Next button.")
+            }
             size="large"
           />
         </div>

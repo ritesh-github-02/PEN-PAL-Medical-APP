@@ -385,7 +385,7 @@ export function Slide6MythTruthScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
+  audioSrc = isSpanish ? "/audio/exported/screen3_5_knowledge_test_es.mp3" : "/audio/exported/screen3_5_knowledge_test_en.mp3",
   stepId = "slide6_myths",
   locale,
   transcriptText,
@@ -506,7 +506,12 @@ export function Slide6MythTruthScreen({
             audioSrc={audioSrc}
             stepId={stepId}
             locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={transcriptText || questionTitle}
+            transcriptText={
+              transcriptText ||
+              (isSpanish
+                ? "¿Por qué se piensa que tantos niños tienen alergia a la penicilina cuando no es así? Haga clic en cada casilla para revelar la verdad. Mito 1: Si un niño tiene un sarpullido cuando toma penicilina, ¿significa que es alérgico a la penicilina? Verdad: Un sarpullido no siempre significa alergia. Los sarpullidos son comunes en los niños, especialmente cuando están enfermos. La enfermedad subyacente puede haber causado el sarpullido. Mito 2: Si un niño tiene dolor de estómago o diarrea mientras toma penicilina, ¿significa que es alérgico a la penicilina? Verdad: Los dolores de estómago y la diarrea son efectos secundarios comunes de los antibióticos. Mito 3: Si uno de los padres es alérgico a la penicilina, ¿su hijo también lo será? Verdad: La alergia a la penicilina no se transmite de padres a hijos. Mito 4: Si un niño tiene alergia a la penicilina, ¿siempre la tendrá? Verdad: Un niño puede superar su alergia a la penicilina."
+                : "Why are so many kids thought to have a penicillin allergy when they don't? Click each box to reveal the truth. Myth 1: If a child gets a rash when taking penicillin, it means they are allergic to penicillin? Truth: A rash does not always mean an allergy. Rashes are common in kids, especially when they are sick. The underlying illness may have caused the rash. Myth 2: If a child gets a bellyache or has diarrhea while taking penicillin, it means they are allergic to penicillin? Truth: Bellyaches and diarrhea are common side effects of antibiotics. Myth 3: If a parent is allergic to penicillin, their child will be too? Truth: A penicillin allergy is not passed down from a parent to child. Myth 4: If a child has a penicillin allergy, they will always have it? Truth: A child may outgrow their allergy to penicillin.")
+            }
             size="large"
           />
         </div>

@@ -435,8 +435,8 @@ export function Slide3EfficacyScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
-  stepId,
+  audioSrc = isSpanish ? "/audio/exported/slide3_efficacy_es.mp3" : "/audio/exported/slide3_efficacy_en.mp3",
+  stepId = "slide3_efficacy",
   locale,
   transcriptText,
 }: Slide3EfficacyScreenProps) {
@@ -485,6 +485,10 @@ export function Slide3EfficacyScreen({
     : (isSpanish ? "Amoxicilina" : "Amoxicillin");
 
   const headingText = resolveMedicineToken(rawHeading, resolvedName, isSpanish);
+
+  const spokenText = isSpanish
+    ? `${headingText} ${resolvedName} es un medicamento maravilloso, pero como todos los antibióticos no funciona bien para los resfriados comunes o la gripe.`
+    : `${headingText} ${resolvedName} is a wonder drug, but like all antibiotics it doesn't work well for common colds or the flu.`;
 
   return (
     <div
@@ -609,7 +613,7 @@ export function Slide3EfficacyScreen({
             audioSrc={audioSrc}
             stepId={stepId || "slide3_efficacy"}
             locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={transcriptText || headingText}
+            transcriptText={transcriptText || spokenText}
             size="large"
           />
         </div>

@@ -418,7 +418,7 @@ export function Slide10SurveyIntroScreen({
   onNext,
   onBack,
   loading = false,
-  audioSrc,
+  audioSrc = isSpanish ? "/audio/exported/screen6_survey_intro_es.mp3" : "/audio/exported/screen6_survey_intro_en.mp3",
   stepId = "screen6_survey_intro",
   locale,
   transcriptText,
