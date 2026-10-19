@@ -442,17 +442,34 @@ const SLIDE14_CSS = `
 
 @media (max-width: 720px) {
   .s14-middle {
-    flex-direction: column-reverse;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
   }
   .s14-options-row {
-    flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    width: 100%;
   }
   .s14-option-btn {
-    flex: 1 1 45%;
+    width: 100%;
+    min-height: 42px;
+    font-size: 0.88rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .s14-nurse-wrap {
+    margin: 0.35rem auto 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .s14-nurse-img {
-    height: 150px;
+    height: clamp(140px, 21vh, 185px);
+    max-height: 185px;
+    width: auto;
+    object-fit: contain;
   }
 }
 `;

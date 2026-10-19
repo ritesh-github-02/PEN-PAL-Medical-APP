@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Printer, Download, Loader2 } from "lucide-react";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
+import { formatAssessmentData } from "@/lib/format-assessment";
 import { toPng } from "html-to-image";
 import { submitAnswer, completeQuestionnaire } from "./actions";
 
@@ -545,142 +546,17 @@ export function Slide18SummaryScreen({
     return () => clearTimeout(timer);
   }, []);
 
-  // Format symptoms string
-  const rawSymptoms = answers?.symptoms || answers?.screen6_1_symptoms || [];
-  const symptomsArray = Array.isArray(rawSymptoms) ? rawSymptoms : [rawSymptoms];
-  const rashDetails = answers?.screen6_1_rash_types || answers?.rashTypes || [];
-  const rashArray = Array.isArray(rashDetails) ? rashDetails : [rashDetails];
+  // Unified clinical data formatting across Slide 18, Report Page, and PDF
+  const formatted = formatAssessmentData(answers, isSpanish);
+  const symptomsFormatted = formatted.symptoms;
+  const ageFormatted = formatted.age;
+  const onsetFormatted = formatted.onset;
+  const medicalCareFormatted = formatted.medicalCare;
+  const resolutionFormatted = formatted.resolution;
+  const repeatUseFormatted = formatted.repeatUse;
+  const effectiveMedName = formatted.medicationName;
+  const tableRows = formatted.summaryTableRows;
 
-  let symptomsFormatted = isSpanish ? "Ninguno reportado" : "None reported";
-  if (symptomsArray.length > 0) {
-    symptomsFormatted = symptomsArray
-      .map((s: string) => {
-        if (s === "Rash" && rashArray.length > 0) {
-          const detailStr = rashArray.join(", ");
-          return isSpanish ? `Erupción cutánea   ${detailStr}` : `Rash   ${detailStr}`;
-        }
-        if (isSpanish) {
-          if (s === "Rash") return "Erupción cutánea";
-          if (s === "Hives") return "Urticaria";
-          if (s === "Swelling") return "Hinchazón";
-          if (s === "Throat tightness") return "Opresión en la garganta";
-          if (s === "Trouble breathing") return "Dificultad para respirar";
-          if (s === "Vomiting/Diarrhea") return "Vómitos/Diarrea";
-          if (s.includes("Unsure") || s.includes("know")) return "No estoy seguro/ No lo sé";
-        }
-        return s;
-      })
-      .join(", ");
-  }
-
-  // Format age string
-  const rawAge = answers?.ageCohort || answers?.ageAtReaction || answers?.screen6_2_timing;
-  const formatAgeValue = (val: any) => {
-    if (!val || val === "none_selected") return isSpanish ? "No reportado" : "Not reported";
-    const valStr = String(val);
-    if (!isNaN(Number(valStr))) {
-      return isSpanish ? `${valStr} años` : `${valStr}-years old`;
-    }
-    if (valStr.includes("Toddler")) return isSpanish ? "Niño pequeño (1-3 años)" : "3-years old";
-    if (valStr.includes("Baby")) return isSpanish ? "Bebé (0-12 meses)" : "Baby (0-12 months)";
-    if (valStr.includes("School")) return isSpanish ? "Edad escolar (4-12 años)" : "School-aged (4-12 years)";
-    if (valStr.includes("Teen")) return isSpanish ? "Adolescente (13-17 años)" : "Teen (13-17 years)";
-    if (valStr.includes("Adult")) return isSpanish ? "Adulto (18+)" : "Adult (18+)";
-    return valStr;
-  };
-  const ageFormatted = formatAgeValue(rawAge);
-
-  // Format onset string
-  const rawOnset = answers?.onset || answers?.screen6_3_onset;
-  const formatOnsetValue = (val: any) => {
-    if (!val || val === "none_selected") return isSpanish ? "No reportado" : "Not reported";
-    const valStr = String(val);
-    if (valStr.toLowerCase().includes("less") || valStr === "<1 hour" || valStr === "< 1 hour") {
-      return isSpanish ? "<1 hora" : "<1 hour";
-    }
-    if (valStr.includes("1-24") || valStr.includes("1 to 24")) {
-      return isSpanish ? "1-24 horas" : "1-24 hours";
-    }
-    if (valStr.includes("24+") || valStr.toLowerCase().includes("more than 24")) {
-      return isSpanish ? "24+ horas" : "24+hours";
-    }
-    if (valStr.toLowerCase().includes("unsure") || valStr.toLowerCase().includes("know")) {
-      return isSpanish ? "No estoy seguro" : "Unsure";
-    }
-    return valStr;
-  };
-  const onsetFormatted = formatOnsetValue(rawOnset);
-
-  // Format resolution string
-  const resVal = answers?.resolution || answers?.screen6_4b_resolution_type;
-  let resolutionFormatted = isSpanish ? "Por sí sola" : "On its own";
-  if (resVal === "With medication") {
-    const meds = answers?.resolutionMedicines || [];
-    const route = answers?.resolutionRoute || answers?.screen6_4b_route;
-    if (meds.length > 0 || route) {
-      const medName = meds[0]?.split(" (")[0] || "Allergy medicine";
-      resolutionFormatted = route
-        ? `${isSpanish ? "Con medicación" : "With medication"} (${medName}, ${route})`
-        : `${isSpanish ? "Con medicación" : "With medication"} (${medName})`;
-    } else {
-      resolutionFormatted = isSpanish ? "Con medicación" : "With medication";
-    }
-  } else if (resVal === "On its own") {
-    resolutionFormatted = isSpanish ? "Por sí sola" : "On its own";
-  } else if (resVal && (resVal.toLowerCase().includes("unsure") || resVal.toLowerCase().includes("know"))) {
-    resolutionFormatted = isSpanish ? "No estoy seguro" : "Unsure";
-  }
-
-  // Format repeat use string (matching spec p18_4.png: "Unsure if child has received penicillin since the reaction")
-  const repeatVal = answers?.repeatUse || answers?.screen6_5_yetagain;
-  const detailVal = answers?.reactionDetailSelected || answers?.screen6_5_reaction_detail;
-  let repeatUseFormatted = isSpanish
-    ? "No, el niño no ha recibido penicilina desde la reacción"
-    : "No, child has not received penicillin since the reaction";
-
-  if (repeatVal === "Unsure" || (repeatVal && repeatVal.toLowerCase().includes("unsure"))) {
-    repeatUseFormatted = isSpanish
-      ? "No estoy seguro si el niño ha recibido penicilina desde la reacción"
-      : "Unsure if child has received penicillin since the reaction";
-  } else if (repeatVal === "Yes") {
-    if (detailVal && detailVal.includes("not have a reaction")) {
-      repeatUseFormatted = isSpanish ? "Sí, y no tuvieron reacción" : "Yes, and they did not have a reaction";
-    } else if (detailVal && detailVal.includes("had a reaction")) {
-      repeatUseFormatted = isSpanish ? "Sí, y tuvieron reacción" : "Yes, and they had a reaction";
-    } else {
-      repeatUseFormatted = isSpanish ? "Sí" : "Yes";
-    }
-  } else if (repeatVal === "No") {
-    repeatUseFormatted = isSpanish
-      ? "No, el niño no ha recibido penicilina desde la reacción"
-      : "No, child has not received penicillin since the reaction";
-  }
-
-  const effectiveMedName = answers?.medicationName || answers?.screen2_naming || (isSpanish ? "penicilina" : "penicillin");
-
-  // Table rows matching Spec p18_4.png exactly
-  const tableRows = [
-    {
-      label: isSpanish ? "Síntomas de la reacción del niño" : "Symptoms of child's reaction",
-      value: symptomsFormatted,
-    },
-    {
-      label: isSpanish ? "Edad del niño al momento de la reacción" : "Age of child at the time of the reaction",
-      value: ageFormatted,
-    },
-    {
-      label: isSpanish ? "Cuánto tiempo después de tomar penicilina ocurrió la reacción" : "How long reaction happened after taking penicillin",
-      value: onsetFormatted,
-    },
-    {
-      label: isSpanish ? "Cómo desapareció la reacción" : "How reaction went away",
-      value: resolutionFormatted,
-    },
-    {
-      label: isSpanish ? "Uso repetido de penicilina" : "Repeat use of penicillin",
-      value: repeatUseFormatted,
-    },
-  ];
 
   const handleSaveAsPicture = async () => {
     if (isSavingPicture) return;
@@ -726,10 +602,11 @@ export function Slide18SummaryScreen({
         locale: isSpanish ? "es" : "en",
         answers,
         participantId: participantId || activeToken,
+        medicationName: effectiveMedName,
         symptoms: symptomsFormatted,
         age: ageFormatted,
         onset: onsetFormatted,
-        medicalCare: answers?.screen6_4_resolution || "None",
+        medicalCare: medicalCareFormatted,
         resolution: resolutionFormatted,
         repeatUse: repeatUseFormatted,
         summarySections: tableRows.map((r, i) => ({

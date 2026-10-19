@@ -3,7 +3,6 @@ import {getMessages, getTranslations} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {routing} from '@/routing'; // We need to configure @ alias or relative path
 import type {Metadata} from 'next';
-import ExtensionErrorShield from '@/components/ExtensionErrorShield';
 import '../globals.css'; 
 
 export async function generateMetadata(
@@ -62,9 +61,35 @@ export default async function LocaleLayout({
                          s.indexOf('message channel closed') !== -1;
                 }
 
+                function isChunkError(str) {
+                  if (!str) return false;
+                  var s = String(str);
+                  return s.indexOf('Loading chunk') !== -1 ||
+                         s.indexOf('ChunkLoadError') !== -1 ||
+                         s.indexOf('Failed to fetch dynamically imported module') !== -1;
+                }
+
+                function handleChunkRecovery(msg, e) {
+                  if (isChunkError(msg)) {
+                    if (e && e.preventDefault) e.preventDefault();
+                    if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+                    try {
+                      var lastReload = sessionStorage.getItem('chunk_retry');
+                      var now = Date.now();
+                      if (!lastReload || now - Number(lastReload) > 8000) {
+                        sessionStorage.setItem('chunk_retry', String(now));
+                        window.location.reload();
+                      }
+                    } catch (err) {}
+                    return true;
+                  }
+                  return false;
+                }
+
                 window.addEventListener('unhandledrejection', function(e) {
                   var reason = e && e.reason;
                   var msg = (reason && (reason.message || reason.stack)) || String(reason);
+                  if (handleChunkRecovery(msg, e)) return;
                   if (isExtError(msg)) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
@@ -73,6 +98,7 @@ export default async function LocaleLayout({
 
                 window.addEventListener('error', function(e) {
                   var msg = (e && (e.message || e.filename || (e.error && e.error.stack))) || '';
+                  if (handleChunkRecovery(msg, e)) return;
                   if (isExtError(msg)) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
@@ -84,8 +110,6 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans overflow-x-hidden" suppressHydrationWarning>
-        {/* Shield to prevent Chrome extension runtime errors from crashing Next.js dev overlay */}
-        <ExtensionErrorShield />
 
         {/* WCAG 2.1 AA Skip to Content Link */}
         <a

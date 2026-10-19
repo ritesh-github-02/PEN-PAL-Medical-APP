@@ -209,7 +209,7 @@ export default function AudioPlayer({
       )}
 
       {/* 1. CC (Closed Caption / Transcript) Speech Bubble Button */}
-      <div className="relative" ref={transcriptPopoverRef}>
+      <div className="relative inline-flex items-center justify-center" ref={transcriptPopoverRef}>
         <button
           type="button"
           onClick={() => setShowTranscript(!showTranscript)}
@@ -232,34 +232,34 @@ export default function AudioPlayer({
           className={`audio-cc-btn group relative inline-flex items-center justify-center ${isCompact ? 'p-0.5' : 'p-0.5 sm:p-1'} rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${showTranscript ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
             }`}
         >
-          {/* Custom CC Speech Bubble SVG matching exact UI */}
+          {/* Custom CC Speech Bubble SVG perfectly aligned with Play button */}
           <svg
             className={`${ccSizeClass} transition-transform duration-150 group-hover:scale-105`}
-            viewBox="0 0 42 38"
+            viewBox="0 0 40 36"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
             {/* Speech Bubble Outline with rounded corners and downward tail */}
             <path
-              d="M 9 5.5 C 5.5 5.5 4 7.2 4 11 V 19.5 C 4 23.2 5.5 25 9 25 H 12.5 C 13.5 25 14.5 25.8 15.2 27 L 17 30 C 17.8 31.2 19.2 31.2 20 30 L 21.8 27 C 22.5 25.8 23.5 25 24.5 25 H 33 C 36.5 25 38 23.2 38 19.5 V 11 C 38 7.2 36.5 5.5 33 5.5 Z"
+              d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
               stroke="currentColor"
               strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
             />
-            {/* CC Text inside */}
+            {/* CC Text inside - vertically and optically centered */}
             <text
-              x="21"
-              y="15"
+              x="20"
+              y="15.5"
               textAnchor="middle"
               dominantBaseline="central"
               fill="currentColor"
-              fontSize="13.5"
+              fontSize="13"
               fontWeight="600"
               fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-              letterSpacing="0.4px"
+              letterSpacing="0.3px"
             >
               CC
             </text>
@@ -342,37 +342,37 @@ export default function AudioPlayer({
             <>
               {/* Rounded Play Triangle Outline when Playing */}
               <path
-                d="M 5 8.5 C 5 5.5 7.2 4.2 10 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 10 30.2 C 7.2 31.8 5 30.5 5 27.5 Z"
+                d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
                 stroke="currentColor"
                 strokeWidth="2.2"
                 strokeLinejoin="round"
                 fill="none"
               />
-              {/* Vertical pause lines inside triangle */}
-              <line x1="13.5" y1="11.5" x2="13.5" y2="24.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-              <line x1="19.5" y1="11.5" x2="19.5" y2="24.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+              {/* Perfectly centered vertical pause lines with clean clearance from slanted borders */}
+              <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+              <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
             </>
           ) : (
             <>
               {/* Rounded Play Triangle - bold 2.2px border */}
               <path
-                d="M 5 8.5 C 5 5.5 7.2 4.2 10 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 10 30.2 C 7.2 31.8 5 30.5 5 27.5 Z"
+                d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
                 stroke="currentColor"
                 strokeWidth="2.2"
                 strokeLinejoin="round"
                 fill="none"
               />
-              {/* "play" text inside the triangle */}
+              {/* "play" text inside the triangle - optically and evenly centered */}
               <text
-                x="14"
-                y="18"
+                x="14.8"
+                y="17.2"
                 textAnchor="middle"
                 dominantBaseline="central"
                 fill="currentColor"
-                fontSize="9"
-                fontWeight="600"
+                fontSize="8"
+                fontWeight="700"
                 fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-                letterSpacing="0.2px"
+                letterSpacing="0.1px"
               >
                 play
               </text>

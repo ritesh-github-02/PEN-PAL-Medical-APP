@@ -295,17 +295,34 @@ const SLIDE13_CSS = `
 
 @media (max-width: 720px) {
   .s13-middle {
-    flex-direction: column-reverse;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
   }
   .s13-options-row {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    width: 100%;
   }
   .s13-option-btn {
-    flex: 1 1 45%;
+    width: 100%;
+    min-height: 44px;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.65rem;
+  }
+  .s13-nurse-wrap {
+    margin: 0.35rem auto 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .s13-nurse-img {
-    height: 150px;
+    height: clamp(140px, 21vh, 185px);
+    max-height: 185px;
+    width: auto;
+    object-fit: contain;
   }
 }
 `;

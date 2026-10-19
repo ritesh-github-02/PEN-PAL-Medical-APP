@@ -423,9 +423,10 @@ export default function PenpalIntervention() {
       // Build compound metadata for slides with modal branching
       let metadata: string | undefined = undefined;
       if (currentStep.id === "screen6_1_symptoms") {
-        if (answers["rashDetails"] || answers["symptomsOther"]) {
+        if (answers["rashDetails"] || answers["swellingDetails"] || answers["symptomsOther"]) {
           metadata = JSON.stringify({
             rashDetails: answers["rashDetails"] || null,
+            swellingDetails: answers["swellingDetails"] || null,
             symptomsOther: answers["symptomsOther"] || null,
           });
         }
@@ -444,6 +445,17 @@ export default function PenpalIntervention() {
       await submitAnswer(currentStep.id, answerPayload, Math.round(currentSlideDwellMs), metadata);
       if (currentSlideDwellMs > 50) {
         await recordSlideTiming(currentStep.id, currentStepIndex, currentSlideDwellMs, false).catch(() => {});
+      }
+      if (currentStep.id === "screen6_1_symptoms") {
+        if (answers["rashDetails"]) {
+          await submitAnswer("rashDetails", answers["rashDetails"], Math.round(currentSlideDwellMs));
+        }
+        if (answers["swellingDetails"]) {
+          await submitAnswer("swellingDetails", answers["swellingDetails"], Math.round(currentSlideDwellMs));
+        }
+        if (answers["symptomsOther"]) {
+          await submitAnswer("symptomsOther", String(answers["symptomsOther"]), Math.round(currentSlideDwellMs));
+        }
       }
       if (currentStep.id === "screen6_4_resolution" && answers["screen6_4_location"]) {
         await submitAnswer("screen6_4_location", String(answers["screen6_4_location"]), Math.round(currentSlideDwellMs));

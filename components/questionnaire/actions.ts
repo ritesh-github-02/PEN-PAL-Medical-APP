@@ -398,7 +398,63 @@ export async function loadQuestionnaireProgress(tokenParam?: string, locale: str
       } catch {
         answers[r.questionId] = r.answerValue;
       }
+
+      // Unpack compound metadata if present
+      if (r.metadata) {
+        try {
+          const meta = JSON.parse(r.metadata);
+          if (meta && typeof meta === 'object') {
+            if (meta.rashDetails && !answers.rashDetails) answers.rashDetails = meta.rashDetails;
+            if (meta.swellingDetails && !answers.swellingDetails) answers.swellingDetails = meta.swellingDetails;
+            if (meta.symptomsOther && !answers.symptomsOther) answers.symptomsOther = meta.symptomsOther;
+            if (meta.location) {
+              if (!answers.screen6_4_location) answers.screen6_4_location = meta.location;
+              if (!answers.medicalCareLocation) answers.medicalCareLocation = meta.location;
+            }
+            if (meta.medicines && !answers.resolutionMedicines) answers.resolutionMedicines = meta.medicines;
+            if (meta.medicine && !answers.screen6_4b_medicine) answers.screen6_4b_medicine = meta.medicine;
+            if (meta.route) {
+              if (!answers.screen6_4b_route) answers.screen6_4b_route = meta.route;
+              if (!answers.resolutionRoute) answers.resolutionRoute = meta.route;
+            }
+            if (meta.reactionDetail) {
+              if (!answers.screen6_5_reaction_detail) answers.screen6_5_reaction_detail = meta.reactionDetail;
+              if (!answers.repeatPenicillinDetail) answers.repeatPenicillinDetail = meta.reactionDetail;
+            }
+          }
+        } catch {}
+      }
     }
+
+    // Bidirectional alias population ensuring 100% consistency
+    if (answers.screen2_naming && !answers.medicationName) answers.medicationName = answers.screen2_naming;
+    if (answers.slide2_naming && !answers.medicationName) answers.medicationName = answers.slide2_naming;
+    if (answers.medicationName && !answers.screen2_naming) answers.screen2_naming = answers.medicationName;
+
+    if (answers.screen6_1_symptoms && !answers.symptoms) answers.symptoms = answers.screen6_1_symptoms;
+    if (answers.symptoms && !answers.screen6_1_symptoms) answers.screen6_1_symptoms = answers.symptoms;
+
+    if (answers.screen6_2_timing && !answers.ageCohort) answers.ageCohort = answers.screen6_2_timing;
+    if (answers.ageCohort && !answers.screen6_2_timing) answers.screen6_2_timing = answers.ageCohort;
+
+    if (answers.screen6_3_onset && !answers.onset) answers.onset = answers.screen6_3_onset;
+    if (answers.onset && !answers.screen6_3_onset) answers.screen6_3_onset = answers.onset;
+
+    if (answers.screen6_4_resolution && !answers.medicalCareReceived) answers.medicalCareReceived = answers.screen6_4_resolution;
+    if (answers.medicalCareReceived && !answers.screen6_4_resolution) answers.screen6_4_resolution = answers.medicalCareReceived;
+    if (answers.screen6_4_location && !answers.medicalCareLocation) answers.medicalCareLocation = answers.screen6_4_location;
+    if (answers.medicalCareLocation && !answers.screen6_4_location) answers.screen6_4_location = answers.medicalCareLocation;
+
+    if (answers.screen6_4b_resolution_type && !answers.resolution) answers.resolution = answers.screen6_4b_resolution_type;
+    if (answers.resolution && !answers.screen6_4b_resolution_type) answers.screen6_4b_resolution_type = answers.resolution;
+    if (answers.screen6_4b_route && !answers.resolutionRoute) answers.resolutionRoute = answers.screen6_4b_route;
+    if (answers.resolutionRoute && !answers.screen6_4b_route) answers.screen6_4b_route = answers.resolutionRoute;
+
+    if (answers.screen6_5_yetagain && !answers.repeatPenicillin) answers.repeatPenicillin = answers.screen6_5_yetagain;
+    if (answers.repeatPenicillin && !answers.screen6_5_yetagain) answers.screen6_5_yetagain = answers.repeatPenicillin;
+    if (answers.repeatPenicillin && !answers.repeatUse) answers.repeatUse = answers.repeatPenicillin;
+    if (answers.screen6_5_reaction_detail && !answers.repeatPenicillinDetail) answers.repeatPenicillinDetail = answers.screen6_5_reaction_detail;
+    if (answers.repeatPenicillinDetail && !answers.screen6_5_reaction_detail) answers.screen6_5_reaction_detail = answers.repeatPenicillinDetail;
   } catch (error) {
     if (error instanceof Error && error.message.includes("Can't reach database server")) {
       // Silenced in preview

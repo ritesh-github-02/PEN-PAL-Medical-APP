@@ -23,12 +23,38 @@ export default function ExtensionErrorShield() {
       );
     };
 
+    const isChunkError = (message: string) => {
+      return (
+        message.includes('Loading chunk') ||
+        message.includes('ChunkLoadError') ||
+        message.includes('Failed to fetch dynamically imported module')
+      );
+    };
+
+    const handleChunkRecovery = (message: string, event: Event) => {
+      if (isChunkError(message)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        try {
+          const lastReload = sessionStorage.getItem('chunk_retry_shield');
+          const now = Date.now();
+          if (!lastReload || now - Number(lastReload) > 8000) {
+            sessionStorage.setItem('chunk_retry_shield', String(now));
+            window.location.reload();
+          }
+        } catch {}
+        return true;
+      }
+      return false;
+    };
+
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       const reason = event.reason;
       const message = typeof reason === 'string' ? reason : reason?.message || '';
       const stack = reason?.stack || '';
       const filename = reason?.fileName || '';
 
+      if (handleChunkRecovery(message, event)) return;
       if (isExtensionError(message, stack, filename)) {
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -40,6 +66,7 @@ export default function ExtensionErrorShield() {
       const message = event.message || '';
       const stack = event.error?.stack || '';
 
+      if (handleChunkRecovery(message, event)) return;
       if (isExtensionError(message, stack, filename)) {
         event.preventDefault();
         event.stopImmediatePropagation();

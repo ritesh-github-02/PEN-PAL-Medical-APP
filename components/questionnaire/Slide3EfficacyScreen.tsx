@@ -19,8 +19,8 @@ import SlideNavigationButtons from "./SlideNavigationButtons";
 const STAGE_W = 750;
 const STAGE_H = 530;
 
-/* Smooth cubic Bézier geometry with tail pointing down toward Anna's head */
-const BUBBLE_BEZIER_PATH =
+/* Smooth cubic Bézier geometry with tail pointing down toward Anna's head (Desktop) */
+const BUBBLE_BEZIER_PATH_DESKTOP =
   "M 182.5 12 " +
   "C 275 12, 350 52, 350 101 " +
   "C 350 138, 318 168, 268 180 " +
@@ -31,7 +31,26 @@ const BUBBLE_BEZIER_PATH =
   "C 15 52, 90 12, 182.5 12 " +
   "Z";
 
+/* Decreased, proportionate cubic Bézier tail for mobile portrait with proper space */
+const BUBBLE_BEZIER_PATH_MOBILE =
+  "M 182.5 12 " +
+  "C 275 12, 350 52, 350 101 " +
+  "C 350 138, 318 168, 268 180 " +
+  "C 278 191, 290 205, 294 218 " +
+  "C 276 208, 251 198, 222 188 " +
+  "C 209 189.5, 196 190, 182.5 190 " +
+  "C 90 190, 15 150, 15 101 " +
+  "C 15 52, 90 12, 182.5 12 " +
+  "Z";
+
 const SLIDE3_CSS = `
+.s3-bubble-path-desktop {
+  display: block;
+}
+.s3-bubble-path-mobile {
+  display: none;
+}
+
 .s3-root,
 .s3-root *,
 .s3-root *::before,
@@ -183,6 +202,12 @@ const SLIDE3_CSS = `
    Mobile-First Responsive Layout (< 768px)
    ========================================================== */
 @media (max-width: 767px) {
+  .s3-bubble-path-desktop {
+    display: none !important;
+  }
+  .s3-bubble-path-mobile {
+    display: block !important;
+  }
   .s3-root {
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -259,7 +284,7 @@ const SLIDE3_CSS = `
     top: auto !important;
     width: 95px !important;
     height: 170px !important;
-    margin-top: -18px !important;
+    margin-top: -4px !important;
     margin-left: auto !important;
     margin-right: 28px !important;
   }
@@ -306,7 +331,7 @@ const SLIDE3_CSS = `
   .s3-nurse-wrap {
     width: 108px !important;
     height: 195px !important;
-    margin-top: -22px !important;
+    margin-top: -6px !important;
   }
 }
 
@@ -509,18 +534,37 @@ export function Slide3EfficacyScreen({
                 </pattern>
               </defs>
 
-              {/* Smooth cubic Bézier body */}
+              {/* Desktop: Smooth cubic Bézier body */}
               <path
-                d={BUBBLE_BEZIER_PATH}
+                className="s3-bubble-path-desktop"
+                d={BUBBLE_BEZIER_PATH_DESKTOP}
                 fill="#ffffff"
                 stroke="#7baea9"
                 strokeWidth="3"
                 strokeLinejoin="round"
                 strokeLinecap="round"
               />
+              <path
+                className="s3-bubble-path-desktop"
+                d={BUBBLE_BEZIER_PATH_DESKTOP}
+                fill="url(#s3-card-dot-pattern)"
+              />
 
-              {/* Subtle paper dot texture */}
-              <path d={BUBBLE_BEZIER_PATH} fill="url(#s3-card-dot-pattern)" />
+              {/* Mobile: Decreased tail design with proper space above Nurse Anna */}
+              <path
+                className="s3-bubble-path-mobile"
+                d={BUBBLE_BEZIER_PATH_MOBILE}
+                fill="#ffffff"
+                stroke="#7baea9"
+                strokeWidth="3"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+              <path
+                className="s3-bubble-path-mobile"
+                d={BUBBLE_BEZIER_PATH_MOBILE}
+                fill="url(#s3-card-dot-pattern)"
+              />
             </svg>
 
             {/* Centered Speech Bubble Text with guaranteed padding on all 4 sides */}

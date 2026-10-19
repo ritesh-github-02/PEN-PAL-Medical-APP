@@ -17,7 +17,7 @@ import SlideNavigationButtons from "./SlideNavigationButtons";
 const STAGE_W = 750;
 const STAGE_H = 530;
 
-/* Clean cubic Bezier contour with rightward tail sweeping toward Anna */
+/* Clean cubic Bezier contour with rightward tail sweeping toward Anna (Desktop) */
 const BUBBLE_PATH_RIGHT =
   "M 232 28 " +
   "C 350 28, 436 74, 436 150 " +
@@ -28,7 +28,25 @@ const BUBBLE_PATH_RIGHT =
   "C 110 294, 38 240, 38 160 " +
   "C 38 78, 115 28, 232 28 Z";
 
+/* Compact, well-proportioned cubic Bezier contour for mobile portrait */
+const BUBBLE_PATH_MOBILE =
+  "M 232 28 " +
+  "C 350 28, 436 74, 436 150 " +
+  "C 436 190, 412 220, 376 236 " +
+  "C 396 244, 418 255, 438 268 " +
+  "C 412 278, 378 282, 342 275 " +
+  "C 302 288, 255 294, 205 294 " +
+  "C 110 294, 38 240, 38 160 " +
+  "C 38 78, 115 28, 232 28 Z";
+
 const SLIDE8_CSS = `
+.s8-bubble-path-desktop {
+  display: block;
+}
+.s8-bubble-path-mobile {
+  display: none;
+}
+
 .s8-root,
 .s8-root *,
 .s8-root *::before,
@@ -181,6 +199,12 @@ const SLIDE8_CSS = `
    Mobile-First Responsive Layout (< 768px)
    ========================================================== */
 @media (max-width: 767px) {
+  .s8-bubble-path-desktop {
+    display: none !important;
+  }
+  .s8-bubble-path-mobile {
+    display: block !important;
+  }
   .s8-root {
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -487,8 +511,9 @@ export function Slide8MilestoneScreen({
               </pattern>
             </defs>
 
-            {/* Smooth Bezier Silhouette sweeping rightward toward Anna */}
+            {/* Desktop: Smooth Bezier Silhouette sweeping rightward toward Anna */}
             <path
+              className="s8-bubble-path-desktop"
               d={BUBBLE_PATH_RIGHT}
               fill="#ffffff"
               stroke="#7baea9"
@@ -496,10 +521,25 @@ export function Slide8MilestoneScreen({
               strokeLinejoin="round"
               strokeLinecap="round"
             />
-
-            {/* Faint Paper Dot Grid Overlay */}
             <path
+              className="s8-bubble-path-desktop"
               d={BUBBLE_PATH_RIGHT}
+              fill="url(#s8-card-dot-pattern)"
+            />
+
+            {/* Mobile: Proportionate, decreased tail design */}
+            <path
+              className="s8-bubble-path-mobile"
+              d={BUBBLE_PATH_MOBILE}
+              fill="#ffffff"
+              stroke="#7baea9"
+              strokeWidth="3"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+            <path
+              className="s8-bubble-path-mobile"
+              d={BUBBLE_PATH_MOBILE}
               fill="url(#s8-card-dot-pattern)"
             />
           </svg>

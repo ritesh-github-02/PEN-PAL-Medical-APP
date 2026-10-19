@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { formatAssessmentData } from "@/lib/format-assessment";
 
 export interface PDFExportData {
   participantId?: string;
@@ -178,6 +179,9 @@ export function generateAssessmentPDF(data: any): void {
     return s;
   };
 
+  // Format answers with unified engine for 100% data consistency
+  const formattedAnswers = formatAssessmentData(data?.answers || {}, isSpanish);
+
   // Helper to resolve card values from direct props, summarySections, answers, or defaults
   const resolveCardValue = (
     key: string,
@@ -195,140 +199,13 @@ export function generateAssessmentPDF(data: any): void {
       if (byIndexVal) return byIndexVal;
     }
 
-    if (data?.answers) {
-      const ans = data.answers;
-      if (key === "symptoms") {
-        const s = ans.symptoms || ans.screen6_1_symptoms;
-        if (s) {
-          const list: string[] = Array.isArray(s) ? s : [String(s)];
-          const cleanList = list.filter((item) => sanitizeVal(item) !== null);
-          if (cleanList.length > 0) {
-            let res = cleanList.join(", ");
-            const rashArr = Array.isArray(ans.rashDetails)
-              ? ans.rashDetails
-              : (typeof ans.rashDetails === "string" ? (() => { try { return JSON.parse(ans.rashDetails); } catch { return []; } })() : []);
-            if (rashArr.length > 0) {
-              const formattedDetails = isSpanish
-                ? rashArr.map((d: string) => {
-                    if (d === "Hives") return "Ronchas";
-                    if (d === "Blisters") return "Ampollas";
-                    if (d === "Red, fine or bumpy rash") return "Rojo, fino o con protuberancias";
-                    if (d === "Flushing") return "Enrojecimiento";
-                    if (d === "Pus-filled pimples") return "Granos con pus";
-                    if (d === "Unsure" || d.includes("Unsure")) return "No estoy seguro";
-                    return d;
-                  }).join(", ")
-                : rashArr.join(", ");
-              res = res.replace(/Rash/i, `Rash (${formattedDetails})`);
-              res = res.replace(/Sarpullido/i, `Sarpullido (${formattedDetails})`);
-            }
-            const swellingArr = Array.isArray(ans.swellingDetails)
-              ? ans.swellingDetails
-              : (typeof ans.swellingDetails === "string" ? (() => { try { return JSON.parse(ans.swellingDetails); } catch { return []; } })() : []);
-            if (swellingArr.length > 0) {
-              const formattedSwelling = isSpanish
-                ? swellingArr.map((d: string) => {
-                    if (d === "Face swelling" || d === "Face or eyes" || d === "Face / Eyes") return "Inflamación de la cara";
-                    if (d === "Throat swelling" || d === "Throat") return "Inflamación de la garganta";
-                    if (d === "Lip swelling" || d === "Lips") return "Inflamación de los labios";
-                    if (d === "Tongue swelling" || d === "Tongue") return "Inflamación de la lengua";
-                    if (d === "Hands or feet" || d === "Hands / Feet") return "Manos o pies";
-                    if (d === "Unsure" || d.includes("Unsure")) return "No estoy seguro/No lo sé";
-                    if (d.startsWith("Other:")) return d.replace(/^Other:\s*/, "Otro: ");
-                    return d;
-                  }).join(", ")
-                : swellingArr.join(", ");
-              res = res.replace(/Swelling/i, `Swelling (${formattedSwelling})`);
-              res = res.replace(/Inflamación/i, `Inflamación (${formattedSwelling})`);
-            }
-            if (ans.symptomsOther) {
-              res += `, ${isSpanish ? "Otro" : "Other"}: ${ans.symptomsOther}`;
-            }
-            return res;
-          }
-        }
-        return isSpanish ? "Ninguno reportado" : "None reported";
-      }
-      if (key === "age") {
-        const a = ans.ageCohort ?? ans.ageAtReaction ?? ans.screen6_2_timing;
-        if (a !== undefined && a !== null && a !== "") {
-          if (typeof a === "number") return isSpanish ? `${a} años` : `${a} years old`;
-          const aStr = String(a);
-          if (isSpanish) {
-            if (aStr.includes("Baby")) return "Bebé (0-12 meses)";
-            if (aStr.includes("Toddler")) return "Niño pequeño (1-3 años)";
-            if (aStr.includes("School")) return "Edad escolar (4-12 años)";
-            if (aStr.includes("Teen")) return "Adolescente (13-17 años)";
-            if (aStr.includes("Adult")) return "Adulto (18+)";
-            return !isNaN(Number(aStr)) ? `${aStr} años` : aStr;
-          }
-          if (!isNaN(Number(aStr)) && !aStr.includes("(") && !aStr.includes("year") && !aStr.includes("month")) {
-            return `${aStr} years old`;
-          }
-          return aStr;
-        }
-      }
-      if (key === "onset") {
-        const o = sanitizeVal(ans.onset || ans.screen6_3_onset);
-        if (o) {
-          if (isSpanish) {
-            if (o === "Less than 1 hour" || o === "<1 hour") return "<1 hora";
-            if (o === "1-24 hours") return "1-24 horas";
-            if (o === "More than 24 hours" || o === "24+ hours") return "Más de 24 horas";
-            if (o.startsWith("Unsure")) return "No estoy seguro/No sé";
-          } else {
-            if (o === "Less than 1 hour") return "<1 hour";
-          }
-          return o;
-        }
-        return isSpanish ? "No reportado" : "Not reported";
-      }
-      if (key === "medicalCare") {
-        const m = sanitizeVal(ans.medicalCare || ans.screen6_4_resolution);
-        if (m) {
-          const loc = sanitizeVal(ans.locationSelected || ans.screen6_4_location);
-          if ((m === "Yes" || m === "Sí") && loc) {
-            return isSpanish ? `Sí (${loc})` : `Yes (${loc})`;
-          }
-          return isSpanish ? (m === "Yes" ? "Sí" : m) : m;
-        }
-      }
-      if (key === "resolution") {
-        const r = sanitizeVal(ans.resolution || ans.screen6_4b_resolution_type);
-        if (r) {
-          let medsList: string[] = [];
-          if (Array.isArray(ans.resolutionMedicines)) {
-            medsList = ans.resolutionMedicines;
-          } else if (typeof ans.resolutionMedicines === "string") {
-            try {
-              const p = JSON.parse(ans.resolutionMedicines);
-              medsList = Array.isArray(p) ? p : [ans.resolutionMedicines];
-            } catch {
-              medsList = [ans.resolutionMedicines];
-            }
-          } else if (ans.medicineSelected || ans.screen6_4b_medicine) {
-            medsList = [ans.medicineSelected || ans.screen6_4b_medicine];
-          }
-          const medStr = medsList.filter((m) => sanitizeVal(m) !== null).join(", ");
-          const rt = sanitizeVal(ans.routeSelected || ans.screen6_4b_route || ans.resolutionRoute);
-          if ((r === "With medication" || r === "Con medicamentos") && (medStr || rt)) {
-            const extra = [medStr, rt].filter(Boolean).join(" - ");
-            return isSpanish ? `Con medicamentos (${extra})` : `With medication (${extra})`;
-          }
-          return isSpanish ? (r === "With medication" ? "Con medicamentos" : r) : r;
-        }
-      }
-      if (key === "repeatUse") {
-        const u = sanitizeVal(ans.repeatUse || ans.screen6_5_yetagain);
-        if (u) {
-          const d = sanitizeVal(ans.reactionDetailSelected || ans.screen6_5_reaction_detail);
-          if ((u === "Yes" || u === "Sí") && d) {
-            return isSpanish ? `Sí (${d})` : `Yes (${d})`;
-          }
-          return isSpanish ? (u === "Yes" ? "Sí" : u) : u;
-        }
-      }
-    }
+    if (key === "symptoms") return sanitizeVal(formattedAnswers.symptoms) || defaultValue;
+    if (key === "age") return sanitizeVal(formattedAnswers.age) || defaultValue;
+    if (key === "onset") return sanitizeVal(formattedAnswers.onset) || defaultValue;
+    if (key === "medicalCare") return sanitizeVal(formattedAnswers.medicalCare) || defaultValue;
+    if (key === "resolution") return sanitizeVal(formattedAnswers.resolution) || defaultValue;
+    if (key === "repeatUse") return sanitizeVal(formattedAnswers.repeatUse) || defaultValue;
+
     return defaultValue;
   };
 
@@ -340,27 +217,27 @@ export function generateAssessmentPDF(data: any): void {
       value: resolveCardValue(
         "symptoms",
         0,
-        data?.symptoms || (isSpanish ? "Ninguno reportado" : "None reported")
+        formattedAnswers.symptoms || (isSpanish ? "Ninguno reportado" : "None reported")
       ),
     },
     {
       label: isSpanish ? "EDAD AL MOMENTO DE LA REACCIÓN" : "AGE AT REACTION",
-      value: resolveCardValue("age", 1, data?.age || (isSpanish ? "17 años" : "17 years old")),
+      value: resolveCardValue("age", 1, formattedAnswers.age || (isSpanish ? "No reportado" : "Not reported")),
     },
     {
       label: isSpanish ? "TIEMPO HASTA EL INICIO" : "TIME TO ONSET",
-      value: resolveCardValue("onset", 2, data?.onset || (isSpanish ? "Más de 24 horas" : "24+ hours")),
+      value: resolveCardValue("onset", 2, formattedAnswers.onset || (isSpanish ? "No reportado" : "Not reported")),
     },
     {
       label: isSpanish ? "ATENCIÓN MÉDICA RECIBIDA" : "MEDICAL CARE RECEIVED",
-      value: resolveCardValue("medicalCare", 3, data?.medicalCare || (isSpanish ? "No" : "No")),
+      value: resolveCardValue("medicalCare", 3, formattedAnswers.medicalCare || (isSpanish ? "No" : "No")),
     },
     {
       label: isSpanish ? "RESOLUCIÓN DE SÍNTOMAS" : "SYMPTOM RESOLUTION",
       value: resolveCardValue(
         "resolution",
         4,
-        data?.resolution || (isSpanish ? "Por sí sola" : "On its own")
+        formattedAnswers.resolution || (isSpanish ? "Por sí sola" : "On its own")
       ),
     },
     {
@@ -368,7 +245,7 @@ export function generateAssessmentPDF(data: any): void {
       value: resolveCardValue(
         "repeatUse",
         5,
-        data?.repeatUse || (isSpanish ? "No" : "No")
+        formattedAnswers.repeatUse || (isSpanish ? "No" : "No")
       ),
     },
   ];
