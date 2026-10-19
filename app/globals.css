@@ -418,10 +418,15 @@ body::-webkit-scrollbar,
    Mobile-First Questionnaire & Slide Mobilization (< 768px)
    ========================================================================== */
 @media (min-width: 768px) {
+  .intervention-frame-outer {
+    max-width: min(64rem, calc(100vw - 1.5rem), calc((100dvh - 5.75rem) * 1.4124)) !important;
+    width: 100% !important;
+  }
   .tablet-mockup-frame {
     aspect-ratio: 1000 / 708;
     max-height: calc(100dvh - 5.75rem);
     height: auto;
+    width: 100% !important;
     border: none !important;
     background: #f4f8ec !important;
     padding: 0 !important;

@@ -18,6 +18,7 @@ import AudioPlayer from "./AudioPlayer";
 import { NurseAnna } from "./NurseAnna";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
 import { SuccessScreen } from "./SuccessScreen";
+import { Slide1IntroScreen } from "./Slide1IntroScreen";
 import { Slide12AgeCohortScreen } from "./Slide12AgeCohortScreen";
 import { Slide2MedicineNamingScreen } from "./Slide2MedicineNamingScreen";
 import { Slide3EfficacyScreen } from "./Slide3EfficacyScreen";
@@ -651,7 +652,7 @@ export default function PenpalIntervention() {
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}
       <div 
-        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 max-w-[420px] md:max-w-[min(64rem,calc(100vw-1.5rem),calc((100dvh-5.75rem)*(1000/708)))] print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
+        className="intervention-frame-outer w-full relative z-10 flex flex-col items-center justify-center my-auto transition-all duration-300 max-w-[420px] md:max-w-[1000px] print:w-full print:max-w-full print:m-0 print:p-0 print:block print:static"
       >
         {/* Header Bar matching old slide: Logo, Step Progress, and Language Switcher */}
         <header className="w-full shrink-0 flex items-center justify-between px-2.5 sm:px-4 py-1 sm:py-1.5 mb-1.5 sm:mb-2 bg-white/90 backdrop-blur border border-slate-200/90 rounded-2xl shadow-xs no-print">
@@ -733,10 +734,16 @@ export default function PenpalIntervention() {
               ) : (
                 <>
                   {currentStep.id === "screen1_intro" ? (
-                    <IntroScreen
-                      {...baseProps}
+                    <Slide1IntroScreen
+                      title={currentStep.titleEn}
+                      description={locale === "es" ? currentStep.descriptionEs : currentStep.descriptionEn}
+                      content={locale === "es" ? currentStep.contentEs : currentStep.contentEn}
+                      onNext={() => handleNext("yes")}
                       onAnswer={handleAnswer}
-                      onNoBranching={() => setIsTerminated(true)}
+                      loading={loading}
+                      locale={locale}
+                      isSpanish={locale === "es"}
+                      headingRef={headingRef}
                       audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
                       stepId={currentStep.id}
                       transcriptText={
@@ -1225,107 +1232,6 @@ function NavigationFooter({ onNext, onBack, loading, locale }: Omit<BaseScreenPr
 
 // ============ Screen Components ============
 
-function IntroScreen({
-  title,
-  description,
-  content,
-  onNext,
-  onAnswer,
-  loading,
-  t,
-  locale,
-  headingRef,
-  audioSrc,
-  stepId,
-  transcriptText,
-}: BaseScreenProps & {
-  onAnswer: (val: string) => void;
-  onNoBranching?: () => void;
-  audioSrc?: string;
-  stepId?: string;
-  transcriptText?: string;
-}) {
-  const isSpanish = locale === "es";
-  const introSubtitle = description || (isSpanish ? "Padres Involucrados en Alergias a la Penicilina" : "Parents Engaged in Penicillin Allergies");
-  const mainCopy = isSpanish
-    ? "¡Hola! Soy la enfermera Anna. Hablemos sobre las alergias a la penicilina en los niños."
-    : "Hi! I'm nurse Anna. Let's talk about penicillin allergies in kids.";
-
-  return (
-    <div
-      id="slide-content"
-      className="relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-4 sm:px-8 md:px-14 lg:px-16 py-3 sm:py-6 pb-14 sm:pb-6 overflow-y-auto"
-      style={{
-        background: `
-          radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
-          radial-gradient(circle at 12% 75%, rgba(162, 230, 228, 0.9) 0%, rgba(162, 230, 228, 0) 50%),
-          radial-gradient(circle at 82% 18%, rgba(204, 246, 219, 0.9) 0%, rgba(204, 246, 219, 0) 48%),
-          radial-gradient(circle at 88% 82%, rgba(235, 248, 208, 0.95) 0%, rgba(235, 248, 208, 0) 52%),
-          linear-gradient(135deg, #c4d4f8 0%, #b2e7e3 28%, #cdf3da 62%, #ecf9d4 100%)
-        `,
-      }}
-    >
-      <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 sm:gap-6 md:gap-12 max-w-4xl w-full my-auto text-center md:text-left py-1 px-1">
-        {/* Left Column: Heading, Subtitle, Copy, and CTA Button */}
-        <div className="flex-1 space-y-1.5 sm:space-y-3 md:space-y-4 text-center md:text-left z-10 max-w-lg">
-          <div>
-            {/* Golden-Yellow Title with Dark Teal Stroke & Drop Shadow */}
-            <h1
-              ref={headingRef}
-              tabIndex={-1}
-              className="text-2xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-black tracking-tight font-display outline-none select-none text-[#ebb016]"
-              style={{
-                WebkitTextStroke: "1.6px #12403d",
-                paintOrder: "stroke fill",
-                textShadow: "0 2px 0 #12403d, 0 3px 2px rgba(18, 64, 61, 0.3)",
-              }}
-            >
-              PEN–PAL
-            </h1>
-            <p className="text-xs sm:text-base md:text-lg lg:text-xl font-bold text-[#143e3b] mt-0.5 sm:mt-1.5 tracking-tight">
-              {introSubtitle}
-            </p>
-          </div>
-
-          <p className="text-xs sm:text-sm md:text-base lg:text-[1.05rem] font-medium text-[#1c403c] leading-relaxed max-w-xs sm:max-w-sm md:max-w-md mx-auto md:mx-0 pt-0.5 sm:pt-2">
-            {mainCopy}
-          </p>
-
-          {/* Pastel Butter-Yellow Pill Button: "Get Started!" */}
-          <div className="pt-1.5 sm:pt-4">
-            <button
-              type="button"
-              onClick={() => {
-                onAnswer("yes");
-                onNext("yes");
-              }}
-              disabled={loading}
-              className="px-6 py-2 sm:px-8 sm:py-3 rounded-full bg-[#fde989] hover:bg-[#f6df71] text-[#1b3b32] border border-[#dcc65b] font-bold text-xs sm:text-base shadow-sm transition duration-150 active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#236f7a]"
-            >
-              {loading ? "..." : (isSpanish ? "¡Comenzar!" : "Get Started!")}
-            </button>
-          </div>
-        </div>
-
-        {/* Right Column: Nurse Anna Illustration (order-first on mobile, order-last on desktop) */}
-        <div className="shrink-0 flex items-center justify-center sm:pr-2 z-10 order-first md:order-last">
-          <NurseAnna size="md" imgClassName="w-20 sm:w-28 md:w-32 lg:w-36 max-h-[135px] sm:max-h-[190px] md:max-h-[220px] object-contain" isDecorative={false} locale={locale} />
-        </div>
-      </div>
-
-      {/* Bottom-Right Audio (CC & Play/Pause) Controls */}
-      <div className="absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-25 flex items-center">
-        <AudioPlayer
-          audioSrc={audioSrc}
-          stepId={stepId || "screen1_intro"}
-          locale={locale || (isSpanish ? "es" : "en")}
-          transcriptText={transcriptText}
-          size="large"
-        />
-      </div>
-    </div>
-  );
-}
 
 
 function SurveyMultipleChoice({ title, options, selected = [], onSelect, ...navProps }: BaseScreenProps & { options: any; selected: string[]; onSelect: (val: string[]) => void }) {
