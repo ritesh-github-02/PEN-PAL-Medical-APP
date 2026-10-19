@@ -100,8 +100,8 @@ const SLIDE11_CSS = `
   font-size: 0.88rem;
   font-weight: 600;
   border-radius: 9px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 1.5px solid transparent;
+  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.12);
+  border: 1.5px solid #236f7a;
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
@@ -109,9 +109,10 @@ const SLIDE11_CSS = `
 }
 
 .s11-chip:hover {
-  background-color: #f7faf8;
+  background-color: #f3f8f6;
+  border-color: #1c5249;
   transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.14);
 }
 
 .s11-chip:active {
@@ -119,27 +120,37 @@ const SLIDE11_CSS = `
 }
 
 .s11-chip:focus-visible {
-  box-shadow: 0 0 0 3px #1f4a43;
+  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
 }
 
-/* Checked / Active Chip State */
+/* Checked / Active Chip State: Yellowish background with greenish border (Figma / Images 2 & 3) */
 .s11-chip--checked {
-  background-color: #1f4d45;
-  color: #ffffff;
-  border-color: #163d36;
-  box-shadow: 0 2px 6px rgba(10, 40, 35, 0.25);
+  background-color: #ffd41d !important;
+  color: #142724 !important;
+  border-color: #1c5249 !important;
+  box-shadow: 0 2px 5px rgba(10, 40, 35, 0.2) !important;
 }
 
 .s11-chip--checked:hover {
-  background-color: #19423b;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
 }
 
 .s11-chip-edit {
   font-size: 0.75rem;
-  margin-left: 0.25rem;
-  background: rgba(255, 255, 255, 0.25);
+  margin-left: 0.35rem;
+  background: rgba(20, 39, 36, 0.12);
+  color: #142724;
+  border: 1px solid rgba(20, 39, 36, 0.25);
   border-radius: 4px;
-  padding: 1px 4px;
+  padding: 1px 5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.s11-chip-edit:hover {
+  background: rgba(20, 39, 36, 0.22);
 }
 
 /* Row 5: Other describe underline + Unsure chip */
@@ -216,8 +227,8 @@ const SLIDE11_CSS = `
   font-weight: 600;
   padding: 0.5rem 0.95rem;
   border-radius: 9px;
-  border: 1.2px solid #5a857b;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1.5px solid #236f7a;
+  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
@@ -227,9 +238,9 @@ const SLIDE11_CSS = `
 
 .s11-rash-btn:hover {
   background-color: #f3f8f6;
-  border-color: #3f6e63;
+  border-color: #1c5249;
   transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.14);
 }
 
 .s11-rash-btn:active {
@@ -237,18 +248,19 @@ const SLIDE11_CSS = `
 }
 
 .s11-rash-btn:focus-visible {
-  box-shadow: 0 0 0 3px #1f4d45;
+  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
 }
 
 .s11-rash-btn--checked {
-  background-color: #1f4d45;
-  color: #ffffff;
-  border-color: #163d36;
-  box-shadow: 0 2px 6px rgba(10, 40, 35, 0.3);
+  background-color: #ffd41d !important;
+  color: #142724 !important;
+  border-color: #1c5249 !important;
+  box-shadow: 0 2px 5px rgba(10, 40, 35, 0.2) !important;
 }
 
 .s11-rash-btn--checked:hover {
-  background-color: #19423b;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
 }
 
 /* ==========================================================
@@ -277,14 +289,14 @@ const SLIDE11_CSS = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #fde882;
+  background-color: #ffffff;
   color: #142724;
   font-size: 0.95rem;
   font-weight: 600;
   padding: 0.55rem 1.25rem;
   border-radius: 9px;
-  border: 1.2px solid #d8c85c;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  border: 1.5px solid #236f7a;
+  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
@@ -293,9 +305,10 @@ const SLIDE11_CSS = `
 }
 
 .s11-swelling-btn:hover {
-  background-color: #fce268;
+  background-color: #f3f8f6;
+  border-color: #1c5249;
   transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.14);
 }
 
 .s11-swelling-btn:active {
@@ -303,18 +316,19 @@ const SLIDE11_CSS = `
 }
 
 .s11-swelling-btn:focus-visible {
-  box-shadow: 0 0 0 3px #1f4d45;
+  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
 }
 
 .s11-swelling-btn--checked {
-  background-color: #1f4d45;
-  color: #ffffff;
-  border-color: #163d36;
-  box-shadow: 0 2px 6px rgba(10, 40, 35, 0.3);
+  background-color: #ffd41d !important;
+  color: #142724 !important;
+  border-color: #1c5249 !important;
+  box-shadow: 0 2px 5px rgba(10, 40, 35, 0.2) !important;
 }
 
 .s11-swelling-btn--checked:hover {
-  background-color: #19423b;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
 }
 
 .s11-swelling-other {

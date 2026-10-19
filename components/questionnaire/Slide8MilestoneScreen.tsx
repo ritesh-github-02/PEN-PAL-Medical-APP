@@ -204,10 +204,12 @@ const SLIDE8_CSS = `
     max-width: 330px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
-    margin: 4px auto 0 auto !important;
+    margin: -257px -33px 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
     pointer-events: none !important;
+    margin-right: -33px !important;
+    margin-top: -257px !important;
   }
   .s8-bubble-svg {
     position: absolute !important;
