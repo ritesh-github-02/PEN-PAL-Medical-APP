@@ -36,7 +36,7 @@ const SLIDE21_CSS = `
   justify-content: flex-start;
   align-items: center;
   background-color: #fafdf3;
-  padding: 32px 48px 72px 48px;
+  padding: 18px 36px 76px 36px;
   overflow-y: auto;
   overflow-x: hidden;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -46,13 +46,13 @@ const SLIDE21_CSS = `
 /* Main Content Area */
 .s21-content-wrap {
   width: 100%;
-  max-width: 820px;
+  max-width: 780px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
 }
 
@@ -65,21 +65,21 @@ const SLIDE21_CSS = `
 
 /* Yellow Badge */
 .s21-badge {
-  width: 195px;
-  height: 62px;
+  width: 160px;
+  height: 46px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background-color: #feff9f;
   border: 1.8px solid #2b7f8f;
-  border-radius: 22px;
-  box-shadow: 0 4px 6px rgba(34, 105, 118, 0.35);
-  margin-bottom: 16px;
+  border-radius: 18px;
+  box-shadow: 0 3px 5px rgba(34, 105, 118, 0.3);
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
 .s21-badge-title {
-  font-size: 23px;
+  font-size: 19px;
   font-weight: 700;
   color: #232323;
   letter-spacing: -0.01em;
@@ -95,28 +95,28 @@ const SLIDE21_CSS = `
 
 /* Heading Statement */
 .s21-heading {
-  font-size: 22.5px;
+  font-size: 19px;
   font-weight: 700;
   color: #232323;
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
   letter-spacing: -0.012em;
-  line-height: 1.35;
+  line-height: 1.32;
   text-align: left;
 }
 
 /* Bullet Points */
 .s21-bullets {
-  margin: 0 0 10px 0;
-  padding-left: 22px;
+  margin: 0 0 8px 0;
+  padding-left: 20px;
   list-style-type: disc;
   width: 100%;
 }
 
 .s21-bullet-item {
-  font-size: 19px;
-  line-height: 1.45;
+  font-size: 15.5px;
+  line-height: 1.38;
   color: #232323;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   font-weight: 500;
   letter-spacing: -0.01em;
   text-align: left;
@@ -128,15 +128,15 @@ const SLIDE21_CSS = `
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 2px;
-  flex: 1 1 auto;
+  margin: 4px auto 6px auto;
+  flex: 0 1 auto;
 }
 
 .s21-illustration-img {
-  width: 480px;
-  max-width: 100%;
-  height: 275px;
-  max-height: 38vh;
+  width: 320px;
+  max-width: 85%;
+  height: auto;
+  max-height: 170px;
   object-fit: contain;
   display: block;
 }
@@ -162,12 +162,42 @@ const SLIDE21_CSS = `
   height: 38px !important;
 }
 
+/* Compact Laptop / Height-constrained screens */
+@media (max-height: 700px) and (min-width: 768px) {
+  .s21-root {
+    padding: 12px 32px 68px 32px !important;
+  }
+  .s21-badge {
+    height: 40px !important;
+    width: 145px !important;
+    margin-bottom: 8px !important;
+  }
+  .s21-badge-title {
+    font-size: 17px !important;
+  }
+  .s21-heading {
+    font-size: 17px !important;
+    margin-bottom: 6px !important;
+  }
+  .s21-bullets {
+    margin-bottom: 6px !important;
+  }
+  .s21-bullet-item {
+    font-size: 14px !important;
+    margin-bottom: 3px !important;
+  }
+  .s21-illustration-img {
+    max-height: 145px !important;
+    width: 270px !important;
+  }
+}
+
 /* ==========================================================
    Mobile Portrait Mode (< 768px)
    ========================================================== */
 @media (max-width: 767px) {
   .s21-root {
-    padding: 16px 16px 72px 16px !important;
+    padding: 14px 14px 72px 14px !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
   }
@@ -175,43 +205,46 @@ const SLIDE21_CSS = `
     max-width: 100% !important;
   }
   .s21-badge {
-    width: 140px !important;
-    height: 46px !important;
-    border-radius: 16px !important;
+    width: 130px !important;
+    height: 38px !important;
+    border-radius: 14px !important;
     box-shadow: 0 3px 5px rgba(34, 105, 118, 0.3) !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 8px !important;
   }
   .s21-badge-title {
-    font-size: 17px !important;
+    font-size: 15.5px !important;
   }
   .s21-heading {
-    font-size: 16.5px !important;
-    line-height: 1.32 !important;
-    margin: 0 0 10px 0 !important;
+    font-size: 15.5px !important;
+    line-height: 1.3 !important;
+    margin: 0 0 8px 0 !important;
   }
   .s21-bullets {
-    margin: 0 0 10px 0 !important;
+    margin: 0 0 8px 0 !important;
     padding-left: 18px !important;
   }
   .s21-bullet-item {
-    font-size: 14px !important;
-    line-height: 1.4 !important;
-    margin-bottom: 6px !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 4px !important;
   }
   .s21-illustration-wrap {
-    margin-top: 8px !important;
-    max-height: 240px !important;
+    margin: 4px auto 8px auto !important;
+    max-height: 150px !important;
+    flex: 0 1 auto !important;
   }
   .s21-illustration-img {
-    max-width: 100% !important;
-    max-height: 215px !important;
+    width: 250px !important;
+    max-width: 80% !important;
+    max-height: 135px !important;
     height: auto !important;
+    object-fit: contain !important;
   }
   .s21-audio {
     position: relative !important;
     right: auto !important;
     bottom: auto !important;
-    margin: 8px auto 0 auto !important;
+    margin: 4px auto 0 auto !important;
     justify-content: center !important;
   }
   .s21-audio .audio-cc-btn svg {
@@ -229,60 +262,60 @@ const SLIDE21_CSS = `
    ========================================================== */
 @media (orientation: landscape) and (max-height: 520px) {
   .s21-root {
-    padding: 10px 20px 65px 20px !important;
+    padding: 8px 16px 60px 16px !important;
     overflow-y: auto !important;
   }
   .s21-content-wrap {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 16px !important;
+    gap: 14px !important;
   }
   .s21-text-col {
-    flex: 1 1 50% !important;
-    width: 50% !important;
+    flex: 1 1 54% !important;
+    width: 54% !important;
     justify-content: center !important;
   }
   .s21-badge {
-    width: 130px !important;
-    height: 38px !important;
-    border-radius: 14px !important;
+    width: 115px !important;
+    height: 32px !important;
+    border-radius: 12px !important;
     box-shadow: 0 2px 4px rgba(34, 105, 118, 0.3) !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 6px !important;
   }
   .s21-badge-title {
-    font-size: 15px !important;
+    font-size: 14px !important;
   }
   .s21-heading {
-    font-size: 15px !important;
-    line-height: 1.25 !important;
-    margin: 0 0 6px 0 !important;
+    font-size: 14px !important;
+    line-height: 1.22 !important;
+    margin: 0 0 4px 0 !important;
   }
   .s21-bullets {
     margin: 0 !important;
-    padding-left: 16px !important;
+    padding-left: 14px !important;
   }
   .s21-bullet-item {
-    font-size: 12.5px !important;
-    line-height: 1.35 !important;
-    margin-bottom: 4px !important;
+    font-size: 11.5px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 2px !important;
   }
   .s21-illustration-wrap {
-    flex: 1 1 50% !important;
-    width: 50% !important;
-    max-height: 200px !important;
-    margin-top: 0 !important;
+    flex: 1 1 44% !important;
+    width: 44% !important;
+    max-height: 140px !important;
+    margin: 0 !important;
   }
   .s21-illustration-img {
-    max-width: 100% !important;
-    max-height: 190px !important;
+    max-width: 90% !important;
+    max-height: 130px !important;
     height: auto !important;
   }
   .s21-audio {
     position: relative !important;
     right: auto !important;
     bottom: auto !important;
-    margin: 4px auto 0 auto !important;
+    margin: 2px auto 0 auto !important;
   }
 }
 `;

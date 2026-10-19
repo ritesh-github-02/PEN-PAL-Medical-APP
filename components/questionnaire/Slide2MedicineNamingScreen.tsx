@@ -158,7 +158,11 @@ const SLIDE2_CSS = `
   color: #141414;
 }
 
-/* ---------- 4. Speech bubble ---------- */
+/* ---------- 4. Speech bubble & Nurse Anna wrapper ---------- */
+.s2-character-wrap {
+  display: contents;
+}
+
 .s2-bubble {
   position: absolute;
   left: 385px;
@@ -397,18 +401,69 @@ const SLIDE2_CSS = `
     height: 22px !important;
     min-width: 22px !important;
   }
+  .s2-character-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 330px !important;
+    margin: 4px auto 0 auto !important;
+    gap: 8px !important;
+    position: relative !important;
+  }
   .s2-bubble {
-    display: none !important;
+    display: block !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 200px !important;
+    height: 130px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+  .s2-bubble-svg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .s2-bubble-text-wrap {
+    position: absolute !important;
+    top: 44% !important;
+    left: 47% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 78% !important;
+    max-width: 155px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .s2-bubble-text {
+    font-size: 10.5px !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
+    color: #1a2e2b !important;
+    text-align: center !important;
   }
   .s2-nurse {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: 75px !important;
-    height: 120px !important;
-    margin: 2px auto 0 auto !important;
+    width: 65px !important;
+    height: 115px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
     z-index: 2 !important;
     pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
   .s2-nurse-img {
     width: 100% !important;
@@ -612,80 +667,83 @@ export function Slide2MedicineNamingScreen({
           })}
         </div>
 
-        {/* 4. Speech bubble matching Image 1 exact shape and black shadow */}
-        <div className="s2-bubble">
-          <svg
-            className="s2-bubble-svg"
-            viewBox="0 0 520 340"
-            fill="none"
-            aria-hidden="true"
-          >
-            <defs>
-              <pattern id="s2-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
-                <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
-              </pattern>
-            </defs>
-
-            {/* Black shadow underneath */}
-            <path
-              d={BUBBLE_PATH}
-              transform="translate(4, 5)"
-              fill="#000000"
-              stroke="#000000"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-
-            {/* White bubble body */}
-            <path d={BUBBLE_PATH} fill="#ffffff" />
-
-            {/* Subtle paper dot grid texture */}
-            <path d={BUBBLE_PATH} fill="url(#s2-bubble-dots)" />
-
-            {/* Soft teal outline */}
-            <path
-              d={BUBBLE_PATH}
+        {/* 4 & 5. Nurse Anna with Speech Bubble */}
+        <div className="s2-character-wrap">
+          {/* 4. Speech bubble matching Image 1 exact shape and black shadow */}
+          <div className="s2-bubble">
+            <svg
+              className="s2-bubble-svg"
+              viewBox="0 0 520 340"
               fill="none"
-              stroke="#8ebfbb"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+              aria-hidden="true"
+            >
+              <defs>
+                <pattern id="s2-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
+                  <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
+                </pattern>
+              </defs>
 
-          <div className="s2-bubble-text-wrap">
-            <p className="s2-bubble-text">
-              {isSpanish ? (
-                <span>
-                  ¡Seleccione cómo lo llama!
-                  <br />
-                  Usaremos el nombre que elija
-                  <br />
-                  durante nuestro tiempo juntos.
-                </span>
-              ) : (
-                <span>
-                  Select what you call it! We&apos;ll
-                  <br />
-                  use the name you choose
-                  <br />
-                  during our time together.
-                </span>
-              )}
-            </p>
+              {/* Black shadow underneath */}
+              <path
+                d={BUBBLE_PATH}
+                transform="translate(4, 5)"
+                fill="#000000"
+                stroke="#000000"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+
+              {/* White bubble body */}
+              <path d={BUBBLE_PATH} fill="#ffffff" />
+
+              {/* Subtle paper dot grid texture */}
+              <path d={BUBBLE_PATH} fill="url(#s2-bubble-dots)" />
+
+              {/* Soft teal outline */}
+              <path
+                d={BUBBLE_PATH}
+                fill="none"
+                stroke="#8ebfbb"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+
+            <div className="s2-bubble-text-wrap">
+              <p className="s2-bubble-text">
+                {isSpanish ? (
+                  <span>
+                    ¡Seleccione cómo lo llama!
+                    <br />
+                    Usaremos el nombre que elija
+                    <br />
+                    durante nuestro tiempo juntos.
+                  </span>
+                ) : (
+                  <span>
+                    Select what you call it! We&apos;ll
+                    <br />
+                    use the name you choose
+                    <br />
+                    during our time together.
+                  </span>
+                )}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* 5. Nurse Anna */}
-        <div className="s2-nurse">
-          <img
-            src="/images/nurse-anna.png"
-            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
-            className="s2-nurse-img"
-            draggable={false}
-            aria-hidden="true"
-          />
+          {/* 5. Nurse Anna */}
+          <div className="s2-nurse">
+            <img
+              src="/images/nurse-anna.png"
+              alt={isSpanish ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
+              className="s2-nurse-img"
+              draggable={false}
+              aria-hidden="true"
+            />
+          </div>
         </div>
 
         {/* 7. Caption (CC) & Play/Pause controls directly below Nurse Anna */}

@@ -2797,9 +2797,8 @@ function SurveySingleChoice({
                     })}
                   </div>
 
-                  {/* Sub-modal Footer with 7-4-1-1 Tag, Back and Done */}
-                  <div className="flex items-center justify-between pt-2.5 border-t border-white/40">
-                    <span className="text-[11px] font-mono font-bold text-[#193d38] select-none">7-4-1-1</span>
+                  {/* Sub-modal Footer with Back and Done */}
+                  <div className="flex items-center justify-end pt-2.5 border-t border-white/40">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -2879,9 +2878,8 @@ function SurveySingleChoice({
               })}
             </div>
 
-            {/* Footer with 7-5-1 Tag, Close, and Next */}
-            <div className="flex items-center justify-between pt-3 border-t border-slate-300/60">
-              <span className="text-[11px] font-mono font-bold text-slate-400 select-none">7-5-1</span>
+            {/* Footer with Close and Next */}
+            <div className="flex items-center justify-end pt-3 border-t border-slate-300/60">
               <div className="flex items-center gap-2">
                 <button
                   type="button"

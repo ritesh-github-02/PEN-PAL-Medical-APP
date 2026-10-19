@@ -198,7 +198,7 @@ const SLIDE4_CSS = `
     left: auto !important;
     top: auto !important;
     width: 100% !important;
-    max-width: 330px !important;
+    max-width: 340px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
     margin: 4px auto 0 auto !important;
@@ -214,12 +214,12 @@ const SLIDE4_CSS = `
   }
   .s4-bubble-text-wrap {
     position: absolute !important;
-    top: 48% !important;
-    left: 54% !important;
+    top: 51% !important;
+    left: 55% !important;
     transform: translate(-50%, -50%) !important;
-    width: 78% !important;
-    max-width: 255px !important;
-    padding: 0 !important;
+    width: 72% !important;
+    max-width: 235px !important;
+    padding: 0 4px !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -228,17 +228,15 @@ const SLIDE4_CSS = `
     text-align: center !important;
   }
   .s4-bubble-text {
-    font-size: 14.5px !important;
-    line-height: 1.4 !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
     font-weight: 700 !important;
     color: #232323 !important;
     text-align: center !important;
     letter-spacing: -0.012em !important;
   }
   .s4-bubble-line {
-    display: block !important;
-    width: 100% !important;
-    text-align: center !important;
+    display: inline !important;
   }
   .s4-nurse {
     order: 2 !important;
@@ -513,16 +511,16 @@ export function Slide4AllergyBarrierScreen({
             <h1 ref={headingRef} tabIndex={-1} className="s4-bubble-text">
               {isSpanish ? (
                 <>
-                  <span className="s4-bubble-line">{resolvedName} es uno de los mejores</span>
-                  <span className="s4-bubble-line">antibióticos. Pero muchos niños no</span>
-                  <span className="s4-bubble-line">lo reciben porque se cree</span>
+                  <span className="s4-bubble-line">{resolvedName} es uno de los mejores </span>
+                  <span className="s4-bubble-line">antibióticos. Pero muchos niños no </span>
+                  <span className="s4-bubble-line">lo reciben porque se cree </span>
                   <span className="s4-bubble-line">que son alérgicos a él.</span>
                 </>
               ) : (
                 <>
-                  <span className="s4-bubble-line">{resolvedName} is one of the best</span>
-                  <span className="s4-bubble-line">antibiotics. But many kids do</span>
-                  <span className="s4-bubble-line">not get it because they are</span>
+                  <span className="s4-bubble-line">{resolvedName} is one of the best </span>
+                  <span className="s4-bubble-line">antibiotics. But many kids do </span>
+                  <span className="s4-bubble-line">not get it because they are </span>
                   <span className="s4-bubble-line">believed to be allergic to it.</span>
                 </>
               )}

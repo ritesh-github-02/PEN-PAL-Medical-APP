@@ -69,11 +69,12 @@ const SLIDE19_CSS = `
   background-color: #8cb2a7;
   border: 1.5px solid #759c92;
   border-radius: 20px;
-  padding: 1.2rem 1.5rem 0.85rem 1.5rem;
+  padding: 1.85rem 1.85rem;
   box-shadow: 0 4px 14px rgba(20, 55, 50, 0.12);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
   max-width: 560px;
   width: 100%;
   transition: all 0.2s ease;
@@ -180,50 +181,7 @@ const SLIDE19_CSS = `
   shrink: 0;
 }
 
-/* Card Footer with Wireframe-spec Clear / Deselect icon & marker */
-.s19-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.65rem;
-  height: 22px;
-}
 
-.s19-wireframe-marker {
-  font-family: monospace;
-  font-size: 0.68rem;
-  color: #4b6f67;
-  user-select: none;
-}
-
-.s19-clear-btn {
-  background-color: #ffffff;
-  border: 1px solid #759c92;
-  border-radius: 6px;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #557871;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.15s ease;
-  outline: none;
-}
-
-.s19-clear-btn:hover {
-  background-color: #f7faf9;
-  color: #c93b2b;
-  border-color: #a6bbb5;
-}
-
-.s19-clear-btn:focus-visible {
-  box-shadow: 0 0 0 2px #1f4d45;
-}
 
 /* Nurse Anna Wrapper */
 .s19-nurse-wrap {
@@ -414,43 +372,7 @@ const SLIDE19_CSS = `
   color: #ffffff;
 }
 
-.s19-modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0.25rem;
-}
 
-.s19-modal-close-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-}
-
-.s19-modal-close-btn {
-  background-color: #ffffff;
-  border: 1px solid #759c92;
-  border-radius: 6px;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #557871;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.15s ease;
-  outline: none;
-}
-
-.s19-modal-close-btn:hover {
-  background-color: #f7faf9;
-  color: #c93b2b;
-  border-color: #a6bbb5;
-}
 
 /* Responsive Scaling */
 @media (max-height: 700px), (max-width: 860px) {
@@ -464,7 +386,7 @@ const SLIDE19_CSS = `
     gap: 1.5rem;
   }
   .s19-card {
-    padding: 1.25rem 1.4rem 0.9rem 1.4rem;
+    padding: 1.35rem 1.4rem;
     max-width: 470px;
   }
   .s19-option-btn {
@@ -752,20 +674,6 @@ export function Slide19RepeatUseScreen({
               </button>
             </div>
           )}
-
-          {/* Card Footer with Wireframe-spec Clear / Deselect icon */}
-          <div className="s19-card-footer">
-            <span className="s19-wireframe-marker" aria-hidden="true">7-6</span>
-            <button
-              type="button"
-              onClick={handleClear}
-              aria-label={isSpanish ? "Borrar selección" : "Clear selection"}
-              title={isSpanish ? "Borrar selección" : "Clear selection"}
-              className="s19-clear-btn"
-            >
-              ✕
-            </button>
-          </div>
         </div>
 
         {/* Nurse Anna on the right */}
@@ -853,21 +761,6 @@ export function Slide19RepeatUseScreen({
                     </button>
                   );
                 })}
-              </div>
-            </div>
-
-            <div className="s19-modal-footer">
-              <div className="s19-modal-close-wrap">
-                <span className="s19-wireframe-marker" aria-hidden="true">7-5-1</span>
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  aria-label={isSpanish ? "Cerrar" : "Close"}
-                  title={isSpanish ? "Cerrar" : "Close"}
-                  className="s19-modal-close-btn"
-                >
-                  ✕
-                </button>
               </div>
             </div>
           </div>

@@ -47,22 +47,23 @@ const SLIDE18_CSS = `
   flex-shrink: 0;
 }
 
-/* "Action Steps for Parents" Yellow Badge */
+/* "Action Steps for Parents" Yellow Badge - Enlarged to match Figma */
 .s18-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #fff475;
-  border: 1.5px solid #142724;
+  background-color: #fff677;
+  border: 2px solid #142724;
   border-radius: 18px;
-  padding: 0.32rem 1.35rem;
-  box-shadow: 2px 2.5px 0px rgba(20, 50, 40, 0.18);
-  margin-bottom: 0.45rem;
+  padding: 0.75rem 2.2rem;
+  box-shadow: 2.5px 3.5px 0px #1a3532;
+  margin-bottom: 0.85rem;
 }
 
 .s18-badge-title {
-  font-size: 1.16rem;
+  font-size: 1.65rem;
   font-weight: 800;
+  letter-spacing: -0.015em;
   color: #142724;
   line-height: 1.2;
   margin: 0;
@@ -206,32 +207,7 @@ const SLIDE18_CSS = `
   box-shadow: 0 0 0 3px #236f7a;
 }
 
-/* Close ✕ button on bottom-right corner */
-.s18-close-btn {
-  position: absolute;
-  right: 0;
-  background-color: #ffffff;
-  border: 1px solid #91b5ae;
-  border-radius: 6px;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #557871;
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.15s ease;
-  outline: none;
-}
 
-.s18-close-btn:hover {
-  background-color: #f7faf9;
-  color: #c93b2b;
-  border-color: #a6bbb5;
-}
 
 /* Print-only elements hidden on screen */
 .s18-print-header,
@@ -245,11 +221,12 @@ const SLIDE18_CSS = `
     padding: 0.6rem 1.5rem 0.35rem 1.5rem;
   }
   .s18-badge {
-    padding: 0.25rem 1.1rem;
-    margin-bottom: 0.35rem;
+    padding: 0.55rem 1.6rem;
+    margin-bottom: 0.55rem;
+    border-radius: 16px;
   }
   .s18-badge-title {
-    font-size: 1.05rem;
+    font-size: 1.35rem;
   }
   .s18-steps-list {
     gap: 0.18rem;
@@ -375,18 +352,18 @@ const SLIDE18_CSS = `
   /* "Action Steps for Parents" Badge */
   .s18-badge {
     display: inline-block !important;
-    background-color: #fff475 !important;
+    background-color: #fff677 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    border: 1.5px solid #142724 !important;
-    border-radius: 14px !important;
-    padding: 4px 16px !important;
+    border: 2px solid #142724 !important;
+    border-radius: 16px !important;
+    padding: 8px 24px !important;
     box-shadow: none !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 14px !important;
   }
 
   .s18-badge-title {
-    font-size: 13pt !important;
+    font-size: 16pt !important;
     font-weight: 800 !important;
     color: #142724 !important;
     line-height: 1.2 !important;
@@ -783,16 +760,6 @@ export function Slide18SummaryScreen({
               ? "Guardar como imagen"
               : "Save as Picture"}
           </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleClose}
-          aria-label={isSpanish ? "Cerrar" : "Close"}
-          title={isSpanish ? "Cerrar" : "Close"}
-          className="s18-close-btn"
-        >
-          ✕
         </button>
       </div>
     </div>

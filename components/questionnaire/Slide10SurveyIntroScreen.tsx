@@ -87,18 +87,18 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   display: block;
   user-select: none;
   -webkit-user-drag: none;
-  transform: scaleX(-1);
+  transform: none;
 }
 
 /* ---------- 2. Speech Bubble on the RIGHT ---------- */
 .s10b-bubble {
   position: relative;
-  width: 510px;
+  width: 490px;
   aspect-ratio: 510 / 315;
   flex-shrink: 0;
   filter: drop-shadow(2.5px 3.5px 0px #1a3532);
-  margin-left: -15px;
-  margin-top: -15px;
+  margin-left: -60px;
+  margin-top: -293px;
   order: 2;
   pointer-events: none;
   z-index: 5;
@@ -135,7 +135,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   padding: 0;
   width: 100%;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
-  font-size: 21.5px;
+  font-size: 20.5px;
   line-height: 1.42;
   font-weight: 700;
   color: #232323;
@@ -476,10 +476,11 @@ export function Slide10SurveyIntroScreen({
       <style>{SLIDE10_SURVEY_INTRO_CSS}</style>
 
       <div className="s10b-stage" style={{ transform: `scale(${scale})` }}>
-        {/* 1. Nurse Anna on the LEFT gesturing toward bubble */}
+        {/* 1. Nurse Anna on the LEFT gesturing toward bubble (Figma-spec explaining vector) */}
         <div className="s10b-nurse">
           <img
-            src="/images/nurse-anna.png"
+            src="/images/nurse-anna-explaining.png"
+            srcSet="/images/nurse-anna-explaining.png 1x, /images/nurse-anna-explaining-2x.png 2x"
             alt={isSpanish ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
             className="s10b-nurse-img"
             draggable={false}

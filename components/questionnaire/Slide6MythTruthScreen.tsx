@@ -199,6 +199,17 @@ const SLIDE6_CSS = `
   background-color: #f5e478;
 }
 
+.s6-root .slide-nav-btn--next.slide-nav-btn--disabled,
+.s6-root .slide-nav-btn--next:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+  background-color: #f1edcf !important;
+  color: #8c8979 !important;
+  border-color: #d8d4b8 !important;
+}
+
 /* ---------- 4. Caption (CC) & Play/Pause Controls ---------- */
 .s6-audio {
   position: absolute;
@@ -443,6 +454,15 @@ export function Slide6MythTruthScreen({
     ? "¿Por qué se piensa que tantos niños tienen alergia a la penicilina cuando no es así? ¡Haga clic en cada cuadro para revelar la verdad!"
     : "Why are so many kids thought to have a penicillin allergy when they don't? Click each box to reveal the truth!";
 
+  const allMythsRevealed =
+    MYTH_TRUTH_DATA.length > 0 &&
+    MYTH_TRUTH_DATA.every((item) => (revealed || []).includes(item.id));
+
+  const handleNext = () => {
+    if (!allMythsRevealed) return;
+    onNext();
+  };
+
   return (
     <div id="slide-content" className="s6-root" ref={rootRef}>
       <style>{SLIDE6_CSS}</style>
@@ -492,12 +512,13 @@ export function Slide6MythTruthScreen({
         </div>
       </div>
 
-      {/* 3. Centered Navigation Buttons (Back & Next) */}
+      {/* 3. Centered Navigation Buttons (Back & Next) - Next disabled until all myths revealed */}
       <SlideNavigationButtons
         onBack={onBack}
-        onNext={onNext}
+        onNext={handleNext}
         isSpanish={isSpanish}
         loading={loading}
+        nextDisabled={!allMythsRevealed}
       />
     </div>
   );

@@ -17,36 +17,18 @@ import SlideNavigationButtons from "./SlideNavigationButtons";
 const STAGE_W = 750;
 const STAGE_H = 530;
 
-/* Clean cubic Bezier contour with rightward tail sweeping toward Anna (Desktop) */
+/* Exact horizontal mirror of Slide 4's organic curved Bezier speech bubble, sweeping rightward toward Anna */
 const BUBBLE_PATH_RIGHT =
-  "M 232 28 " +
-  "C 350 28, 436 74, 436 150 " +
-  "C 436 190, 412 220, 376 236 " +
-  "C 412 250, 466 270, 494 282 " +
-  "C 456 290, 395 292, 342 275 " +
-  "C 302 288, 255 294, 205 294 " +
-  "C 110 294, 38 240, 38 160 " +
-  "C 38 78, 115 28, 232 28 Z";
-
-/* Compact, well-proportioned cubic Bezier contour for mobile portrait */
-const BUBBLE_PATH_MOBILE =
-  "M 232 28 " +
-  "C 350 28, 436 74, 436 150 " +
-  "C 436 190, 412 220, 376 236 " +
-  "C 396 244, 418 255, 438 268 " +
-  "C 412 278, 378 282, 342 275 " +
-  "C 302 288, 255 294, 205 294 " +
-  "C 110 294, 38 240, 38 160 " +
-  "C 38 78, 115 28, 232 28 Z";
+  "M 377 242 " +
+  "C 407 255, 462 270, 484 276 " +
+  "C 460 258, 426 230, 418 208 " +
+  "C 460 172, 468 110, 420 62 " +
+  "C 364 14, 232 8, 132 28 " +
+  "C 42 46, 7 112, 17 168 " +
+  "C 27 224, 82 264, 192 272 " +
+  "C 272 278, 342 262, 377 242 Z";
 
 const SLIDE8_CSS = `
-.s8-bubble-path-desktop {
-  display: block;
-}
-.s8-bubble-path-mobile {
-  display: none;
-}
-
 .s8-root,
 .s8-root *,
 .s8-root *::before,
@@ -87,10 +69,11 @@ const SLIDE8_CSS = `
 .s8-bubble {
   position: relative;
   width: 510px;
-  aspect-ratio: 540 / 350;
+  aspect-ratio: 510 / 315;
   flex-shrink: 0;
   filter: drop-shadow(2.5px 3.5px 0px #1a3532);
   margin-right: -10px;
+  margin-top: -70px;
   order: 1;
   pointer-events: none;
   z-index: 5;
@@ -107,10 +90,10 @@ const SLIDE8_CSS = `
 
 .s8-bubble-text-wrap {
   position: absolute;
-  top: 45%;
-  left: 44%;
+  top: 48%;
+  left: 46%;
   transform: translate(-50%, -50%);
-  width: 72%;
+  width: 78%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -199,12 +182,6 @@ const SLIDE8_CSS = `
    Mobile-First Responsive Layout (< 768px)
    ========================================================== */
 @media (max-width: 767px) {
-  .s8-bubble-path-desktop {
-    display: none !important;
-  }
-  .s8-bubble-path-mobile {
-    display: block !important;
-  }
   .s8-root {
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -242,7 +219,7 @@ const SLIDE8_CSS = `
     top: auto !important;
     width: 100% !important;
     max-width: 330px !important;
-    aspect-ratio: 540 / 350 !important;
+    aspect-ratio: 510 / 315 !important;
     height: auto !important;
     margin: 4px auto 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
@@ -257,11 +234,11 @@ const SLIDE8_CSS = `
   }
   .s8-bubble-text-wrap {
     position: absolute !important;
-    top: 45% !important;
-    left: 44% !important;
+    top: 48% !important;
+    left: 46% !important;
     transform: translate(-50%, -50%) !important;
-    width: 74% !important;
-    max-width: 250px !important;
+    width: 78% !important;
+    max-width: 255px !important;
     padding: 0 !important;
     margin: 0 !important;
     display: flex !important;
@@ -283,9 +260,9 @@ const SLIDE8_CSS = `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: 130px !important;
-    height: 220px !important;
-    margin: -10px auto 0 auto !important;
+    width: 120px !important;
+    height: 200px !important;
+    margin: 6px auto 0 auto !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -370,12 +347,14 @@ const SLIDE8_CSS = `
     left: auto !important;
     top: auto !important;
     width: 320px !important;
-    aspect-ratio: 540 / 350 !important;
+    aspect-ratio: 510 / 315 !important;
     margin: 0 !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     flex-shrink: 0 !important;
   }
   .s8-bubble-text-wrap {
+    top: 48% !important;
+    left: 46% !important;
     width: 78% !important;
   }
   .s8-bubble-text {
@@ -501,7 +480,7 @@ export function Slide8MilestoneScreen({
         <div className="s8-bubble">
           <svg
             className="s8-bubble-svg"
-            viewBox="0 0 540 350"
+            viewBox="-20 -10 540 330"
             fill="none"
             aria-hidden="true"
           >
@@ -511,35 +490,19 @@ export function Slide8MilestoneScreen({
               </pattern>
             </defs>
 
-            {/* Desktop: Smooth Bezier Silhouette sweeping rightward toward Anna */}
+            {/* Smooth Bezier Silhouette sweeping rightward toward Nurse Anna */}
             <path
-              className="s8-bubble-path-desktop"
               d={BUBBLE_PATH_RIGHT}
               fill="#ffffff"
               stroke="#7baea9"
               strokeWidth="3"
               strokeLinejoin="round"
               strokeLinecap="round"
-            />
-            <path
-              className="s8-bubble-path-desktop"
-              d={BUBBLE_PATH_RIGHT}
-              fill="url(#s8-card-dot-pattern)"
             />
 
-            {/* Mobile: Proportionate, decreased tail design */}
+            {/* Faint Paper Dot Grid Overlay */}
             <path
-              className="s8-bubble-path-mobile"
-              d={BUBBLE_PATH_MOBILE}
-              fill="#ffffff"
-              stroke="#7baea9"
-              strokeWidth="3"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-            <path
-              className="s8-bubble-path-mobile"
-              d={BUBBLE_PATH_MOBILE}
+              d={BUBBLE_PATH_RIGHT}
               fill="url(#s8-card-dot-pattern)"
             />
           </svg>

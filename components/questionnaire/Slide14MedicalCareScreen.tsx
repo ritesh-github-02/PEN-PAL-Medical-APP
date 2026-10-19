@@ -69,11 +69,12 @@ const SLIDE14_CSS = `
   background-color: #8cb2a7;
   border: 1.5px solid #759c92;
   border-radius: 20px;
-  padding: 1.6rem 1.85rem 1.1rem 1.85rem;
+  padding: 1.85rem 1.85rem;
   box-shadow: 0 4px 14px rgba(20, 55, 50, 0.12);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
   max-width: 550px;
   width: 100%;
   transition: all 0.2s ease;
@@ -165,42 +166,6 @@ const SLIDE14_CSS = `
   font-size: 0.78rem;
 }
 
-/* Card Footer with Wireframe-spec Clear / Deselect icon */
-.s14-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 0.65rem;
-  height: 22px;
-}
-
-.s14-clear-btn {
-  background-color: #ffffff;
-  border: 1px solid #759c92;
-  border-radius: 6px;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #557871;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.15s ease;
-  outline: none;
-}
-
-.s14-clear-btn:hover {
-  background-color: #f7faf9;
-  color: #c93b2b;
-  border-color: #a6bbb5;
-}
-
-.s14-clear-btn:focus-visible {
-  box-shadow: 0 0 0 2px #1f4d45;
-}
 
 /* Nurse Anna Wrapper */
 .s14-nurse-wrap {
@@ -422,7 +387,7 @@ const SLIDE14_CSS = `
     gap: 1.5rem;
   }
   .s14-card {
-    padding: 1.25rem 1.4rem 0.9rem 1.4rem;
+    padding: 1.35rem 1.4rem;
     max-width: 460px;
   }
   .s14-option-btn {
@@ -686,22 +651,6 @@ export function Slide14MedicalCareScreen({
               </button>
             </div>
           )}
-
-          {/* Card Footer with Wireframe-spec Clear / Deselect icon */}
-          <div className="s14-card-footer">
-            <button
-              type="button"
-              onClick={() => {
-                onSelect("");
-                onLocationSelect("");
-              }}
-              aria-label={isSpanish ? "Borrar selección" : "Clear selection"}
-              title={isSpanish ? "Borrar selección" : "Clear selection"}
-              className="s14-clear-btn"
-            >
-              ✕
-            </button>
-          </div>
         </div>
 
         {/* Nurse Anna on the right */}
@@ -733,11 +682,9 @@ export function Slide14MedicalCareScreen({
           aria-modal="true"
           aria-labelledby="modal-15-heading"
           className="s14-modal-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setModalOpen(false);
-          }}
+          onClick={() => setModalOpen(false)}
         >
-          <div className="s14-modal-card">
+          <div className="s14-modal-card" onClick={(e) => e.stopPropagation()}>
             <h2
               id="modal-15-heading"
               ref={modalHeadingRef}
@@ -768,18 +715,6 @@ export function Slide14MedicalCareScreen({
                   </button>
                 );
               })}
-            </div>
-
-            <div className="s14-modal-footer">
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                aria-label={isSpanish ? "Cerrar" : "Close"}
-                title={isSpanish ? "Cerrar" : "Close"}
-                className="s14-modal-close-btn"
-              >
-                ✕
-              </button>
             </div>
           </div>
         </div>

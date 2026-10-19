@@ -184,6 +184,74 @@ const SLIDE11_CSS = `
 }
 
 /* ==========================================================
+   Rash Pop-up (Figma 7-1-1) Pixel-Perfect Styles
+   ========================================================== */
+.s11-rash-dialog {
+  background-color: #fffef2;
+  border-radius: 24px;
+  padding: 1.85rem 2rem 1.6rem 2rem;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 16px 40px -8px rgba(20, 40, 35, 0.28);
+  border: 1.5px solid #142724;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.s11-rash-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.s11-rash-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  color: #142724;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  border-radius: 9px;
+  border: 1.2px solid #5a857b;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  outline: none;
+  min-height: 40px;
+}
+
+.s11-rash-btn:hover {
+  background-color: #f3f8f6;
+  border-color: #3f6e63;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.14);
+}
+
+.s11-rash-btn:active {
+  transform: scale(0.97);
+}
+
+.s11-rash-btn:focus-visible {
+  box-shadow: 0 0 0 3px #1f4d45;
+}
+
+.s11-rash-btn--checked {
+  background-color: #1f4d45;
+  color: #ffffff;
+  border-color: #163d36;
+  box-shadow: 0 2px 6px rgba(10, 40, 35, 0.3);
+}
+
+.s11-rash-btn--checked:hover {
+  background-color: #19423b;
+}
+
+/* ==========================================================
    Swelling Pop-up (Figma 7-1-2) Pixel-Perfect Styles
    ========================================================== */
 .s11-swelling-dialog {
@@ -484,6 +552,30 @@ const SLIDE11_CSS = `
     max-height: 130px;
   }
 
+  /* Modal 11B (Rash) Mobile Overrides */
+  .s11-rash-dialog {
+    padding: 1.25rem 1rem 1rem 1rem;
+    border-radius: 20px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    gap: 0.65rem;
+  }
+
+  .s11-rash-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .s11-rash-btn {
+    width: 100%;
+    text-align: center;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.88rem;
+    min-height: 40px;
+  }
+
   /* Modal 11C (Swelling) Mobile Overrides */
   .s11-swelling-dialog {
     padding: 1.25rem 1rem 1rem 1rem;
@@ -600,7 +692,7 @@ export function Slide11SymptomsScreen({
   loading = false,
 }: Slide11SymptomsScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
-  const modalHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const rashFirstBtnRef = useRef<HTMLButtonElement | null>(null);
   const modalTriggerRef = useRef<HTMLElement | null>(null);
 
   const swellingTriggerRef = useRef<HTMLElement | null>(null);
@@ -630,7 +722,7 @@ export function Slide11SymptomsScreen({
   useEffect(() => {
     if (!rashModalOpen) return;
     const timer = setTimeout(() => {
-      modalHeadingRef.current?.focus();
+      rashFirstBtnRef.current?.focus();
     }, 50);
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -911,70 +1003,81 @@ export function Slide11SymptomsScreen({
         <div
           role="dialog"
           aria-modal="true"
-          aria-labelledby="modal-11b-heading"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+          aria-label={isSpanish ? "Detalles del sarpullido" : "Rash details"}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45 backdrop-blur-[2px]"
+          onClick={() => {
+            setRashModalOpen(false);
+            modalTriggerRef.current?.focus();
+          }}
         >
-          <div className="bg-white rounded-3xl p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="space-y-1">
-              <h2
-                id="modal-11b-heading"
-                ref={modalHeadingRef}
-                tabIndex={-1}
-                className="text-base sm:text-lg font-bold text-slate-900 tracking-tight outline-none"
+          <div
+            className="s11-rash-dialog animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Row 1: Hives, Blisters, Red, fine or bumpy rash */}
+            <div className="s11-rash-row">
+              <button
+                ref={rashFirstBtnRef}
+                type="button"
+                role="checkbox"
+                aria-checked={activeRashDetails.includes("Hives")}
+                onClick={() => toggleRashDetail("Hives")}
+                className={`s11-rash-btn${activeRashDetails.includes("Hives") ? " s11-rash-btn--checked" : ""}`}
               >
-                {isSpanish ? "¿Cómo era el sarpullido?" : "What did the rash look like?"}
-              </h2>
-              <p className="text-xs font-medium text-slate-500">
-                {isSpanish
-                  ? "Seleccione todas las opciones que correspondan."
-                  : "Select all that apply."}
-              </p>
-            </div>
-
-            <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
-              {RASH_SUBTYPE_OPTIONS.map((sub) => {
-                const isChecked = activeRashDetails.includes(sub.value);
-                const label = isSpanish ? sub.labelEs : sub.labelEn;
-                return (
-                  <button
-                    key={sub.value}
-                    type="button"
-                    role="checkbox"
-                    aria-checked={isChecked}
-                    onClick={() => toggleRashDetail(sub.value)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 min-h-[42px] rounded-xl text-left font-semibold text-xs sm:text-sm transition cursor-pointer border ${isChecked
-                        ? "bg-[#236f7a] text-white border-[#1a555e] shadow-2xs"
-                        : "bg-[#f8faf7] text-slate-800 border-slate-300 hover:bg-slate-100"
-                      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a] active:scale-[0.99]`}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isChecked ? "border-white bg-[#1a555e]" : "border-slate-400 bg-white"
-                        }`}
-                      aria-hidden="true"
-                    >
-                      {isChecked && (
-                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="leading-tight">{label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-              <span className="text-[11px] font-mono text-slate-400">7-1-1</span>
+                {isSpanish ? "Ronchas (Urticaria)" : "Hives"}
+              </button>
               <button
                 type="button"
-                onClick={() => {
-                  setRashModalOpen(false);
-                  modalTriggerRef.current?.focus();
-                }}
-                className="px-6 py-2 min-h-[44px] rounded-full bg-[#132338] hover:bg-[#0c1827] text-white font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#236f7a]"
+                role="checkbox"
+                aria-checked={activeRashDetails.includes("Blisters")}
+                onClick={() => toggleRashDetail("Blisters")}
+                className={`s11-rash-btn${activeRashDetails.includes("Blisters") ? " s11-rash-btn--checked" : ""}`}
               >
-                {isSpanish ? "Guardar y continuar" : "Save and Continue"}
+                {isSpanish ? "Ampollas" : "Blisters"}
+              </button>
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={activeRashDetails.includes("Red, fine or bumpy rash")}
+                onClick={() => toggleRashDetail("Red, fine or bumpy rash")}
+                className={`s11-rash-btn${activeRashDetails.includes("Red, fine or bumpy rash") ? " s11-rash-btn--checked" : ""}`}
+              >
+                {isSpanish ? "Sarpullido rojo, fino o con protuberancias" : "Red, fine or bumpy rash"}
+              </button>
+            </div>
+
+            {/* Row 2: Flushing, Pus-filled pimples */}
+            <div className="s11-rash-row">
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={activeRashDetails.includes("Flushing")}
+                onClick={() => toggleRashDetail("Flushing")}
+                className={`s11-rash-btn${activeRashDetails.includes("Flushing") ? " s11-rash-btn--checked" : ""}`}
+              >
+                {isSpanish ? "Enrojecimiento" : "Flushing"}
+              </button>
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={activeRashDetails.includes("Pus-filled pimples")}
+                onClick={() => toggleRashDetail("Pus-filled pimples")}
+                className={`s11-rash-btn${activeRashDetails.includes("Pus-filled pimples") ? " s11-rash-btn--checked" : ""}`}
+              >
+                {isSpanish ? "Granos con pus" : "Pus-filled pimples"}
+              </button>
+            </div>
+
+            {/* Row 3: Unsure/I don't know */}
+            <div className="s11-rash-row">
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={activeRashDetails.includes("Unsure")}
+                onClick={() => toggleRashDetail("Unsure")}
+                className={`s11-rash-btn${activeRashDetails.includes("Unsure") ? " s11-rash-btn--checked" : ""}`}
+              >
+                {isSpanish ? "No estoy seguro" : "Unsure/I don't know"}
               </button>
             </div>
           </div>
@@ -990,14 +1093,15 @@ export function Slide11SymptomsScreen({
           aria-modal="true"
           aria-label={isSpanish ? "Detalles de inflamación" : "Swelling details"}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-[2px]"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setSwellingModalOpen(false);
-              swellingTriggerRef.current?.focus();
-            }
+          onClick={() => {
+            setSwellingModalOpen(false);
+            swellingTriggerRef.current?.focus();
           }}
         >
-          <div className="s11-swelling-dialog animate-in fade-in zoom-in-95 duration-200">
+          <div
+            className="s11-swelling-dialog animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Row 1: Face swelling & Throat swelling */}
             <div className="s11-swelling-row">
               <button
@@ -1069,24 +1173,6 @@ export function Slide11SymptomsScreen({
                 className="s11-swelling-other-input"
                 aria-label={isSpanish ? "Otro tipo de inflamación, por favor describa" : "Other swelling, please describe"}
               />
-            </div>
-
-            {/* Footer: 7-1-2 and [ X ] button */}
-            <div className="s11-swelling-footer">
-              <span className="s11-swelling-code">7-1-2</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setSwellingModalOpen(false);
-                  swellingTriggerRef.current?.focus();
-                }}
-                className="s11-swelling-close-btn"
-                aria-label={isSpanish ? "Cerrar" : "Close"}
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </div>
           </div>
         </div>

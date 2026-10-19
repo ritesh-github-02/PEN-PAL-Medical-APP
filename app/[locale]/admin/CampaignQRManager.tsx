@@ -530,14 +530,14 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
       )}
 
       {/* Main Header & Creation Trigger - Clinical Sage/Teal Palette */}
-      <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="p-4 sm:p-6 border-b border-slate-100 bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2e7d8a] text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-white/20 border border-white/25 rounded-xl text-white shadow-xs backdrop-blur-xs">
               <QrCode className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
                 Study QR Codes & Campaign Manager
               </h2>
               <p className="text-xs text-teal-100 font-normal">
@@ -553,7 +553,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
             resetCreateForm();
             setIsCreateModalOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#71ad9d] hover:bg-[#609c8d] active:scale-[0.98] text-[#132c27] text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#71ad9d] hover:bg-[#609c8d] active:scale-[0.98] text-[#132c27] text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer w-full sm:w-auto shrink-0"
         >
           <Plus className="w-4 h-4" />
           Create New Campaign & Batch Links
@@ -562,52 +562,52 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
 
       {/* Summary KPI Stats Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-slate-100 bg-slate-50/70 border-b border-slate-100">
-        <div className="p-4 flex items-center gap-3">
-          <div className="p-2 bg-white border border-slate-200 rounded-lg text-slate-700 shadow-2xs">
+        <div className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+          <div className="p-2 bg-white border border-slate-200 rounded-lg text-slate-700 shadow-2xs shrink-0">
             <QrCode className="w-4 h-4" />
           </div>
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Campaigns</p>
-            <p className="text-lg font-extrabold font-mono text-slate-900">{totalCount}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Total Campaigns</p>
+            <p className="text-base sm:text-lg font-extrabold font-mono text-slate-900">{totalCount}</p>
           </div>
         </div>
 
-        <div className="p-4 flex items-center gap-3">
-          <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 shadow-2xs">
+        <div className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+          <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 shadow-2xs shrink-0">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Campaigns</p>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Active Campaigns</p>
             <div className="flex items-center gap-1.5">
-              <span className="text-lg font-extrabold font-mono text-emerald-700">{activeCount}</span>
+              <span className="text-base sm:text-lg font-extrabold font-mono text-emerald-700">{activeCount}</span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             </div>
           </div>
         </div>
 
-        <div className="p-4 flex items-center gap-3">
-          <div className="p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 shadow-2xs">
+        <div className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+          <div className="p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 shadow-2xs shrink-0">
             <Power className="w-4 h-4 text-slate-500" />
           </div>
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Deactivated</p>
-            <p className="text-lg font-extrabold font-mono text-slate-600">{deactivatedCount}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Deactivated</p>
+            <p className="text-base sm:text-lg font-extrabold font-mono text-slate-600">{deactivatedCount}</p>
           </div>
         </div>
 
-        <div className="p-4 flex items-center gap-3">
-          <div className="p-2 bg-teal-50 border border-teal-200 rounded-lg text-teal-700 shadow-2xs">
+        <div className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+          <div className="p-2 bg-teal-50 border border-teal-200 rounded-lg text-teal-700 shadow-2xs shrink-0">
             <Activity className="w-4 h-4 text-teal-600" />
           </div>
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enrolled Participants</p>
-            <p className="text-lg font-extrabold font-mono text-teal-900">{totalScans}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Enrolled</p>
+            <p className="text-base sm:text-lg font-extrabold font-mono text-teal-900">{totalScans}</p>
           </div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 border-b border-slate-100 bg-white flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="p-3.5 sm:p-4 border-b border-slate-100 bg-white flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Search */}
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -628,16 +628,18 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           )}
         </div>
 
-        {/* Filter dropdowns */}
-        <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
+        {/* Filter dropdowns - Responsive 2-column grid on mobile, inline on desktop */}
+        <div className="grid grid-cols-2 gap-2 w-full md:w-auto shrink-0">
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-500 font-medium">Status:</span>
+          <div className="flex items-center justify-between gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs">
+            <div className="flex items-center gap-1 text-slate-500 font-medium">
+              <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <span>Status:</span>
+            </div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer"
+              className="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer text-xs"
             >
               <option value="ALL">All ({campaigns.length})</option>
               <option value="ACTIVE">Active ({activeCount})</option>
@@ -646,12 +648,12 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           </div>
 
           {/* Arm Filter */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs">
+          <div className="flex items-center justify-between gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs">
             <span className="text-slate-500 font-medium">Arm:</span>
             <select
               value={armFilter}
               onChange={(e) => setArmFilter(e.target.value as any)}
-              className="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer"
+              className="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer text-xs"
             >
               <option value="ALL">All Arms</option>
               <option value="INTERVENTION">Intervention</option>
@@ -661,9 +663,9 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
         </div>
       </div>
 
-      {/* Campaigns Main Table */}
+      {/* Campaigns Main Content */}
       {filteredCampaigns.length === 0 ? (
-        <div className="text-center py-12 bg-slate-50/50">
+        <div className="text-center py-12 px-4 bg-slate-50/50">
           <QrCode className="w-10 h-10 mx-auto text-slate-300 mb-2" />
           <p className="text-sm font-semibold text-slate-700">No campaigns found</p>
           <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto font-light">
@@ -673,132 +675,246 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-700 border-collapse">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-100/75 text-slate-500 font-mono uppercase text-[10px] tracking-wider">
-                <th className="py-3 px-5 font-bold">Campaign Name & ID</th>
-                <th className="py-3 px-5 font-bold">Study Arm</th>
-                <th className="py-3 px-5 font-bold text-center">Participants</th>
-                <th className="py-3 px-5 font-bold text-center">Access Status</th>
-                <th className="py-3 px-5 text-right font-bold">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredCampaigns.map((item) => {
-                const isActive = item.status === 'ACTIVE';
-                const isToggling = togglingId === item.id;
+        <>
+          {/* Mobile Card List View (Phones & Small Tablets < md) */}
+          <div className="block md:hidden divide-y divide-slate-100 bg-white">
+            {filteredCampaigns.map((item) => {
+              const isActive = item.status === 'ACTIVE';
+              const isToggling = togglingId === item.id;
 
-                return (
-                  <tr key={item.id} className="hover:bg-slate-50/90 transition-colors">
-                    {/* Name & ID */}
-                    <td className="py-4 px-5">
-                      <div className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                        <span>{item.name}</span>
+              return (
+                <div key={item.id} className="p-4 space-y-3 hover:bg-slate-50/60 transition-colors">
+                  {/* Top Row: Name, Status toggle, Edit */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-slate-900 text-sm truncate">{item.name}</span>
                         {isActive && (
                           <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Active"></span>
                         )}
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(item)}
-                          className="opacity-60 hover:opacity-100 p-1 text-slate-400 hover:text-[#1d5c64] rounded transition cursor-pointer"
+                          className="p-1 text-slate-400 hover:text-[#1d5c64] rounded transition cursor-pointer shrink-0"
                           title="Rename Campaign"
                         >
-                          <Pencil className="w-3 h-3" />
+                          <Pencil className="w-3.5 h-3.5" />
                         </button>
                       </div>
                       <div className="text-[11px] font-mono text-slate-500 mt-0.5 flex items-center gap-1.5">
                         <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold">ID:</span>
-                        <span>{item.slug}</span>
+                        <span className="truncate">{item.slug}</span>
                       </div>
-                    </td>
+                    </div>
 
-                    {/* Study Arm */}
-                    <td className="py-4 px-5">
+                    {/* Status Toggle Button */}
+                    <button
+                      type="button"
+                      disabled={isToggling}
+                      onClick={() => handleToggle(item.id, item.status, item.name)}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase transition-all shadow-2xs cursor-pointer border shrink-0 ${isActive
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-slate-100 text-slate-500 border-slate-200'
+                        } ${isToggling ? 'opacity-50 cursor-wait' : 'active:scale-95'}`}
+                      title={isActive ? 'Click to deactivate campaign' : 'Click to activate campaign'}
+                    >
+                      {isToggling ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                            }`}
+                        />
+                      )}
+                      <span>{isActive ? 'Active' : 'Deactivated'}</span>
+                    </button>
+                  </div>
+
+                  {/* Middle Row: Arm Badge & Link Count */}
+                  <div className="flex items-center justify-between text-xs pt-0.5">
+                    <div>
                       {item.arm === 'INTERVENTION' ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
                           <Smartphone className="w-3 h-3" />
                           Intervention
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                           <BookOpen className="w-3 h-3" />
                           Control
                         </span>
-                      )}                    </td>
+                      )}
+                    </div>
+                    <span className="bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg text-xs font-mono font-bold">
+                      {item.totalScans || 0} links
+                    </span>
+                  </div>
 
-                    {/* Participant / Link Count */}
-                    <td className="py-4 px-5 text-center font-mono font-bold text-slate-800">
-                      <span className="bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg text-xs">
-                        {item.totalScans || 0} links
-                      </span>
-                    </td>
+                  {/* Action Buttons Row */}
+                  <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCampaignLinks(item)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-teal-50 hover:bg-teal-100 active:scale-[0.98] text-teal-800 text-xs font-bold rounded-xl border border-teal-200 transition-colors shadow-2xs cursor-pointer"
+                    >
+                      <Layers className="w-3.5 h-3.5" />
+                      <span>Manage Links</span>
+                    </button>
 
-                    {/* Active / Deactivated Switch */}
-                    <td className="py-4 px-5 text-center">
-                      <button
-                        type="button"
-                        disabled={isToggling}
-                        onClick={() => handleToggle(item.id, item.status, item.name)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase transition-all shadow-2xs cursor-pointer border ${isActive
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                            : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
-                          } ${isToggling ? 'opacity-50 cursor-wait' : 'active:scale-95'}`}
-                        title={isActive ? 'Click to deactivate campaign (pause access)' : 'Click to activate campaign (enable access)'}
-                      >
-                        {isToggling ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
+                    <a
+                      href={`/api/export?type=campaign_links&campaignId=${item.id}`}
+                      download
+                      className="p-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl border border-slate-200 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center"
+                      title="Export CSV spreadsheet of links"
+                      aria-label="Export CSV spreadsheet"
+                    >
+                      <CsvDownloadIcon className="w-4 h-4" />
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDelete(item)}
+                      className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl border border-rose-200 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center"
+                      title="Permanently delete campaign"
+                      aria-label="Permanently delete campaign"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-700 border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-100/75 text-slate-500 font-mono uppercase text-[10px] tracking-wider">
+                  <th className="py-3 px-5 font-bold">Campaign Name & ID</th>
+                  <th className="py-3 px-5 font-bold">Study Arm</th>
+                  <th className="py-3 px-5 font-bold text-center">Participants</th>
+                  <th className="py-3 px-5 font-bold text-center">Access Status</th>
+                  <th className="py-3 px-5 text-right font-bold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredCampaigns.map((item) => {
+                  const isActive = item.status === 'ACTIVE';
+                  const isToggling = togglingId === item.id;
+
+                  return (
+                    <tr key={item.id} className="hover:bg-slate-50/90 transition-colors">
+                      {/* Name & ID */}
+                      <td className="py-4 px-5">
+                        <div className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                          <span>{item.name}</span>
+                          {isActive && (
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Active"></span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEdit(item)}
+                            className="opacity-60 hover:opacity-100 p-1 text-slate-400 hover:text-[#1d5c64] rounded transition cursor-pointer"
+                            title="Rename Campaign"
+                          >
+                            <Pencil className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <div className="text-[11px] font-mono text-slate-500 mt-0.5 flex items-center gap-1.5">
+                          <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold">ID:</span>
+                          <span>{item.slug}</span>
+                        </div>
+                      </td>
+
+                      {/* Study Arm */}
+                      <td className="py-4 px-5">
+                        {item.arm === 'INTERVENTION' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                            <Smartphone className="w-3 h-3" />
+                            Intervention
+                          </span>
                         ) : (
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
-                              }`}
-                          />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                            <BookOpen className="w-3 h-3" />
+                            Control
+                          </span>
                         )}
-                        <span>{isActive ? 'Active' : 'Deactivated'}</span>
-                      </button>
-                    </td>
+                      </td>
 
-                    {/* Row Actions */}
-                    <td className="py-4 px-5 text-right space-x-1.5 whitespace-nowrap">
-                      {/* View & Manage Links */}
-                      <button
-                        type="button"
-                        onClick={() => handleOpenCampaignLinks(item)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 text-[11px] font-bold rounded-lg border border-teal-200 transition-colors shadow-2xs cursor-pointer"
-                        title="View and manage unique links & QR codes"
-                      >
-                        <Layers className="w-3.5 h-3.5" />
-                        <span>Manage Links</span>
-                      </button>
+                      {/* Participant / Link Count */}
+                      <td className="py-4 px-5 text-center font-mono font-bold text-slate-800">
+                        <span className="bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg text-xs">
+                          {item.totalScans || 0} links
+                        </span>
+                      </td>
 
-                      {/* Export CSV Direct (Icon Button) */}
-                      <a
-                        href={`/api/export?type=campaign_links&campaignId=${item.id}`}
-                        download
-                        className="p-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center"
-                        title="Export CSV spreadsheet of all unique links"
-                        aria-label="Export CSV spreadsheet"
-                      >
-                        <CsvDownloadIcon className="w-4 h-4" />
-                      </a>
+                      {/* Active / Deactivated Switch */}
+                      <td className="py-4 px-5 text-center">
+                        <button
+                          type="button"
+                          disabled={isToggling}
+                          onClick={() => handleToggle(item.id, item.status, item.name)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase transition-all shadow-2xs cursor-pointer border ${isActive
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                              : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
+                            } ${isToggling ? 'opacity-50 cursor-wait' : 'active:scale-95'}`}
+                          title={isActive ? 'Click to deactivate campaign (pause access)' : 'Click to activate campaign (enable access)'}
+                        >
+                          {isToggling ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                                }`}
+                            />
+                          )}
+                          <span>{isActive ? 'Active' : 'Deactivated'}</span>
+                        </button>
+                      </td>
 
-                      {/* Delete Campaign (Icon Only) */}
-                      <button
-                        type="button"
-                        onClick={() => handleOpenDelete(item)}
-                        className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg border border-rose-200 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center"
-                        title="Permanently delete campaign"
-                        aria-label="Permanently delete campaign"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      {/* Row Actions */}
+                      <td className="py-4 px-5 text-right space-x-1.5 whitespace-nowrap">
+                        {/* View & Manage Links */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenCampaignLinks(item)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 text-[11px] font-bold rounded-lg border border-teal-200 transition-colors shadow-2xs cursor-pointer"
+                          title="View and manage unique links & QR codes"
+                        >
+                          <Layers className="w-3.5 h-3.5" />
+                          <span>Manage Links</span>
+                        </button>
+
+                        {/* Export CSV Direct (Icon Button) */}
+                        <a
+                          href={`/api/export?type=campaign_links&campaignId=${item.id}`}
+                          download
+                          className="p-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center"
+                          title="Export CSV spreadsheet of all unique links"
+                          aria-label="Export CSV spreadsheet"
+                        >
+                          <CsvDownloadIcon className="w-4 h-4" />
+                        </a>
+
+                        {/* Delete Campaign (Icon Only) */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenDelete(item)}
+                          className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg border border-rose-200 transition-colors shadow-2xs cursor-pointer inline-flex items-center justify-center"
+                          title="Permanently delete campaign"
+                          aria-label="Permanently delete campaign"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {/* =========================================================================
@@ -959,18 +1075,18 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                   </div>
 
                   {/* Submit Action Button */}
-                  <div className="pt-3 flex justify-end gap-2">
+                  <div className="pt-3 flex flex-col-reverse sm:flex-row justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => setIsCreateModalOpen(false)}
-                      className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer"
+                      className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer text-center"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={loading || !name.trim()}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1d5c64] hover:bg-[#16484e] active:scale-[0.98] text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1d5c64] hover:bg-[#16484e] active:scale-[0.98] text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer disabled:opacity-50"
                     >
                       {loading ? (
                         <>
@@ -990,9 +1106,9 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 /* Step 2: Batch Generated Success & Download Actions */
                 <div className="space-y-6">
                   {/* Success Banner */}
-                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-4">
+                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-emerald-600 text-white rounded-xl shadow-xs">
+                      <div className="p-2.5 bg-emerald-600 text-white rounded-xl shadow-xs shrink-0">
                         <Check className="w-5 h-5" />
                       </div>
                       <div>
@@ -1011,7 +1127,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                       onClick={() =>
                         exportLinksToCSV(generatedLinks, createdCampaign.name, createdCampaign.slug)
                       }
-                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 active:scale-[0.98] text-white text-xs font-extrabold rounded-xl transition shadow-md cursor-pointer shrink-0"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 active:scale-[0.98] text-white text-xs font-extrabold rounded-xl transition shadow-md cursor-pointer w-full sm:w-auto shrink-0"
                     >
                       <FileSpreadsheet className="w-4 h-4" />
                       <span>Download CSV / Excel</span>
@@ -1224,15 +1340,15 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
             {/* Body */}
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1 custom-scrollbar">
               {/* Action Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="flex flex-wrap items-center gap-2">
                   {/* Export CSV Button */}
                   <button
                     type="button"
                     onClick={() =>
                       exportLinksToCSV(activeCampaignLinks, activeCampaign.name, activeCampaign.slug)
                     }
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition shadow-xs cursor-pointer"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition shadow-xs cursor-pointer"
                   >
                     <FileSpreadsheet className="w-3.5 h-3.5" />
                     <span>Download CSV / Excel</span>
@@ -1241,7 +1357,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                   <button
                     type="button"
                     onClick={() => handleCopyAllLinks(activeCampaignLinks)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold rounded-lg transition cursor-pointer"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold rounded-lg transition cursor-pointer"
                   >
                     <Copy className="w-3.5 h-3.5" />
                     <span>Copy All URLs</span>
@@ -1249,28 +1365,30 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 </div>
 
                 {/* Add More Links Form */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between sm:justify-start gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200">
                   <span className="text-xs text-slate-500 font-medium">Add more:</span>
-                  <select
-                    value={addQuantity}
-                    onChange={(e) => setAddQuantity(Number(e.target.value))}
-                    className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none"
-                  >
-                    <option value={5}>+5 links</option>
-                    <option value={10}>+10 links</option>
-                    <option value={25}>+25 links</option>
-                    <option value={50}>+50 links</option>
-                    <option value={100}>+100 links</option>
-                  </select>
-                  <button
-                    type="button"
-                    onClick={handleAddMoreLinks}
-                    disabled={addingMore}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-lg transition cursor-pointer disabled:opacity-50 active:scale-[0.98]"
-                  >
-                    {addingMore ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
-                    <span>Generate</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={addQuantity}
+                      onChange={(e) => setAddQuantity(Number(e.target.value))}
+                      className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none"
+                    >
+                      <option value={5}>+5 links</option>
+                      <option value={10}>+10 links</option>
+                      <option value={25}>+25 links</option>
+                      <option value={50}>+50 links</option>
+                      <option value={100}>+100 links</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={handleAddMoreLinks}
+                      disabled={addingMore}
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-lg transition cursor-pointer disabled:opacity-50 active:scale-[0.98]"
+                    >
+                      {addingMore ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+                      <span>Generate</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1607,21 +1725,21 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 </p>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => {
                     setIsEditModalOpen(false);
                     setEditCampaign(null);
                   }}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer text-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingEdit || !editName.trim()}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#1d5c64] hover:bg-[#16484e] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer disabled:opacity-50"
                 >
                   {isSavingEdit ? (
                     <>
@@ -1680,7 +1798,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
               </p>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-slate-100">
               <button
                 type="button"
                 disabled={isDeleting}
@@ -1688,7 +1806,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                   setIsDeleteModalOpen(false);
                   setDeleteCampaign(null);
                 }}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer text-center"
               >
                 Cancel
               </button>
@@ -1696,7 +1814,7 @@ export function CampaignQRManager({ initialCampaigns }: { initialCampaigns?: Cam
                 type="button"
                 disabled={isDeleting}
                 onClick={handleConfirmDelete}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer disabled:opacity-50"
               >
                 {isDeleting ? (
                   <>

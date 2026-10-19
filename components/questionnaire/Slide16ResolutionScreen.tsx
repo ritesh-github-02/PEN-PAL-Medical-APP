@@ -69,11 +69,12 @@ const SLIDE16_CSS = `
   background-color: #8cb2a7;
   border: 1.5px solid #759c92;
   border-radius: 20px;
-  padding: 1.6rem 1.85rem 1.1rem 1.85rem;
+  padding: 1.85rem 1.85rem;
   box-shadow: 0 4px 14px rgba(20, 55, 50, 0.12);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
   max-width: 580px;
   width: 100%;
   transition: all 0.2s ease;
@@ -172,50 +173,7 @@ const SLIDE16_CSS = `
   shrink: 0;
 }
 
-/* Card Footer with Wireframe-spec Clear / Deselect icon & marker */
-.s16-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.65rem;
-  height: 22px;
-}
 
-.s16-wireframe-marker {
-  font-family: monospace;
-  font-size: 0.68rem;
-  color: #4b6f67;
-  user-select: none;
-}
-
-.s16-clear-btn {
-  background-color: #ffffff;
-  border: 1px solid #759c92;
-  border-radius: 6px;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #557871;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.15s ease;
-  outline: none;
-}
-
-.s16-clear-btn:hover {
-  background-color: #f7faf9;
-  color: #c93b2b;
-  border-color: #a6bbb5;
-}
-
-.s16-clear-btn:focus-visible {
-  box-shadow: 0 0 0 2px #1f4d45;
-}
 
 /* Nurse Anna Wrapper */
 .s16-nurse-wrap {
@@ -519,7 +477,7 @@ const SLIDE16_CSS = `
 .s16-modal18-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   margin-top: 0.25rem;
 }
 
@@ -553,7 +511,7 @@ const SLIDE16_CSS = `
     gap: 1.5rem;
   }
   .s16-card {
-    padding: 1.25rem 1.4rem 0.9rem 1.4rem;
+    padding: 1.35rem 1.4rem;
     max-width: 480px;
   }
   .s16-option-btn {
@@ -910,20 +868,6 @@ export function Slide16ResolutionScreen({
               </button>
             </div>
           )}
-
-          {/* Card Footer with Wireframe-spec Clear / Deselect icon */}
-          <div className="s16-card-footer">
-            <span className="s16-wireframe-marker" aria-hidden="true">7-5</span>
-            <button
-              type="button"
-              onClick={handleClear}
-              aria-label={isSpanish ? "Borrar selección" : "Clear selection"}
-              title={isSpanish ? "Borrar selección" : "Clear selection"}
-              className="s16-clear-btn"
-            >
-              ✕
-            </button>
-          </div>
         </div>
 
         {/* Nurse Anna on the right */}
@@ -955,11 +899,14 @@ export function Slide16ResolutionScreen({
           aria-modal="true"
           aria-labelledby="modal-17-heading"
           className="s16-modal-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setModal17Open(false);
+          onClick={() => {
+            if (handleMedicines) {
+              handleMedicines(activeMeds);
+            }
+            setModal17Open(false);
           }}
         >
-          <div className="s16-modal17-card">
+          <div className="s16-modal17-card" onClick={(e) => e.stopPropagation()}>
             <h2
               id="modal-17-heading"
               ref={modal17HeadingRef}
@@ -1002,19 +949,6 @@ export function Slide16ResolutionScreen({
               >
                 <span>{isSpanish ? "Más preguntas >>" : "More Questions >>"}</span>
               </button>
-
-              <div className="s16-modal-close-wrap">
-                <span className="s16-wireframe-marker" aria-hidden="true">7-4-1</span>
-                <button
-                  type="button"
-                  onClick={() => setModal17Open(false)}
-                  aria-label={isSpanish ? "Cerrar" : "Close"}
-                  title={isSpanish ? "Cerrar" : "Close"}
-                  className="s16-modal-close-btn"
-                >
-                  ✕
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -1029,11 +963,14 @@ export function Slide16ResolutionScreen({
           aria-modal="true"
           aria-labelledby="modal-18-heading"
           className="s16-modal-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setModal18Open(false);
+          onClick={() => {
+            if (activeRoute && handleRoute) {
+              handleRoute(activeRoute);
+            }
+            setModal18Open(false);
           }}
         >
-          <div className="s16-modal18-card">
+          <div className="s16-modal18-card" onClick={(e) => e.stopPropagation()}>
             <h2
               id="modal-18-heading"
               ref={modal18HeadingRef}
@@ -1063,29 +1000,6 @@ export function Slide16ResolutionScreen({
                   </button>
                 );
               })}
-            </div>
-
-            <div className="s16-modal18-footer">
-              <button
-                type="button"
-                onClick={() => setModal18Open(false)}
-                className="s16-save-continue-btn"
-              >
-                {isSpanish ? "Guardar" : "Save & Continue"}
-              </button>
-
-              <div className="s16-modal-close-wrap">
-                <span className="s16-wireframe-marker" aria-hidden="true">7-4-1-1</span>
-                <button
-                  type="button"
-                  onClick={() => setModal18Open(false)}
-                  aria-label={isSpanish ? "Cerrar" : "Close"}
-                  title={isSpanish ? "Cerrar" : "Close"}
-                  className="s16-modal-close-btn"
-                >
-                  ✕
-                </button>
-              </div>
             </div>
           </div>
         </div>

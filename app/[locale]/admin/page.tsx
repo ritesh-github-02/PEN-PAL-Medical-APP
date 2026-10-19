@@ -94,32 +94,32 @@ export default async function AdminPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-3 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         
         {/* Soft Clinical Header Navigation Bar (Sage/Teal Medical Registry) */}
-        <header className="bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2d7d8a] border border-[#1d5c64]/30 rounded-2xl p-5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-xs rounded-xl flex items-center justify-center shadow-xs border border-white/25">
-              <Shield className="w-5 h-5 text-white" />
+        <header className="bg-gradient-to-r from-[#1d5c64] via-[#236f7a] to-[#2d7d8a] border border-[#1d5c64]/30 rounded-2xl p-4 sm:p-5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 sm:gap-4 shadow-sm">
+          <div className="flex items-center gap-3 sm:gap-3.5">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 backdrop-blur-xs rounded-xl flex items-center justify-center shadow-xs border border-white/25 shrink-0">
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight text-white font-sans flex items-center gap-2">
-                PEN-PAL <span className="text-teal-200 font-normal">|</span> <span className="text-white font-semibold">Clinical Admin Portal</span>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-lg font-bold tracking-tight text-white font-sans flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <span>PEN-PAL</span> <span className="text-teal-200 font-normal">|</span> <span className="text-white font-semibold">Clinical Admin Portal</span>
               </h1>
-              <p className="text-xs text-teal-100 font-medium mt-0.5">Clinical Study Data & Cohort Registry Dashboard</p>
+              <p className="text-[11px] sm:text-xs text-teal-100 font-medium mt-0.5 truncate">Clinical Study Data & Cohort Registry Dashboard</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <span className="text-xs font-bold text-white bg-white/15 border border-white/25 rounded-lg px-3 py-1.5 flex items-center gap-2 backdrop-blur-xs">
+          <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end shrink-0 pt-1 sm:pt-0 border-t border-white/15 sm:border-0">
+            <span className="text-[11px] sm:text-xs font-bold text-white bg-white/15 border border-white/25 rounded-lg px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 sm:gap-2 backdrop-blur-xs">
               <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
               Enrollment Open
             </span>
             <form action={logout}>
               <button 
                 type="submit"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/15 hover:bg-rose-600/80 hover:text-white border border-white/25 text-white rounded-lg text-xs font-bold transition-all cursor-pointer backdrop-blur-xs shadow-xs active:scale-[0.98]"
+                className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white/15 hover:bg-rose-600/80 hover:text-white border border-white/25 text-white rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer backdrop-blur-xs shadow-xs active:scale-[0.98]"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 Logout
@@ -130,98 +130,98 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
         {/* Database Offline Error Alert */}
         {dbError && (
-          <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-rose-900 shadow-xs flex items-center justify-between">
+          <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 sm:p-4 text-rose-900 shadow-xs flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 bg-rose-100 rounded-lg flex items-center justify-center font-bold text-rose-700">
-                <AlertTriangle className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-rose-100 rounded-lg flex items-center justify-center font-bold text-rose-700 shrink-0">
+                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
-                <p className="font-bold text-sm text-rose-900">Database Connection Offline</p>
-                <p className="text-xs text-rose-700 mt-0.5">PostgreSQL is not responding. Showing cached data.</p>
+                <p className="font-bold text-xs sm:text-sm text-rose-900">Database Connection Offline</p>
+                <p className="text-[11px] sm:text-xs text-rose-700 mt-0.5">PostgreSQL is not responding. Showing cached data.</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Key Metrics Overview Grid - 4 Clinical KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Key Metrics Overview Grid - 4 Clinical KPI Cards (2x2 on Mobile, 4x1 on Desktop) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
           
           {/* 1. Total Enrolled Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-xs hover:border-[#1d5c64]/40 transition-all">
-            <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d5c64] bg-[#f4f8e8] border border-[#1d5c64]/25 px-2.5 py-0.5 rounded-md">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-xs hover:border-[#1d5c64]/40 transition-all">
+            <div className="flex justify-between items-start gap-1">
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#1d5c64] bg-[#f4f8e8] border border-[#1d5c64]/25 px-2 py-0.5 rounded-md truncate">
                 Active Cohort
               </span>
-              <div className="w-8 h-8 rounded-lg bg-[#f4f8e8] flex items-center justify-center text-[#1d5c64]">
-                <Users className="w-4 h-4" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#f4f8e8] flex items-center justify-center text-[#1d5c64] shrink-0">
+                <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Enrolled</p>
-              <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono">{participantCount}</p>
+            <div className="mt-3 sm:mt-4">
+              <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Total Enrolled</p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mt-0.5 sm:mt-1 font-mono">{participantCount}</p>
             </div>
-            <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
-              Registered in PEN-PAL Registry
+            <p className="text-[10px] sm:text-[11px] text-slate-500 mt-2 pt-2 sm:mt-3 sm:pt-3 border-t border-slate-100 font-medium truncate">
+              Registered in Registry
             </p>
           </div>
 
           {/* 2. Active Now Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-xs hover:border-emerald-300 transition-all">
-            <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-xs hover:border-emerald-300 transition-all">
+            <div className="flex justify-between items-start gap-1">
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md truncate">
                 Live Status
               </span>
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                <Clock className="w-4 h-4" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Now</p>
-              <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono flex items-baseline gap-2">
+            <div className="mt-3 sm:mt-4">
+              <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Active Now</p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mt-0.5 sm:mt-1 font-mono flex items-baseline gap-1.5 sm:gap-2">
                 {activeNowCount}
-                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
               </p>
             </div>
-            <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
-              Logged activity in last 30 minutes
+            <p className="text-[10px] sm:text-[11px] text-slate-500 mt-2 pt-2 sm:mt-3 sm:pt-3 border-t border-slate-100 font-medium truncate">
+              Activity in last 30m
             </p>
           </div>
 
           {/* 3. Assessments In-Progress Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-xs hover:border-amber-300 transition-all">
-            <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-md">
-                Clinical Status
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-xs hover:border-amber-300 transition-all">
+            <div className="flex justify-between items-start gap-1">
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md truncate">
+                In-Progress
               </span>
-              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
-                <Activity className="w-4 h-4" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assessments In-Progress</p>
-              <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1 font-mono">{inProgressAssessmentsCount}</p>
+            <div className="mt-3 sm:mt-4">
+              <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">In-Progress</p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mt-0.5 sm:mt-1 font-mono">{inProgressAssessmentsCount}</p>
             </div>
-            <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
-              Ongoing participant evaluations
+            <p className="text-[10px] sm:text-[11px] text-slate-500 mt-2 pt-2 sm:mt-3 sm:pt-3 border-t border-slate-100 font-medium truncate">
+              Ongoing evaluations
             </p>
           </div>
 
           {/* 4. Completed Assessments Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-xs hover:border-teal-300 transition-all">
-            <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-md">
-                Protocol Complete
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-xs hover:border-teal-300 transition-all">
+            <div className="flex justify-between items-start gap-1">
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md truncate">
+                Completed
               </span>
-              <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600">
-                <CheckCircle2 className="w-4 h-4" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 shrink-0">
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed Assessments</p>
-              <p className="text-3xl sm:text-4xl font-extrabold text-teal-900 tracking-tight mt-1 font-mono">{completedAssessmentsCount}</p>
+            <div className="mt-3 sm:mt-4">
+              <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Completed</p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-teal-900 tracking-tight mt-0.5 sm:mt-1 font-mono">{completedAssessmentsCount}</p>
             </div>
-            <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-slate-100 font-medium">
-              Fully finalized clinical evaluations
+            <p className="text-[10px] sm:text-[11px] text-slate-500 mt-2 pt-2 sm:mt-3 sm:pt-3 border-t border-slate-100 font-medium truncate">
+              Finalized evaluations
             </p>
           </div>
 
@@ -237,47 +237,53 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
         {/* Clinical Data Export Gateway */}
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-          <div className="p-5 border-b border-slate-200 bg-slate-50">
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-              <FileSpreadsheet className="w-4 h-4 text-teal-700" /> Clinical Data Export Gateway
+          <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50">
+            <h2 className="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <FileSpreadsheet className="w-4 h-4 text-teal-700 shrink-0" /> Clinical Data Export Gateway
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
               Download compiled CSV analytical payloads of participant questionnaire responses and event telemetry for external clinical audits.
             </p>
           </div>
           
-          <div className="p-5 space-y-3 bg-white">
+          <div className="p-3.5 sm:p-5 space-y-3 bg-white">
             {/* Download All Responses */}
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-slate-50 border border-slate-200 rounded-lg gap-4">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-3.5 sm:p-4 bg-slate-50 border border-slate-200 rounded-xl gap-3 sm:gap-4">
               <div>
                 <h4 className="font-bold text-slate-900 text-xs">Complete Participant Responses Ledger</h4>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                   Export structured records of all questionnaire input fields, symptoms, timeline selections, and assessment answers across all participants.
                 </p>
               </div>
-              <ExportButton type="responses" />
+              <div className="w-full sm:w-auto shrink-0 flex justify-end sm:justify-start">
+                <ExportButton type="responses" />
+              </div>
             </div>
 
             {/* Download Full Cohort List */}
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-slate-50 border border-slate-200 rounded-lg gap-4">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-3.5 sm:p-4 bg-slate-50 border border-slate-200 rounded-xl gap-3 sm:gap-4">
               <div>
                 <h4 className="font-bold text-slate-900 text-xs">Clinical Cohort Registry List</h4>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                   Export complete participant list metadata including external IDs, cohort groups, status, token usage counts, and last active dates.
                 </p>
               </div>
-              <ExportButton type="participants" label="Export List CSV" />
+              <div className="w-full sm:w-auto shrink-0 flex justify-end sm:justify-start">
+                <ExportButton type="participants" label="Export List CSV" />
+              </div>
             </div>
 
             {/* Download System Events */}
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-slate-50 border border-slate-200 rounded-lg gap-4">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-3.5 sm:p-4 bg-slate-50 border border-slate-200 rounded-xl gap-3 sm:gap-4">
               <div>
                 <h4 className="font-bold text-slate-900 text-xs">System & Behavioral Event Logs</h4>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                   Export chronological action telemetry, page durations, token validations, and security event payloads.
                 </p>
               </div>
-              <ExportButton type="events" />
+              <div className="w-full sm:w-auto shrink-0 flex justify-end sm:justify-start">
+                <ExportButton type="events" />
+              </div>
             </div>
             
           </div>
