@@ -157,25 +157,8 @@ const SLIDE8_CSS = `
   -webkit-user-drag: none;
 }
 
-/* ---------- 3. Caption (CC) & Play/Pause Controls ---------- */
 .s8-audio {
-  position: absolute;
-  left: 565px;
-  top: 444px;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.s8-audio .audio-cc-btn svg {
-  width: 52px !important;
-  height: 47px !important;
-}
-
-.s8-audio .audio-play-btn svg {
-  width: 70px !important;
-  height: 47px !important;
+  display: none !important;
 }
 
 /* ==========================================================

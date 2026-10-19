@@ -210,23 +210,8 @@ const SLIDE6_CSS = `
   border-color: #d8d4b8 !important;
 }
 
-/* ---------- 4. Caption (CC) & Play/Pause Controls ---------- */
 .s6-audio {
-  position: absolute;
-  left: 570px;
-  top: 444px;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.s6-audio .audio-cc-btn svg {
-  width: 52px !important;
-  height: 47px !important;
-}
-.s6-audio .audio-play-btn svg {
-  width: 70px !important;
-  height: 47px !important;
+  display: none !important;
 }
 
 /* ==========================================================

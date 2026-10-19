@@ -212,23 +212,8 @@ const SLIDE9_CSS = `
   background-color: #f5e478;
 }
 
-/* ---------- 5. Caption (CC) & Play/Pause Controls ---------- */
 .s9-audio {
-  position: absolute;
-  left: 565px;
-  top: 444px;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.s9-audio .audio-cc-btn svg {
-  width: 52px !important;
-  height: 47px !important;
-}
-.s9-audio .audio-play-btn svg {
-  width: 70px !important;
-  height: 47px !important;
+  display: none !important;
 }
 
 /* ==========================================================

@@ -289,23 +289,9 @@ const SLIDE2_CSS = `
   background-color: #f5e478;
 }
 
-/* ---------- 7. CC & Play/Pause Controls directly below Nurse Anna ---------- */
+/* ---------- 7. CC & Play/Pause Controls (Desktop provided by PenpalIntervention tablet frame, mobile inline below Nurse Anna) ---------- */
 .s2-audio {
-  position: absolute;
-  left: 580px;
-  top: 444px;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.s2-audio .audio-cc-btn svg {
-  width: 52px !important;
-  height: 47px !important;
-}
-.s2-audio .audio-play-btn svg {
-  width: 70px !important;
-  height: 47px !important;
+  display: none !important;
 }
 
 /* ==========================================================

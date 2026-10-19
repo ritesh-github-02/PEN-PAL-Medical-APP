@@ -1103,6 +1103,15 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext("acknowledged")}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                       navProps={baseProps}
                     />
                   ) : currentStep.type === "summary" ? (
@@ -1155,22 +1164,41 @@ export default function PenpalIntervention() {
               </div>
 
               {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
-              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.type !== "statistics" && currentStep.type !== "knowledge_revelation" && currentStep.id !== "screen1_intro" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && currentStep.id !== "slide4_barrier" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics" && currentStep.id !== "slide6_myths" && currentStep.id !== "slide8_milestone" && currentStep.id !== "slide9_why_it_matters" && currentStep.id !== "slide10_testing" && currentStep.id !== "screen4_testing" && currentStep.id !== "screen3_5_knowledge_test" && currentStep.id !== "screen3_6_all_correct" && currentStep.id !== "screen6_survey_intro" && currentStep.id !== "slide10_survey_intro") && (
-                <div className="absolute bottom-[14px] md:bottom-[22px] right-4 sm:right-5 md:right-7 z-30 flex items-center">
-                  <AudioPlayer
-                    audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
-                    stepId={currentStep.id}
-                    locale={locale}
-                    size="small"
-                    transcriptText={
-                      (locale === "es"
-                        ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
-                        : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
-                      ).replace(/\[name\]/gi, medicationName).trim()
-                    }
-                  />
-                </div>
-              )}
+              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.id !== "screen1_intro" && currentStep.id !== "slide21_what_now" && (currentStep.audioEn || currentStep.audioEs)) && (() => {
+                const hasInternalMobilePlayer = [
+                  "slide2_naming",
+                  "slide3_efficacy",
+                  "slide4_barrier",
+                  "slide5_prevalence",
+                  "screen2_statistics",
+                  "slide6_myths",
+                  "slide8_milestone",
+                  "slide9_why_it_matters",
+                  "slide10_testing",
+                  "screen4_testing",
+                  "screen3_5_knowledge_test",
+                  "screen3_6_all_correct",
+                  "screen6_survey_intro",
+                  "slide10_survey_intro",
+                ].includes(currentStep.id);
+
+                return (
+                  <div className={`absolute bottom-[14px] md:bottom-[22px] right-4 sm:right-5 md:right-7 z-30 ${hasInternalMobilePlayer ? "hidden md:flex" : "flex"} items-center`}>
+                    <AudioPlayer
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      size="large"
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
+                    />
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
