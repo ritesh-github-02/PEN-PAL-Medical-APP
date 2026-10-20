@@ -1,23 +1,141 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
-import { resolveMedicineToken } from "@/lib/token-engine";
 import SlideNavigationButtons from "./SlideNavigationButtons";
+import { resolveMedicineToken } from "@/lib/token-engine";
 
-/* ==========================================================
-   Slide6MythTruthScreen – Scoped Pixel-Perfect Stage Layout
-   Exact Match to User Reference Image:
-   - 896 x 645 scaled stage with background #fafdf3
-   - 2-line bold question heading at left: 107px, top: 97px, width: 682px
-   - 4 Peach rounded Myth cards (#f1c9a9) vertically stacked (gap: 18px)
-   - Click to reveal Truth with smooth teal state (#bce3dc)
-   - Centered Back (left: 352px) & Next (left: 483px) buttons at y = 544px
-   - Single audio player at left: 659px, y = 538px
-   ========================================================== */
+export interface Slide6MythTruthScreenProps {
+  isSpanish?: boolean;
+  medicationName?: string;
+  variant?: "auto" | "desktop" | "mobile";
+  revealedCards?: number[];
+  onRevealedChange?: (revealed: number[]) => void;
+  onNext?: () => void;
+  onBack?: () => void;
+  loading?: boolean;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
+}
 
+/** Fixed design stage, scaled to fit the tablet frame (same convention as the other slides). */
 const STAGE_W = 750;
 const STAGE_H = 530;
+
+interface MythTruthItem {
+  id: number;
+  mythEn: string;
+  mythEs: string;
+  truthEn: string;
+  truthEs: string;
+}
+
+const MYTHS: MythTruthItem[] = [
+  {
+    id: 1,
+    mythEn:
+      "Myth 1 - If a child gets a rash when taking [name], it means they are allergic to [name].",
+    mythEs:
+      "Mito 1 - Si un niño tiene sarpullido al tomar [name], significa que es alérgico a [name].",
+    truthEn:
+      "Truth - A rash does not always mean an allergy. Rashes are common in kids, especially when they are sick. The underlying illness may have caused the rash.",
+    truthEs:
+      "Verdad - Un sarpullido no siempre significa alergia. Los sarpullidos son comunes en los niños, especialmente cuando están enfermos. La enfermedad subyacente puede haber causado el sarpullido.",
+  },
+  {
+    id: 2,
+    mythEn:
+      "Myth 2 - If a child gets a belly ache or has diarrhea while taking [name], it means they are allergic to [name].",
+    mythEs:
+      "Mito 2 - Si un niño tiene dolor de estómago o diarrea mientras toma [name], significa que es alérgico a [name].",
+    truthEn: "Truth - Belly aches and diarrhea are common side effects of antibiotics.",
+    truthEs: "Verdad - Los dolores de estómago y la diarrea son efectos secundarios comunes de los antibióticos.",
+  },
+  {
+    id: 3,
+    mythEn: "Myth 3 - If a parent is allergic to penicillin, their child will be too.",
+    mythEs: "Mito 3 - Si uno de los padres es alérgico a la penicilina, su hijo también lo será.",
+    truthEn: "Truth - A penicillin allergy is not passed down from a parent to child.",
+    truthEs: "Verdad - La alergia a la penicilina no se transmite de padres a hijos.",
+  },
+  {
+    id: 4,
+    mythEn: "Myth 4 - If a child has a [name] allergy, they will always have it.",
+    mythEs: "Mito 4 - Si un niño tiene alergia a [name], siempre la tendrá.",
+    truthEn: "Truth - A child may outgrow their allergy to [name].",
+    truthEs: "Verdad - Un niño puede superar su alergia a [name].",
+  },
+];
+
+const TITLE_EN =
+  "Why are so many kids thought to have a penicillin allergy when they don't? Click each box to reveal the truth!";
+const TITLE_ES =
+  "¿Por qué se piensa que tantos niños tienen alergia a la penicilina cuando no es así? ¡Haga clic en cada cuadro para revelar la verdad!";
+
+/** The "Myth 1 -" / "Truth -" prefixes are already shown by the status tag. */
+const stripPrefix = (text: string) =>
+  text
+    .replace(/^(myth|mito)\s*\d+\s*[-–—:]\s*/i, "")
+    .replace(/^(truth|verdad)\s*[-–—:]\s*/i, "");
+
+/**
+ * Stacked phone layout. Declared once and reused for both the media query and
+ * the explicit `variant="mobile"` mode instead of duplicating the rules.
+ */
+const mobileLayout = (scope: string) => `
+  ${scope} {
+    height: auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0.85rem 0.75rem 1rem;
+  }
+  ${scope} .s6-stage {
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    padding: 16px 14px 12px;
+    transform: none !important;
+  }
+  ${scope} .s6-heading {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  ${scope} .s6-cards {
+    gap: 8px;
+  }
+  ${scope} .s6-card {
+    min-height: 48px;
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+  ${scope} .s6-card-tag {
+    font-size: 10px;
+    padding: 3px 7px;
+  }
+  ${scope} .s6-card-text {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+  ${scope} .s6-audio {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  ${scope} .s6-audio .audio-cc-btn svg {
+    width: 32px;
+    height: 28px;
+  }
+  ${scope} .s6-audio .audio-play-btn svg {
+    width: 42px;
+    height: 28px;
+  }
+`;
 
 const SLIDE6_CSS = `
 .s6-root,
@@ -29,348 +147,189 @@ const SLIDE6_CSS = `
 
 .s6-root {
   position: relative;
-  width: 100%;
-  height: 100%;
-  flex: 1 1 0%;
-  min-height: 0;
-  overflow: hidden;
-  background-color: #fafdf3;
   display: flex;
+  flex: 1 1 0%;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: #232323;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color: #262626;
 }
 
+.s6-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Bottom padding keeps the slide content clear of the shared navigation row. */
 .s6-stage {
   position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
   width: ${STAGE_W}px;
   height: ${STAGE_H}px;
-  flex: none;
+  padding: 30px 36px 60px;
   transform-origin: center center;
   background-color: #fafdf3;
+  overflow: hidden;
 }
 
-/* ---------- 1. Question Heading ---------- */
+/* 1. Question heading (AAA contrast: #232323 on #fafdf3 ≈ 15.8:1) */
 .s6-heading {
-  position: absolute;
-  left: 34px;
-  top: 15px;
-  width: 682px;
-  margin: 0;
+  flex: none;
+  margin: 0 0 16px;
   padding: 0;
-  font-size: 21.5px;
-  line-height: 1.28;
-  font-weight: 700;
-  letter-spacing: -0.015em;
   color: #232323;
-  text-align: left;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
   outline: none;
 }
+
 .s6-heading:focus-visible {
-  box-shadow: 0 0 0 2px #236f7a;
+  outline: 2px dashed #143833;
+  outline-offset: 4px;
   border-radius: 4px;
 }
 
-/* ---------- 2. 4 Myth Cards Stack ---------- */
+/* 2. Myth / truth cards */
 .s6-cards {
-  position: absolute;
-  left: 34px;
-  top: 83px;
-  width: 682px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .s6-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   width: 100%;
-  border-radius: 16px;
+  min-height: 54px;
+  padding: 13px 18px;
+  border: 1.5px solid #d9a97f;
+  border-radius: 14px;
   background-color: #f1c9a9;
-  border: 1.5px solid transparent;
+  color: #232323;
+  font-family: inherit;
   text-align: left;
   cursor: pointer;
   outline: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.12s ease;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  font-family: inherit;
-}
-.s6-card--1 {
-  min-height: 108px;
-  padding: 18px 28px;
-}
-.s6-card--2 {
-  min-height: 88px;
-  padding: 16px 28px;
-}
-.s6-card--3 {
-  min-height: 54px;
-  padding: 14px 28px;
-}
-.s6-card--4 {
-  min-height: 48px;
-  padding: 12px 28px;
 }
 
 .s6-card:hover {
-  background-color: #f5cfb1;
-}
-.s6-card:active {
-  transform: scale(0.995);
-}
-.s6-card:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
+  background-color: #f6d3b8;
+  border-color: #c89163;
+  transform: translateY(-1px);
 }
 
-/* Revealed Truth State */
+.s6-card:active {
+  transform: translateY(0);
+}
+
+.s6-card:focus-visible {
+  outline: 3px solid #143833;
+  outline-offset: 2px;
+}
+
+/* Revealed truth (AAA contrast: #232323 on #bce3dc ≈ 12.6:1) */
 .s6-card--revealed {
   background-color: #bce3dc;
   border-color: #8ab8b0;
 }
+
 .s6-card--revealed:hover {
-  background-color: #c7ebe5;
+  background-color: #c9ebe5;
+  border-color: #79a9a0;
+}
+
+.s6-card-tag {
+  flex-shrink: 0;
+  padding: 4px 9px;
+  border-radius: 9999px;
+  background-color: #7a4526;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.s6-card-tag--truth {
+  background-color: #144e57;
 }
 
 .s6-card-text {
+  flex: 1 1 auto;
   margin: 0;
-  font-family: inherit;
-  font-size: 16.5px;
-  line-height: 1.4;
-  font-weight: 500;
-  color: #232323;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.38;
   letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
 }
 
-/* ---------- 3. Centered Navigation Buttons (Back & Next) ---------- */
-.s6-nav-back {
-  position: absolute;
-  left: 279px;
-  top: 462px;
-  z-index: 10;
-}
-.s6-nav-next {
-  position: absolute;
-  left: 410px;
-  top: 462px;
-  z-index: 10;
-}
-.s6-btn {
-  height: 35px;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  display: inline-flex;
+.s6-card-icon {
+  display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s ease;
-}
-.s6-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-.s6-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-.s6-btn--back {
-  width: 64px;
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
   color: #143833;
-}
-.s6-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
-}
-.s6-btn--next {
-  width: 62px;
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
-  cursor: pointer;
-}
-.s6-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
+  opacity: 0.75;
 }
 
-.s6-root .slide-nav-btn--next.slide-nav-btn--disabled,
-.s6-root .slide-nav-btn--next:disabled {
-  opacity: 0.45 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-  box-shadow: none !important;
-  background-color: #f1edcf !important;
-  color: #8c8979 !important;
-  border-color: #d8d4b8 !important;
-}
-
+/* 3. Audio controls — desktop uses the shared player in the tablet frame */
 .s6-audio {
-  display: none !important;
+  display: none;
 }
 
-/* ==========================================================
-   Mobile-First Responsive Layout (< 768px)
-   ========================================================== */
 @media (max-width: 767px) {
-  .s6-root {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
-    min-height: auto !important;
-    flex: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    padding: 0.85rem 0.85rem 1rem 0.85rem !important;
-    gap: 0 !important;
-  }
-  .s6-stage {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 380px !important;
-    height: auto !important;
-    min-height: auto !important;
-    transform: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    background-color: transparent !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-  }
-  .s6-heading {
-    position: static !important;
-    left: auto !important;
-    top: auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    font-size: 14px !important;
-    line-height: 1.35 !important;
-    font-weight: 700 !important;
-    text-align: left !important;
-    color: #232323 !important;
-    margin: 0 0 10px 0 !important;
-    padding: 0 2px !important;
-  }
-  .s6-cards {
-    position: static !important;
-    left: auto !important;
-    top: auto !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-    margin: 0 0 12px 0 !important;
-  }
-  .s6-card {
-    border-radius: 12px !important;
-    min-height: auto !important;
-    padding: 9px 13px !important;
-  }
-  .s6-card-text {
-    font-size: 12.5px !important;
-    line-height: 1.35 !important;
-    font-weight: 500 !important;
-  }
-  .s6-audio {
-    position: relative !important;
-    right: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    top: auto !important;
-    align-self: center !important;
-    margin: 8px auto 0 auto !important;
-    z-index: 25 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 5px !important;
-  }
-  .s6-audio .audio-cc-btn svg {
-    width: 32px !important;
-    height: 28px !important;
-  }
-  .s6-audio .audio-play-btn svg {
-    width: 42px !important;
-    height: 28px !important;
+${mobileLayout(".s6-root")}
+}
+
+${mobileLayout(".s6-root.is-mobile")}
+
+@media (prefers-reduced-motion: reduce) {
+  .s6-root *,
+  .s6-root *::before,
+  .s6-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 `;
 
-export interface Slide6MythTruthScreenProps {
-  isSpanish: boolean;
-  medicationName?: string;
-  revealedCards?: number[];
-  onRevealedChange?: (revealed: number[]) => void;
-  onNext: () => void;
-  onBack: () => void;
-  loading?: boolean;
-  audioSrc?: string;
-  stepId?: string;
-  locale?: string;
-  transcriptText?: string;
-}
-
-interface MythTruthItem {
-  id: number;
-  mythEn: string;
-  mythEs: string;
-  truthEn: string;
-  truthEs: string;
-  compact?: boolean;
-}
-
-const MYTH_TRUTH_DATA: MythTruthItem[] = [
-  {
-    id: 1,
-    mythEn: "Myth 1 - If a child gets a rash when taking [name], it means they are allergic to [name].",
-    mythEs: "Mito 1 - Si un niño tiene sarpullido al tomar [name], significa que es alérgico a [name].",
-    truthEn: "Truth - A rash does not always mean an allergy. Rashes are common in kids, especially when they are sick. The underlying illness may have caused the rash.",
-    truthEs: "Verdad - Un sarpullido no siempre significa alergia. Los sarpullidos son comunes en los niños, especialmente cuando están enfermos. La enfermedad subyacente puede haber causado el sarpullido.",
-  },
-  {
-    id: 2,
-    mythEn: "Myth 2 – If a child gets a belly ache or has diarrhea while taking [name], it means they are allergic to [name].",
-    mythEs: "Mito 2 – Si un niño tiene dolor de estómago o diarrea mientras toma [name], significa que es alérgico a [name].",
-    truthEn: "Truth - Belly aches and diarrhea are common side effects of antibiotics.",
-    truthEs: "Verdad - Los dolores de estómago y la diarrea son efectos secundarios comunes de los antibióticos.",
-  },
-  {
-    id: 3,
-    mythEn: "Myth 3 – If a parent is allergic to penicillin, their child will be too.",
-    mythEs: "Mito 3 – Si uno de los padres es alérgico a la penicilina, su hijo también lo será.",
-    truthEn: "Truth - A penicillin allergy is not passed down from a parent to child.",
-    truthEs: "Verdad - La alergia a la penicilina no se transmite de padres a hijos.",
-    compact: true,
-  },
-  {
-    id: 4,
-    mythEn: "Myth 4 – If a child has a [name] allergy, they will always have it.",
-    mythEs: "Mito 4 – Si un niño tiene alergia a [name], siempre la tendrá.",
-    truthEn: "Truth - A child may outgrow their allergy to [name].",
-    truthEs: "Verdad - Un niño puede superar su alergia a [name].",
-    compact: true,
-  },
-];
-
 export function Slide6MythTruthScreen({
-  isSpanish,
+  isSpanish = false,
   medicationName,
-  revealedCards = [],
+  variant = "auto",
+  revealedCards,
   onRevealedChange,
   onNext,
   onBack,
   loading = false,
-  audioSrc = isSpanish ? "/audio/exported/screen3_5_knowledge_test_es.mp3" : "/audio/exported/screen3_5_knowledge_test_en.mp3",
+  audioSrc,
   stepId = "slide6_myths",
   locale,
   transcriptText,
@@ -378,137 +337,202 @@ export function Slide6MythTruthScreen({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const [scale, setScale] = useState(1);
-  const [revealed, setRevealed] = useState<number[]>(revealedCards);
+  const [ownRevealed, setOwnRevealed] = useState<number[]>([]);
+  const [announcement, setAnnouncement] = useState("");
 
-  useEffect(() => {
-    const timer = setTimeout(() => headingRef.current?.focus(), 50);
-    return () => clearTimeout(timer);
-  }, []);
+  const isEs = (locale ?? "").startsWith("es") || isSpanish;
+  const activeLocale = isEs ? "es" : "en";
+  const medName = medicationName?.trim();
 
-  // Responsive stage scaling that fits container with zero distortion across all viewports
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-    const update = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      if (w && h) {
-        if (typeof window !== "undefined" && window.innerWidth < 768) {
-          setScale(1);
-        } else {
-          const safeW = Math.max(0, w - 24);
-          const safeH = Math.max(0, h - 36);
-          setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
-        }
-      }
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    window.addEventListener("resize", update);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", update);
-    };
-  }, []);
+  // Controlled by the parent when `revealedCards` is supplied; self-managed otherwise.
+  const revealed = revealedCards ?? ownRevealed;
 
-  // Sync state if parent revealedCards prop updates
-  useEffect(() => {
-    if (Array.isArray(revealedCards)) {
-      setRevealed(revealedCards);
-    }
-  }, [revealedCards]);
-
-  const toggleCard = useCallback(
-    (id: number) => {
-      const current = revealed || [];
-      const updated = current.includes(id)
-        ? current.filter((i) => i !== id)
-        : [...current, id];
-
-      setRevealed(updated);
-
-      if (onRevealedChange) {
-        onRevealedChange(updated);
-      }
-    },
-    [revealed, onRevealedChange]
+  const text = useCallback(
+    (value: string) => stripPrefix(resolveMedicineToken(value, medName, isEs)),
+    [medName, isEs]
   );
 
-  const questionTitle = isSpanish
-    ? "¿Por qué se piensa que tantos niños tienen alergia a la penicilina cuando no es así? ¡Haga clic en cada cuadro para revelar la verdad!"
-    : "Why are so many kids thought to have a penicillin allergy when they don't? Click each box to reveal the truth!";
+  // WCAG 2.4.3 — move reading order to the new heading.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
-  const allMythsRevealed =
-    MYTH_TRUTH_DATA.length > 0 &&
-    MYTH_TRUTH_DATA.every((item) => (revealed || []).includes(item.id));
+  // Fit the fixed stage into the available frame without distorting it.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
 
-  const handleNext = () => {
-    if (!allMythsRevealed) return;
-    onNext();
-  };
+    const update = () => {
+      if (variant === "mobile" || window.innerWidth < 768) {
+        setScale(1);
+        return;
+      }
+      const { clientWidth: w, clientHeight: h } = el;
+      if (!w || !h) return;
+      setScale(Math.min((w - 24) / STAGE_W, (h - 24) / STAGE_H, 1));
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [variant]);
+
+  const toggleCard = useCallback(
+    (item: MythTruthItem) => {
+      const isOpen = revealed.includes(item.id);
+      const updated = isOpen
+        ? revealed.filter((id) => id !== item.id)
+        : [...revealed, item.id];
+
+      if (!revealedCards) setOwnRevealed(updated);
+      onRevealedChange?.(updated);
+
+      if (isOpen) {
+        setAnnouncement(
+          isEs ? `Mito ${item.id} restaurado.` : `Myth ${item.id} restored.`
+        );
+        return;
+      }
+
+      const truth = text(isEs ? item.truthEs : item.truthEn);
+      const allRevealed = MYTHS.every((myth) => updated.includes(myth.id));
+      const suffix = allRevealed
+        ? isEs
+          ? " Todos los mitos han sido revelados. Ya puede continuar."
+          : " All myths are revealed. You can continue."
+        : isEs
+          ? ` Quedan ${MYTHS.length - updated.length} mitos por revelar.`
+          : ` ${MYTHS.length - updated.length} myths left to reveal.`;
+
+      setAnnouncement(
+        `${isEs ? `Verdad revelada para el mito ${item.id}` : `Truth revealed for myth ${item.id}`}: ${truth}.${suffix}`
+      );
+    },
+    [revealed, revealedCards, onRevealedChange, isEs, text]
+  );
+
+  const title = isEs ? TITLE_ES : TITLE_EN;
+  const allRevealed = MYTHS.every((item) => revealed.includes(item.id));
+
+  const plainTranscript =
+    transcriptText ||
+    `${title} ${MYTHS.map((item) =>
+      `${text(isEs ? item.mythEs : item.mythEn)} ${text(isEs ? item.truthEs : item.truthEn)}`
+    ).join(" ")}`;
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isEs
+      ? "/audio/exported/screen3_5_knowledge_test_es.mp3"
+      : "/audio/exported/screen3_5_knowledge_test_en.mp3");
+
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
-    <div id="slide-content" className="s6-root" ref={rootRef}>
-      <style>{SLIDE6_CSS}</style>
+    <div
+      id="slide-content"
+      ref={rootRef}
+      className={`s6-root${variantClass}`}
+      role="region"
+      aria-roledescription="slide"
+      aria-labelledby="s6-heading"
+      lang={activeLocale}
+    >
+      <style dangerouslySetInnerHTML={{ __html: SLIDE6_CSS }} />
+
+      <div className="s6-sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
 
       <div className="s6-stage" style={{ transform: `scale(${scale})` }}>
-        {/* 1. Question Heading */}
-        <h1 ref={headingRef} tabIndex={-1} className="s6-heading">
-          {questionTitle}
+        <h1 id="s6-heading" ref={headingRef} tabIndex={-1} className="s6-heading">
+          {title}
         </h1>
 
-        {/* 2. 4 Interactive Myth / Truth Cards */}
-        <div className="s6-cards" role="region" aria-label={questionTitle}>
-          {MYTH_TRUTH_DATA.map((item) => {
-            const isRevealed = revealed.includes(item.id);
-            const rawText = isRevealed
-              ? isSpanish ? item.truthEs : item.truthEn
-              : isSpanish ? item.mythEs : item.mythEn;
-            const displayText = medicationName
-              ? resolveMedicineToken(rawText, medicationName, isSpanish)
-              : rawText;
+        <div
+          className="s6-cards"
+          role="group"
+          aria-label={isEs ? "Mitos para revelar" : "Myths to reveal"}
+        >
+          {MYTHS.map((item) => {
+            const isOpen = revealed.includes(item.id);
+            const statement = text(isEs ? (isOpen ? item.truthEs : item.mythEs) : isOpen ? item.truthEn : item.mythEn);
+            const typeLabel = isEs ? (isOpen ? "Verdad" : `Mito ${item.id}`) : isOpen ? "Truth" : `Myth ${item.id}`;
 
             return (
               <button
                 key={item.id}
                 type="button"
-                aria-expanded={isRevealed}
-                onClick={() => toggleCard(item.id)}
-                className={`s6-card s6-card--${item.id}${isRevealed ? " s6-card--revealed" : ""}`}
+                className={`s6-card${isOpen ? " s6-card--revealed" : ""}`}
+                aria-expanded={isOpen}
+                aria-label={`${typeLabel}. ${statement} ${
+                  isOpen
+                    ? isEs
+                      ? "Haga clic para volver a mostrar el mito."
+                      : "Click to show the myth again."
+                    : isEs
+                      ? "Haga clic para revelar la verdad."
+                      : "Click to reveal the truth."
+                }`}
+                onClick={() => toggleCard(item)}
               >
-                <p className="s6-card-text">
-                  {displayText}
-                </p>
+                <span
+                  className={`s6-card-tag${isOpen ? " s6-card-tag--truth" : ""}`}
+                  aria-hidden="true"
+                >
+                  {typeLabel}
+                </span>
+
+                <span className="s6-card-text">{statement}</span>
+
+                <span className="s6-card-icon" aria-hidden="true">
+                  {isOpen ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="3" />
+                    </svg>
+                  )}
+                </span>
               </button>
             );
           })}
         </div>
 
-        {/* 4. Caption (CC) & Play/Pause controls directly at right baseline */}
         <div className="s6-audio">
           <AudioPlayer
-            audioSrc={audioSrc}
+            audioSrc={effectiveAudioSrc}
             stepId={stepId}
-            locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={
-              transcriptText ||
-              (isSpanish
-                ? "¿Por qué se piensa que tantos niños tienen alergia a la penicilina cuando no es así? Haga clic en cada casilla para revelar la verdad. Mito 1: Si un niño tiene un sarpullido cuando toma penicilina, ¿significa que es alérgico a la penicilina? Verdad: Un sarpullido no siempre significa alergia. Los sarpullidos son comunes en los niños, especialmente cuando están enfermos. La enfermedad subyacente puede haber causado el sarpullido. Mito 2: Si un niño tiene dolor de estómago o diarrea mientras toma penicilina, ¿significa que es alérgico a la penicilina? Verdad: Los dolores de estómago y la diarrea son efectos secundarios comunes de los antibióticos. Mito 3: Si uno de los padres es alérgico a la penicilina, ¿su hijo también lo será? Verdad: La alergia a la penicilina no se transmite de padres a hijos. Mito 4: Si un niño tiene alergia a la penicilina, ¿siempre la tendrá? Verdad: Un niño puede superar su alergia a la penicilina."
-                : "Why are so many kids thought to have a penicillin allergy when they don't? Click each box to reveal the truth. Myth 1: If a child gets a rash when taking penicillin, it means they are allergic to penicillin? Truth: A rash does not always mean an allergy. Rashes are common in kids, especially when they are sick. The underlying illness may have caused the rash. Myth 2: If a child gets a bellyache or has diarrhea while taking penicillin, it means they are allergic to penicillin? Truth: Bellyaches and diarrhea are common side effects of antibiotics. Myth 3: If a parent is allergic to penicillin, their child will be too? Truth: A penicillin allergy is not passed down from a parent to child. Myth 4: If a child has a penicillin allergy, they will always have it? Truth: A child may outgrow their allergy to penicillin.")
-            }
+            locale={activeLocale}
+            transcriptText={plainTranscript}
             size="large"
           />
         </div>
       </div>
 
-      {/* 3. Centered Navigation Buttons (Back & Next) - Next disabled until all myths revealed */}
+      <p className="s6-sr-only">
+        {allRevealed
+          ? isEs
+            ? "Todos los mitos han sido revelados."
+            : "All myths are revealed."
+          : isEs
+            ? "El botón Siguiente se activa cuando se revelan los cuatro mitos."
+            : "The Next button is enabled once all four myths are revealed."}
+      </p>
+
       <SlideNavigationButtons
         onBack={onBack}
-        onNext={handleNext}
-        isSpanish={isSpanish}
+        onNext={onNext}
+        isSpanish={isEs}
         loading={loading}
-        nextDisabled={!allMythsRevealed}
+        nextDisabled={!allRevealed}
       />
     </div>
   );

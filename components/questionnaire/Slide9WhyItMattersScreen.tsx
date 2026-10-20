@@ -1,360 +1,16 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
-import { resolveMedicineToken } from "@/lib/token-engine";
 import SlideNavigationButtons from "./SlideNavigationButtons";
-
-/* ==========================================================
-   Slide9WhyItMattersScreen – Scoped Pixel-Perfect Stage Layout
-   Exact Match to User Reference Image (Slide 8 / Why It Matters):
-   - 896 x 645 scaled stage with background #fafdf3
-   - Top-left yellow pill badge ("Why does this matter?"):
-     left: 119px, top: 66px, width: 310px, height: 74px with dark teal 3D drop shadow
-   - Nurse Anna on the LEFT at left: 117px, top: 225px, width: 136px, height: 271px
-     Flipped horizontally (scaleX(-1)) with hand pointed toward the right side
-   - Right-side explanatory text & 4 bullet points at left: 270px, top: 174px, width: 512px
-   - Centered Back (left: 352px) & Next (left: 483px) buttons at y = 544px
-   - Single stage audio controls at left: 659px, y = 538px
-   ========================================================== */
-
-const STAGE_W = 750;
-const STAGE_H = 530;
-
-const SLIDE9_CSS = `
-.s9-root,
-.s9-root *,
-.s9-root *::before,
-.s9-root *::after {
-  box-sizing: border-box;
-}
-
-.s9-root {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  flex: 1 1 0%;
-  min-height: 0;
-  overflow: hidden;
-  background-color: #fafdf3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color: #232323;
-}
-
-.s9-stage {
-  position: relative;
-  width: ${STAGE_W}px;
-  height: ${STAGE_H}px;
-  flex: none;
-  transform-origin: center center;
-  background-color: #fafdf3;
-}
-
-/* ---------- 1. Top-Left Yellow Header Badge ---------- */
-.s9-badge {
-  position: absolute;
-  left: 39px;
-  top: 12px;
-  width: 310px;
-  height: 74px;
-  border-radius: 20px;
-  background-color: #fdee8e;
-  border: 2px solid #508e82;
-  box-shadow: 0 5px 0 #3a6d65;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-.s9-badge-title {
-  margin: 0;
-  font-family: inherit;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  color: #232323;
-  text-align: center;
-  outline: none;
-}
-.s9-badge-title:focus-visible {
-  box-shadow: 0 0 0 2px #236f7a;
-  border-radius: 4px;
-}
-
-/* ---------- 2. Nurse Anna on the LEFT (Pointed to the Right) ---------- */
-.s9-nurse {
-  position: absolute;
-  left: 37px;
-  top: 161px;
-  width: 136px;
-  height: 271px;
-  z-index: 10;
-  pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-.s9-nurse-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-  display: block;
-}
-
-/* ---------- 3. Right-Side Text & Bullet Points ---------- */
-.s9-content {
-  position: absolute;
-  left: 195px;
-  top: 114px;
-  width: 515px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  z-index: 10;
-}
-
-.s9-intro {
-  margin: 0;
-  font-family: inherit;
-  font-size: 19.5px;
-  font-weight: 500;
-  line-height: 1.38;
-  color: #232323;
-  letter-spacing: -0.01em;
-  text-align: left;
-}
-
-.s9-bullets {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.s9-bullet-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-family: inherit;
-  font-size: 19px;
-  font-weight: 500;
-  line-height: 1.36;
-  color: #232323;
-  letter-spacing: -0.01em;
-  text-align: left;
-}
-
-.s9-bullet-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #232323;
-  flex-shrink: 0;
-  margin-top: 10px;
-}
-
-/* ---------- 4. Centered Navigation Buttons (Back & Next) ---------- */
-.s9-nav-back {
-  position: absolute;
-  left: 272px;
-  top: 462px;
-  z-index: 20;
-}
-.s9-nav-next {
-  position: absolute;
-  left: 403px;
-  top: 462px;
-  z-index: 20;
-}
-.s9-btn {
-  height: 35px;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-.s9-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-.s9-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-.s9-btn--back {
-  width: 64px;
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
-  color: #143833;
-}
-.s9-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
-}
-.s9-btn--next {
-  width: 62px;
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
-  cursor: pointer;
-}
-.s9-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
-}
-
-.s9-audio {
-  display: none !important;
-}
-
-/* ==========================================================
-   Mobile-First Responsive Layout (< 768px)
-   ========================================================== */
-@media (max-width: 767px) {
-  .s9-root {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
-    min-height: auto !important;
-    flex: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    padding: 0.85rem 0.85rem 1rem 0.85rem !important;
-    gap: 0 !important;
-  }
-  .s9-stage {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 380px !important;
-    height: auto !important;
-    min-height: auto !important;
-    transform: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    background-color: transparent !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-  }
-  .s9-badge {
-    position: static !important;
-    left: auto !important;
-    top: auto !important;
-    width: auto !important;
-    min-width: 200px !important;
-    max-width: 90% !important;
-    height: auto !important;
-    min-height: 46px !important;
-    padding: 8px 16px !important;
-    border-radius: 16px !important;
-    margin: 0 auto 10px auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s9-badge-title {
-    font-size: 16px !important;
-    line-height: 1.25 !important;
-    text-align: center !important;
-  }
-  .s9-content {
-    position: static !important;
-    left: auto !important;
-    top: auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 0 10px 0 !important;
-    padding: 0 4px !important;
-  }
-  .s9-intro {
-    font-size: 13.5px !important;
-    line-height: 1.35 !important;
-    font-weight: 600 !important;
-    color: #232323 !important;
-    margin: 0 0 8px 0 !important;
-    text-align: left !important;
-  }
-  .s9-bullets {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    list-style: none !important;
-  }
-  .s9-bullet-item {
-    font-size: 12.5px !important;
-    line-height: 1.35 !important;
-    gap: 8px !important;
-    display: flex !important;
-    align-items: flex-start !important;
-  }
-  .s9-bullet-dot {
-    width: 6px !important;
-    height: 6px !important;
-    min-width: 6px !important;
-    margin-top: 5px !important;
-  }
-  .s9-nurse {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: 80px !important;
-    height: 130px !important;
-    margin: 2px auto 0 auto !important;
-    z-index: 2 !important;
-    pointer-events: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s9-nurse-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-  }
-  .s9-audio {
-    position: relative !important;
-    right: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    top: auto !important;
-    margin: 8px auto 0 auto !important;
-    z-index: 25 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 5px !important;
-  }
-  .s9-audio .audio-cc-btn svg {
-    width: 32px !important;
-    height: 28px !important;
-  }
-  .s9-audio .audio-play-btn svg {
-    width: 42px !important;
-    height: 28px !important;
-  }
-}
-`;
+import { resolveMedicineToken } from "@/lib/token-engine";
 
 export interface Slide9WhyItMattersScreenProps {
-  isSpanish: boolean;
+  isSpanish?: boolean;
   medicationName?: string;
-  onNext: () => void;
-  onBack: () => void;
+  variant?: "auto" | "desktop" | "mobile";
+  onNext?: () => void;
+  onBack?: () => void;
   loading?: boolean;
   audioSrc?: string;
   stepId?: string;
@@ -362,62 +18,20 @@ export interface Slide9WhyItMattersScreenProps {
   transcriptText?: string;
 }
 
-export function Slide9WhyItMattersScreen({
-  isSpanish,
-  medicationName,
-  onNext,
-  onBack,
-  loading = false,
-  audioSrc = isSpanish ? "/audio/exported/slide9_why_it_matters_es.mp3" : "/audio/exported/slide9_why_it_matters_en.mp3",
-  stepId = "slide9_why_it_matters",
-  locale,
-  transcriptText,
-}: Slide9WhyItMattersScreenProps) {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const headingRef = useRef<HTMLHeadingElement | null>(null);
-  const [scale, setScale] = useState(1);
+/** Fixed design stage, scaled to fit the tablet frame (same convention as the other slides). */
+const STAGE_W = 750;
+const STAGE_H = 530;
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      headingRef.current?.focus();
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Responsive stage scaling that fits container with zero distortion across all viewports
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-    const update = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      if (w && h) {
-        if (typeof window !== "undefined" && window.innerWidth < 768) {
-          setScale(1);
-        } else {
-          const safeW = Math.max(0, w - 24);
-          const safeH = Math.max(0, h - 36);
-          setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
-        }
-      }
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    window.addEventListener("resize", update);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-
-  const badgeTitle = isSpanish ? "¿Por qué es importante esto?" : "Why does this matter?";
-
-  const rawIntro = isSpanish
-    ? "Cuando un niño necesita antibióticos y se cree que tiene alergia a [name], recibe diferentes antibióticos que..."
-    : "When a child needs antibiotics and is believed to have an allergy to [name], they receive different antibiotics that...";
-
-  const rawBullets = [
+const COPY = {
+  title: {
+    en: "Why does this matter?",
+    es: "¿Por qué es importante esto?",
+  },
+  intro: {
+    en: "When a child needs antibiotics and is believed to have an allergy to [name], they receive different antibiotics that...",
+    es: "Cuando un niño necesita antibióticos y se cree que tiene alergia a [name], recibe diferentes antibióticos que...",
+  },
+  bullets: [
     {
       en: "Are more likely to cause diarrhea or other side effects",
       es: "Tienen más probabilidades de causar diarrea u otros efectos secundarios",
@@ -434,77 +48,374 @@ export function Slide9WhyItMattersScreen({
       en: "May make an infection harder to treat in the future",
       es: "Pueden hacer que una infección sea más difícil de tratar en el futuro",
     },
-  ];
+  ],
+} as const;
 
-  const introText = medicationName
-    ? resolveMedicineToken(rawIntro, medicationName, isSpanish)
-    : rawIntro;
+/**
+ * Stacked phone layout. Declared once and reused for both the media query and
+ * the explicit `variant="mobile"` mode instead of duplicating the rules.
+ */
+const mobileLayout = (scope: string) => `
+  ${scope} {
+    height: auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0.85rem 0.75rem 1rem;
+  }
+  ${scope} .s9-stage {
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    padding: 16px 14px 12px;
+    transform: none !important;
+  }
+  ${scope} .s9-badge {
+    margin: 0 auto 10px;
+    padding: 8px 18px;
+    border-radius: 16px;
+  }
+  ${scope} .s9-heading {
+    font-size: 16px;
+  }
+  ${scope} .s9-main {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  ${scope} .s9-nurse {
+    order: 2;
+    width: 95px;
+    height: 160px;
+    margin-top: 4px;
+  }
+  ${scope} .s9-content {
+    order: 1;
+    width: 100%;
+    gap: 10px;
+  }
+  ${scope} .s9-intro {
+    font-size: 13.5px;
+    line-height: 1.38;
+  }
+  ${scope} .s9-bullets {
+    gap: 8px;
+  }
+  ${scope} .s9-bullet {
+    gap: 8px;
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+  ${scope} .s9-bullet-dot {
+    width: 5px;
+    height: 5px;
+    margin-top: 6px;
+  }
+  ${scope} .s9-audio {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  ${scope} .s9-audio .audio-cc-btn svg {
+    width: 32px;
+    height: 28px;
+  }
+  ${scope} .s9-audio .audio-play-btn svg {
+    width: 42px;
+    height: 28px;
+  }
+`;
+
+const SLIDE9_CSS = `
+.s9-root,
+.s9-root *,
+.s9-root *::before,
+.s9-root *::after {
+  box-sizing: border-box;
+}
+
+.s9-root {
+  position: relative;
+  display: flex;
+  flex: 1 1 0%;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: #232323;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Bottom padding keeps the slide content clear of the shared navigation row. */
+.s9-stage {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: ${STAGE_W}px;
+  height: ${STAGE_H}px;
+  padding: 24px 40px 60px;
+  transform-origin: center center;
+  background-color: #fafdf3;
+  overflow: hidden;
+}
+
+/* 1. Yellow title badge (AAA contrast: #232323 on #fdee8e ≈ 12.4:1) */
+.s9-badge {
+  display: inline-flex;
+  flex: none;
+  align-self: flex-start;
+  padding: 10px 24px;
+  border: 2px solid #508e82;
+  border-radius: 16px;
+  background-color: #fdee8e;
+  box-shadow: 0 4px 0 #3a6d65;
+}
+
+.s9-heading {
+  margin: 0;
+  padding: 0;
+  color: #232323;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  outline: none;
+}
+
+.s9-heading:focus-visible {
+  outline: 2px dashed #143833;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* 2. Nurse + explanation ("this...", so the list completes the sentence) */
+.s9-main {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 24px;
+  min-height: 0;
+  margin-top: 18px;
+}
+
+.s9-nurse {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 300px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.s9-nurse-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.s9-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.s9-intro {
+  margin: 0;
+  color: #232323;
+  font-size: 18.5px;
+  font-weight: 600;
+  line-height: 1.36;
+  letter-spacing: -0.01em;
+}
+
+.s9-bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.s9-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #232323;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.34;
+  letter-spacing: -0.01em;
+}
+
+.s9-bullet-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-top: 9px;
+  border-radius: 50%;
+  background-color: #236f7a;
+}
+
+/* 3. Audio controls — desktop uses the shared player in the tablet frame */
+.s9-audio {
+  display: none;
+}
+
+@media (max-width: 767px) {
+${mobileLayout(".s9-root")}
+}
+
+${mobileLayout(".s9-root.is-mobile")}
+
+@media (prefers-reduced-motion: reduce) {
+  .s9-root *,
+  .s9-root *::before,
+  .s9-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+`;
+
+export function Slide9WhyItMattersScreen({
+  isSpanish = false,
+  medicationName,
+  variant = "auto",
+  onNext,
+  onBack,
+  loading = false,
+  audioSrc,
+  stepId = "slide9_why_it_matters",
+  locale,
+  transcriptText,
+}: Slide9WhyItMattersScreenProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const [scale, setScale] = useState(1);
+
+  const isEs = (locale ?? "").startsWith("es") || isSpanish;
+  const activeLocale = isEs ? "es" : "en";
+  const medName = medicationName?.trim();
+
+  // WCAG 2.4.3 — move reading order to the new heading.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  // Fit the fixed stage into the available frame without distorting it.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+
+    const update = () => {
+      if (variant === "mobile" || window.innerWidth < 768) {
+        setScale(1);
+        return;
+      }
+      const { clientWidth: w, clientHeight: h } = el;
+      if (!w || !h) return;
+      setScale(Math.min((w - 24) / STAGE_W, (h - 24) / STAGE_H, 1));
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [variant]);
+
+  const resolve = (value: string) => resolveMedicineToken(value, medName, isEs);
+
+  const title = isEs ? COPY.title.es : COPY.title.en;
+  const intro = resolve(isEs ? COPY.intro.es : COPY.intro.en);
+  const bullets = COPY.bullets.map((bullet) => resolve(isEs ? bullet.es : bullet.en));
+
+  const plainTranscript =
+    transcriptText || `${title} ${intro} ${bullets.join(", ")}.`;
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isEs
+      ? "/audio/exported/slide9_why_it_matters_es.mp3"
+      : "/audio/exported/slide9_why_it_matters_en.mp3");
+
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
-    <div id="slide-content" className="s9-root" ref={rootRef}>
-      <style>{SLIDE9_CSS}</style>
+    <div
+      id="slide-content"
+      ref={rootRef}
+      className={`s9-root${variantClass}`}
+      role="region"
+      aria-roledescription="slide"
+      aria-labelledby="s9-heading"
+      lang={activeLocale}
+    >
+      <style dangerouslySetInnerHTML={{ __html: SLIDE9_CSS }} />
 
       <div className="s9-stage" style={{ transform: `scale(${scale})` }}>
-        {/* 1. Top-Left Yellow Header Badge with 3D Teal Shadow */}
         <div className="s9-badge">
-          <h1 ref={headingRef} tabIndex={-1} className="s9-badge-title">
-            {badgeTitle}
+          <h1 id="s9-heading" ref={headingRef} tabIndex={-1} className="s9-heading">
+            {title}
           </h1>
         </div>
 
-        {/* 2. Nurse Anna on the LEFT (Hand pointed toward the right) */}
-        <div className="s9-nurse">
-          <img
-            src="/images/nurse-anna-explaining.png"
-            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Illustration of Nurse Anna"}
-            className="s9-nurse-img"
-          />
-        </div>
+        <div className="s9-main">
+          <div className="s9-nurse" aria-hidden="true">
+            <img
+              src="/images/nurse-anna-explaining.png"
+              alt=""
+              className="s9-nurse-img"
+              draggable={false}
+            />
+          </div>
 
-        {/* 3. Right-Side Text & Explanatory Bullet List */}
-        <div className="s9-content">
-          <p className="s9-intro">
-            {introText}
-          </p>
+          <div className="s9-content">
+            <p className="s9-intro">{intro}</p>
 
-          <ul className="s9-bullets">
-            {rawBullets.map((b, idx) => {
-              const raw = isSpanish ? b.es : b.en;
-              const text = medicationName
-                ? resolveMedicineToken(raw, medicationName, isSpanish)
-                : raw;
-              return (
-                <li key={idx} className="s9-bullet-item">
+            <ul className="s9-bullets">
+              {bullets.map((bullet) => (
+                <li key={bullet} className="s9-bullet">
                   <span className="s9-bullet-dot" aria-hidden="true" />
-                  <span>{text}</span>
+                  <span>{bullet}</span>
                 </li>
-              );
-            })}
-          </ul>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* 5. Caption (CC) & Play/Pause controls directly at right baseline */}
         <div className="s9-audio">
           <AudioPlayer
-            audioSrc={audioSrc}
+            audioSrc={effectiveAudioSrc}
             stepId={stepId}
-            locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={
-              transcriptText ||
-              (isSpanish
-                ? "Why does this matter? Cuando un niño necesita antibióticos y se cree que tiene alergia a la penicilina, recibe diferentes antibióticos que tienen más probabilidades de causar diarrea u otros efectos secundarios, cuestan más que la penicilina, tienen peor sabor que la penicilina y pueden hacer que una infección sea más difícil de tratar en el futuro."
-                : "Why does this matter? When a child needs antibiotics and is believed to have an allergy to penicillin, they receive different antibiotics that: are more likely to cause diarrhea or other side effects, cost more than penicillin, taste worse than penicillin, may make an infection harder to treat in the future.")
-            }
+            locale={activeLocale}
+            transcriptText={plainTranscript}
             size="large"
           />
         </div>
       </div>
 
-      {/* 4. Centered Navigation Buttons (Back & Next) */}
       <SlideNavigationButtons
         onBack={onBack}
         onNext={onNext}
-        isSpanish={isSpanish}
+        isSpanish={isEs}
         loading={loading}
       />
     </div>

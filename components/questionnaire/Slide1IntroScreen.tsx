@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, memo } from "react";
+import React, { useRef, useEffect, useCallback, memo } from "react";
 import { NurseAnna } from "./NurseAnna";
 import AudioPlayer from "./AudioPlayer";
 
@@ -126,44 +126,7 @@ const SLIDE1_COMPONENT_CSS = `
   /* -------------------------------------------------------------
      Mobile Layout (.is-mobile or screen width < 768px)
      ------------------------------------------------------------- */
-  .s1-component-root.is-mobile .s1-content-container {
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    justify-content: center !important;
-    gap: 14px !important;
-  }
-  .s1-component-root.is-mobile .s1-nurse-col {
-    order: -1 !important;
-    margin: 0 auto 4px auto !important;
-  }
-  .s1-component-root.is-mobile .s1-left-col {
-    align-items: center !important;
-    text-align: center !important;
-    max-width: 100% !important;
-    gap: 10px !important;
-  }
-  .s1-component-root.is-mobile .s1-title {
-    font-size: 2.25rem !important;
-    line-height: 1.15 !important;
-    white-space: nowrap !important;
-  }
-  .s1-component-root.is-mobile .s1-subtitle {
-    font-size: 1rem !important;
-    margin-top: 4px !important;
-  }
-  .s1-component-root.is-mobile .s1-copy {
-    font-size: 0.95rem !important;
-    margin: 0 auto !important;
-    max-width: 300px !important;
-  }
-  .s1-component-root.is-mobile .s1-btn-start {
-    min-height: 44px !important;
-    min-width: 130px !important;
-    font-size: 15px !important;
-    padding: 0 24px !important;
-  }
-
+  .s1-component-root.is-mobile .s1-content-container,
   @media (max-width: 767px) {
     .s1-content-container {
       flex-direction: column !important;
@@ -234,7 +197,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
   const internalHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const headingRef = externalHeadingRef || internalHeadingRef;
 
-  // Programmatic focus on mount per accessibility standards (WCAG 2.4.3 Focus Order)
+  // Programmatic focus on mount per Karen's review (WCAG 2.4.3 Focus Order)
   useEffect(() => {
     if (autoFocusHeading) {
       headingRef.current?.focus({ preventScroll: true });
@@ -265,11 +228,11 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
       ? "PEN-PAL. Padres Involucrados en Alergias a la Penicilina. ¡Hola! Soy la enfermera Anna. Hablemos sobre las alergias a la penicilina en los niños. ¡Comenzar!"
       : "PEN-PAL. Parents Engaged in Penicillin Allergies. Hi! I'm nurse Anna. Let's talk about penicillin allergies in kids. Get started.");
 
-  const handleStart = () => {
+  const handleStart = useCallback(() => {
     if (loading) return;
     if (onAnswer) onAnswer("yes");
     if (onNext) onNext("yes");
-  };
+  }, [loading, onAnswer, onNext]);
 
   const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
@@ -291,7 +254,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
         `,
       }}
     >
-      <style>{SLIDE1_COMPONENT_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: SLIDE1_COMPONENT_CSS }} />
 
       <div className="s1-content-container">
         {/* Left Column: Heading, Subtitle, Copy, and CTA Button */}
@@ -351,7 +314,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
 
       {/* Bottom-Right Audio (CC & Play/Pause) Controls */}
       <footer
-        className="absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-25 flex items-center"
+        className="absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-30 flex items-center"
         role="toolbar"
         aria-label={isSpanish ? "Controles de audio y subtítulos" : "Slide audio and caption controls"}
       >
