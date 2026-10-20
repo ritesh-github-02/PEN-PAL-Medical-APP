@@ -68,12 +68,12 @@ const SLIDE8_CSS = `
 /* ---------- 1. Speech Bubble on Left (Tail pointing right toward Anna) ---------- */
 .s8-bubble {
   position: relative;
-  width: 510px;
+  width: 453px;
   aspect-ratio: 510 / 315;
   flex-shrink: 0;
   filter: drop-shadow(2.5px 3.5px 0px #1a3532);
-  margin-right: -10px;
-  margin-top: -70px;
+  margin-right: -33px;
+  margin-top: -280px;
   order: 1;
   pointer-events: none;
   z-index: 5;
@@ -110,7 +110,7 @@ const SLIDE8_CSS = `
   padding: 0;
   width: 100%;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
-  font-size: 21.5px;
+  font-size: 18.5px;
   line-height: 1.42;
   font-weight: 700;
   color: #232323;
@@ -136,13 +136,13 @@ const SLIDE8_CSS = `
 /* ---------- 2. Nurse Anna standing on Right ---------- */
 .s8-nurse {
   position: relative;
-  width: 175px;
+  width: 150px;
   height: 355px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -10px;
+  margin-top: 10px;
   order: 2;
   pointer-events: none;
   z-index: 10;

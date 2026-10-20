@@ -85,9 +85,9 @@ const SLIDE4_CSS = `
 /* ---------- 2. Speech Bubble on Right (Tail pointing left toward Anna) ---------- */
 .s4-bubble {
   position: absolute;
-  left: 200px;
-  top: 64px;
-  width: 510px;
+  left: 188px;
+  top: -14px;
+  width: 458px;
   aspect-ratio: 510 / 315;
   pointer-events: none;
   z-index: 1;

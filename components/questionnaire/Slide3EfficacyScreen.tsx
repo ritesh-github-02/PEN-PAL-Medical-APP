@@ -110,7 +110,7 @@ const SLIDE3_CSS = `
 .s3-bubble {
   position: absolute;
   left: 0;
-  top: -19;
+  top: -19px;
   width: 330px;
   aspect-ratio: 380 / 250;
   height: auto;
