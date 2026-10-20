@@ -271,15 +271,15 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
+    gap: 5px !important;
   }
   .s10b-audio .audio-cc-btn svg {
-    width: 38px !important;
-    height: 34px !important;
+    width: 32px !important;
+    height: 28px !important;
   }
   .s10b-audio .audio-play-btn svg {
-    width: 48px !important;
-    height: 34px !important;
+    width: 42px !important;
+    height: 28px !important;
   }
 }
 
@@ -373,15 +373,15 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     flex-shrink: 0 !important;
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 4px !important;
   }
   .s10b-audio .audio-cc-btn svg {
-    width: 34px !important;
-    height: 30px !important;
+    width: 28px !important;
+    height: 24px !important;
   }
   .s10b-audio .audio-play-btn svg {
-    width: 44px !important;
-    height: 30px !important;
+    width: 38px !important;
+    height: 24px !important;
   }
 }
 `;

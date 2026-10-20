@@ -146,16 +146,17 @@ const SLIDE12_CSS = `
   box-shadow: 0 0 0 3px #1f4a43;
 }
 
-/* Checked / Selected Cohort Button */
+/* Checked / Selected Cohort Button (Yellowish background with greenish border matching Slide 11) */
 .s12-cohort-btn--selected {
-  background-color: #1f4d45;
-  border-color: #153933;
-  color: #ffffff;
-  box-shadow: 0 4px 10px rgba(10, 40, 35, 0.28);
+  background-color: #ffd41d !important;
+  border-color: #1c5249 !important;
+  color: #142724 !important;
+  box-shadow: 0 4px 10px rgba(10, 40, 35, 0.22) !important;
 }
 
 .s12-cohort-btn--selected:hover {
-  background-color: #19433b;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
 }
 
 .s12-cohort-title {

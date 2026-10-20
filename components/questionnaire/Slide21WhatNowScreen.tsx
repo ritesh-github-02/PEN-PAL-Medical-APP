@@ -155,17 +155,17 @@ const SLIDE21_CSS = `
   z-index: 25;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
 }
 
 .s21-audio .audio-cc-btn svg {
-  width: 44px !important;
-  height: 38px !important;
+  width: 38px !important;
+  height: 32px !important;
 }
 
 .s21-audio .audio-play-btn svg {
-  width: 56px !important;
-  height: 38px !important;
+  width: 50px !important;
+  height: 32px !important;
 }
 
 /* Compact Laptop / Height-constrained screens */
@@ -264,14 +264,15 @@ const SLIDE21_CSS = `
     bottom: 14px !important;
     margin: 0 !important;
     z-index: 25 !important;
+    gap: 5px !important;
   }
   .s21-audio .audio-cc-btn svg {
-    width: 36px !important;
-    height: 32px !important;
+    width: 30px !important;
+    height: 26px !important;
   }
   .s21-audio .audio-play-btn svg {
-    width: 46px !important;
-    height: 32px !important;
+    width: 40px !important;
+    height: 26px !important;
   }
 }
 
@@ -338,6 +339,15 @@ const SLIDE21_CSS = `
     right: 12px !important;
     bottom: 12px !important;
     margin: 0 !important;
+    gap: 4px !important;
+  }
+  .s21-audio .audio-cc-btn svg {
+    width: 28px !important;
+    height: 24px !important;
+  }
+  .s21-audio .audio-play-btn svg {
+    width: 38px !important;
+    height: 24px !important;
   }
 }
 `;

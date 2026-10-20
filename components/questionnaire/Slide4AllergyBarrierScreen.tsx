@@ -255,15 +255,15 @@ const SLIDE4_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
+    gap: 5px !important;
   }
   .s4-audio .audio-cc-btn svg {
-    width: 38px !important;
-    height: 34px !important;
+    width: 32px !important;
+    height: 28px !important;
   }
   .s4-audio .audio-play-btn svg {
-    width: 48px !important;
-    height: 34px !important;
+    width: 42px !important;
+    height: 28px !important;
   }
 }
 
@@ -357,15 +357,15 @@ const SLIDE4_CSS = `
     flex-shrink: 0 !important;
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 5px !important;
   }
   .s4-audio .audio-cc-btn svg {
-    width: 34px !important;
-    height: 30px !important;
+    width: 29px !important;
+    height: 25px !important;
   }
   .s4-audio .audio-play-btn svg {
-    width: 44px !important;
-    height: 30px !important;
+    width: 38px !important;
+    height: 25px !important;
   }
 }
 `;

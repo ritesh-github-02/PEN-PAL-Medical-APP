@@ -337,15 +337,15 @@ const SLIDE9_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
+    gap: 5px !important;
   }
   .s9-audio .audio-cc-btn svg {
-    width: 38px !important;
-    height: 34px !important;
+    width: 32px !important;
+    height: 28px !important;
   }
   .s9-audio .audio-play-btn svg {
-    width: 48px !important;
-    height: 34px !important;
+    width: 42px !important;
+    height: 28px !important;
   }
 }
 `;

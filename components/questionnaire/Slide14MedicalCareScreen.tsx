@@ -96,7 +96,7 @@ const SLIDE14_CSS = `
   padding: 0.55rem 0.85rem;
   border-radius: 8px;
   background-color: #ffffff;
-  border: 1px solid #759c92;
+  border: 1.5px solid #236f7a;
   color: #142724;
   font-size: 0.9rem;
   font-weight: 700;
@@ -114,7 +114,7 @@ const SLIDE14_CSS = `
 
 .s14-option-btn:hover {
   background-color: #f2f8f6;
-  border-color: #5f897e;
+  border-color: #1c5249;
   transform: translateY(-1.5px);
   box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
 }
@@ -124,20 +124,21 @@ const SLIDE14_CSS = `
 }
 
 .s14-option-btn:focus-visible {
-  box-shadow: 0 0 0 3px #1f4d45;
+  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
 }
 
-/* Selected Button State */
+/* Selected Button State: Yellowish background with greenish border */
 .s14-option-btn--selected {
-  background-color: #1f4d45;
-  border-color: #153a34;
-  color: #ffffff;
-  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.28);
+  background-color: #ffd41d !important;
+  border: 1.5px solid #1c5249 !important;
+  color: #142724 !important;
+  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.22) !important;
 }
 
 .s14-option-btn--selected:hover {
-  background-color: #19433b;
-  color: #ffffff;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
+  color: #142724 !important;
 }
 
 /* Location Badge inside Card (when Yes is chosen) */
@@ -309,7 +310,7 @@ const SLIDE14_CSS = `
   padding: 0.55rem 0.65rem;
   border-radius: 8px;
   background-color: #ffffff;
-  border: 1px solid #759c92;
+  border: 1.5px solid #236f7a;
   color: #142724;
   font-size: 0.85rem;
   font-weight: 700;
@@ -327,20 +328,21 @@ const SLIDE14_CSS = `
 
 .s14-modal-btn:hover {
   background-color: #f2f8f6;
-  border-color: #5f897e;
+  border-color: #1c5249;
   transform: translateY(-1px);
 }
 
 .s14-modal-btn--selected {
-  background-color: #1f4d45;
-  border-color: #153a34;
-  color: #ffffff;
-  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.28);
+  background-color: #ffd41d !important;
+  border: 1.5px solid #1c5249 !important;
+  color: #142724 !important;
+  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.22) !important;
 }
 
 .s14-modal-btn--selected:hover {
-  background-color: #19433b;
-  color: #ffffff;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
+  color: #142724 !important;
 }
 
 .s14-modal-footer {

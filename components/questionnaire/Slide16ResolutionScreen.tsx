@@ -96,7 +96,7 @@ const SLIDE16_CSS = `
   padding: 0.55rem 0.85rem;
   border-radius: 8px;
   background-color: #ffffff;
-  border: 1px solid #759c92;
+  border: 1.5px solid #236f7a;
   color: #142724;
   font-size: 0.9rem;
   font-weight: 700;
@@ -114,7 +114,7 @@ const SLIDE16_CSS = `
 
 .s16-option-btn:hover {
   background-color: #f2f8f6;
-  border-color: #5f897e;
+  border-color: #1c5249;
   transform: translateY(-1.5px);
   box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
 }
@@ -124,20 +124,21 @@ const SLIDE16_CSS = `
 }
 
 .s16-option-btn:focus-visible {
-  box-shadow: 0 0 0 3px #1f4d45;
+  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
 }
 
-/* Selected Button State */
+/* Selected Button State: Yellowish background with greenish border */
 .s16-option-btn--selected {
-  background-color: #1f4d45;
-  border-color: #153a34;
-  color: #ffffff;
-  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.28);
+  background-color: #ffd41d !important;
+  border: 1.5px solid #1c5249 !important;
+  color: #142724 !important;
+  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.22) !important;
 }
 
 .s16-option-btn--selected:hover {
-  background-color: #19433b;
-  color: #ffffff;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
+  color: #142724 !important;
 }
 
 /* Medication & Route Badge inside Card (when With medication is chosen) */
@@ -316,8 +317,8 @@ const SLIDE16_CSS = `
   min-height: 48px;
   padding: 0.55rem 0.75rem;
   border-radius: 8px;
-  background-color: #fae255;
-  border: 1.5px solid #dac85e;
+  background-color: #ffffff;
+  border: 1.5px solid #236f7a;
   color: #142724;
   font-size: 0.85rem;
   font-weight: 700;
@@ -334,20 +335,30 @@ const SLIDE16_CSS = `
 }
 
 .s16-med-btn:hover {
-  background-color: #f5da3d;
+  background-color: #f2f8f6;
+  border-color: #1c5249;
   transform: translateY(-1px);
 }
 
+.s16-med-btn:active {
+  transform: scale(0.97);
+}
+
+.s16-med-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
+}
+
 .s16-med-btn--selected {
-  background-color: #1f4d45;
-  border-color: #153a34;
-  color: #ffffff;
-  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.28);
+  background-color: #ffd41d !important;
+  border: 1.5px solid #1c5249 !important;
+  color: #142724 !important;
+  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.22) !important;
 }
 
 .s16-med-btn--selected:hover {
-  background-color: #19433b;
-  color: #ffffff;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
+  color: #142724 !important;
 }
 
 .s16-modal17-footer {
@@ -440,7 +451,7 @@ const SLIDE16_CSS = `
   padding: 0.5rem 0.65rem;
   border-radius: 8px;
   background-color: #ffffff;
-  border: 1px solid #759c92;
+  border: 1.5px solid #236f7a;
   color: #142724;
   font-size: 0.85rem;
   font-weight: 700;
@@ -458,20 +469,29 @@ const SLIDE16_CSS = `
 
 .s16-route-btn:hover {
   background-color: #f2f8f6;
-  border-color: #5f897e;
+  border-color: #1c5249;
   transform: translateY(-1px);
 }
 
+.s16-route-btn:active {
+  transform: scale(0.97);
+}
+
+.s16-route-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
+}
+
 .s16-route-btn--selected {
-  background-color: #1f4d45;
-  border-color: #153a34;
-  color: #ffffff;
-  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.28);
+  background-color: #ffd41d !important;
+  border: 1.5px solid #1c5249 !important;
+  color: #142724 !important;
+  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.22) !important;
 }
 
 .s16-route-btn--selected:hover {
-  background-color: #19433b;
-  color: #ffffff;
+  background-color: #f7ca12 !important;
+  border-color: #143e37 !important;
+  color: #142724 !important;
 }
 
 .s16-modal18-footer {
