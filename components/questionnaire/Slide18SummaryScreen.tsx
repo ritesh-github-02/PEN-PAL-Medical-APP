@@ -499,6 +499,10 @@ export interface Slide18SummaryScreenProps {
   onPrint?: () => void;
   onNavigateToSuccess?: () => void;
   onNext?: () => void;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
 }
 
 export function Slide18SummaryScreen({
@@ -510,6 +514,10 @@ export function Slide18SummaryScreen({
   onPrint,
   onNavigateToSuccess,
   onNext,
+  audioSrc,
+  stepId = "screen7_summary",
+  locale,
+  transcriptText,
 }: Slide18SummaryScreenProps) {
   const summaryTitleRef = useRef<HTMLHeadingElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);

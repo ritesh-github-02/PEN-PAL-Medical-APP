@@ -1030,6 +1030,14 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext(answers["screen6_4_resolution"] || answers["medicalCareReceived"])}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : (currentStep.audioEn || "/audio/exported/Slide14..mp3")}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        locale === "es"
+                          ? currentStep.titleEs || "¿Su hijo recibió atención médica por su reacción?"
+                          : currentStep.titleEn || "Did your child receive medical care for their reaction?"
+                      }
                       navProps={baseProps}
                     />
                   ) : currentStep.id === "screen6_4b_resolution_type" ? (
@@ -1129,6 +1137,14 @@ export default function PenpalIntervention() {
                       participantId={activeToken}
                       onBack={handleBack}
                       onPrint={() => window.print()}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}`
+                      }
                       onNavigateToSuccess={async () => {
                         try {
                           await submitAnswer("screen7_summary", "completed", 0);
@@ -1171,7 +1187,7 @@ export default function PenpalIntervention() {
               </div>
 
               {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
-              {(!isTerminated && !showSuccess && currentStep && currentStep.type !== "summary" && currentStep.id !== "screen1_intro" && currentStep.id !== "slide21_what_now" && (currentStep.audioEn || currentStep.audioEs)) && (() => {
+              {(!isTerminated && !showSuccess && currentStep && currentStep.id !== "screen1_intro" && (currentStep.audioEn || currentStep.audioEs)) && (() => {
                 const hasInternalMobilePlayer = [
                   "slide2_naming",
                   "slide3_efficacy",
@@ -1187,10 +1203,11 @@ export default function PenpalIntervention() {
                   "screen3_6_all_correct",
                   "screen6_survey_intro",
                   "slide10_survey_intro",
+                  "screen6_4_resolution",
                 ].includes(currentStep.id);
 
                 return (
-                  <div className={`absolute bottom-[14px] md:bottom-[22px] right-4 sm:right-5 md:right-7 z-30 ${hasInternalMobilePlayer ? "hidden md:flex" : "flex"} items-center`}>
+                  <div className={`absolute bottom-[14px] md:bottom-[22px] right-4 sm:right-5 md:right-7 z-40 ${hasInternalMobilePlayer ? "hidden md:flex" : "flex"} items-center pointer-events-auto`}>
                     <AudioPlayer
                       audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
                       stepId={currentStep.id}

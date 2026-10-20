@@ -203,6 +203,13 @@
     "text": "¿Ha recibido su hijo penicilina desde la reacción?. Opciones: 1. Sí. 2. No. 3. No estoy seguro/ No lo sé"
   },
   {
+    "stepId": "slide21_what_now",
+    "screenIndex": 12,
+    "locale": "en",
+    "filename": "slide21_what_now_en.mp3",
+    "text": "What now? Talk to your child's doctor about penicillin allergy testing. The test can help you learn the truth about your child's past reaction. The test may help your child get better medicine in the future."
+  },
+  {
     "stepId": "screen7_summary",
     "screenIndex": 12,
     "locale": "en",

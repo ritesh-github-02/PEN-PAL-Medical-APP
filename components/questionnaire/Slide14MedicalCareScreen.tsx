@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
 const SLIDE14_CSS = `
@@ -439,6 +440,30 @@ const SLIDE14_CSS = `
     object-fit: contain;
   }
 }
+
+/* Inline Audio Player for Mobile */
+.s14-audio {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  .s14-audio {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0.5rem auto 0 auto !important;
+    gap: 5px !important;
+    z-index: 25 !important;
+  }
+  .s14-audio .audio-cc-btn svg {
+    width: 32px !important;
+    height: 28px !important;
+  }
+  .s14-audio .audio-play-btn svg {
+    width: 42px !important;
+    height: 28px !important;
+  }
+}
 `;
 
 export interface CareOption {
@@ -485,6 +510,10 @@ export interface Slide14MedicalCareScreenProps {
   onNext?: () => void;
   onBack?: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
   navProps?: {
     onNext: (explicitAnswer?: any) => void;
     onBack: () => void;
@@ -502,12 +531,29 @@ export function Slide14MedicalCareScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  stepId,
+  locale,
+  transcriptText,
   navProps,
 }: Slide14MedicalCareScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const modalHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isSpanish
+      ? "/audio/exported/screen6_4_resolution_es.mp3"
+      : "/audio/exported/Slide14..mp3");
+  const effectiveStepId = stepId || "screen6_4_resolution";
+  const effectiveLocale = locale || (isSpanish ? "es" : "en");
+  const effectiveTranscript =
+    transcriptText ||
+    (isSpanish
+      ? "¿Su hijo recibió atención médica por su reacción?"
+      : "Did your child receive medical care for their reaction?");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -665,7 +711,18 @@ export function Slide14MedicalCareScreen({
         </div>
       </div>
 
-      {/* 3. Bottom Centered Navigation (Back & Next) */}
+      {/* 3. Audio Player (CC & Play/Pause Controls) */}
+      <div className="s14-audio">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={effectiveStepId}
+          locale={effectiveLocale}
+          transcriptText={effectiveTranscript}
+          size="large"
+        />
+      </div>
+
+      {/* 4. Bottom Centered Navigation (Back & Next) */}
       <SlideNavigationButtons
         onBack={handleBackClick}
         onNext={handleNextClick}

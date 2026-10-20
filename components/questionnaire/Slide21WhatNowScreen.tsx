@@ -3,7 +3,6 @@
 import React, { useRef, useEffect } from "react";
 import { resolveMedicineToken } from "@/lib/token-engine";
 import { SlideNavigationButtons } from "./SlideNavigationButtons";
-import AudioPlayer from "./AudioPlayer";
 
 /* ==========================================================
    Slide21WhatNowScreen – Pixel-Perfect Styles Matching Figma UI
@@ -147,27 +146,6 @@ const SLIDE21_CSS = `
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.04));
 }
 
-/* Audio Controls Position */
-.s21-audio {
-  position: absolute;
-  right: clamp(16px, 3vw, 28px);
-  bottom: clamp(14px, 2.5vh, 22px);
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.s21-audio .audio-cc-btn svg {
-  width: 38px !important;
-  height: 32px !important;
-}
-
-.s21-audio .audio-play-btn svg {
-  width: 50px !important;
-  height: 32px !important;
-}
-
 /* Compact Laptop / Height-constrained screens */
 @media (max-height: 720px) and (min-width: 768px) {
   .s21-root {
@@ -200,10 +178,6 @@ const SLIDE21_CSS = `
   .s21-illustration-img {
     max-width: 480px !important;
     max-height: clamp(190px, 32vh, 250px) !important;
-  }
-  .s21-audio {
-    right: 18px !important;
-    bottom: 14px !important;
   }
 }
 
@@ -257,22 +231,6 @@ const SLIDE21_CSS = `
     height: auto !important;
     object-fit: contain !important;
     margin: 0 auto !important;
-  }
-  .s21-audio {
-    position: absolute !important;
-    right: 12px !important;
-    bottom: 14px !important;
-    margin: 0 !important;
-    z-index: 25 !important;
-    gap: 5px !important;
-  }
-  .s21-audio .audio-cc-btn svg {
-    width: 30px !important;
-    height: 26px !important;
-  }
-  .s21-audio .audio-play-btn svg {
-    width: 40px !important;
-    height: 26px !important;
   }
 }
 
@@ -333,21 +291,6 @@ const SLIDE21_CSS = `
     max-width: 340px !important;
     max-height: clamp(140px, 52vh, 190px) !important;
     height: auto !important;
-  }
-  .s21-audio {
-    position: absolute !important;
-    right: 12px !important;
-    bottom: 12px !important;
-    margin: 0 !important;
-    gap: 4px !important;
-  }
-  .s21-audio .audio-cc-btn svg {
-    width: 28px !important;
-    height: 24px !important;
-  }
-  .s21-audio .audio-play-btn svg {
-    width: 38px !important;
-    height: 24px !important;
   }
 }
 `;
@@ -481,17 +424,6 @@ export function Slide21WhatNowScreen({
           />
         </div>
       </main>
-
-      {/* Caption (CC) & Play/Pause Controls */}
-      <div className="s21-audio">
-        <AudioPlayer
-          audioSrc={audioSrc}
-          stepId={stepId}
-          locale={locale || (isSpanish ? "es" : "en")}
-          transcriptText={transcriptText || spokenText}
-          size="normal"
-        />
-      </div>
 
       {/* Standardized Navigation Buttons (Back & Next) pinned at bottom */}
       <SlideNavigationButtons

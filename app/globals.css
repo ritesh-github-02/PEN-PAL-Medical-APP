@@ -353,7 +353,7 @@ body::-webkit-scrollbar,
   width: 100% !important;
   max-width: 100% !important;
   z-index: 30 !important;
-  pointer-events: auto !important;
+  pointer-events: none !important;
 }
 
 .slide-nav-btn {
@@ -363,6 +363,7 @@ body::-webkit-scrollbar,
   min-width: 68px;
   border-radius: 9999px;
   font-family: inherit;
+  pointer-events: auto !important;
   font-size: 15px;
   font-weight: 500;
   outline: none;
@@ -663,7 +664,8 @@ body::-webkit-scrollbar,
   .s14-root .slide-nav,
   .s16-root .slide-nav,
   .s19-root .slide-nav,
-  .s21-root .slide-nav {
+  .s21-root .slide-nav,
+  .s18-root .s18-nav {
     padding-right: 76px !important;
     padding-left: 12px !important;
     box-sizing: border-box !important;
