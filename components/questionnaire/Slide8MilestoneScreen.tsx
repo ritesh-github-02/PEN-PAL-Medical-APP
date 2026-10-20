@@ -93,12 +93,12 @@ const SLIDE8_COMPONENT_CSS = `
   .s8-bubble-wrap {
     position: relative;
     width: 500px;
-    max-width: 58%;
+    max-width: 60%;
     aspect-ratio: 510 / 315;
     flex-shrink: 0;
     filter: drop-shadow(2.5px 3.5px 0px #1a3532);
-    margin-right: -10px;
-    margin-top: -30px;
+    margin-right: -23px;
+    margin-top: -216px;
     z-index: 5;
   }
 
@@ -133,7 +133,7 @@ const SLIDE8_COMPONENT_CSS = `
     margin: 0;
     padding: 0;
     width: 100%;
-    font-size: 21.5px;
+    font-size: 14.5px;
     line-height: 1.42;
     font-weight: 700;
     color: #142724;
@@ -154,7 +154,7 @@ const SLIDE8_COMPONENT_CSS = `
   /* 2. Nurse Anna standing on Right (Strictly decorative on Slide 2+) */
   .s8-nurse-wrap {
     position: relative;
-    width: 185px;
+    width: 118px;
     height: 360px;
     flex-shrink: 0;
     display: flex;

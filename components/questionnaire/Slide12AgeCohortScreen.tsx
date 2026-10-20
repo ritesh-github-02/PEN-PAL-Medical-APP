@@ -129,6 +129,10 @@ const SLIDE12_CSS = `
   box-shadow: 0 3px 6px rgba(20, 50, 45, 0.12);
   transition: all 0.18s ease;
   outline: none;
+  white-space: normal;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow: hidden;
 }
 
 .s12-cohort-btn:hover {
@@ -262,6 +266,10 @@ const SLIDE12_CSS = `
   .s12-cohort-btn {
     min-height: 46px;
     padding: 0.35rem 0.25rem;
+    white-space: normal;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow: hidden;
   }
   .s12-cohort-title {
     font-size: 0.86rem;
@@ -282,6 +290,10 @@ const SLIDE12_CSS = `
   }
   .s12-cohort-btn {
     min-height: 42px;
+    white-space: normal;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow: hidden;
   }
   .s12-cohort-title {
     font-size: 0.8rem;

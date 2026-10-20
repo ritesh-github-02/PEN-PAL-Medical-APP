@@ -160,7 +160,6 @@ const SLIDE9_CSS = `
   height: ${STAGE_H}px;
   padding: 24px 40px 60px;
   transform-origin: center center;
-  background-color: #fafdf3;
   overflow: hidden;
 }
 

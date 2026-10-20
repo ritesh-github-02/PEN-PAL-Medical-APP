@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import AudioPlayer from "./AudioPlayer";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 import { resolveMedicineToken } from "@/lib/token-engine";
@@ -18,300 +18,276 @@ export interface Slide3EfficacyScreenProps {
   transcriptText?: string;
 }
 
-/** Fixed design stage, scaled to fit on tablet/desktop (same convention as the other slides). */
-const STAGE_W = 896;
-const STAGE_H = 620;
+const STAGE_W = 750;
+const STAGE_H = 530;
 
-const HEADING_EN =
-  "Many kids have had [name] because it's the best for treating common ear, sinus and throat infections. It is also one of the best antibiotics in adults, too.";
-const HEADING_ES =
-  "Muchos niños han tomado [name] porque es el mejor para tratar infecciones comunes de oído, senos paranasales y garganta. También es uno de los mejores antibióticos para adultos.";
-const BUBBLE_EN =
-  "[name] is a wonder drug, but like all antibiotics it doesn't work well for common colds or the flu.";
-const BUBBLE_ES =
-  "[name] es un medicamento maravilloso, pero como todos los antibióticos no funciona bien para los resfriados comunes o la gripe.";
-
-/** Speech-bubble artwork (viewBox 0 0 320 220). */
-const BUBBLE_PATH =
-  "M 160.424 10.4243 C 241.879 10.4243 307.915 45.4852 307.915 88.7303 " +
-  "C 307.915 121.168 279.799 147.469 235.875 158.077 " +
-  "C 250.795 173.877 268.358 194.945 274.503 214.266 " +
-  "C 255.19 198.461 227.094 180.902 195.483 165.1 " +
-  "C 184.067 166.417 172.399 167.036 160.424 167.036 " +
-  "C 78.9698 167.036 12.9333 131.975 12.9333 88.7303 " +
-  "C 12.9333 45.4852 78.9698 10.4243 160.424 10.4243 Z";
+/** Speech-bubble smooth curved Bezier artwork pointing down-right toward Nurse Anna. */
+const BUBBLE_BEZIER_PATH =
+  "M 182.5 12 " +
+  "C 275 12, 350 52, 350 101 " +
+  "C 350 138, 318 168, 268 180 " +
+  "C 285 198, 305 222, 312 244 " +
+  "C 290 226, 258 206, 222 188 " +
+  "C 209 189.5, 196 190, 182.5 190 " +
+  "C 90 190, 15 150, 15 101 " +
+  "C 15 52, 90 12, 182.5 12 " +
+  "Z";
 
 /**
- * Stacked layout for phones. Declared once and reused for both the media query
- * and the explicit `variant="mobile"` mode instead of duplicating ~120 lines.
+ * Stacked layout for phones (< 768px). Declared once and reused for both
+ * the media query and the explicit `variant="mobile"` mode.
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: auto;
-    min-height: 0;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 0.85rem 0.75rem 1rem;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: auto !important;
+    min-height: 0 !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0.85rem 0.75rem 1rem !important;
   }
   ${scope} .s3-stage {
-    width: 100%;
-    max-width: 360px;
-    height: auto;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    height: auto !important;
+    min-height: 0 !important;
     transform: none !important;
-    padding: 16px 14px 14px;
-    border-radius: 24px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    gap: 10px !important;
   }
-  ${scope} .s3-body {
-    position: static;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    height: auto;
+  ${scope} .s3-left-col {
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   ${scope} .s3-heading {
-    position: static;
-    width: 100%;
-    font-size: 15.5px;
-    line-height: 1.4;
-  }
-  ${scope} .s3-character {
-    position: static;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    height: auto;
-  }
-  ${scope} .s3-bubble {
-    position: static;
-    width: min(320px, 100%);
-    height: auto;
-    aspect-ratio: 320 / 220;
-    margin: 0 auto;
-  }
-  ${scope} .s3-bubble-text {
-    font-size: 12.5px;
-    line-height: 1.38;
-  }
-  ${scope} .s3-bubble-text--long {
-    font-size: 12px;
-    line-height: 1.34;
-  }
-  ${scope} .s3-nurse {
-    position: static;
-    width: 105px;
-    height: 190px;
-    margin: -18px 24px 0 auto;
-  }
-  ${scope} .s3-footer {
-    flex-direction: column;
-    gap: 6px;
-    align-items: center;
-    margin-top: 8px;
-  }
-  ${scope} .s3-footer .slide-nav-flow {
     position: static !important;
+    width: 100% !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    text-align: left !important;
+    margin: 0 !important;
+  }
+  ${scope} .s3-character-wrap {
+    position: relative !important;
     left: auto !important;
     top: auto !important;
-    transform: none !important;
-    width: auto !important;
-    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    margin-top: 4px !important;
+  }
+  ${scope} .s3-bubble {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    aspect-ratio: 380 / 250 !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    filter: drop-shadow(2px 3px 0px #1a3532) !important;
+  }
+  ${scope} .s3-bubble-text-wrap {
+    top: 40% !important;
+    left: 48% !important;
+    width: 76% !important;
+    max-width: 210px !important;
+  }
+  ${scope} .s3-bubble-text {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+  ${scope} .s3-nurse {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 105px !important;
+    height: 195px !important;
+    margin-top: -14px !important;
+    margin-left: auto !important;
+    margin-right: 24px !important;
+  }
+  ${scope} .s3-nurse-img {
+    height: 100% !important;
+    max-height: 195px !important;
+  }
+  ${scope} .s3-audio {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 10px auto 4px auto !important;
+    z-index: 25 !important;
   }
 `;
 
 const SLIDE3_CSS = `
-.s3-root,
-.s3-root *,
-.s3-root *::before,
-.s3-root *::after {
-  box-sizing: border-box;
-}
-
-.s3-root {
-  position: relative;
-  display: flex;
-  flex: 1 1 0%;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-  color: #142724;
-  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-}
-
-/* Card that scales as one composition — no reflow, no overlap at any width. */
-.s3-stage {
-  position: relative;
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  width: ${STAGE_W}px;
-  height: ${STAGE_H}px;
-  padding: 34px 50px 24px;
-  transform-origin: center center;
-  background-color: #f6faf0;
-  border: 1px solid rgba(120, 165, 155, 0.28);
-  border-radius: 28px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-}
-
-.s3-body {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-/* 1. Statement heading (WCAG AAA contrast: #142724 on #f6faf0 ≈ 14.7:1) */
-.s3-heading {
-  position: absolute;
-  left: 0;
-  top: 6px;
-  width: 468px;
-  margin: 0;
-  padding: 0;
-  color: #142724;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.38;
-  letter-spacing: -0.012em;
-  outline: none;
-}
-
-.s3-heading:focus-visible {
-  outline: 2px dashed #143833;
-  outline-offset: 4px;
-  border-radius: 4px;
-}
-
-/* 2. Character column: speech bubble + Nurse Anna */
-.s3-character {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 352px;
-  height: 100%;
-}
-
-.s3-bubble {
-  position: absolute;
-  right: 18px;
-  top: 8px;
-  width: 334px;
-  height: 220px;
-  margin: 0;
-  filter: drop-shadow(2.5px 3.5px 0 #1a3532);
-}
-
-.s3-bubble-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.s3-bubble-text-wrap {
-  position: absolute;
-  top: 39%;
-  left: 48%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 76%;
-  max-width: 225px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.s3-bubble-text {
-  margin: 0;
-  color: #142724;
-  font-size: 13.5px;
-  font-weight: 700;
-  line-height: 1.44;
-  letter-spacing: -0.005em;
-  text-align: center;
-  overflow-wrap: anywhere;
-  hyphens: auto;
-}
-
-/* Longer brand names (e.g. "Amoxicillin Clavulanate") need a touch more room */
-.s3-bubble-text--long {
-  font-size: 12px;
-  line-height: 1.34;
-}
-
-.s3-nurse {
-  position: absolute;
-  right: 32px;
-  top: 186px;
-  width: 132px;
-  height: 260px;
-  pointer-events: none;
-  user-select: none;
-}
-
-.s3-nurse-img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* 3. Footer: navigation stays centred, audio controls sit on the right */
-.s3-footer {
-  position: relative;
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: flex-end;
-  min-height: 44px;
-  margin-top: 8px;
-}
-
-.s3-footer .slide-nav-flow {
-  position: absolute !important;
-  left: 50% !important;
-  right: auto !important;
-  top: 50% !important;
-  bottom: auto !important;
-  width: auto !important;
-  max-width: none !important;
-  margin: 0 !important;
-  transform: translate(-50%, -50%) !important;
-  z-index: 30 !important;
-}
-
-.s3-audio {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-@media (max-width: 767px) {
-${mobileLayout(".s3-root")}
-}
-
-${mobileLayout(".s3-root.is-mobile")}
-
-@media (prefers-reduced-motion: reduce) {
+  /* ------------------------------------------------------------
+     WCAG 2.1 / 2.2 Level AAA Accessibility & Stage Layout
+     ------------------------------------------------------------ */
+  .s3-root,
   .s3-root *,
   .s3-root *::before,
   .s3-root *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    box-sizing: border-box;
   }
+
+  .s3-root {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow: hidden;
+    background-color: #fafdf3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #142724;
+  }
+
+  .s3-stage {
+    position: relative;
+    width: ${STAGE_W}px;
+    height: ${STAGE_H}px;
+    flex: none;
+    transform-origin: center center;
+    background-color: transparent;
+  }
+
+
+
+  .s3-left-col {
+    position: absolute;
+    left: 40px;
+    top: 33px;
+    width: 440px;
+    margin: 0;
+    padding: 0;
+    z-index: 5;
 }
+
+  .s3-heading {
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    line-height: 1.38;
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    color: #142724;
+    outline: none;
+  }
+
+  .s3-heading:focus-visible {
+    outline: 2px dashed #143833;
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  /* 2. Speech Bubble (Oval with tail pointing down-right toward Nurse Anna) */
+  .s3-bubble {
+    position: absolute;
+    left: 378px;
+    top: 106px;
+    width:  297px;
+    aspect-ratio: 380 / 250;
+    height: auto;
+    filter: drop-shadow(2.5px 3.5px 0px #1a3532);
+    z-index: 6;
+    margin: 0;
+    padding: 0;
+  }
+
+  .s3-bubble-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .s3-bubble-text-wrap {
+    position: absolute;
+    top: 40%;
+    left: 48%;
+    transform: translate(-50%, -50%);
+    width: 76%;
+    max-width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .s3-bubble-text {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    font-weight: 600;
+    color: #142724;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
+
+  /* 3. Nurse Anna standing on Right under bubble tail */
+  .s3-nurse {
+    position: absolute;
+    left: 585px;
+    top: 228px;
+    width: 120px;
+    height: 236px;
+    z-index: 20;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .s3-nurse-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.08));
+  }
+
+  /* Audio Player: Desktop provided by PenpalIntervention tablet frame, mobile inline */
+  .s3-audio {
+    display: none !important;
+  }
+
+  @media (max-width: 767px) {
+    ${mobileLayout(".s3-root")}
+  }
+
+  ${mobileLayout(".s3-root.is-mobile")}
+
+  /* Prefers-Reduced-Motion (WCAG 2.3.3) */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
 `;
 
 export function Slide3EfficacyScreen({
@@ -331,103 +307,159 @@ export function Slide3EfficacyScreen({
   const [scale, setScale] = useState(1);
 
   const isEs = (locale ?? "").startsWith("es") || isSpanish;
-  const activeLocale = isEs ? "es" : "en";
 
-  // WCAG 2.4.3 — move reading order to the new heading (parent skips it on slide change).
+  // Programmatic focus on mount (WCAG 2.4.3 Focus Order)
   useEffect(() => {
-    const frame = requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true }));
-    return () => cancelAnimationFrame(frame);
+    const timer = setTimeout(() => headingRef.current?.focus(), 50);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Fit the fixed stage into the available frame. ResizeObserver covers window resizes too.
+  // Standardized dynamic responsive stage scaling across all viewports
   useEffect(() => {
     const el = rootRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
 
     const update = () => {
-      if (variant === "mobile" || window.innerWidth < 768) {
-        setScale(1);
-        return;
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w && h) {
+        if (variant === "mobile" || window.innerWidth < 768) {
+          setScale(1);
+        } else {
+          const safeW = Math.max(0, w - 24);
+          const safeH = Math.max(0, h - 24);
+          setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
+        }
       }
-      const { clientWidth: w, clientHeight: h } = el;
-      if (!w || !h) return;
-      // Never upscale past the design size, never overflow the frame.
-      setScale(Math.min((w - 24) / STAGE_W, (h - 24) / STAGE_H, 1));
     };
 
     update();
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
-    return () => observer.disconnect();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, [variant]);
 
-  // Single source of truth for the medication name, with a locale-aware fallback.
-  const medName = medicationName?.trim() || (isEs ? "Amoxicilina" : "Amoxicillin");
-  const headingText = resolveMedicineToken(isEs ? HEADING_ES : HEADING_EN, medName, isEs);
-  const bubbleText = resolveMedicineToken(isEs ? BUBBLE_ES : BUBBLE_EN, medName, isEs);
-  const isLongMedName = medName.length > 18;
+  const rawMed = medicationName && medicationName.trim()
+    ? medicationName.trim()
+    : isEs
+      ? "la amoxicilina"
+      : "amoxicillin";
+
+  const rawHeadingEn = `Many kids have had [name] because it's the best for treating common ear, sinus and throat infections. It is also one of the best antibiotics in adults, too.`;
+  const rawHeadingEs = `Muchos niños han tomado [name] porque es el mejor para tratar infecciones comunes de oído, senos paranasales y garganta. También es uno de los mejores antibióticos para adultos.`;
+
+  const headingText = resolveMedicineToken(isEs ? rawHeadingEs : rawHeadingEn, rawMed, isEs);
+
+  const bubbleText = isEs
+    ? `${rawMed} es un medicamento maravilloso, pero como todos los antibióticos no funciona bien para los resfriados comunes o la gripe.`
+    : `${rawMed} is a wonder drug, but like all antibiotics it doesn't work well for common colds or the flu.`;
+
+  const captionText = transcriptText || `${headingText} ${bubbleText}`;
 
   const effectiveAudioSrc =
     audioSrc ||
-    (isEs ? "/audio/exported/slide3_efficacy_es.mp3" : "/audio/exported/slide3_efficacy_en.mp3");
+    (isEs
+      ? "/audio/exported/slide3_efficacy_es.mp3"
+      : "/audio/exported/slide3_efficacy_en.mp3");
+
+  const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
     <div
       id="slide-content"
       ref={rootRef}
-      className={`s3-root${variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : ""}`}
+      className={`s3-root${variantClass}`}
       role="region"
       aria-roledescription="slide"
-      aria-labelledby="s3-heading"
-      lang={activeLocale}
+      aria-labelledby="s3-screen-heading"
+      lang={isEs ? "es" : "en"}
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE3_CSS }} />
 
+      {/* Scaled stage container (Seamless with tablet frame — no double card borders/shadows) */}
       <div className="s3-stage" style={{ transform: `scale(${scale})` }}>
-        <div className="s3-body">
-          <h1 ref={headingRef} tabIndex={-1} id="s3-heading" className="s3-heading">
+        {/* 1. Left Column: Statement Heading */}
+        <div className="s3-left-col">
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            className="s3-heading"
+            id="s3-screen-heading"
+          >
             {headingText}
           </h1>
-
-          <div className="s3-character">
-            <figure className="s3-bubble" role="group" aria-label={isEs ? "Comentario de la enfermera Anna" : "Nurse Anna statement"}>
-              <svg className="s3-bubble-svg" viewBox="0 0 320 220" fill="none" aria-hidden="true" focusable="false">
-                <defs>
-                  <pattern id="s3-dot-grid" width="16" height="16" patternUnits="userSpaceOnUse">
-                    <circle cx="8" cy="8" r="0.75" fill="#cadada" opacity="0.6" />
-                  </pattern>
-                </defs>
-                <path d={BUBBLE_PATH} fill="#ffffff" stroke="#7baea9" strokeWidth="2.8" strokeLinejoin="round" strokeLinecap="round" />
-                <path d={BUBBLE_PATH} fill="url(#s3-dot-grid)" />
-              </svg>
-
-              <div className="s3-bubble-text-wrap">
-                <blockquote className={`s3-bubble-text${isLongMedName ? " s3-bubble-text--long" : ""}`}>
-                  {bubbleText}
-                </blockquote>
-              </div>
-            </figure>
-
-            <div className="s3-nurse" aria-hidden="true">
-              <img src="/images/nurse-anna.png" alt="" className="s3-nurse-img" draggable={false} />
-            </div>
-          </div>
         </div>
 
-        <footer className="s3-footer">
-          <SlideNavigationButtons onBack={onBack} onNext={onNext} isSpanish={isEs} loading={loading} />
+        {/* 2. Speech Bubble pointing down-right toward Nurse Anna */}
+        <figure
+          className="s3-bubble"
+          role="group"
+          aria-label={isEs ? "Comentario de la enfermera Anna" : "Nurse Anna statement"}
+        >
+          <svg
+            className="s3-bubble-svg"
+            viewBox="0 0 380 250"
+            fill="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <defs>
+              <pattern id="s3-cmp-dot-grid" width="16" height="16" patternUnits="userSpaceOnUse">
+                <circle cx="8" cy="8" r="0.75" fill="#cadada" opacity="0.6" />
+              </pattern>
+            </defs>
 
-          <div className="s3-audio">
-            <AudioPlayer
-              audioSrc={effectiveAudioSrc}
-              stepId={stepId}
-              locale={activeLocale}
-              transcriptText={transcriptText || `${headingText} ${bubbleText}`}
-              size="large"
+            <path
+              d={BUBBLE_BEZIER_PATH}
+              fill="#ffffff"
+              stroke="#7baea9"
+              strokeWidth="3.5"
+              strokeLinejoin="round"
+              strokeLinecap="round"
             />
+            <path d={BUBBLE_BEZIER_PATH} fill="url(#s3-cmp-dot-grid)" />
+          </svg>
+
+          <div className="s3-bubble-text-wrap">
+            <blockquote className="s3-bubble-text">
+              {bubbleText}
+            </blockquote>
           </div>
-        </footer>
+        </figure>
+
+        {/* 3. Nurse Anna standing on Right under bubble tail */}
+        <div className="s3-nurse" aria-hidden="true">
+          <img
+            src="/images/nurse-anna.png"
+            alt={isEs ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
+            className="s3-nurse-img"
+            draggable={false}
+          />
+        </div>
+
+        {/* 4. Inline Audio Player for Mobile (hidden on desktop; desktop uses PenpalIntervention frame player) */}
+        <div className="s3-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={isEs ? "es" : "en"}
+            transcriptText={captionText}
+            size="large"
+          />
+        </div>
       </div>
+
+      {/* 5. Fixed Centered Bottom Navigation (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isEs}
+        loading={loading}
+      />
     </div>
   );
 }

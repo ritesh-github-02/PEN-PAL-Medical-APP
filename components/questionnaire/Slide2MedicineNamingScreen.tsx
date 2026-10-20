@@ -25,7 +25,7 @@ export const MEDICINE_OPTIONS_DISPLAY = [
   { value: "Augmentin", labelEn: "Augmentin", labelEs: "Augmentin" },
 ];
 
-/* Hand-drawn style bubble body + sharp tail matching Image 2 */
+/* Hand-drawn style bubble body + sharp tail pointing down-right toward Nurse Anna's hand */
 const BUBBLE_PATH =
   "M 397.9,283.4 " +
   "C 395.8,284.6 391.2,287.9 385.1,290.7 " +
@@ -78,30 +78,39 @@ const BUBBLE_PATH =
 const SLIDE2_COMPONENT_CSS = `
   /* ------------------------------------------------------------
      Slide 2: WCAG 2.1/2.2 Level AAA, WAVE & Karen Accessibility Rules
+     Clean presentation directly filling the frame with no double border.
      ------------------------------------------------------------ */
 
-  .s2-component-card {
+  .s2-root,
+  .s2-root *,
+  .s2-root *::before,
+  .s2-root *::after {
+    box-sizing: border-box;
+  }
+
+  /* Single clean slide root filling the presentation card directly (no extra border or shadow) */
+  .s2-root {
     position: relative;
     width: 100%;
-    max-width: 896px;
-    max-height: 100%;
-    aspect-ratio: 896 / 620;
-    background-color: #fafdf3;
-    border-radius: 28px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(120, 165, 155, 0.28);
+    height: 100%;
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow: hidden;
+    background: transparent;
+    border: none;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow: hidden;
-    padding: 24px 36px 20px 36px;
-    box-sizing: border-box;
+    padding: clamp(14px, 2.4vh, 22px) clamp(16px, 3.2vw, 36px) clamp(10px, 1.8vh, 16px);
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #232323;
   }
 
-  .s2-component-card button:focus-visible,
-  .s2-component-card [tabindex="0"]:focus-visible,
-  .s2-component-card input[type="radio"]:focus-visible + span {
+  /* Universal High Contrast Focus Indicator */
+  .s2-root button:focus-visible,
+  .s2-root [tabindex="0"]:focus-visible,
+  .s2-root input[type="radio"]:focus-visible + span {
     outline: 3px solid #143833 !important;
     outline-offset: 3px !important;
   }
@@ -110,18 +119,18 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-banner-wrap {
     width: 100%;
     max-width: 760px;
-    margin: 0 auto 12px auto;
+    margin: 0 auto;
     background-color: #feff9f;
     border: 2px solid #236f7a;
     border-radius: 9999px;
     box-shadow: 0 4px 6px rgba(34, 105, 118, 0.25);
-    padding: 10px 24px;
+    padding: clamp(8px, 1.2vh, 10px) clamp(16px, 2.2vw, 24px);
     text-align: center;
     flex-shrink: 0;
   }
   .s2-heading {
     margin: 0;
-    font-size: 20px;
+    font-size: clamp(16px, 1.95vw, 20px);
     line-height: 1.3;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -140,23 +149,26 @@ const SLIDE2_COMPONENT_CSS = `
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
     min-height: 0;
     padding: 0 8px;
-    gap: 16px;
+    gap: clamp(12px, 2.2vw, 28px);
   }
 
   .s2-options-col {
     display: flex;
     align-items: center;
-    gap: 24px;
-    flex: 1;
+    gap: clamp(12px, 2.2vw, 24px);
+    flex: 1 1 380px;
     max-width: 480px;
+    min-width: 0;
   }
 
   .s2-bottle-wrap {
     flex-shrink: 0;
-    width: 90px;
-    height: 170px;
+    width: clamp(66px, 8.5vw, 88px);
+    height: clamp(130px, 16.5vw, 170px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -173,17 +185,18 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-radiogroup {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: clamp(6px, 1vh, 9px);
     flex: 1;
+    min-width: 0;
   }
   .s2-option-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    min-height: 44px;
+    min-height: clamp(38px, 4.4vh, 44px);
     cursor: pointer;
     user-select: none;
-    padding: 2px 4px;
+    padding: 2px 6px;
     border-radius: 8px;
     transition: background-color 0.12s ease;
   }
@@ -192,8 +205,8 @@ const SLIDE2_COMPONENT_CSS = `
   }
 
   .s2-checkbox-box {
-    width: 28px;
-    height: 28px;
+    width: clamp(23px, 2.4vw, 26px);
+    height: clamp(23px, 2.4vw, 26px);
     flex-shrink: 0;
     border-radius: 4px;
     border: 2px solid #236f7a;
@@ -210,7 +223,7 @@ const SLIDE2_COMPONENT_CSS = `
   }
 
   .s2-option-text {
-    font-size: 18px;
+    font-size: clamp(15px, 1.7vw, 17.5px);
     line-height: 1.3;
     font-weight: 500;
     color: #143833;
@@ -224,16 +237,17 @@ const SLIDE2_COMPONENT_CSS = `
   /* Character & Bubble Area */
   .s2-character-col {
     position: relative;
-    width: 320px;
-    height: 270px;
+    width: clamp(240px, 32vw, 330px);
+    height: clamp(210px, 27vh, 265px);
     flex-shrink: 0;
   }
   .s2-bubble-wrap {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 260px;
-    height: 175px;
+    left: -28px;
+    top: -44px;
+    width: 78%;
+    height: auto;
+    aspect-ratio: 520 / 340;
     z-index: 5;
     pointer-events: none;
   }
@@ -246,11 +260,11 @@ const SLIDE2_COMPONENT_CSS = `
   }
   .s2-bubble-text-wrap {
     position: absolute;
-    top: 45%;
-    left: 48%;
+    top: 44%;
+    left: 47%;
     transform: translate(-50%, -50%);
     width: 78%;
-    max-width: 200px;
+    max-width: 195px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -261,7 +275,7 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-bubble-text {
     margin: 0;
     padding: 0;
-    font-size: 13px;
+    font-size: clamp(11.5px, 1.2vw, 12.5px);
     line-height: 1.42;
     font-weight: 600;
     color: #143833;
@@ -271,10 +285,11 @@ const SLIDE2_COMPONENT_CSS = `
   /* Nurse Anna (Post-Slide 1 Decorative Character) */
   .s2-nurse-wrap {
     position: absolute;
-    right: 8px;
-    bottom: 0;
-    width: 105px;
-    height: 200px;
+    right: 0;
+    bottom: -37px;
+    width: 34%;
+    height: auto;
+    aspect-ratio: 118 / 252;
     z-index: 6;
     pointer-events: none;
     display: flex;
@@ -296,7 +311,7 @@ const SLIDE2_COMPONENT_CSS = `
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    padding-top: 8px;
+    padding-top: 6px;
     position: relative;
     z-index: 20;
   }
@@ -323,9 +338,9 @@ const SLIDE2_COMPONENT_CSS = `
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-height: 46px;
-    min-width: 98px;
-    font-size: 16px;
+    min-height: clamp(40px, 4.5vh, 46px);
+    min-width: clamp(86px, 10vw, 98px);
+    font-size: clamp(14.5px, 1.6vw, 16px);
     padding: 0 24px;
     transition: transform 0.1s ease, background-color 0.15s ease;
   }
@@ -365,151 +380,300 @@ const SLIDE2_COMPONENT_CSS = `
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    width: 110px;
+    flex-shrink: 0;
   }
 
   /* -------------------------------------------------------------
-     Mobile Layout (.is-mobile or screen width < 768px)
+     Mobile Layout (< 768px) & explicit .is-mobile
      ------------------------------------------------------------- */
-  .s2-component-card.is-mobile {
-    aspect-ratio: auto !important;
-    max-height: none !important;
-    height: 100% !important;
-    border-radius: 24px !important;
-    padding: 14px 12px 12px 12px !important;
+  @media (max-width: 767px) {
+    .s2-root {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      height: auto !important;
+      min-height: 0 !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+      align-items: center !important;
+      padding: 0.75rem 0.65rem 1.25rem !important;
+      gap: 10px !important;
+    }
+    .s2-banner-wrap {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 16px !important;
+      padding: 8px 12px !important;
+    }
+    .s2-heading {
+      font-size: 15px !important;
+      line-height: 1.35 !important;
+    }
+    .s2-stage-middle {
+      flex-direction: column !important;
+      align-items: center !important;
+      width: 100% !important;
+      gap: 12px !important;
+      padding: 0 !important;
+    }
+    .s2-character-col {
+      order: 1 !important;
+      position: relative !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      width: 100% !important;
+      max-width: 340px !important;
+      height: auto !important;
+      margin: 2px auto !important;
+    }
+    .s2-bubble-wrap {
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      width: min(230px, calc(100% - 75px)) !important;
+      height: auto !important;
+      aspect-ratio: 520 / 340 !important;
+      flex-shrink: 1 !important;
+    }
+    .s2-bubble-text-wrap {
+      width: 80% !important;
+      max-width: 175px !important;
+    }
+    .s2-bubble-text {
+      font-size: 11.5px !important;
+      line-height: 1.35 !important;
+    }
+    .s2-nurse-wrap {
+      position: relative !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 68px !important;
+      height: 128px !important;
+      flex-shrink: 0 !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+    }
+    .s2-nurse-img {
+      max-height: 128px !important;
+    }
+    .s2-options-col {
+      order: 2 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      gap: 12px !important;
+    }
+    .s2-bottle-wrap {
+      width: 54px !important;
+      height: 115px !important;
+      flex-shrink: 0 !important;
+    }
+    .s2-radiogroup {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      flex: 1 !important;
+      min-width: 0 !important;
+    }
+    .s2-option-row {
+      min-height: 42px !important;
+      gap: 10px !important;
+      padding: 3px 6px !important;
+    }
+    .s2-checkbox-box {
+      width: 24px !important;
+      height: 24px !important;
+      flex-shrink: 0 !important;
+    }
+    .s2-option-text {
+      font-size: 14.5px !important;
+      line-height: 1.25 !important;
+    }
+    .s2-bottom-bar {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 8px !important;
+      width: 100% !important;
+      padding-top: 4px !important;
+    }
+    .s2-spacer-side {
+      display: none !important;
+    }
+    .s2-nav-center {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 12px !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+    }
+    .s2-btn-nav {
+      min-height: 42px !important;
+      min-width: 88px !important;
+      font-size: 15px !important;
+      padding: 0 20px !important;
+    }
+    .s2-audio-wrap {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+    }
+  }
+
+  /* Explicit .is-mobile */
+  .s2-root.is-mobile {
     overflow-y: auto !important;
-  }
-  .s2-component-card.is-mobile .s2-banner-wrap {
-    border-radius: 18px !important;
-    padding: 8px 14px !important;
-    margin-bottom: 8px !important;
-  }
-  .s2-component-card.is-mobile .s2-heading {
-    font-size: 15px !important;
-  }
-  .s2-component-card.is-mobile .s2-stage-middle {
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: auto !important;
+    min-height: 0 !important;
     flex-direction: column !important;
+    justify-content: flex-start !important;
     align-items: center !important;
-    gap: 12px !important;
-  }
-  .s2-component-card.is-mobile .s2-options-col {
-    max-width: 100% !important;
-    width: 100% !important;
-    gap: 12px !important;
-  }
-  .s2-component-card.is-mobile .s2-bottle-wrap {
-    width: 60px !important;
-    height: 120px !important;
-  }
-  .s2-component-card.is-mobile .s2-option-row {
-    min-height: 44px !important;
+    padding: 0.75rem 0.65rem 1.25rem !important;
     gap: 10px !important;
   }
-  .s2-component-card.is-mobile .s2-option-text {
-    font-size: 14.5px !important;
-  }
-  .s2-component-card.is-mobile .s2-character-col {
+  .s2-root.is-mobile .s2-banner-wrap {
     width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px !important;
+    padding: 8px 12px !important;
+  }
+  .s2-root.is-mobile .s2-heading {
+    font-size: 15px !important;
+    line-height: 1.35 !important;
+  }
+  .s2-root.is-mobile .s2-stage-middle {
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 12px !important;
+    padding: 0 !important;
+  }
+  .s2-root.is-mobile .s2-character-col {
+    order: 1 !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 340px !important;
     height: auto !important;
+    margin: 2px auto !important;
+  }
+  .s2-root.is-mobile .s2-bubble-wrap {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: min(230px, calc(100% - 75px)) !important;
+    height: auto !important;
+    aspect-ratio: 520 / 340 !important;
+    flex-shrink: 1 !important;
+  }
+  .s2-root.is-mobile .s2-bubble-text-wrap {
+    width: 80% !important;
+    max-width: 175px !important;
+  }
+  .s2-root.is-mobile .s2-bubble-text {
+    font-size: 11.5px !important;
+    line-height: 1.35 !important;
+  }
+  .s2-root.is-mobile .s2-nurse-wrap {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 68px !important;
+    height: 128px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+  }
+  .s2-root.is-mobile .s2-nurse-img {
+    max-height: 128px !important;
+  }
+  .s2-root.is-mobile .s2-options-col {
+    order: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 12px !important;
+  }
+  .s2-root.is-mobile .s2-bottle-wrap {
+    width: 54px !important;
+    height: 115px !important;
+    flex-shrink: 0 !important;
+  }
+  .s2-root.is-mobile .s2-radiogroup {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  .s2-root.is-mobile .s2-option-row {
+    min-height: 42px !important;
+    gap: 10px !important;
+    padding: 3px 6px !important;
+  }
+  .s2-root.is-mobile .s2-checkbox-box {
+    width: 24px !important;
+    height: 24px !important;
+    flex-shrink: 0 !important;
+  }
+  .s2-root.is-mobile .s2-option-text {
+    font-size: 14.5px !important;
+    line-height: 1.25 !important;
+  }
+  .s2-root.is-mobile .s2-bottom-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding-top: 4px !important;
+  }
+  .s2-root.is-mobile .s2-spacer-side {
+    display: none !important;
+  }
+  .s2-root.is-mobile .s2-nav-center {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 12px !important;
-    margin-top: 4px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
   }
-  .s2-component-card.is-mobile .s2-bubble-wrap {
-    position: relative !important;
-    width: 220px !important;
-    height: 145px !important;
+  .s2-root.is-mobile .s2-btn-nav {
+    min-height: 42px !important;
+    min-width: 88px !important;
+    font-size: 15px !important;
+    padding: 0 20px !important;
   }
-  .s2-component-card.is-mobile .s2-bubble-text {
-    font-size: 11px !important;
-  }
-  .s2-component-card.is-mobile .s2-nurse-wrap {
-    position: relative !important;
-    width: 75px !important;
-    height: 145px !important;
-    right: auto !important;
-    bottom: auto !important;
-  }
-  .s2-component-card.is-mobile .s2-btn-nav {
-    min-height: 44px !important;
-    min-width: 72px !important;
-    font-size: 14px !important;
-    padding: 0 16px !important;
-  }
-  .s2-component-card.is-mobile .s2-spacer-side {
-    width: 60px !important;
+  .s2-root.is-mobile .s2-audio-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
   }
 
-  @media (max-width: 767px) {
-    .s2-component-card {
-      aspect-ratio: auto;
-      max-height: none;
-      border-radius: 24px;
-      padding: 14px 12px 12px 12px;
-      overflow-y: auto;
-    }
-    .s2-banner-wrap {
-      border-radius: 18px;
-      padding: 8px 14px;
-      margin-bottom: 8px;
-    }
-    .s2-heading {
-      font-size: 15px;
-    }
-    .s2-stage-middle {
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .s2-options-col {
-      max-width: 100%;
-      width: 100%;
-      gap: 12px;
-    }
-    .s2-bottle-wrap {
-      width: 60px;
-      height: 120px;
-    }
-    .s2-option-row {
-      min-height: 44px;
-      gap: 10px;
-    }
-    .s2-option-text {
-      font-size: 14.5px;
-    }
-    .s2-character-col {
-      width: 100%;
-      height: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 4px;
-    }
-    .s2-bubble-wrap {
-      position: relative;
-      width: 220px;
-      height: 145px;
-    }
-    .s2-bubble-text {
-      font-size: 11px;
-    }
-    .s2-nurse-wrap {
-      position: relative;
-      width: 75px;
-      height: 145px;
-      right: auto;
-      bottom: auto;
-    }
-    .s2-btn-nav {
-      min-height: 44px;
-      min-width: 72px;
-      font-size: 14px;
-      padding: 0 16px;
-    }
-    .s2-spacer-side {
-      width: 60px;
+  /* Short landscape (<520px height) */
+  @media (orientation: landscape) and (max-height: 520px) {
+    .s2-root {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      padding: 0.5rem 1rem 1rem !important;
     }
   }
 
@@ -540,7 +704,8 @@ export function Slide2MedicineNamingScreen({
 
   // Programmatic focus on mount per Karen's review (WCAG 2.4.3 Focus Order)
   useEffect(() => {
-    headingRef.current?.focus({ preventScroll: true });
+    const frame = requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const nextEnabled = !!selected && !loading;
@@ -578,7 +743,7 @@ export function Slide2MedicineNamingScreen({
       aria-roledescription="slide"
       aria-labelledby="slide2-heading"
       lang={isSpanish ? "es" : "en"}
-      className={`s2-component-card${variantClass}`}
+      className={`s2-root${variantClass}`}
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE2_COMPONENT_CSS }} />
 
@@ -598,7 +763,7 @@ export function Slide2MedicineNamingScreen({
 
       {/* 2. Middle Interactive Content Area */}
       <div className="s2-stage-middle">
-        {/* Left Column: Pink Bottle + Accessible Radio Options */}
+        {/* Options Column: Pink Bottle + Accessible Radio Options */}
         <div className="s2-options-col">
           {/* Pink Bottle (WCAG 1.1.1 Non-text Content) */}
           <div className="s2-bottle-wrap">
@@ -668,9 +833,9 @@ export function Slide2MedicineNamingScreen({
           </div>
         </div>
 
-        {/* Right Column: Speech Bubble + Nurse Anna */}
+        {/* Character Column: Speech Bubble + Nurse Anna */}
         <div className="s2-character-col">
-          {/* Hand-drawn SVG Speech Bubble */}
+          {/* Hand-drawn SVG Speech Bubble with tail pointing toward Nurse Anna */}
           <div
             className="s2-bubble-wrap"
             role="group"
@@ -716,24 +881,14 @@ export function Slide2MedicineNamingScreen({
 
             <div className="s2-bubble-text-wrap">
               <p className="s2-bubble-text">
-                {isSpanish ? (
-                  <>
-                    ¡Seleccione cómo lo llama!<br />
-                    Usaremos el nombre que elija<br />
-                    durante nuestro tiempo juntos.
-                  </>
-                ) : (
-                  <>
-                    Select what you call it! We&apos;ll<br />
-                    use the name you choose<br />
-                    during our time together.
-                  </>
-                )}
+                {isSpanish
+                  ? "¡Seleccione cómo lo llama! Usaremos el nombre que elija durante nuestro tiempo juntos."
+                  : "Select what you call it! We'll use the name you choose during our time together."}
               </p>
             </div>
           </div>
 
-          {/* Nurse Anna (Decorative after Slide 1 per Karen & Eileen's Rule) */}
+          {/* Nurse Anna (Post-Slide 1 Decorative Character) */}
           <div className="s2-nurse-wrap" aria-hidden="true">
             <img
               src="/images/nurse-anna.png"

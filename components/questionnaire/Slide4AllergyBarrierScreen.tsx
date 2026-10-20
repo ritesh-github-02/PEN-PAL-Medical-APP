@@ -143,7 +143,11 @@ const SLIDE4_CSS = `
 
 /* ---------- 3. CC & Play/Pause Controls ---------- */
 .s4-audio {
-  display: none !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* ==========================================================
@@ -178,19 +182,20 @@ const SLIDE4_CSS = `
     padding: 0 !important;
     margin: 0 auto !important;
   }
- .s4-bubble {
-  order: 1 !important;
-  position: relative !important;
-  left: 196px !important;
-  top: -30px !important;
-  width: 490px !important;
-  max-width: 340px !important;
-  aspect-ratio: 510 / 315 !important;
-  height: auto !important;
-  margin: 4px auto 0 auto !important;
-  filter: drop-shadow(2px 3px 0px #1a3532) !important;
-  z-index: 1 !important;
-  pointer-events: none !important;
+  .s4-bubble {
+    order: 1 !important;
+    position: relative !important;
+    left: 50% !important;
+    top: -30px !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    aspect-ratio: 510 / 315 !important;
+    height: auto !important;
+    margin: 4px auto 0 auto !important;
+    filter: drop-shadow(2px 3px 0px #1a3532) !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
 }
   .s4-bubble-svg {
     position: absolute !important;
@@ -515,7 +520,7 @@ export function Slide4AllergyBarrierScreen({
         </div>
 
         {/* 3. Caption (CC) & Play/Pause Controls */}
-        <div className="s4-audio">
+        {/* <div className="s4-audio">
           <AudioPlayer
             audioSrc={audioSrc}
             stepId={stepId || "slide4_barrier"}
@@ -523,7 +528,7 @@ export function Slide4AllergyBarrierScreen({
             transcriptText={transcriptText || titleText}
             size="large"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* 4. Navigation Buttons (Back & Next) */}

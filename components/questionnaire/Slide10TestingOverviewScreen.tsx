@@ -204,7 +204,6 @@ const SLIDE10_CSS = `
   height: ${STAGE_H}px;
   padding: 28px 30px 60px;
   transform-origin: center center;
-  background-color: #fafdf3;
   overflow: hidden;
 }
 

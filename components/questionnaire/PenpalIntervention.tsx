@@ -1187,13 +1187,12 @@ export default function PenpalIntervention() {
               </div>
 
               {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
-              {(!isTerminated && !showSuccess && currentStep && currentStep.id !== "screen1_intro" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide3_efficacy" && (currentStep.audioEn || currentStep.audioEs)) && (() => {
-                // slide2_naming & slide3_efficacy render their own footer AudioPlayer on every breakpoint.
+              {(!isTerminated && !showSuccess && currentStep && currentStep.id !== "screen1_intro" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics" && (currentStep.audioEn || currentStep.audioEs)) && (() => {
+                // slide2_naming & slide5_prevalence render their own footer AudioPlayer on every breakpoint.
                 const hasInternalMobilePlayer = [
                   "slide2_naming",
+                  "slide3_efficacy",
                   "slide4_barrier",
-                  "slide5_prevalence",
-                  "screen2_statistics",
                   "slide6_myths",
                   "slide8_milestone",
                   "slide9_why_it_matters",
