@@ -121,7 +121,7 @@ const SLIDE4_CSS = `
   padding: 0;
   width: 100%;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
-  font-size: 21.5px;
+  font-size: 18.5px;
   line-height: 1.42;
   font-weight: 700;
   color: #232323;
@@ -178,20 +178,20 @@ const SLIDE4_CSS = `
     padding: 0 !important;
     margin: 0 auto !important;
   }
-  .s4-bubble {
-    order: 1 !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: 100% !important;
-    max-width: 340px !important;
-    aspect-ratio: 510 / 315 !important;
-    height: auto !important;
-    margin: 4px auto 0 auto !important;
-    filter: drop-shadow(2px 3px 0px #1a3532) !important;
-    z-index: 1 !important;
-    pointer-events: none !important;
-  }
+ .s4-bubble {
+  order: 1 !important;
+  position: relative !important;
+  left: 196px !important;
+  top: -30px !important;
+  width: 490px !important;
+  max-width: 340px !important;
+  aspect-ratio: 510 / 315 !important;
+  height: auto !important;
+  margin: 4px auto 0 auto !important;
+  filter: drop-shadow(2px 3px 0px #1a3532) !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
   .s4-bubble-svg {
     position: absolute !important;
     inset: 0 !important;
