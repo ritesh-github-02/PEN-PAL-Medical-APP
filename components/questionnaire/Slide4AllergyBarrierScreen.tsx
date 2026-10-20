@@ -142,9 +142,10 @@ const SLIDE4_CSS = `
 }
 
 /* ---------- 3. CC & Play/Pause Controls ---------- */
+/* Hidden on desktop/tablet web layout (the floating player handles those);
+   the mobile layout below reveals this in-slide control row. */
 .s4-audio {
-  display: flex !important;
-  flex-direction: column;
+  display: none !important;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
@@ -360,7 +361,7 @@ const SLIDE4_CSS = `
     bottom: auto !important;
     margin: 0 !important;
     flex-shrink: 0 !important;
-    display: flex !important;
+    display: none !important;
     align-items: center !important;
     gap: 5px !important;
   }
@@ -371,6 +372,13 @@ const SLIDE4_CSS = `
   .s4-audio .audio-play-btn svg {
     width: 38px !important;
     height: 25px !important;
+  }
+  /* Mobile landscape only: reveal the in-slide controls */
+  @media (max-width: 767px) {
+    .s4-audio {
+      display: flex !important;
+      justify-content: center !important;
+    }
   }
 }
 `;
@@ -519,8 +527,8 @@ export function Slide4AllergyBarrierScreen({
           </div>
         </div>
 
-        {/* 3. Caption (CC) & Play/Pause Controls */}
-        {/* <div className="s4-audio">
+        {/* 3. Caption (CC) & Play/Pause Controls – rendered in the mobile layout only */}
+        <div className="s4-audio">
           <AudioPlayer
             audioSrc={audioSrc}
             stepId={stepId || "slide4_barrier"}
@@ -528,7 +536,7 @@ export function Slide4AllergyBarrierScreen({
             transcriptText={transcriptText || titleText}
             size="large"
           />
-        </div> */}
+        </div>
       </div>
 
       {/* 4. Navigation Buttons (Back & Next) */}

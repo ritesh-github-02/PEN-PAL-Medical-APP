@@ -396,73 +396,91 @@ const SLIDE2_COMPONENT_CSS = `
       min-height: 0 !important;
       flex-direction: column !important;
       justify-content: flex-start !important;
-      align-items: center !important;
-      padding: 0.75rem 0.65rem 1.25rem !important;
-      gap: 10px !important;
+      align-items: stretch !important;
+      padding: 0.75rem 0.75rem 1.5rem !important;
+      gap: 0.75rem !important;
     }
     .s2-banner-wrap {
       width: 100% !important;
       max-width: 100% !important;
-      border-radius: 16px !important;
-      padding: 8px 12px !important;
+      margin: 0 !important;
+      border-radius: 18px !important;
+      padding: 9px 14px !important;
     }
     .s2-heading {
-      font-size: 15px !important;
-      line-height: 1.35 !important;
+      font-size: 15.5px !important;
+      line-height: 1.3 !important;
     }
+
+    /* Stage: natural content height (no stretched 380px flex basis) */
     .s2-stage-middle {
+      flex: 0 0 auto !important;
       flex-direction: column !important;
-      align-items: center !important;
+      align-items: stretch !important;
+      justify-content: flex-start !important;
       width: 100% !important;
-      gap: 12px !important;
+      max-width: 100% !important;
+      gap: 0.85rem !important;
       padding: 0 !important;
+      margin: 0 !important;
     }
+
+    /* 2. Speech bubble with Nurse Anna tucked directly beneath its tail */
     .s2-character-col {
-      order: 1 !important;
+      order: 2 !important;
       position: relative !important;
       display: flex !important;
-      align-items: flex-end !important;
-      justify-content: center !important;
-      gap: 8px !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: 0 !important;
       width: 100% !important;
-      max-width: 340px !important;
+      max-width: 100% !important;
       height: auto !important;
-      margin: 2px auto !important;
+      margin: 0.15rem 0 0 0 !important;
     }
     .s2-bubble-wrap {
       position: relative !important;
       left: auto !important;
       top: auto !important;
-      width: min(230px, calc(100% - 75px)) !important;
+      width: min(228px, 100%) !important;
       height: auto !important;
       aspect-ratio: 520 / 340 !important;
-      flex-shrink: 1 !important;
+      flex: 0 0 auto !important;
+      margin: 0 auto !important;
     }
     .s2-bubble-text-wrap {
-      width: 80% !important;
-      max-width: 175px !important;
+      top: 45% !important;
+      left: 47% !important;
+      width: 84% !important;
+      max-width: 190px !important;
     }
     .s2-bubble-text {
-      font-size: 11.5px !important;
-      line-height: 1.35 !important;
+      font-size: 12.5px !important;
+      line-height: 1.34 !important;
     }
     .s2-nurse-wrap {
       position: relative !important;
       right: auto !important;
       bottom: auto !important;
-      width: 68px !important;
-      height: 128px !important;
-      flex-shrink: 0 !important;
+      width: 84px !important;
+      height: 112px !important;
+      flex: 0 0 auto !important;
+      align-self: flex-end !important;
+      margin: -8px 10% 0 0 !important;
       display: flex !important;
       align-items: flex-end !important;
       justify-content: center !important;
     }
     .s2-nurse-img {
-      max-height: 128px !important;
+      max-height: 112px !important;
     }
+
+    /* 1. Options block centered on screen: bottle + hugging checkbox list */
     .s2-options-col {
-      order: 2 !important;
+      order: 1 !important;
       display: flex !important;
+      flex: 0 0 auto !important;
       align-items: center !important;
       justify-content: center !important;
       width: 100% !important;
@@ -470,21 +488,27 @@ const SLIDE2_COMPONENT_CSS = `
       gap: 12px !important;
     }
     .s2-bottle-wrap {
-      width: 54px !important;
-      height: 115px !important;
-      flex-shrink: 0 !important;
+      width: 52px !important;
+      height: 104px !important;
+      flex: 0 0 auto !important;
     }
     .s2-radiogroup {
       display: flex !important;
       flex-direction: column !important;
-      gap: 6px !important;
-      flex: 1 !important;
+      justify-content: center !important;
+      align-items: stretch !important;
+      gap: 2px !important;
+      flex: 0 1 auto !important;
+      width: auto !important;
+      max-width: 100% !important;
       min-width: 0 !important;
     }
     .s2-option-row {
-      min-height: 42px !important;
+      width: 100% !important;
+      min-height: 44px !important;
       gap: 10px !important;
-      padding: 3px 6px !important;
+      padding: 4px 8px !important;
+      justify-content: flex-start !important;
     }
     .s2-checkbox-box {
       width: 24px !important;
@@ -492,16 +516,21 @@ const SLIDE2_COMPONENT_CSS = `
       flex-shrink: 0 !important;
     }
     .s2-option-text {
-      font-size: 14.5px !important;
+      font-size: 15px !important;
       line-height: 1.25 !important;
     }
+
+    /* 3. Bottom bar: Back/Next centered, CC + play centered beneath them */
     .s2-bottom-bar {
+      flex: 0 0 auto !important;
       display: flex !important;
       flex-direction: column !important;
       align-items: center !important;
-      gap: 8px !important;
+      justify-content: center !important;
+      gap: 6px !important;
       width: 100% !important;
-      padding-top: 4px !important;
+      margin-top: auto !important;
+      padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     .s2-spacer-side {
       display: none !important;
@@ -510,25 +539,26 @@ const SLIDE2_COMPONENT_CSS = `
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 12px !important;
-      width: 100% !important;
+      gap: 10px !important;
+      width: auto !important;
       margin: 0 auto !important;
     }
     .s2-btn-nav {
-      min-height: 42px !important;
-      min-width: 88px !important;
+      min-height: 44px !important;
+      min-width: 86px !important;
       font-size: 15px !important;
-      padding: 0 20px !important;
+      padding: 0 16px !important;
     }
     .s2-audio-wrap {
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       width: 100% !important;
+      margin: 0 auto !important;
     }
   }
 
-  /* Explicit .is-mobile */
+  /* Explicit .is-mobile preview variant mirrors the mobile layout */
   .s2-root.is-mobile {
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -537,73 +567,85 @@ const SLIDE2_COMPONENT_CSS = `
     min-height: 0 !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
-    align-items: center !important;
-    padding: 0.75rem 0.65rem 1.25rem !important;
-    gap: 10px !important;
+    align-items: stretch !important;
+    padding: 0.75rem 0.75rem 1.5rem !important;
+    gap: 0.75rem !important;
   }
   .s2-root.is-mobile .s2-banner-wrap {
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 16px !important;
-    padding: 8px 12px !important;
+    margin: 0 !important;
+    border-radius: 18px !important;
+    padding: 9px 14px !important;
   }
   .s2-root.is-mobile .s2-heading {
-    font-size: 15px !important;
-    line-height: 1.35 !important;
+    font-size: 15.5px !important;
+    line-height: 1.3 !important;
   }
   .s2-root.is-mobile .s2-stage-middle {
+    flex: 0 0 auto !important;
     flex-direction: column !important;
-    align-items: center !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
     width: 100% !important;
-    gap: 12px !important;
+    max-width: 100% !important;
+    gap: 0.85rem !important;
     padding: 0 !important;
+    margin: 0 !important;
   }
   .s2-root.is-mobile .s2-character-col {
-    order: 1 !important;
+    order: 2 !important;
     position: relative !important;
     display: flex !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-    gap: 8px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0 !important;
     width: 100% !important;
-    max-width: 340px !important;
+    max-width: 100% !important;
     height: auto !important;
-    margin: 2px auto !important;
+    margin: 0.15rem 0 0 0 !important;
   }
   .s2-root.is-mobile .s2-bubble-wrap {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: min(230px, calc(100% - 75px)) !important;
+    width: min(228px, 100%) !important;
     height: auto !important;
     aspect-ratio: 520 / 340 !important;
-    flex-shrink: 1 !important;
+    flex: 0 0 auto !important;
+    margin: 0 auto !important;
   }
   .s2-root.is-mobile .s2-bubble-text-wrap {
-    width: 80% !important;
-    max-width: 175px !important;
+    top: 45% !important;
+    left: 47% !important;
+    width: 84% !important;
+    max-width: 190px !important;
   }
   .s2-root.is-mobile .s2-bubble-text {
-    font-size: 11.5px !important;
-    line-height: 1.35 !important;
+    font-size: 12.5px !important;
+    line-height: 1.34 !important;
   }
   .s2-root.is-mobile .s2-nurse-wrap {
     position: relative !important;
     right: auto !important;
     bottom: auto !important;
-    width: 68px !important;
-    height: 128px !important;
-    flex-shrink: 0 !important;
+    width: 84px !important;
+    height: 112px !important;
+    flex: 0 0 auto !important;
+    align-self: flex-end !important;
+    margin: -8px 10% 0 0 !important;
     display: flex !important;
     align-items: flex-end !important;
     justify-content: center !important;
   }
   .s2-root.is-mobile .s2-nurse-img {
-    max-height: 128px !important;
+    max-height: 112px !important;
   }
   .s2-root.is-mobile .s2-options-col {
-    order: 2 !important;
+    order: 1 !important;
     display: flex !important;
+    flex: 0 0 auto !important;
     align-items: center !important;
     justify-content: center !important;
     width: 100% !important;
@@ -611,21 +653,27 @@ const SLIDE2_COMPONENT_CSS = `
     gap: 12px !important;
   }
   .s2-root.is-mobile .s2-bottle-wrap {
-    width: 54px !important;
-    height: 115px !important;
-    flex-shrink: 0 !important;
+    width: 52px !important;
+    height: 104px !important;
+    flex: 0 0 auto !important;
   }
   .s2-root.is-mobile .s2-radiogroup {
     display: flex !important;
     flex-direction: column !important;
-    gap: 6px !important;
-    flex: 1 !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+    gap: 2px !important;
+    flex: 0 1 auto !important;
+    width: auto !important;
+    max-width: 100% !important;
     min-width: 0 !important;
   }
   .s2-root.is-mobile .s2-option-row {
-    min-height: 42px !important;
+    width: 100% !important;
+    min-height: 44px !important;
     gap: 10px !important;
-    padding: 3px 6px !important;
+    padding: 4px 8px !important;
+    justify-content: flex-start !important;
   }
   .s2-root.is-mobile .s2-checkbox-box {
     width: 24px !important;
@@ -633,16 +681,19 @@ const SLIDE2_COMPONENT_CSS = `
     flex-shrink: 0 !important;
   }
   .s2-root.is-mobile .s2-option-text {
-    font-size: 14.5px !important;
+    font-size: 15px !important;
     line-height: 1.25 !important;
   }
   .s2-root.is-mobile .s2-bottom-bar {
+    flex: 0 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 8px !important;
+    justify-content: center !important;
+    gap: 6px !important;
     width: 100% !important;
-    padding-top: 4px !important;
+    margin-top: auto !important;
+    padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
   }
   .s2-root.is-mobile .s2-spacer-side {
     display: none !important;
@@ -651,29 +702,63 @@ const SLIDE2_COMPONENT_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 12px !important;
-    width: 100% !important;
+    gap: 10px !important;
+    width: auto !important;
     margin: 0 auto !important;
   }
   .s2-root.is-mobile .s2-btn-nav {
-    min-height: 42px !important;
-    min-width: 88px !important;
+    min-height: 44px !important;
+    min-width: 86px !important;
     font-size: 15px !important;
-    padding: 0 20px !important;
+    padding: 0 16px !important;
   }
   .s2-root.is-mobile .s2-audio-wrap {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     width: 100% !important;
+    margin: 0 auto !important;
   }
 
-  /* Short landscape (<520px height) */
-  @media (orientation: landscape) and (max-height: 520px) {
+  /* Short landscape phones: compact but complete */
+  @media (max-width: 767px) and (orientation: landscape) and (max-height: 520px) {
     .s2-root {
       overflow-y: auto !important;
       overflow-x: hidden !important;
-      padding: 0.5rem 1rem 1rem !important;
+      padding: 0.5rem 0.9rem 1rem !important;
+      gap: 0.5rem !important;
+    }
+    .s2-stage-middle {
+      gap: 0.5rem !important;
+    }
+    .s2-bubble-wrap {
+      width: min(200px, calc(100% - 70px)) !important;
+    }
+    .s2-bubble-text {
+      font-size: 11.5px !important;
+      line-height: 1.3 !important;
+    }
+    .s2-nurse-wrap,
+    .s2-root.is-mobile .s2-nurse-wrap {
+      width: 62px !important;
+      height: 108px !important;
+    }
+    .s2-nurse-img {
+      max-height: 108px !important;
+    }
+    .s2-bottle-wrap {
+      width: 46px !important;
+      height: 92px !important;
+    }
+    .s2-option-row {
+      min-height: 38px !important;
+      padding: 2px 6px !important;
+    }
+    .s2-option-text {
+      font-size: 13.5px !important;
+    }
+    .s2-btn-nav {
+      min-height: 40px !important;
     }
   }
 
@@ -933,7 +1018,7 @@ export function Slide2MedicineNamingScreen({
             {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
           </button>
         </nav>
-
+        <br></br>
         {/* Audio Player */}
         <div className="s2-audio-wrap s2-spacer-side">
           <AudioPlayer
