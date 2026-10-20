@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import SlideNavigationButtons from "./SlideNavigationButtons";
 
 export interface Slide8MilestoneScreenProps {
   isSpanish?: boolean;
@@ -195,62 +196,19 @@ const SLIDE8_COMPONENT_CSS = `
     flex-shrink: 0;
   }
 
-  .s8-nav-center {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 0 auto;
-    flex-shrink: 0;
-  }
-
-  /* Navigation Buttons (WCAG 2.5.5 AAA Target Size >= 44px) */
-  .s8-btn-nav {
-    border-radius: 9999px;
-    font-weight: 700;
-    border: 1.5px solid transparent;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-height: 48px;
-    min-width: 98px;
-    font-size: 16px;
-    padding: 0 24px;
-    transition: transform 0.1s ease, background-color 0.15s ease;
-  }
-  .s8-btn-nav:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.14);
-  }
-  .s8-btn-nav:active:not(:disabled) {
-    transform: translateY(1px);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-  .s8-btn-nav:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-
-  /* Back Button (Contrast #11332e on #bddfd8 = 9.4:1 AAA) */
-  .s8-btn-back {
-    background-color: #bddfd8;
-    color: #11332e;
-    border-color: #78a59b;
-  }
-  .s8-btn-back:hover:not(:disabled) {
-    background-color: #a8d5cc;
-  }
-
-  /* Next Button (Contrast #1a2624 on #fdee8e = 12.8:1 AAA) */
-  .s8-btn-next {
-    background-color: #fdee8e;
-    color: #1a2624;
-    border-color: #c8b746;
-  }
-  .s8-btn-next:hover:not(:disabled) {
-    background-color: #f5e478;
+  /* Shared SlideNavigationButtons kept inline inside the footer bar */
+  .s8-bottom-bar .slide-nav {
+    position: static !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    gap: 14px !important;
   }
 
   /* Audio Controls (WCAG 1.4.3 AAA Contrast: #144e57 on #fafdf3 = 8.2:1) */
@@ -351,12 +309,6 @@ const SLIDE8_COMPONENT_CSS = `
     margin-left: auto !important;
     margin-right: 48px !important;
   }
-  .s8-component-card.is-mobile .s8-btn-nav {
-    min-height: 44px !important;
-    min-width: 72px !important;
-    font-size: 14px !important;
-    padding: 0 16px !important;
-  }
   .s8-component-card.is-mobile .s8-spacer-side {
     width: 60px !important;
   }
@@ -396,12 +348,6 @@ const SLIDE8_COMPONENT_CSS = `
       margin-top: -24px;
       margin-left: auto;
       margin-right: 48px;
-    }
-    .s8-btn-nav {
-      min-height: 44px;
-      min-width: 72px;
-      font-size: 14px;
-      padding: 0 16px;
     }
     .s8-spacer-side {
       width: 60px;
@@ -675,33 +621,16 @@ export function Slide8MilestoneScreen({
         <div className="s8-spacer-side" aria-hidden="true" />
 
         {/* Centered Navigation Buttons (Back & Next) */}
-        <nav
-          className="s8-nav-center"
-          aria-label={isEs ? "Navegación de diapositiva" : "Slide pagination"}
-        >
-          <button
-            type="button"
-            className="s8-btn-nav s8-btn-back"
-            onClick={onBack}
-            disabled={loading}
-            aria-label={isEs ? "Volver a la diapositiva anterior" : "Back to previous slide"}
-          >
-            {isEs ? "Atrás" : "Back"}
-          </button>
-          <button
-            type="button"
-            className="s8-btn-nav s8-btn-next"
-            onClick={onNext}
-            disabled={loading}
-            aria-label={isEs ? "Continuar a la siguiente diapositiva" : "Next slide"}
-          >
-            {isEs ? "Siguiente" : "Next"}
-          </button>
-        </nav>
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
+        />
 
         {/* Audio narration & CC controls */}
         <div className="s8-audio-controls s8-spacer-side">
-          <button
+          {/* <button
             type="button"
             className="s8-audio-btn"
             onClick={toggleCaptions}
@@ -827,7 +756,7 @@ export function Slide8MilestoneScreen({
                 <polygon points="28,14 46,23.5 28,33" fill="#144e57" />
               </svg>
             )}
-          </button>
+          </button> */}
         </div>
       </footer>
     </section>

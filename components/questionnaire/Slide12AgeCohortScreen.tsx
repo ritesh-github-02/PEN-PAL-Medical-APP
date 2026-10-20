@@ -123,7 +123,7 @@ const SLIDE12_CSS = `
   justify-content: center;
   text-align: center;
   cursor: pointer;
-  background-color: #beddd7;
+  background-color: #ffffff;
   border: 1.5px solid #4a867e;
   color: #142724;
   box-shadow: 0 3px 6px rgba(20, 50, 45, 0.12);
@@ -136,7 +136,7 @@ const SLIDE12_CSS = `
 }
 
 .s12-cohort-btn:hover {
-  background-color: #aed5ce;
+  background-color: #f4f9f8;
   border-color: #3b746c;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(20, 50, 45, 0.18);

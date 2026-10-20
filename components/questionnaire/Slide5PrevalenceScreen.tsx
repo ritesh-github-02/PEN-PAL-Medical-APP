@@ -91,9 +91,12 @@ const mobileLayout = (scope: string) => `
     max-height: 250px !important;
   }
   ${scope} .s5-audio {
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
     display: flex !important;
     justify-content: center !important;
-    margin: 10px auto 4px auto !important;
+    margin: 10px auto 0 auto !important;
     z-index: 25 !important;
   }
 `;
@@ -242,9 +245,15 @@ const SLIDE5_CSS = `
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
   }
 
-  /* Audio Player: hidden on desktop (PenpalIntervention frame provides it), shown on mobile */
+  /* Audio narration & CC controls: bottom-right on desktop, centered on mobile */
   .s5-audio {
-    display: none !important;
+    position: absolute;
+    right: 22px;
+    bottom: clamp(16px, 3vh, 22px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 30;
   }
 
   @media (max-width: 767px) {
@@ -395,26 +404,26 @@ export function Slide5PrevalenceScreen({
             draggable={false}
           />
         </div>
-
-        {/* 4. Inline Audio Player (mobile only, hidden on desktop) */}
-        <div className="s5-audio">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId}
-            locale={isEs ? "es" : "en"}
-            transcriptText={captionText}
-            size="large"
-          />
-        </div>
       </div>
 
-      {/* 5. Fixed Centered Bottom Navigation (Back & Next) */}
+      {/* 4. Fixed Centered Bottom Navigation (Back & Next) */}
       <SlideNavigationButtons
         onBack={onBack}
         onNext={onNext}
         isSpanish={isEs}
         loading={loading}
       />
+
+      {/* 5. Audio narration & CC controls (bottom-right on desktop, centered under nav on mobile) */}
+      <div className="s5-audio">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId}
+          locale={isEs ? "es" : "en"}
+          transcriptText={captionText}
+          size="large"
+        />
+      </div>
     </div>
   );
 }
