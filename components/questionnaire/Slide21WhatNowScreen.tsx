@@ -5,15 +5,11 @@ import { resolveMedicineToken } from "@/lib/token-engine";
 import { SlideNavigationButtons } from "./SlideNavigationButtons";
 
 /* ==========================================================
-   Slide21WhatNowScreen – Styles matching Figma UI
-   (Figma Screen 17: "What Now?")
-   - Yellow "What Now?" pill badge (#feff9f) with teal border + shadow
-   - Regular-weight heading & bullets, same size (like Figma)
-   - Illustration centred right under the text, blended into background
-   - Desktop: vertical column
-   - Mobile Portrait: scaled-down proportions
-   - Mobile Landscape: side-by-side split row
-   - Standardized SlideNavigationButtons pinned at bottom
+   Slide21WhatNowScreen – "What Now?" (Figma Screen 17)
+   Layout: badge → heading → bullets → illustration (fills the
+   remaining space) → Back / Next pinned at the bottom.
+   - Desktop / tablet / phone portrait: vertical column
+   - Phone landscape: text left, image right
    ========================================================== */
 
 const SLIDE21_CSS = `
@@ -25,6 +21,7 @@ const SLIDE21_CSS = `
 }
 
 .s21-root {
+  --s21-nav-space: 88px; /* room reserved for Back / Next */
   position: relative;
   width: 100%;
   height: 100%;
@@ -32,62 +29,58 @@ const SLIDE21_CSS = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
+  padding: clamp(14px, 3vh, 32px) clamp(16px, 4vw, 48px) var(--s21-nav-space);
   background-color: #fafdf3;
-  padding: clamp(18px, 3.4vh, 34px) clamp(20px, 4vw, 48px) clamp(80px, 11vh, 96px) clamp(20px, 4vw, 48px);
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   color: #232323;
 }
 
-/* Main Content Area */
-.s21-content-wrap {
+/* ---------- Layout ---------- */
+.s21-content {
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  gap: clamp(8px, 1.6vh, 16px);
+}
+
+.s21-text {
   flex: 0 0 auto;
-}
-
-.s21-text-col {
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  flex-shrink: 0;
 }
 
-/* Yellow Badge matching Figma */
+/* ---------- Badge ---------- */
 .s21-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: auto;
-  min-width: 180px;
-  height: 78px;
-  padding: 0 30px;
+  min-width: clamp(130px, 22vw, 180px);
+  height: clamp(48px, 8vh, 78px);
+  padding: 0 clamp(20px, 3vw, 30px);
+  margin-bottom: clamp(12px, 2.6vh, 28px);
   background-color: #feff9f;
   border: 2px solid #2b7f8f;
-  border-radius: 22px;
+  border-radius: clamp(14px, 2vw, 22px);
   box-shadow: 0 4px 5px rgba(34, 105, 118, 0.45);
-  margin: 0 0 clamp(18px, 3.4vh, 32px) 0;
-  flex-shrink: 0;
 }
 
 .s21-badge-title {
-  font-size: 25px;
-  font-weight: 700;
-  color: #232323;
-  letter-spacing: -0.01em;
   margin: 0;
+  font-size: clamp(17px, 2.4vw, 25px);
+  font-weight: 700;
   line-height: 1;
-  outline: none;
+  letter-spacing: -0.01em;
   white-space: nowrap;
+  color: #232323;
+  outline: none;
 }
 
 .s21-badge-title:focus-visible {
@@ -95,177 +88,87 @@ const SLIDE21_CSS = `
   border-radius: 4px;
 }
 
-/* Heading Statement (regular weight, like Figma) */
+/* ---------- Heading + bullets (same size, regular weight) ---------- */
+.s21-heading,
+.s21-bullet {
+  font-size: clamp(16px, 2.3vw, 26px);
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  text-align: left;
+  color: #232323;
+}
+
 .s21-heading {
-  font-size: clamp(20px, 2.7vw, 26px);
-  font-weight: 400;
-  color: #232323;
   margin: 0;
-  letter-spacing: -0.005em;
-  line-height: 1.3;
-  text-align: left;
 }
 
-/* Bullet Points (same size as heading, like Figma) */
 .s21-bullets {
+  width: 100%;
   margin: 0;
-  padding-left: 38px;
-  list-style-type: disc;
-  width: 100%;
+  padding-left: clamp(24px, 3.4vw, 38px);
+  list-style: disc;
 }
 
-.s21-bullet-item {
-  font-size: clamp(20px, 2.7vw, 26px);
-  line-height: 1.3;
-  color: #232323;
+/* ---------- Illustration: fills the leftover space ---------- */
+.s21-figure {
+  position: relative;
+  flex: 1 1 0;
+  width: 100%;
+  max-width: 620px;
+  min-height: 160px; /* below this the slide scrolls instead of shrinking */
+  align-self: center;
   margin: 0;
-  font-weight: 400;
-  letter-spacing: -0.005em;
-  text-align: left;
 }
 
-/* Illustration - centred right under the text, blended into background */
-.s21-illustration-wrap {
+.s21-image {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  margin: clamp(2px, 0.8vh, 8px) auto 0 auto;
-  flex: 0 0 auto;
-}
-
-.s21-illustration-img {
-  width: 100%;
-  max-width: 420px;
-  height: auto;
-  max-height: clamp(220px, 38vh, 300px);
+  height: 100%;
   object-fit: contain;
-  display: block;
+  object-position: center top;
+  mix-blend-mode: multiply; /* hides the beige box against the page background */
   user-select: none;
-  background: transparent;
-  mix-blend-mode: multiply;
-  box-shadow: none;
-  filter: none;
 }
 
-/* Compact Laptop / Height-constrained screens */
-@media (max-height: 720px) and (min-width: 768px) {
-  .s21-root {
-    padding: 14px 28px 68px 28px !important;
-  }
-  .s21-badge {
-    height: 60px !important;
-    min-width: 150px !important;
-    padding: 0 24px !important;
-    margin-bottom: 14px !important;
-  }
-  .s21-badge-title {
-    font-size: 20px !important;
-  }
-  .s21-heading,
-  .s21-bullet-item {
-    font-size: 19px !important;
-  }
-  .s21-illustration-img {
-    max-width: 340px !important;
-    max-height: clamp(170px, 30vh, 230px) !important;
-  }
+/* ---------- Small phones ---------- */
+@media (max-width: 599px) {
+  .s21-root { --s21-nav-space: 96px; }
+  .s21-figure { min-height: 180px; }
 }
 
-/* ==========================================================
-   Mobile Portrait Mode (< 768px)
-   ========================================================== */
-@media (max-width: 767px) {
-  .s21-root {
-    padding: 16px 16px 76px 16px !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-  .s21-content-wrap {
-    max-width: 100% !important;
-  }
-  .s21-badge {
-    min-width: 128px !important;
-    height: 54px !important;
-    padding: 0 22px !important;
-    border-radius: 16px !important;
-    margin-bottom: 14px !important;
-  }
-  .s21-badge-title {
-    font-size: 18px !important;
-  }
-  .s21-heading {
-    font-size: 17px !important;
-    line-height: 1.32 !important;
-  }
-  .s21-bullets {
-    padding-left: 26px !important;
-  }
-  .s21-bullet-item {
-    font-size: 17px !important;
-    line-height: 1.32 !important;
-  }
-  .s21-illustration-wrap {
-    margin: 6px auto 4px auto !important;
-  }
-  .s21-illustration-img {
-    max-width: 340px !important;
-    max-height: clamp(190px, 34vh, 270px) !important;
-    margin: 0 auto !important;
-  }
-}
-
-/* ==========================================================
-   Mobile Landscape Mode (< 520px height) - Split Screen Row
-   ========================================================== */
+/* ---------- Phone landscape: text left, image right ---------- */
 @media (orientation: landscape) and (max-height: 520px) {
   .s21-root {
-    padding: 10px 18px 60px 18px !important;
-    overflow-y: auto !important;
+    --s21-nav-space: 64px;
+    padding-top: 10px;
   }
-  .s21-content-wrap {
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 16px !important;
-    max-width: 100% !important;
+  .s21-content {
+    max-width: 100%;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 16px;
   }
-  .s21-text-col {
-    flex: 1 1 54% !important;
-    width: 54% !important;
-    justify-content: center !important;
+  .s21-text {
+    flex: 1 1 50%;
+    justify-content: center;
   }
   .s21-badge {
-    min-width: 110px !important;
-    height: 40px !important;
-    padding: 0 16px !important;
-    border-radius: 13px !important;
-    margin-bottom: 8px !important;
+    min-width: 110px;
+    height: 40px;
+    margin-bottom: 8px;
   }
-  .s21-badge-title {
-    font-size: 14px !important;
+  .s21-badge-title { font-size: 14px; }
+  .s21-heading,
+  .s21-bullet { font-size: 14px; line-height: 1.3; }
+  .s21-bullets { padding-left: 18px; }
+  .s21-figure {
+    flex: 1 1 50%;
+    min-height: 120px;
+    align-self: stretch;
   }
-  .s21-heading {
-    font-size: 14px !important;
-    line-height: 1.3 !important;
-  }
-  .s21-bullets {
-    padding-left: 18px !important;
-  }
-  .s21-bullet-item {
-    font-size: 14px !important;
-    line-height: 1.3 !important;
-  }
-  .s21-illustration-wrap {
-    flex: 1 1 44% !important;
-    width: 44% !important;
-    margin: 0 !important;
-    align-items: center !important;
-  }
-  .s21-illustration-img {
-    max-width: 320px !important;
-    max-height: clamp(130px, 50vh, 190px) !important;
-  }
+  .s21-image { object-position: center center; }
 }
 `;
 
@@ -287,6 +190,17 @@ export interface Slide21WhatNowScreenProps {
   transcriptText?: string;
 }
 
+const BULLETS = [
+  {
+    en: "The test can help you learn the truth about your child’s past reaction.",
+    es: "La prueba puede ayudarle a conocer la verdad sobre la reacción pasada de su hijo.",
+  },
+  {
+    en: "The test may help your child get better medicine in the future.",
+    es: "La prueba puede ayudar a que su hijo reciba mejores medicamentos en el futuro.",
+  },
+];
+
 export function Slide21WhatNowScreen({
   isSpanish = false,
   medicationName,
@@ -294,17 +208,11 @@ export function Slide21WhatNowScreen({
   onBack,
   loading = false,
   navProps,
-  audioSrc,
-  stepId = "slide21_what_now",
-  locale,
-  transcriptText,
 }: Slide21WhatNowScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      headingRef.current?.focus();
-    }, 50);
+    const timer = setTimeout(() => headingRef.current?.focus(), 50);
     return () => clearTimeout(timer);
   }, []);
 
@@ -312,49 +220,18 @@ export function Slide21WhatNowScreen({
     ? "¡Hable con el médico de su hijo sobre la prueba de alergia a [name]!"
     : "Talk to your child’s doctor about [name] allergy testing!";
 
-  const rawBullets = [
-    {
-      en: "The test can help you learn the truth about your child’s past reaction.",
-      es: "La prueba puede ayudarle a conocer la verdad sobre la reacción pasada de su hijo.",
-    },
-    {
-      en: "The test may help your child get better medicine in the future.",
-      es: "La prueba puede ayudar a que su hijo reciba mejores medicamentos en el futuro.",
-    },
-  ];
-
   const titleText = resolveMedicineToken(rawTitle, medicationName, isSpanish);
 
-  const handleNextClick = () => {
-    if (onNext) {
-      onNext();
-    } else if (navProps?.onNext) {
-      navProps.onNext();
-    }
-  };
-
-  const handleBackClick = () => {
-    if (onBack) {
-      onBack();
-    } else if (navProps?.onBack) {
-      navProps.onBack();
-    }
-  };
-
+  const handleNext = () => (onNext ? onNext() : navProps?.onNext());
+  const handleBack = () => (onBack ? onBack() : navProps?.onBack());
   const isLoading = loading || navProps?.loading || false;
-
-  const spokenText = `${isSpanish ? "Qué sigue ahora. " : "What Now? "}${titleText}. ${rawBullets
-    .map((b) => resolveMedicineToken(isSpanish ? b.es : b.en, medicationName, isSpanish))
-    .join(" ")}`;
 
   return (
     <div id="slide-content" className="s21-root">
       <style>{SLIDE21_CSS}</style>
 
-      {/* Main Content Area */}
-      <main className="s21-content-wrap">
-        <div className="s21-text-col">
-          {/* Yellow Badge */}
+      <main className="s21-content">
+        <div className="s21-text">
           <div className="s21-badge">
             <h2
               ref={headingRef}
@@ -366,17 +243,17 @@ export function Slide21WhatNowScreen({
             </h2>
           </div>
 
-          {/* Heading Statement */}
-          <h1 className="s21-heading">
-            {titleText}
-          </h1>
+          <h1 className="s21-heading">{titleText}</h1>
 
-          {/* Bullet Points */}
           <ul className="s21-bullets" aria-label={titleText}>
-            {rawBullets.map((b, idx) => {
-              const text = resolveMedicineToken(isSpanish ? b.es : b.en, medicationName, isSpanish);
+            {BULLETS.map((b) => {
+              const text = resolveMedicineToken(
+                isSpanish ? b.es : b.en,
+                medicationName,
+                isSpanish
+              );
               return (
-                <li key={idx} className="s21-bullet-item">
+                <li key={b.en} className="s21-bullet">
                   {text}
                 </li>
               );
@@ -384,8 +261,7 @@ export function Slide21WhatNowScreen({
           </ul>
         </div>
 
-        {/* Doctor Consultation Illustration */}
-        <div className="s21-illustration-wrap" aria-hidden="true">
+        <figure className="s21-figure" aria-hidden="true">
           <img
             src="/images/doctor-consultation.png"
             alt={
@@ -393,16 +269,15 @@ export function Slide21WhatNowScreen({
                 ? "Madre e hija consultando con la pediatra sobre las pruebas de alergia"
                 : "Mother and daughter consulting with pediatrician about allergy testing"
             }
-            className="s21-illustration-img"
+            className="s21-image"
             draggable={false}
           />
-        </div>
+        </figure>
       </main>
 
-      {/* Standardized Navigation Buttons (Back & Next) pinned at bottom */}
       <SlideNavigationButtons
-        onBack={handleBackClick}
-        onNext={handleNextClick}
+        onBack={handleBack}
+        onNext={handleNext}
         isSpanish={isSpanish}
         loading={isLoading}
       />
