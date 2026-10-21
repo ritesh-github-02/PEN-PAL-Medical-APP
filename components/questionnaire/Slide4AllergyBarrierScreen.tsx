@@ -186,11 +186,11 @@ const SLIDE4_CSS = `
   .s4-bubble {
     order: 1 !important;
     position: relative !important;
-    left: 55% !important;
+    left: 53% !important;
     top: 30px !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
-    max-width: 320px !important;
+    max-width: 270px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
     margin: 4px auto 0 auto !important;
@@ -220,7 +220,7 @@ const SLIDE4_CSS = `
     text-align: center !important;
   }
   .s4-bubble-text {
-    font-size: 13px !important;
+    font-size: 10px !important;
     line-height: 1.35 !important;
     font-weight: 700 !important;
     color: #232323 !important;
