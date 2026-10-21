@@ -175,8 +175,6 @@ const SLIDE6_CSS = `
   width: ${STAGE_W}px;
   height: ${STAGE_H}px;
   padding: 30px 36px 60px;
-  transform-origin: center center;
-  background-color: #fafdf3;
   overflow: hidden;
 }
 

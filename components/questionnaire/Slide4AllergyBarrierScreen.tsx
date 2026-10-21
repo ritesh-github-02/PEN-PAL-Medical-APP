@@ -186,11 +186,11 @@ const SLIDE4_CSS = `
   .s4-bubble {
     order: 1 !important;
     position: relative !important;
-    left: 50% !important;
-    top: -30px !important;
+    left: 55% !important;
+    top: 30px !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
-    max-width: 340px !important;
+    max-width: 320px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
     margin: 4px auto 0 auto !important;
@@ -233,7 +233,7 @@ const SLIDE4_CSS = `
   .s4-nurse {
     order: 2 !important;
     position: relative !important;
-    left: auto !important;
+    left: -96px !important;
     top: auto !important;
     width: 120px !important;
     height: 200px !important;
