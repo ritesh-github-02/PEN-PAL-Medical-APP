@@ -99,6 +99,9 @@ const mobileLayout = (scope: string) => `
     margin: 10px auto 0 auto !important;
     z-index: 25 !important;
   }
+  ${scope} .slide-nav {
+    margin: 10px auto 0.25rem auto !important;
+  }
 `;
 
 const SLIDE5_CSS = `
@@ -406,15 +409,7 @@ export function Slide5PrevalenceScreen({
         </div>
       </div>
 
-      {/* 4. Fixed Centered Bottom Navigation (Back & Next) */}
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isEs}
-        loading={loading}
-      />
-
-      {/* 5. Audio narration & CC controls (bottom-right on desktop, centered under nav on mobile) */}
+      {/* 4. Audio narration & CC controls (bottom-right on desktop, centered above nav on mobile) */}
       <div className="s5-audio">
         <AudioPlayer
           audioSrc={effectiveAudioSrc}
@@ -424,6 +419,14 @@ export function Slide5PrevalenceScreen({
           size="large"
         />
       </div>
+
+      {/* 5. Fixed Centered Bottom Navigation (Back & Next) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isEs}
+        loading={loading}
+      />
     </div>
   );
 }

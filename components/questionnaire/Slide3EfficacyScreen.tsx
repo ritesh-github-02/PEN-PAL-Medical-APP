@@ -128,8 +128,11 @@ const mobileLayout = (scope: string) => `
   ${scope} .s3-audio {
     display: flex !important;
     justify-content: center !important;
-    margin: 10px auto 4px auto !important;
+    margin: 10px auto 0 auto !important;
     z-index: 25 !important;
+  }
+  ${scope} .slide-nav {
+    margin: 10px auto 0.25rem auto !important;
   }
 `;
 

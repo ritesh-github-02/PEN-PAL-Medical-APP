@@ -1203,6 +1203,7 @@ export default function PenpalIntervention() {
                   "screen6_survey_intro",
                   "slide10_survey_intro",
                   "screen6_4_resolution",
+                  "screen6_4_care",
                 ].includes(currentStep.id);
 
                 return (

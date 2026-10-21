@@ -135,6 +135,9 @@ const mobileLayout = (scope: string) => `
     width: 42px;
     height: 28px;
   }
+  ${scope} .slide-nav {
+    margin: 10px auto 0.25rem auto !important;
+  }
 `;
 
 const SLIDE6_CSS = `

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
 export interface Slide8MilestoneScreenProps {
@@ -211,31 +212,13 @@ const SLIDE8_COMPONENT_CSS = `
     gap: 14px !important;
   }
 
-  /* Audio Controls (WCAG 1.4.3 AAA Contrast: #144e57 on #fafdf3 = 8.2:1) */
-  .s8-audio-controls {
+  /* Audio Controls wrap */
+  .s8-audio-wrap {
     display: flex;
     align-items: center;
-    gap: 6px;
-    color: #144e57;
     justify-content: flex-end;
-  }
-  .s8-audio-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #144e57;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    min-width: 44px;
-    min-height: 44px;
-    border-radius: 8px;
-    transition: transform 0.12s ease, opacity 0.15s ease;
-  }
-  .s8-audio-btn:hover {
-    transform: scale(1.08);
-    opacity: 0.85;
+    width: 110px;
+    flex-shrink: 0;
   }
 
   /* Closed Captions Panel (WCAG 1.2.2 Captions, Contrast 14.8:1 AAA) */
@@ -309,8 +292,36 @@ const SLIDE8_COMPONENT_CSS = `
     margin-left: auto !important;
     margin-right: 48px !important;
   }
+  .s8-component-card.is-mobile .s8-bottom-bar {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin-top: auto !important;
+    padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
   .s8-component-card.is-mobile .s8-spacer-side {
-    width: 60px !important;
+    display: none !important;
+  }
+  .s8-component-card.is-mobile .s8-audio-wrap {
+    order: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+  .s8-component-card.is-mobile .s8-bottom-bar .slide-nav {
+    order: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: auto !important;
+    margin: 0 auto !important;
   }
 
   /* Responsive Fallback (< 768px) */
@@ -349,8 +360,36 @@ const SLIDE8_COMPONENT_CSS = `
       margin-left: auto;
       margin-right: 48px;
     }
+    .s8-bottom-bar {
+      flex: 0 0 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 10px !important;
+      width: 100% !important;
+      margin-top: auto !important;
+      padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
     .s8-spacer-side {
-      width: 60px;
+      display: none !important;
+    }
+    .s8-audio-wrap {
+      order: 1 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+    }
+    .s8-bottom-bar .slide-nav {
+      order: 2 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 12px !important;
+      width: auto !important;
+      margin: 0 auto !important;
     }
   }
 
@@ -377,12 +416,7 @@ export function Slide8MilestoneScreen({
   locale,
   transcriptText,
 }: Slide8MilestoneScreenProps) {
-  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
-  const [showCaptions, setShowCaptions] = useState<boolean>(false);
-  const [liveAnnouncement, setLiveAnnouncement] = useState<string>("");
-
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const activeLocale = locale || (isSpanish ? "es" : "en");
   const isEs = activeLocale.startsWith("es") || isSpanish;
@@ -391,18 +425,6 @@ export function Slide8MilestoneScreen({
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
   }, []);
-
-  // Keyboard Escape listener for Closed Captions dismissal (WCAG 1.4.13)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && showCaptions) {
-        setShowCaptions(false);
-        setLiveAnnouncement(isEs ? "Subtítulos ocultados" : "Closed captions dismissed");
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showCaptions, isEs]);
 
   const effectiveAudioSrc =
     audioSrc ||
@@ -416,93 +438,6 @@ export function Slide8MilestoneScreen({
       ? "¡Buen trabajo! ¡Ahora ya sabe lo que es verdad sobre las alergias a la penicilina!"
       : "Great job! Now you know what is true about penicillin allergies!");
 
-  // Synchronize audio playback state with audio element events and SpeechSynthesis
-  useEffect(() => {
-    const audioEl = audioRef.current;
-    if (!audioEl) return;
-
-    const handlePlay = () => setAudioPlaying(true);
-    const handlePause = () => setAudioPlaying(false);
-    const handleEnded = () => setAudioPlaying(false);
-
-    audioEl.addEventListener("play", handlePlay);
-    audioEl.addEventListener("pause", handlePause);
-    audioEl.addEventListener("ended", handleEnded);
-
-    return () => {
-      audioEl.removeEventListener("play", handlePlay);
-      audioEl.removeEventListener("pause", handlePause);
-      audioEl.removeEventListener("ended", handleEnded);
-      audioEl.pause();
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, [effectiveAudioSrc, stepId]);
-
-  const toggleAudio = () => {
-    const audioEl = audioRef.current;
-    const willPlay = !audioPlaying;
-
-    setLiveAnnouncement(
-      willPlay
-        ? isEs
-          ? "Reproduciendo narración de audio"
-          : "Audio narration playing"
-        : isEs
-        ? "Narración de audio pausada"
-        : "Audio narration paused"
-    );
-
-    if (willPlay) {
-      if (audioEl && audioEl.src && !audioEl.src.endsWith(".undefined")) {
-        audioEl.play().catch(() => {
-          if (typeof window !== "undefined" && "speechSynthesis" in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(spokenText);
-            utterance.lang = isEs ? "es-US" : "en-US";
-            utterance.rate = 0.95;
-            utterance.onstart = () => setAudioPlaying(true);
-            utterance.onend = () => setAudioPlaying(false);
-            utterance.onerror = () => setAudioPlaying(false);
-            window.speechSynthesis.speak(utterance);
-          }
-        });
-      } else if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(spokenText);
-        utterance.lang = isEs ? "es-US" : "en-US";
-        utterance.rate = 0.95;
-        utterance.onstart = () => setAudioPlaying(true);
-        utterance.onend = () => setAudioPlaying(false);
-        utterance.onerror = () => setAudioPlaying(false);
-        window.speechSynthesis.speak(utterance);
-      }
-    } else {
-      if (audioEl) {
-        audioEl.pause();
-      }
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-      setAudioPlaying(false);
-    }
-  };
-
-  const toggleCaptions = () => {
-    const next = !showCaptions;
-    setShowCaptions(next);
-    setLiveAnnouncement(
-      next
-        ? isEs
-          ? "Subtítulos mostrados"
-          : "Closed captions displayed"
-        : isEs
-        ? "Subtítulos ocultados"
-        : "Closed captions hidden"
-    );
-  };
-
   const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
@@ -514,20 +449,6 @@ export function Slide8MilestoneScreen({
       lang={isEs ? "es" : "en"}
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE8_COMPONENT_CSS }} />
-
-      {/* Screen Reader Live Region for WCAG 4.1.3 */}
-      <div className="s8-sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {liveAnnouncement}
-      </div>
-
-      {/* Hidden audio element for audio narration */}
-      <audio
-        ref={audioRef}
-        src={effectiveAudioSrc}
-        preload="metadata"
-        className="s8-sr-only"
-        aria-hidden="true"
-      />
 
       {/* Stage Body */}
       <div className="s8-stage-body">
@@ -596,22 +517,6 @@ export function Slide8MilestoneScreen({
         </div>
       </div>
 
-      {/* Closed Caption Drawer (WCAG 1.2.2 Captions) */}
-      {showCaptions && (
-        <div
-          className="s8-captions-panel"
-          role="region"
-          aria-label={isEs ? "Subtítulos de narración" : "Closed captions"}
-        >
-          <span className="s8-captions-tag" aria-hidden="true">
-            CC
-          </span>
-          <p className="s8-captions-text">
-            {spokenText}
-          </p>
-        </div>
-      )}
-
       {/* 3. Bottom Navigation & Audio Controls (WCAG 2.4.1 Toolbar) */}
       <footer
         className="s8-bottom-bar"
@@ -629,134 +534,14 @@ export function Slide8MilestoneScreen({
         />
 
         {/* Audio narration & CC controls */}
-        <div className="s8-audio-controls s8-spacer-side">
-          {/* <button
-            type="button"
-            className="s8-audio-btn"
-            onClick={toggleCaptions}
-            aria-pressed={showCaptions}
-            aria-label={
-              showCaptions
-                ? isEs
-                  ? "Ocultar subtítulos"
-                  : "Hide closed captions"
-                : isEs
-                ? "Mostrar subtítulos"
-                : "Show closed captions"
-            }
-            title={
-              showCaptions
-                ? isEs
-                  ? "Ocultar subtítulos"
-                  : "Hide closed captions"
-                : isEs
-                ? "Mostrar subtítulos"
-                : "Show closed captions"
-            }
-          >
-            <svg
-              width="40"
-              height="36"
-              viewBox="0 0 52 47"
-              fill="none"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <rect
-                x="2"
-                y="2"
-                width="48"
-                height="43"
-                rx="10"
-                fill={showCaptions ? "#144e57" : "#e6f4f1"}
-                stroke="#144e57"
-                strokeWidth="2.5"
-              />
-              <text
-                x="26"
-                y="28"
-                textAnchor="middle"
-                fill={showCaptions ? "#ffffff" : "#144e57"}
-                fontSize="18"
-                fontFamily="Plus Jakarta Sans, sans-serif"
-                fontWeight="800"
-                letterSpacing="1"
-                aria-hidden="true"
-              >
-                CC
-              </text>
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            className="s8-audio-btn"
-            onClick={toggleAudio}
-            aria-pressed={audioPlaying}
-            aria-label={
-              audioPlaying
-                ? isEs
-                  ? "Pausar narración de audio"
-                  : "Pause audio narration"
-                : isEs
-                ? "Reproducir narración de audio"
-                : "Play audio narration"
-            }
-            title={
-              audioPlaying
-                ? isEs
-                  ? "Pausar narración de audio"
-                  : "Pause audio narration"
-                : isEs
-                ? "Reproducir narración de audio"
-                : "Play audio narration"
-            }
-          >
-            {audioPlaying ? (
-              <svg
-                width="52"
-                height="36"
-                viewBox="0 0 70 47"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <rect
-                  x="2"
-                  y="2"
-                  width="66"
-                  height="43"
-                  rx="10"
-                  fill="#144e57"
-                  stroke="#144e57"
-                  strokeWidth="2.5"
-                />
-                <rect x="25" y="14" width="6" height="19" rx="2" fill="#ffffff" />
-                <rect x="39" y="14" width="6" height="19" rx="2" fill="#ffffff" />
-              </svg>
-            ) : (
-              <svg
-                width="52"
-                height="36"
-                viewBox="0 0 70 47"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <rect
-                  x="2"
-                  y="2"
-                  width="66"
-                  height="43"
-                  rx="10"
-                  fill="#e6f4f1"
-                  stroke="#144e57"
-                  strokeWidth="2.5"
-                />
-                <polygon points="28,14 46,23.5 28,33" fill="#144e57" />
-              </svg>
-            )}
-          </button> */}
+        <div className="s8-audio-wrap s8-spacer-side">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={isEs ? "es" : "en"}
+            transcriptText={spokenText}
+            size="large"
+          />
         </div>
       </footer>
     </section>

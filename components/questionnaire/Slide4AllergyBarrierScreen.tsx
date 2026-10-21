@@ -271,6 +271,9 @@ const SLIDE4_CSS = `
     width: 42px !important;
     height: 28px !important;
   }
+  .s4-root .slide-nav {
+    margin: 10px auto 0.25rem auto !important;
+  }
 }
 
 /* Tablet Portrait Enhancements (481px to 767px) */

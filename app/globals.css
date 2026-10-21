@@ -537,7 +537,7 @@ body::-webkit-scrollbar,
     left: auto !important;
     right: auto !important;
     top: auto !important;
-    margin: 1rem auto 0.25rem auto !important;
+    margin: 10px auto 0.25rem auto !important;
     gap: 12px !important;
     width: 100% !important;
     display: flex !important;
@@ -664,7 +664,6 @@ body::-webkit-scrollbar,
   .s11-root .slide-nav,
   .s12-root .slide-nav,
   .s13-root .slide-nav,
-  .s14-root .slide-nav,
   .s16-root .slide-nav,
   .s19-root .slide-nav,
   .s21-root .slide-nav,
@@ -754,7 +753,7 @@ body::-webkit-scrollbar,
   .s14-root .slide-nav,
   .s16-root .slide-nav,
   .s19-root .slide-nav {
-    margin: 0.5rem auto 0.25rem auto !important;
+    margin: 10px auto 0.25rem auto !important;
   }
 
   @media (max-height: 560px) {

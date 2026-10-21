@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
 const SLIDE14_CSS = `
@@ -349,6 +350,17 @@ const SLIDE14_CSS = `
     height: 150px;
   }
 }
+
+.s14-audio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 0 auto;
+  z-index: 25;
+}
+.s14-root .slide-nav {
+  margin: 10px auto 0.25rem auto !important;
+}
 `;
 
 export interface CareOption {
@@ -416,12 +428,29 @@ export function Slide14MedicalCareScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  stepId = "screen6_4_resolution",
+  locale,
+  transcriptText,
   navProps,
 }: Slide14MedicalCareScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const modalHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const isEs = isSpanish || (locale ? locale.startsWith("es") : false);
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isEs
+      ? "/audio/exported/screen6_4_care_es.mp3"
+      : "/audio/exported/screen6_4_care_en.mp3");
+
+  const effectiveTranscript =
+    transcriptText ||
+    (isEs
+      ? "¿Su hijo recibió atención médica por su reacción?"
+      : "Did your child receive medical care for their reaction?");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -580,11 +609,22 @@ export function Slide14MedicalCareScreen({
         </div>
       </div>
 
-      {/* 3. Bottom Centered Navigation (shared SlideNavigationButtons, like the other survey slides) */}
+      {/* 3. Audio Player for Mobile (sits centered directly above Back & Next) */}
+      <div className="s14-audio md:hidden">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId || "screen6_4_resolution"}
+          locale={isEs ? "es" : "en"}
+          transcriptText={effectiveTranscript}
+          size="large"
+        />
+      </div>
+
+      {/* 4. Bottom Centered Navigation (shared SlideNavigationButtons) */}
       <SlideNavigationButtons
         onBack={handleBackClick}
         onNext={handleNextClick}
-        isSpanish={isSpanish}
+        isSpanish={isEs}
         loading={isLoading}
         nextDisabled={!isNextEnabled}
         variant="flow"

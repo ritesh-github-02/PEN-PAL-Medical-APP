@@ -520,14 +520,14 @@ const SLIDE2_COMPONENT_CSS = `
       line-height: 1.25 !important;
     }
 
-    /* 3. Bottom bar: Back/Next centered, CC + play centered beneath them */
+    /* 3. Bottom bar: CC + play sits ABOVE Back/Next centered with matching 10px spacing */
     .s2-bottom-bar {
       flex: 0 0 auto !important;
       display: flex !important;
       flex-direction: column !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 6px !important;
+      gap: 10px !important;
       width: 100% !important;
       margin-top: auto !important;
       padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
@@ -535,25 +535,21 @@ const SLIDE2_COMPONENT_CSS = `
     .s2-spacer-side {
       display: none !important;
     }
-    .s2-nav-center {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 10px !important;
-      width: auto !important;
-      margin: 0 auto !important;
-    }
-    .s2-btn-nav {
-      min-height: 44px !important;
-      min-width: 86px !important;
-      font-size: 15px !important;
-      padding: 0 16px !important;
-    }
     .s2-audio-wrap {
+      order: 1 !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       width: 100% !important;
+      margin: 0 auto !important;
+    }
+    .s2-nav-center {
+      order: 2 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 12px !important;
+      width: auto !important;
       margin: 0 auto !important;
     }
   }
@@ -690,7 +686,7 @@ const SLIDE2_COMPONENT_CSS = `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 6px !important;
+    gap: 10px !important;
     width: 100% !important;
     margin-top: auto !important;
     padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
@@ -698,25 +694,21 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-root.is-mobile .s2-spacer-side {
     display: none !important;
   }
-  .s2-root.is-mobile .s2-nav-center {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    width: auto !important;
-    margin: 0 auto !important;
-  }
-  .s2-root.is-mobile .s2-btn-nav {
-    min-height: 44px !important;
-    min-width: 86px !important;
-    font-size: 15px !important;
-    padding: 0 16px !important;
-  }
   .s2-root.is-mobile .s2-audio-wrap {
+    order: 1 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     width: 100% !important;
+    margin: 0 auto !important;
+  }
+  .s2-root.is-mobile .s2-nav-center {
+    order: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: auto !important;
     margin: 0 auto !important;
   }
 
@@ -1018,7 +1010,7 @@ export function Slide2MedicineNamingScreen({
             {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
           </button>
         </nav>
-        <br></br>
+
         {/* Audio Player */}
         <div className="s2-audio-wrap s2-spacer-side">
           <AudioPlayer
