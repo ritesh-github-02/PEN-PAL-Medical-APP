@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import { resolveMedicineToken } from "@/lib/token-engine";
 import { SlideNavigationButtons } from "./SlideNavigationButtons";
 
@@ -170,6 +171,23 @@ const SLIDE21_CSS = `
   }
   .s21-image { object-position: center center; }
 }
+
+@media (max-width: 640px) {
+  .s21-root {
+    padding-bottom: 1.5rem !important;
+  }
+}
+
+.s21-audio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 0 auto;
+  z-index: 25;
+}
+.s21-root .slide-nav {
+  margin: 10px auto 0.25rem auto !important;
+}
 `;
 
 export interface Slide21WhatNowScreenProps {
@@ -208,6 +226,10 @@ export function Slide21WhatNowScreen({
   onBack,
   loading = false,
   navProps,
+  audioSrc,
+  stepId,
+  locale,
+  transcriptText,
 }: Slide21WhatNowScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
 
@@ -225,6 +247,18 @@ export function Slide21WhatNowScreen({
   const handleNext = () => (onNext ? onNext() : navProps?.onNext());
   const handleBack = () => (onBack ? onBack() : navProps?.onBack());
   const isLoading = loading || navProps?.loading || false;
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isSpanish
+      ? "/audio/es/step-21.mp3"
+      : "/audio/en/step-21.mp3");
+
+  const effectiveTranscript =
+    transcriptText ||
+    (isSpanish
+      ? "¿Qué sigue ahora? Hable con el médico de su hijo sobre la prueba de alergia a la medicina."
+      : "What Now? Talk to your child’s doctor about allergy testing.");
 
   return (
     <div id="slide-content" className="s21-root">
@@ -274,6 +308,17 @@ export function Slide21WhatNowScreen({
           />
         </figure>
       </main>
+
+      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
+      <div className="s21-audio md:hidden">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId || "slide21_what_now"}
+          locale={locale || (isSpanish ? "es" : "en")}
+          transcriptText={effectiveTranscript}
+          size="large"
+        />
+      </div>
 
       <SlideNavigationButtons
         onBack={handleBack}

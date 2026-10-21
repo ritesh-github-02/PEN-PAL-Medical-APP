@@ -303,25 +303,15 @@ export default function AudioPlayer({
   // If there's neither audio file nor transcript text, hide player
   if (!audioSrc && !transcriptText) return null;
 
-  // Size classes for CC and Play icons (decreased 5-7px as requested, with tighter spacing)
+  // Unified, exact identical size for CC and Play icons across ALL slides
   const isCompact = size === 'small' || size === 'compact';
-  const ccSizeClass =
-    isCompact
-      ? 'w-[30px] h-[26px] sm:w-[33px] sm:h-[29px]'
-      : size === 'normal'
-      ? 'w-[30px] h-[26px] sm:w-[38px] sm:h-[34px]'
-      : size === 'xl'
-      ? 'w-[49px] h-[44px] sm:w-[56px] sm:h-[50px]'
-      : 'w-[42px] h-[38px] sm:w-[49px] sm:h-[44px]';
+  const ccSizeClass = isCompact
+    ? 'w-[30px] h-[26px] sm:w-[33px] sm:h-[29px]'
+    : 'w-[36px] h-[30px] sm:w-[40px] sm:h-[34px]';
 
-  const playSizeClass =
-    isCompact
-      ? 'w-[42px] h-[26px] sm:w-[46px] sm:h-[29px]'
-      : size === 'normal'
-      ? 'w-[42px] h-[26px] sm:w-[51px] sm:h-[34px]'
-      : size === 'xl'
-      ? 'w-[64px] h-[44px] sm:w-[76px] sm:h-[50px]'
-      : 'w-[56px] h-[38px] sm:w-[67px] sm:h-[44px]';
+  const playSizeClass = isCompact
+    ? 'w-[40px] h-[26px] sm:w-[44px] sm:h-[29px]'
+    : 'w-[46px] h-[30px] sm:w-[52px] sm:h-[34px]';
 
   return (
     <div

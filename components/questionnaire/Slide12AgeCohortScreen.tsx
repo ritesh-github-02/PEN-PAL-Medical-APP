@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import { resolveMedicineToken } from "@/lib/token-engine";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
@@ -322,6 +323,17 @@ const SLIDE12_CSS = `
     height: 130px;
   }
 }
+
+.s12-audio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 0 auto;
+  z-index: 25;
+}
+.s12-root .slide-nav {
+  margin: 10px auto 0.25rem auto !important;
+}
 `;
 
 export interface AgeCohortOption {
@@ -396,6 +408,10 @@ export interface Slide12AgeCohortScreenProps {
   onNext?: () => void;
   onBack?: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  transcriptText?: string;
+  stepId?: string;
+  locale?: string;
   navProps?: {
     onNext: (explicitAnswer?: any) => void;
     onBack: () => void;
@@ -412,10 +428,26 @@ export function Slide12AgeCohortScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  transcriptText,
+  stepId,
+  locale,
   navProps,
 }: Slide12AgeCohortScreenProps) {
   const slideTitleRef = useRef<HTMLHeadingElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isSpanish
+      ? "/audio/es/step-6-2.mp3"
+      : "/audio/en/step-6-2.mp3");
+
+  const effectiveTranscript =
+    transcriptText ||
+    (isSpanish
+      ? "¿Qué edad tenía su hijo cuando tuvo una reacción a la medicina?"
+      : "How old was your child when they had a reaction to the medicine?");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -548,6 +580,17 @@ export function Slide12AgeCohortScreen({
             );
           })}
         </div>
+      </div>
+
+      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
+      <div className="s12-audio md:hidden">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId || "screen6_2_timing"}
+          locale={isSpanish ? "es" : "en"}
+          transcriptText={effectiveTranscript}
+          size="large"
+        />
       </div>
 
       {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}

@@ -958,12 +958,30 @@ export default function PenpalIntervention() {
                       onNext={() => handleNext(answers["screen6_1_symptoms"])}
                       onBack={handleBack}
                       loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? currentStep.titleEs || "¿Qué síntomas o reacciones tuvo su hijo con la medicina?"
+                          : currentStep.titleEn || "What symptoms or reactions did your child have to the medicine?"
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                     />
                   ) : currentStep.id === "screen6_2_timing" ? (
                     <Slide12AgeCohortScreen
                       isSpanish={locale === "es"}
                       selected={answers[currentStep.id] || answers["ageCohort"]}
                       medicationName={answers["medicationName"] || answers["screen2_naming"]}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? currentStep.titleEs || "¿Qué edad tenía su hijo cuando tuvo una reacción a [name]?"
+                          : currentStep.titleEn || "How old was your child when they had a reaction to [name]?"
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                       onSelect={(val: string) => {
                         handleAnswer(val);
                         setAnswers((prev) => {
@@ -986,6 +1004,15 @@ export default function PenpalIntervention() {
                       isSpanish={locale === "es"}
                       medicationName={medicationName}
                       selected={answers["screen6_3_onset"] || answers["onset"]}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? currentStep.titleEs || "¿Cuándo comenzaron los síntomas de su hijo después de tomar [name]?"
+                          : currentStep.titleEn || "When did your child's symptoms start after taking [name]?"
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
                       onSelect={(val: string) => {
                         setAnswers((prev) => {
                           const updated = { ...prev, screen6_3_onset: val, onset: val };
@@ -1046,6 +1073,14 @@ export default function PenpalIntervention() {
                       selected={answers["screen6_4b_resolution_type"] || answers["resolution"]}
                       medicines={answers["resolutionMedicines"] || (answers["screen6_4b_medicine"] ? [answers["screen6_4b_medicine"]] : [])}
                       route={answers["screen6_4b_route"] || answers["resolutionRoute"]}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        locale === "es"
+                          ? currentStep.titleEs || "¿Cómo desapareció la reacción de su hijo?"
+                          : currentStep.titleEn || "How did your child's reaction go away?"
+                      }
                       onSelectResolution={(val: string) => {
                         setAnswers((prev) => {
                           const updated = { ...prev, screen6_4b_resolution_type: val, resolution: val };
@@ -1086,6 +1121,14 @@ export default function PenpalIntervention() {
                       isSpanish={locale === "es"}
                       selected={answers["screen6_5_yetagain"] || answers["repeatPenicillin"]}
                       reactionDetailSelected={answers["screen6_5_reaction_detail"] || answers["repeatPenicillinDetail"]}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        locale === "es"
+                          ? currentStep.titleEs || "¿Alguna vez su hijo tomó penicilina o un antibiótico similar después de su reacción?"
+                          : currentStep.titleEn || "Did your child ever take penicillin or a similar antibiotic yet again after their reaction?"
+                      }
                       onSelect={(val: string) => {
                         setAnswers((prev) => {
                           const updated = { ...prev, screen6_5_yetagain: val, repeatPenicillin: val };
@@ -1193,6 +1236,8 @@ export default function PenpalIntervention() {
                   "slide2_naming",
                   "slide3_efficacy",
                   "slide4_barrier",
+                  "slide5_prevalence",
+                  "screen2_statistics",
                   "slide6_myths",
                   "slide8_milestone",
                   "slide9_why_it_matters",
@@ -1202,9 +1247,17 @@ export default function PenpalIntervention() {
                   "screen3_6_all_correct",
                   "screen6_survey_intro",
                   "slide10_survey_intro",
+                  "screen6_1_symptoms",
+                  "screen6_2_timing",
+                  "screen6_3_onset",
                   "screen6_4_resolution",
                   "screen6_4_care",
-                ].includes(currentStep.id);
+                  "screen6_4b_resolution_type",
+                  "screen6_5_yetagain",
+                  "screen6_5_reaction_detail",
+                  "slide21_what_now",
+                  "screen7_summary",
+                ].includes(currentStep.id) || currentStep.type === "summary";
 
                 return (
                   <div className={`absolute bottom-[14px] md:bottom-[22px] right-4 sm:right-5 md:right-7 z-40 ${hasInternalMobilePlayer ? "hidden md:flex" : "flex"} items-center pointer-events-auto`}>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
 const SLIDE19_CSS = `
@@ -452,6 +453,17 @@ const SLIDE19_CSS = `
     flex-direction: column;
   }
 }
+
+.s19-audio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 0 auto;
+  z-index: 25;
+}
+.s19-root .slide-nav {
+  margin: 10px auto 0.25rem auto !important;
+}
 `;
 
 export interface Slide19RepeatUseScreenProps {
@@ -463,6 +475,10 @@ export interface Slide19RepeatUseScreenProps {
   onNext?: () => void;
   onBack?: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  transcriptText?: string;
+  stepId?: string;
+  locale?: string;
   navProps?: {
     onNext: (explicitAnswer?: any) => void;
     onBack: () => void;
@@ -529,12 +545,28 @@ export function Slide19RepeatUseScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  transcriptText,
+  stepId,
+  locale,
   navProps,
 }: Slide19RepeatUseScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const modalHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isSpanish
+      ? "/audio/es/step-6-5.mp3"
+      : "/audio/en/step-6-5.mp3");
+
+  const effectiveTranscript =
+    transcriptText ||
+    (isSpanish
+      ? "¿Alguna vez su hijo tomó penicilina o un antibiótico similar después de su reacción?"
+      : "Did your child ever take penicillin or a similar antibiotic yet again after their reaction?");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -697,6 +729,17 @@ export function Slide19RepeatUseScreen({
             className="s19-nurse-img"
           />
         </div>
+      </div>
+
+      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
+      <div className="s19-audio md:hidden">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId || "screen6_5_yetagain"}
+          locale={isSpanish ? "es" : "en"}
+          transcriptText={effectiveTranscript}
+          size="large"
+        />
       </div>
 
       {/* 3. Bottom Centered Navigation (Back & Next) */}

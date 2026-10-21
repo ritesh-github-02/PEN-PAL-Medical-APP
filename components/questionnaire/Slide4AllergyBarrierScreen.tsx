@@ -263,14 +263,6 @@ const SLIDE4_CSS = `
     justify-content: center !important;
     gap: 5px !important;
   }
-  .s4-audio .audio-cc-btn svg {
-    width: 32px !important;
-    height: 28px !important;
-  }
-  .s4-audio .audio-play-btn svg {
-    width: 42px !important;
-    height: 28px !important;
-  }
   .s4-root .slide-nav {
     margin: 10px auto 0.25rem auto !important;
   }
@@ -367,14 +359,6 @@ const SLIDE4_CSS = `
     display: none !important;
     align-items: center !important;
     gap: 5px !important;
-  }
-  .s4-audio .audio-cc-btn svg {
-    width: 29px !important;
-    height: 25px !important;
-  }
-  .s4-audio .audio-play-btn svg {
-    width: 38px !important;
-    height: 25px !important;
   }
   /* Mobile landscape only: reveal the in-slide controls */
   @media (max-width: 767px) {

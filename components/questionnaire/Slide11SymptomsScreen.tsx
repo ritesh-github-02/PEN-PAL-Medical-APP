@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import { NurseAnna } from "./NurseAnna";
 import { resolveMedicineToken } from "@/lib/token-engine";
 import SlideNavigationButtons from "./SlideNavigationButtons";
@@ -625,6 +626,17 @@ const SLIDE11_CSS = `
     width: 100%;
   }
 }
+
+.s11-audio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 0 auto;
+  z-index: 25;
+}
+.s11-root .slide-nav {
+  margin: 10px auto 0.25rem auto !important;
+}
 `;
 
 export interface Slide11SymptomsScreenProps {
@@ -641,6 +653,10 @@ export interface Slide11SymptomsScreenProps {
   onNext: () => void;
   onBack: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  transcriptText?: string;
+  stepId?: string;
+  locale?: string;
 }
 
 interface SymptomItem {
@@ -704,10 +720,26 @@ export function Slide11SymptomsScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  transcriptText,
+  stepId = "screen6_1_symptoms",
+  locale,
 }: Slide11SymptomsScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const rashFirstBtnRef = useRef<HTMLButtonElement | null>(null);
   const modalTriggerRef = useRef<HTMLElement | null>(null);
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isSpanish
+      ? "/audio/exported/screen6_1_symptoms_es.mp3"
+      : "/audio/exported/screen6_1_symptoms_en.mp3");
+
+  const effectiveTranscript =
+    transcriptText ||
+    (isSpanish
+      ? "Seleccione lo que sucedió cuando se le dijo que su hijo era alérgico a la penicilina."
+      : "Select what happened when your child was said to be allergic to penicillin.");
 
   const swellingTriggerRef = useRef<HTMLElement | null>(null);
   const swellingFirstBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -998,6 +1030,16 @@ export function Slide11SymptomsScreen({
             />
           </div>
         </div>
+      </div>
+
+      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
+      <div className="s11-audio md:hidden">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId || "screen6_1_symptoms"}
+          locale={locale || (isSpanish ? "es" : "en")}
+          transcriptText={effectiveTranscript}
+        />
       </div>
 
       {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}

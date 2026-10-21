@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
+import AudioPlayer from "./AudioPlayer";
 import { Printer, Download, Loader2 } from "lucide-react";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
 import { formatAssessmentData } from "@/lib/format-assessment";
@@ -488,6 +489,14 @@ const SLIDE18_CSS = `
     box-shadow: none !important;
   }
 }
+
+.s18-audio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 0 auto;
+  z-index: 25;
+}
 `;
 
 export interface Slide18SummaryScreenProps {
@@ -718,6 +727,17 @@ export function Slide18SummaryScreen({
           </p>
           <span className="s18-print-footer-tag">PEN-PAL Medical Study</span>
         </div>
+      </div>
+
+      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
+      <div className="s18-audio md:hidden">
+        <AudioPlayer
+          audioSrc={audioSrc || (isSpanish ? "/audio/es/step-7.mp3" : "/audio/en/step-7.mp3")}
+          stepId={stepId || "screen7_summary"}
+          locale={locale || (isSpanish ? "es" : "en")}
+          transcriptText={transcriptText || (isSpanish ? "Resumen y pasos a seguir" : "Summary and Action Steps")}
+          size="large"
+        />
       </div>
 
       {/* 4. Bottom Centered Navigation (Back, Print & Save) + Close ✕ */}

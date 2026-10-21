@@ -200,10 +200,10 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   .s10b-bubble {
     order: 1 !important;
     position: relative !important;
-    left: auto !important;
-    top: auto !important;
+    left: 40px !important;
+    top: 28px !important;
     width: 100% !important;
-    max-width: 330px !important;
+    max-width: 290px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
     margin: 4px auto 0 auto !important;
@@ -233,7 +233,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     text-align: center !important;
   }
   .s10b-bubble-text {
-    font-size: 14.5px !important;
+    font-size: 11.5px !important;
     line-height: 1.4 !important;
     font-weight: 700 !important;
     color: #232323 !important;
@@ -243,7 +243,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   .s10b-nurse {
     order: 2 !important;
     position: relative !important;
-    left: auto !important;
+    left: -77PX !important;
     top: auto !important;
     width: 125px !important;
     height: 215px !important;
@@ -272,14 +272,6 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     align-items: center !important;
     justify-content: center !important;
     gap: 5px !important;
-  }
-  .s10b-audio .audio-cc-btn svg {
-    width: 32px !important;
-    height: 28px !important;
-  }
-  .s10b-audio .audio-play-btn svg {
-    width: 42px !important;
-    height: 28px !important;
   }
   .s10b-root .slide-nav {
     margin: 10px auto 0.25rem auto !important;
@@ -377,14 +369,6 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     display: flex !important;
     align-items: center !important;
     gap: 4px !important;
-  }
-  .s10b-audio .audio-cc-btn svg {
-    width: 28px !important;
-    height: 24px !important;
-  }
-  .s10b-audio .audio-play-btn svg {
-    width: 38px !important;
-    height: 24px !important;
   }
 }
 `;

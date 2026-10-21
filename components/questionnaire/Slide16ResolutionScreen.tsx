@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import AudioPlayer from "./AudioPlayer";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
 const SLIDE16_CSS = `
@@ -593,6 +594,17 @@ const SLIDE16_CSS = `
     flex: 1 1 45%;
   }
 }
+
+.s16-audio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 0 auto;
+  z-index: 25;
+}
+.s16-root .slide-nav {
+  margin: 10px auto 0.25rem auto !important;
+}
 `;
 
 export interface Slide16ResolutionScreenProps {
@@ -611,6 +623,10 @@ export interface Slide16ResolutionScreenProps {
   onNext?: () => void;
   onBack?: () => void;
   loading?: boolean;
+  audioSrc?: string;
+  transcriptText?: string;
+  stepId?: string;
+  locale?: string;
   navProps?: {
     onNext: (explicitAnswer?: any) => void;
     onBack: () => void;
@@ -668,12 +684,28 @@ export function Slide16ResolutionScreen({
   onNext,
   onBack,
   loading = false,
+  audioSrc,
+  transcriptText,
+  stepId,
+  locale,
   navProps,
 }: Slide16ResolutionScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const modal17HeadingRef = useRef<HTMLHeadingElement | null>(null);
   const modal18HeadingRef = useRef<HTMLHeadingElement | null>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isSpanish
+      ? "/audio/es/step-6-4b.mp3"
+      : "/audio/en/step-6-4b.mp3");
+
+  const effectiveTranscript =
+    transcriptText ||
+    (isSpanish
+      ? "¿Cómo desapareció la reacción de su hijo?"
+      : "How did your child's reaction go away?");
 
   const initialMeds = medicines ?? resolutionMedicines ?? [];
   const initialRoute = route ?? resolutionRoute;
@@ -904,6 +936,17 @@ export function Slide16ResolutionScreen({
             className="s16-nurse-img"
           />
         </div>
+      </div>
+
+      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
+      <div className="s16-audio md:hidden">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId || "screen6_4b_resolution_type"}
+          locale={isSpanish ? "es" : "en"}
+          transcriptText={effectiveTranscript}
+          size="large"
+        />
       </div>
 
       {/* 3. Bottom Centered Navigation (Back & Next) */}

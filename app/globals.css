@@ -660,18 +660,6 @@ body::-webkit-scrollbar,
     font-size: 0.75rem !important;
   }
 
-  /* Survey Slide Navigation vs AudioPlayer Collision Prevention */
-  .s11-root .slide-nav,
-  .s12-root .slide-nav,
-  .s13-root .slide-nav,
-  .s16-root .slide-nav,
-  .s19-root .slide-nav,
-  .s21-root .slide-nav,
-  .s18-root .s18-nav {
-    padding-right: 76px !important;
-    padding-left: 12px !important;
-    box-sizing: border-box !important;
-  }
 
   /* Slide 13, 14, 16, 19: Survey questions */
   .s13-middle, .s14-middle, .s16-middle, .s19-middle {

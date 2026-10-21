@@ -118,14 +118,6 @@ const mobileLayout = (scope: string) => `
     justify-content: center;
     margin-top: 10px;
   }
-  ${scope} .s9-audio .audio-cc-btn svg {
-    width: 32px;
-    height: 28px;
-  }
-  ${scope} .s9-audio .audio-play-btn svg {
-    width: 42px;
-    height: 28px;
-  }
   ${scope} .slide-nav {
     margin: 10px auto 0.25rem auto !important;
   }

@@ -144,31 +144,25 @@ const mobileLayout = (scope: string) => `
     gap: 0;
   }
   ${scope} .s10-bubble {
-    width: 220px;
+    width: 206px;
     height: auto;
     aspect-ratio: 520 / 330;
     margin: 0 auto;
+    left: -83px;
   }
   ${scope} .s10-bubble-text {
     font-size: 12.5px;
   }
   ${scope} .s10-nurse {
     width: 75px;
-    height: 130px;
+    height: 146px;
     margin-top: -14px;
+    z-index: 20;
   }
   ${scope} .s10-audio {
     display: flex;
     justify-content: center;
     margin-top: 8px;
-  }
-  ${scope} .s10-audio .audio-cc-btn svg {
-    width: 32px;
-    height: 28px;
-  }
-  ${scope} .s10-audio .audio-play-btn svg {
-    width: 42px;
-    height: 28px;
   }
   ${scope} .slide-nav {
     margin: 10px auto 0.25rem auto !important;

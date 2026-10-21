@@ -343,14 +343,16 @@ const SLIDE8_COMPONENT_CSS = `
     }
     .s8-bubble-wrap {
       width: 100%;
-      max-width: 320px;
+      max-width: 280px;
       aspect-ratio: 510 / 315;
       height: auto;
       margin: 0 auto;
       filter: drop-shadow(2px 3px 0px #1a3532);
+      left: -45px;
+      top: 26px;
     }
     .s8-heading {
-      font-size: 14.5px;
+      font-size: 11.5px;
       line-height: 1.38;
     }
     .s8-nurse-wrap {
@@ -535,13 +537,13 @@ export function Slide8MilestoneScreen({
 
         {/* Audio narration & CC controls */}
         <div className="s8-audio-wrap s8-spacer-side">
-          <AudioPlayer
+          {/* <AudioPlayer
             audioSrc={effectiveAudioSrc}
             stepId={stepId}
             locale={isEs ? "es" : "en"}
             transcriptText={spokenText}
             size="large"
-          />
+          /> */}
         </div>
       </footer>
     </section>
