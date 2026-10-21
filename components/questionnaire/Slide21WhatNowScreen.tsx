@@ -5,14 +5,14 @@ import { resolveMedicineToken } from "@/lib/token-engine";
 import { SlideNavigationButtons } from "./SlideNavigationButtons";
 
 /* ==========================================================
-   Slide21WhatNowScreen – Pixel-Perfect Styles Matching Figma UI
+   Slide21WhatNowScreen – Styles matching Figma UI
    (Figma Screen 17: "What Now?")
-   - Prominent yellow "What Now?" pill badge (#feff9f)
-   - Bold, clear doctor consultation heading & benefits bullets
-   - High-impact, generously sized doctor consultation illustration
-   - Desktop: Clean vertical column with centered artwork
-   - Mobile Portrait: Balanced proportional typography and illustration
-   - Mobile Landscape: Side-by-side split row (text column on left, artwork on right)
+   - Yellow "What Now?" pill badge (#feff9f) with teal border + shadow
+   - Regular-weight heading & bullets, same size (like Figma)
+   - Illustration centred right under the text, blended into background
+   - Desktop: vertical column
+   - Mobile Portrait: scaled-down proportions
+   - Mobile Landscape: side-by-side split row
    - Standardized SlideNavigationButtons pinned at bottom
    ========================================================== */
 
@@ -35,7 +35,7 @@ const SLIDE21_CSS = `
   justify-content: flex-start;
   align-items: center;
   background-color: #fafdf3;
-  padding: clamp(16px, 2.8vh, 26px) clamp(20px, 4vw, 44px) clamp(68px, 9vh, 80px) clamp(20px, 4vw, 44px);
+  padding: clamp(18px, 3.4vh, 34px) clamp(20px, 4vw, 48px) clamp(80px, 11vh, 96px) clamp(20px, 4vw, 48px);
   overflow-y: auto;
   overflow-x: hidden;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -45,14 +45,13 @@ const SLIDE21_CSS = `
 /* Main Content Area */
 .s21-content-wrap {
   width: 100%;
-  max-width: 760px;
+  max-width: 800px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
 }
 
 .s21-text-col {
@@ -63,31 +62,32 @@ const SLIDE21_CSS = `
   flex-shrink: 0;
 }
 
-/* Yellow Badge matching Figma Design */
+/* Yellow Badge matching Figma */
 .s21-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: auto;
-  min-width: 154px;
-  height: 44px;
-  padding: 0 22px;
+  min-width: 180px;
+  height: 78px;
+  padding: 0 30px;
   background-color: #feff9f;
-  border: 1.8px solid #2b7f8f;
-  border-radius: 18px;
-  box-shadow: 0 3px 5px rgba(34, 105, 118, 0.28);
-  margin-bottom: clamp(10px, 1.8vh, 14px);
+  border: 2px solid #2b7f8f;
+  border-radius: 22px;
+  box-shadow: 0 4px 5px rgba(34, 105, 118, 0.45);
+  margin: 0 0 clamp(18px, 3.4vh, 32px) 0;
   flex-shrink: 0;
 }
 
 .s21-badge-title {
-  font-size: 19px;
+  font-size: 25px;
   font-weight: 700;
   color: #232323;
   letter-spacing: -0.01em;
   margin: 0;
   line-height: 1;
   outline: none;
+  white-space: nowrap;
 }
 
 .s21-badge-title:focus-visible {
@@ -95,89 +95,80 @@ const SLIDE21_CSS = `
   border-radius: 4px;
 }
 
-/* Heading Statement */
+/* Heading Statement (regular weight, like Figma) */
 .s21-heading {
-  font-size: 19.5px;
-  font-weight: 700;
+  font-size: clamp(20px, 2.7vw, 26px);
+  font-weight: 400;
   color: #232323;
-  margin: 0 0 clamp(6px, 1.2vh, 10px) 0;
-  letter-spacing: -0.012em;
-  line-height: 1.32;
+  margin: 0;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
   text-align: left;
 }
 
-/* Bullet Points */
+/* Bullet Points (same size as heading, like Figma) */
 .s21-bullets {
-  margin: 0 0 clamp(8px, 1.5vh, 14px) 0;
-  padding-left: 22px;
+  margin: 0;
+  padding-left: 38px;
   list-style-type: disc;
   width: 100%;
 }
 
 .s21-bullet-item {
-  font-size: 15.5px;
-  line-height: 1.42;
+  font-size: clamp(20px, 2.7vw, 26px);
+  line-height: 1.3;
   color: #232323;
-  margin-bottom: 5px;
-  font-weight: 500;
-  letter-spacing: -0.008em;
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: -0.005em;
   text-align: left;
 }
 
-/* Doctor Consultation Illustration - Prominent, Generous Size matching Figma */
+/* Illustration - centred right under the text, blended into background */
 .s21-illustration-wrap {
   width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin: clamp(4px, 1.2vh, 12px) auto clamp(8px, 1.8vh, 18px) auto;
-  flex: 1 1 auto;
-  min-height: 0;
+  align-items: flex-start;
+  margin: clamp(2px, 0.8vh, 8px) auto 0 auto;
+  flex: 0 0 auto;
 }
 
 .s21-illustration-img {
   width: 100%;
-  max-width: 580px;
+  max-width: 420px;
   height: auto;
-  max-height: clamp(240px, 40vh, 325px);
+  max-height: clamp(220px, 38vh, 300px);
   object-fit: contain;
   display: block;
   user-select: none;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.04));
+  background: transparent;
+  mix-blend-mode: multiply;
+  box-shadow: none;
+  filter: none;
 }
 
 /* Compact Laptop / Height-constrained screens */
 @media (max-height: 720px) and (min-width: 768px) {
   .s21-root {
-    padding: 12px 28px 62px 28px !important;
+    padding: 14px 28px 68px 28px !important;
   }
   .s21-badge {
-    height: 38px !important;
-    min-width: 140px !important;
-    padding: 0 18px !important;
-    margin-bottom: 8px !important;
+    height: 60px !important;
+    min-width: 150px !important;
+    padding: 0 24px !important;
+    margin-bottom: 14px !important;
   }
   .s21-badge-title {
-    font-size: 16.5px !important;
+    font-size: 20px !important;
   }
-  .s21-heading {
-    font-size: 17px !important;
-    margin-bottom: 6px !important;
-  }
-  .s21-bullets {
-    margin-bottom: 6px !important;
-    padding-left: 20px !important;
-  }
+  .s21-heading,
   .s21-bullet-item {
-    font-size: 13.5px !important;
-    margin-bottom: 3px !important;
-  }
-  .s21-illustration-wrap {
-    margin: 4px auto 6px auto !important;
+    font-size: 19px !important;
   }
   .s21-illustration-img {
-    max-width: 480px !important;
-    max-height: clamp(190px, 32vh, 250px) !important;
+    max-width: 340px !important;
+    max-height: clamp(170px, 30vh, 230px) !important;
   }
 }
 
@@ -186,7 +177,7 @@ const SLIDE21_CSS = `
    ========================================================== */
 @media (max-width: 767px) {
   .s21-root {
-    padding: 14px 14px 72px 14px !important;
+    padding: 16px 16px 76px 16px !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
   }
@@ -194,42 +185,32 @@ const SLIDE21_CSS = `
     max-width: 100% !important;
   }
   .s21-badge {
-    width: auto !important;
-    min-width: 130px !important;
-    height: 38px !important;
-    padding: 0 16px !important;
-    border-radius: 14px !important;
-    box-shadow: 0 3px 5px rgba(34, 105, 118, 0.28) !important;
-    margin-bottom: 10px !important;
+    min-width: 128px !important;
+    height: 54px !important;
+    padding: 0 22px !important;
+    border-radius: 16px !important;
+    margin-bottom: 14px !important;
   }
   .s21-badge-title {
-    font-size: 15px !important;
+    font-size: 18px !important;
   }
   .s21-heading {
-    font-size: 16px !important;
+    font-size: 17px !important;
     line-height: 1.32 !important;
-    margin: 0 0 8px 0 !important;
   }
   .s21-bullets {
-    margin: 0 0 10px 0 !important;
-    padding-left: 18px !important;
+    padding-left: 26px !important;
   }
   .s21-bullet-item {
-    font-size: 13.5px !important;
-    line-height: 1.38 !important;
-    margin-bottom: 4px !important;
+    font-size: 17px !important;
+    line-height: 1.32 !important;
   }
   .s21-illustration-wrap {
-    width: 100% !important;
-    margin: 4px auto 10px auto !important;
-    flex: 0 1 auto !important;
+    margin: 6px auto 4px auto !important;
   }
   .s21-illustration-img {
-    width: 100% !important;
-    max-width: 380px !important;
-    max-height: clamp(190px, 32vh, 250px) !important;
-    height: auto !important;
-    object-fit: contain !important;
+    max-width: 340px !important;
+    max-height: clamp(190px, 34vh, 270px) !important;
     margin: 0 auto !important;
   }
 }
@@ -239,7 +220,7 @@ const SLIDE21_CSS = `
    ========================================================== */
 @media (orientation: landscape) and (max-height: 520px) {
   .s21-root {
-    padding: 8px 18px 58px 18px !important;
+    padding: 10px 18px 60px 18px !important;
     overflow-y: auto !important;
   }
   .s21-content-wrap {
@@ -255,42 +236,35 @@ const SLIDE21_CSS = `
     justify-content: center !important;
   }
   .s21-badge {
-    width: auto !important;
-    min-width: 115px !important;
-    height: 32px !important;
-    padding: 0 14px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 4px rgba(34, 105, 118, 0.28) !important;
-    margin-bottom: 6px !important;
+    min-width: 110px !important;
+    height: 40px !important;
+    padding: 0 16px !important;
+    border-radius: 13px !important;
+    margin-bottom: 8px !important;
   }
   .s21-badge-title {
-    font-size: 13.5px !important;
+    font-size: 14px !important;
   }
   .s21-heading {
-    font-size: 13.5px !important;
-    line-height: 1.25 !important;
-    margin: 0 0 4px 0 !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
   }
   .s21-bullets {
-    margin: 0 !important;
-    padding-left: 14px !important;
+    padding-left: 18px !important;
   }
   .s21-bullet-item {
-    font-size: 11.5px !important;
-    line-height: 1.25 !important;
-    margin-bottom: 2px !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
   }
   .s21-illustration-wrap {
     flex: 1 1 44% !important;
     width: 44% !important;
-    max-height: 190px !important;
     margin: 0 !important;
+    align-items: center !important;
   }
   .s21-illustration-img {
-    width: 100% !important;
-    max-width: 340px !important;
-    max-height: clamp(140px, 52vh, 190px) !important;
-    height: auto !important;
+    max-width: 320px !important;
+    max-height: clamp(130px, 50vh, 190px) !important;
   }
 }
 `;

@@ -143,7 +143,7 @@ const SLIDE15_CSS = `
 }
 
 .s15-heading {
-  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  font-size: clamp(1.2rem, 2vw, 1.4rem);
   line-height: 1.35;
   font-weight: 700;
   color: #142724;
@@ -174,7 +174,7 @@ const SLIDE15_CSS = `
   background-color: #8cb2a7;
   border: 2px solid #638d82;
   border-radius: 24px;
-  padding: clamp(1.2rem, 2.5vw, 2rem);
+  padding: 1.6rem 1.85rem;
   box-shadow: 0 8px 24px rgba(20, 55, 50, 0.14);
   display: flex;
   flex-direction: column;

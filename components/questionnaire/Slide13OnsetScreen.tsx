@@ -46,12 +46,13 @@ const SLIDE13_CSS = `
 }
 .s13-heading {
   font-size: clamp(1.05rem, 2vw, 1.25rem);
-  line-height: 1.35;
-  font-weight: 700;
-  color: #142724;
-  letter-spacing: -0.015em;
-  margin: 0;
-  outline: none;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #142724;
+    letter-spacing: -0.015em;
+    margin: 0;
+    outline: none;
+
 }
 .s13-heading:focus-visible {
   box-shadow: 0 0 0 2px #236f7a;
@@ -67,7 +68,7 @@ const SLIDE13_CSS = `
   background-color: #8cb2a7;
   border: 1.5px solid #759c92;
   border-radius: 20px;
-  padding: 1.85rem 1.85rem;
+  padding: 1.6rem 1.85rem;
   box-shadow: 0 4px 14px rgba(20, 55, 50, 0.12);
   display: flex;
   flex-direction: column;

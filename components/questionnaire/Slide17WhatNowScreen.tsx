@@ -5,16 +5,15 @@ import { resolveMedicineToken } from "@/lib/token-engine";
 import { SlideNavigationButtons } from "./SlideNavigationButtons";
 
 /* ==========================================================
-   Slide17WhatNowScreen – "What Now?" (Figma Screen 17)
-   - Prominent yellow "What Now?" pill badge (#feff9f)
-   - Bold doctor-consultation heading & benefit bullets
-   - High-impact illustration (doctor-consultation.png)
+   Slide17WhatNowScreen - "What Now?" (Figma Screen 17)
+   - Yellow "What Now?" pill badge (#feff9f), top-left
+   - Regular-weight heading & bullets (same size, like Figma)
+   - Illustration centred right under the text
+   - CC / Play icons on the right, same line as Back / Next
    - Inline audio narration with SpeechSynthesis fallback
-   - Closed-captions panel (WCAG 1.2.2) + CC / Play toggle buttons
-   - Desktop: vertical column with centred artwork
-   - Mobile Portrait: scaled-down proportions, scrollable
+   - Closed-captions panel (WCAG 1.2.2)
+   - Mobile Portrait: scaled-down, scrollable
    - Mobile Landscape: side-by-side split row
-   - Standardised SlideNavigationButtons pinned at bottom
    ========================================================== */
 
 const SLIDE17_CSS = `
@@ -26,6 +25,7 @@ const SLIDE17_CSS = `
 }
 
 .s17-root {
+  --s17-audio-bottom: 14px;
   position: relative;
   width: 100%;
   height: 100%;
@@ -36,7 +36,7 @@ const SLIDE17_CSS = `
   justify-content: flex-start;
   align-items: center;
   background-color: #fafdf3;
-  padding: clamp(16px, 2.8vh, 26px) clamp(20px, 4vw, 44px) clamp(68px, 9vh, 80px) clamp(20px, 4vw, 44px);
+  padding: clamp(18px, 3.4vh, 34px) clamp(20px, 4vw, 48px) clamp(80px, 11vh, 96px) clamp(20px, 4vw, 48px);
   overflow-y: auto;
   overflow-x: hidden;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -68,14 +68,13 @@ const SLIDE17_CSS = `
 
 .s17-content-wrap {
   width: 100%;
-  max-width: 760px;
+  max-width: 800px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
 }
 
 .s17-text-col {
@@ -86,85 +85,92 @@ const SLIDE17_CSS = `
   flex-shrink: 0;
 }
 
+/* ---------- Badge ---------- */
 .s17-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: auto;
-  min-width: 154px;
-  height: 44px;
-  padding: 0 22px;
+  min-width: 180px;
+  height: 78px;
+  padding: 0 30px;
   background-color: #feff9f;
-  border: 1.8px solid #2b7f8f;
-  border-radius: 18px;
-  box-shadow: 0 3px 5px rgba(34, 105, 118, 0.28);
-  margin-bottom: clamp(10px, 1.8vh, 14px);
+  border: 2px solid #2b7f8f;
+  border-radius: 22px;
+  box-shadow: 0 4px 5px rgba(34, 105, 118, 0.45);
+  margin: 0 0 clamp(18px, 3.4vh, 32px) 0;
   flex-shrink: 0;
 }
 
 .s17-badge-title {
-  font-size: 19px;
+  font-size: 25px;
   font-weight: 700;
   color: #142724;
   letter-spacing: -0.01em;
   margin: 0;
   line-height: 1;
   outline: none;
+  white-space: nowrap;
 }
 
+/* ---------- Heading + bullets (regular weight, same size) ---------- */
 .s17-heading {
-  font-size: 19.5px;
-  font-weight: 700;
-  color: #142724;
-  margin: 0 0 clamp(6px, 1.2vh, 10px) 0;
-  letter-spacing: -0.012em;
-  line-height: 1.32;
+  font-size: clamp(20px, 2.7vw, 26px);
+  font-weight: 400;
+  color: #232323;
+  margin: 0;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
   text-align: left;
   outline: none;
 }
 
 .s17-bullets {
-  margin: 0 0 clamp(8px, 1.5vh, 14px) 0;
-  padding-left: 22px;
+  margin: 0;
+  padding-left: 38px;
   list-style-type: disc;
   width: 100%;
 }
 
 .s17-bullet-item {
-  font-size: 15.5px;
-  line-height: 1.42;
-  color: #142724;
-  margin-bottom: 5px;
-  font-weight: 500;
-  letter-spacing: -0.008em;
+  font-size: clamp(20px, 2.7vw, 26px);
+  line-height: 1.3;
+  color: #232323;
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: -0.005em;
   text-align: left;
 }
 
+/* ---------- Illustration ---------- */
 .s17-illustration-wrap {
   width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin: clamp(4px, 1.2vh, 12px) auto clamp(8px, 1.8vh, 18px) auto;
-  flex: 1 1 auto;
-  min-height: 0;
+  align-items: flex-start;
+  margin: clamp(2px, 0.8vh, 8px) auto 0 auto;
+  flex: 0 0 auto;
 }
 
 .s17-illustration-img {
   width: 100%;
-  max-width: 580px;
+  max-width: 420px;
   height: auto;
-  max-height: clamp(240px, 40vh, 325px);
+  max-height: clamp(220px, 38vh, 300px);
   object-fit: contain;
   display: block;
   user-select: none;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.04));
+  background: transparent;
+  mix-blend-mode: multiply;
+  box-shadow: none;
+  filter: none;
 }
 
+/* ---------- Captions ---------- */
 .s17-captions-panel {
   width: 100%;
-  max-width: 760px;
-  margin: 0 auto clamp(6px, 1.2vh, 10px) auto;
+  max-width: 800px;
+  margin: 8px auto 0 auto;
   background: #143833;
   color: #ffffff;
   border: 1.5px solid #bddfd8;
@@ -197,15 +203,16 @@ const SLIDE17_CSS = `
   color: #ffffff;
 }
 
+/* ---------- Audio row: same line as Back / Next, right side ---------- */
 .s17-audio-row {
+  position: absolute;
+  right: clamp(16px, 4vw, 44px);
+  bottom: var(--s17-audio-bottom);
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto clamp(4px, 0.8vh, 8px) auto;
-  flex-shrink: 0;
+  gap: 10px;
+  z-index: 5;
 }
 
 .s17-audio-btn {
@@ -216,7 +223,7 @@ const SLIDE17_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  padding: 2px;
   min-width: 44px;
   min-height: 44px;
   border-radius: 8px;
@@ -228,42 +235,54 @@ const SLIDE17_CSS = `
   opacity: 0.85;
 }
 
+/* ---------- Short desktop screens ---------- */
 @media (max-height: 720px) and (min-width: 768px) {
-  .s17-root { padding: 12px 28px 62px 28px !important; }
-  .s17-badge { height: 38px !important; min-width: 140px !important; padding: 0 18px !important; margin-bottom: 8px !important; }
-  .s17-badge-title { font-size: 16.5px !important; }
-  .s17-heading { font-size: 17px !important; margin-bottom: 6px !important; }
-  .s17-bullets { margin-bottom: 6px !important; padding-left: 20px !important; }
-  .s17-bullet-item { font-size: 13.5px !important; margin-bottom: 3px !important; }
-  .s17-illustration-wrap { margin: 4px auto 6px auto !important; }
-  .s17-illustration-img { max-width: 480px !important; max-height: clamp(190px, 32vh, 250px) !important; }
+  .s17-root { padding: 14px 28px 68px 28px !important; }
+  .s17-badge { height: 60px !important; min-width: 150px !important; padding: 0 24px !important; margin-bottom: 14px !important; }
+  .s17-badge-title { font-size: 20px !important; }
+  .s17-heading, .s17-bullet-item { font-size: 19px !important; }
+  .s17-illustration-img { max-width: 340px !important; max-height: clamp(170px, 30vh, 230px) !important; }
 }
 
+/* ---------- Mobile portrait ---------- */
 @media (max-width: 767px) {
-  .s17-root { padding: 14px 14px 72px 14px !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; }
+  .s17-root { padding: 16px 16px 76px 16px !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; }
   .s17-content-wrap { max-width: 100% !important; }
-  .s17-badge { width: auto !important; min-width: 130px !important; height: 38px !important; padding: 0 16px !important; border-radius: 14px !important; margin-bottom: 10px !important; }
-  .s17-badge-title { font-size: 15px !important; }
-  .s17-heading { font-size: 16px !important; line-height: 1.32 !important; margin: 0 0 8px 0 !important; }
-  .s17-bullets { margin: 0 0 10px 0 !important; padding-left: 18px !important; }
-  .s17-bullet-item { font-size: 13.5px !important; line-height: 1.38 !important; margin-bottom: 4px !important; }
-  .s17-illustration-wrap { width: 100% !important; margin: 4px auto 10px auto !important; flex: 0 1 auto !important; }
-  .s17-illustration-img { width: 100% !important; max-width: 380px !important; max-height: clamp(190px, 32vh, 250px) !important; height: auto !important; object-fit: contain !important; margin: 0 auto !important; }
-  .s17-audio-row { max-width: 100% !important; }
+  .s17-badge { min-width: 128px !important; height: 54px !important; padding: 0 22px !important; border-radius: 16px !important; margin-bottom: 14px !important; }
+  .s17-badge-title { font-size: 18px !important; }
+  .s17-heading { font-size: 17px !important; line-height: 1.32 !important; }
+  .s17-bullets { padding-left: 26px !important; }
+  .s17-bullet-item { font-size: 17px !important; line-height: 1.32 !important; }
+  .s17-illustration-wrap { margin: 6px auto 4px auto !important; }
+  .s17-illustration-img { max-width: 340px !important; max-height: clamp(190px, 34vh, 270px) !important; margin: 0 auto !important; }
   .s17-captions-panel { max-width: 100% !important; }
 }
 
+/* Small phones: icons sit on their own row just above Back / Next */
+@media (max-width: 599px) {
+  .s17-root { padding-bottom: 124px !important; }
+  .s17-audio-row {
+    right: 12px;
+    bottom: 70px;
+    gap: 6px;
+  }
+  .s17-audio-btn svg { transform: scale(0.9); }
+}
+
+/* ---------- Mobile landscape ---------- */
 @media (orientation: landscape) and (max-height: 520px) {
-  .s17-root { padding: 8px 18px 58px 18px !important; overflow-y: auto !important; }
+  .s17-root { --s17-audio-bottom: 8px; padding: 10px 18px 60px 18px !important; overflow-y: auto !important; }
   .s17-content-wrap { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 16px !important; max-width: 100% !important; }
   .s17-text-col { flex: 1 1 54% !important; width: 54% !important; justify-content: center !important; }
-  .s17-badge { width: auto !important; min-width: 115px !important; height: 32px !important; padding: 0 14px !important; border-radius: 12px !important; margin-bottom: 6px !important; }
-  .s17-badge-title { font-size: 13.5px !important; }
-  .s17-heading { font-size: 13.5px !important; line-height: 1.25 !important; margin: 0 0 4px 0 !important; }
-  .s17-bullets { margin: 0 !important; padding-left: 14px !important; }
-  .s17-bullet-item { font-size: 11.5px !important; line-height: 1.25 !important; margin-bottom: 2px !important; }
-  .s17-illustration-wrap { flex: 1 1 44% !important; width: 44% !important; max-height: 190px !important; margin: 0 !important; }
-  .s17-illustration-img { width: 100% !important; max-width: 340px !important; max-height: clamp(140px, 52vh, 190px) !important; height: auto !important; }
+  .s17-badge { min-width: 110px !important; height: 40px !important; padding: 0 16px !important; border-radius: 13px !important; margin-bottom: 8px !important; }
+  .s17-badge-title { font-size: 14px !important; }
+  .s17-heading { font-size: 14px !important; line-height: 1.3 !important; }
+  .s17-bullets { padding-left: 18px !important; }
+  .s17-bullet-item { font-size: 14px !important; line-height: 1.3 !important; }
+  .s17-illustration-wrap { flex: 1 1 44% !important; width: 44% !important; margin: 0 !important; align-items: center !important; }
+  .s17-illustration-img { max-width: 320px !important; max-height: clamp(130px, 50vh, 190px) !important; }
+  .s17-audio-row { right: 14px !important; bottom: 8px !important; }
+  .s17-audio-btn svg { transform: scale(0.8); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -335,8 +354,8 @@ export function Slide17WhatNowScreen({
   }, [showCaptions, isEs]);
 
   const rawTitle = isEs
-    ? "Hable con el medico de su hijo sobre la prueba de alergia a [name]!"
-    : "Talk to your child's doctor about [name] allergy testing!";
+    ? "Hable con el medico de su hijo sobre Pink medicine allergy testing!"
+    : "Talk to your child's doctor about Pink medicine allergy testing!"
 
   const rawBullets = [
     {
@@ -519,6 +538,7 @@ export function Slide17WhatNowScreen({
         role="toolbar"
         aria-label={isEs ? "Controles de audio" : "Audio controls"}
       >
+        {/* CC - speech bubble icon (Figma) */}
         <button
           type="button"
           className="s17-audio-btn"
@@ -527,12 +547,30 @@ export function Slide17WhatNowScreen({
           aria-label={showCaptions ? (isEs ? "Ocultar subtitulos" : "Hide closed captions") : (isEs ? "Mostrar subtitulos" : "Show closed captions")}
           title={showCaptions ? (isEs ? "Ocultar subtitulos" : "Hide closed captions") : (isEs ? "Mostrar subtitulos" : "Show closed captions")}
         >
-          <svg width="40" height="36" viewBox="0 0 52 47" fill="none" aria-hidden="true" focusable="false">
-            <rect x="2" y="2" width="48" height="43" rx="10" fill={showCaptions ? "#144e57" : "#e6f4f1"} stroke="#144e57" strokeWidth="2.5" />
-            <text x="26" y="28" textAnchor="middle" fill={showCaptions ? "#ffffff" : "#144e57"} fontSize="18" fontFamily="Plus Jakarta Sans, sans-serif" fontWeight="800" letterSpacing="1" aria-hidden="true">CC</text>
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true" focusable="false">
+            <path
+              d="M8 3H32C34.2 3 36 4.8 36 7V26C36 28.2 34.2 30 32 30H17L9 37V30H8C5.8 30 4 28.2 4 26V7C4 4.8 5.8 3 8 3Z"
+              fill={showCaptions ? "#144e57" : "#e6f4f1"}
+              stroke="#1b6f7c"
+              strokeWidth="2.4"
+              strokeLinejoin="round"
+            />
+            <text
+              x="20"
+              y="22"
+              textAnchor="middle"
+              fill={showCaptions ? "#ffffff" : "#1b6f7c"}
+              fontSize="15"
+              fontFamily="Plus Jakarta Sans, sans-serif"
+              fontWeight="600"
+              aria-hidden="true"
+            >
+              CC
+            </text>
           </svg>
         </button>
 
+        {/* Play - triangle with sound waves (Figma) */}
         <button
           type="button"
           className="s17-audio-btn"
@@ -542,15 +580,35 @@ export function Slide17WhatNowScreen({
           title={audioPlaying ? (isEs ? "Pausar narracion de audio" : "Pause audio narration") : (isEs ? "Reproducir narracion de audio" : "Play audio narration")}
         >
           {audioPlaying ? (
-            <svg width="52" height="36" viewBox="0 0 70 47" fill="none" aria-hidden="true" focusable="false">
-              <rect x="2" y="2" width="66" height="43" rx="10" fill="#144e57" stroke="#144e57" strokeWidth="2.5" />
-              <rect x="25" y="14" width="6" height="19" rx="2" fill="#ffffff" />
-              <rect x="39" y="14" width="6" height="19" rx="2" fill="#ffffff" />
+            <svg width="52" height="40" viewBox="0 0 52 40" fill="none" aria-hidden="true" focusable="false">
+              <rect x="4" y="4" width="8" height="26" rx="2.5" fill="#1b6f7c" />
+              <rect x="18" y="4" width="8" height="26" rx="2.5" fill="#1b6f7c" />
+              <path d="M33 11C36.5 14.5 36.5 21.5 33 25" stroke="#1b6f7c" strokeWidth="2.4" strokeLinecap="round" />
+              <path d="M39 6C45.5 12.5 45.5 23.5 39 30" stroke="#1b6f7c" strokeWidth="2.4" strokeLinecap="round" />
             </svg>
           ) : (
-            <svg width="52" height="36" viewBox="0 0 70 47" fill="none" aria-hidden="true" focusable="false">
-              <rect x="2" y="2" width="66" height="43" rx="10" fill="#e6f4f1" stroke="#144e57" strokeWidth="2.5" />
-              <polygon points="28,14 46,23.5 28,33" fill="#144e57" />
+            <svg width="52" height="40" viewBox="0 0 52 40" fill="none" aria-hidden="true" focusable="false">
+              <path
+                d="M5 5.5C5 3.6 7 2.5 8.6 3.5L30 16.2C31.5 17.1 31.5 19.3 30 20.2L8.6 32.9C7 33.9 5 32.8 5 30.9V5.5Z"
+                fill="#e6f4f1"
+                stroke="#1b6f7c"
+                strokeWidth="2.4"
+                strokeLinejoin="round"
+              />
+              <text
+                x="15"
+                y="23"
+                textAnchor="middle"
+                fill="#1b6f7c"
+                fontSize="9"
+                fontFamily="Plus Jakarta Sans, sans-serif"
+                fontWeight="700"
+                aria-hidden="true"
+              >
+                play
+              </text>
+              <path d="M35 11C38.5 14.5 38.5 21.5 35 25" stroke="#1b6f7c" strokeWidth="2.4" strokeLinecap="round" />
+              <path d="M41 6C47.5 12.5 47.5 23.5 41 30" stroke="#1b6f7c" strokeWidth="2.4" strokeLinecap="round" />
             </svg>
           )}
         </button>
