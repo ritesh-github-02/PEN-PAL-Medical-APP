@@ -1,7 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { logInteraction } from '@/lib/tracking';
+
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 interface AudioPlayerProps {
   audioSrc?: string;
@@ -26,6 +29,124 @@ export default function AudioPlayer({
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showTranscript, setShowTranscript] = useState(false);
+  const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({
+    position: 'absolute',
+    bottom: 'calc(100% + 10px)',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 'min(320px, calc(100vw - 24px))',
+    maxWidth: 'calc(100vw - 24px)',
+    maxHeight: '240px',
+  });
+
+  // Dynamically calculate and clamp popover positioning on mobile and desktop
+  const updatePopoverPosition = useCallback(() => {
+    if (!showTranscript || !transcriptPopoverRef.current) return;
+    if (typeof window === 'undefined') return;
+
+    const buttonEl = transcriptPopoverRef.current;
+    const buttonRect = buttonEl.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Find nearest clipping ancestor (slide container, screen inner, or stage card)
+    const container = buttonEl.closest(
+      '.tablet-screen-inner, .tablet-slide-content, [class*="-stage"], [class*="-root"]'
+    ) as HTMLElement | null;
+    const containerRect = container ? container.getBoundingClientRect() : null;
+
+    // Safe horizontal boundaries: must be safely inside container (if present) and screen viewport
+    const leftBound = Math.max(12, (containerRect ? containerRect.left : 0) + 10);
+    const rightBound = Math.min(vw - 12, (containerRect ? containerRect.right : vw) - 10);
+    const availableWidth = Math.max(220, rightBound - leftBound);
+    const targetWidth = Math.min(320, availableWidth);
+
+    // Safe vertical boundaries
+    const topBound = Math.max(12, (containerRect ? containerRect.top : 0) + 10);
+    const bottomBound = Math.min(vh - 12, (containerRect ? containerRect.bottom : vh) - 10);
+
+    const isDesktop = vw >= 768;
+
+    // On desktop, if right-aligning to button fits safely inside leftBound, keep standard desktop behavior
+    if (isDesktop && buttonRect.right - targetWidth >= leftBound) {
+      const spaceAbove = buttonRect.top - topBound;
+      setPopoverStyle({
+        position: 'absolute',
+        right: 0,
+        left: 'auto',
+        bottom: 'calc(100% + 10px)',
+        top: 'auto',
+        transform: 'none',
+        width: `${targetWidth}px`,
+        maxWidth: `${availableWidth}px`,
+        maxHeight: `${Math.min(260, Math.max(140, spaceAbove - 10))}px`,
+      });
+      return;
+    }
+
+    // On mobile or narrow screens/containers:
+    // Horizontally center above the button, then clamp strictly within [leftBound, rightBound - targetWidth]
+    const idealScreenLeft = buttonRect.left + (buttonRect.width - targetWidth) / 2;
+    const clampedScreenLeft = Math.max(
+      leftBound,
+      Math.min(idealScreenLeft, rightBound - targetWidth)
+    );
+    const relativeLeft = Math.round(clampedScreenLeft - buttonRect.left);
+
+    // Vertical placement: prefer opening upward if space permits
+    const spaceAbove = buttonRect.top - topBound;
+    const spaceBelow = bottomBound - buttonRect.bottom;
+    const openUpward = spaceAbove >= 180 || spaceAbove >= spaceBelow;
+
+    if (openUpward) {
+      const maxH = Math.min(260, Math.max(140, spaceAbove - 10));
+      setPopoverStyle({
+        position: 'absolute',
+        left: `${relativeLeft}px`,
+        right: 'auto',
+        bottom: 'calc(100% + 10px)',
+        top: 'auto',
+        transform: 'none',
+        width: `${targetWidth}px`,
+        maxWidth: `${availableWidth}px`,
+        maxHeight: `${maxH}px`,
+      });
+    } else {
+      const maxH = Math.min(260, Math.max(140, spaceBelow - 10));
+      setPopoverStyle({
+        position: 'absolute',
+        left: `${relativeLeft}px`,
+        right: 'auto',
+        top: 'calc(100% + 10px)',
+        bottom: 'auto',
+        transform: 'none',
+        width: `${targetWidth}px`,
+        maxWidth: `${availableWidth}px`,
+        maxHeight: `${maxH}px`,
+      });
+    }
+  }, [showTranscript]);
+
+  // Keep popover positioned on mount, resize, and scroll
+  useIsomorphicLayoutEffect(() => {
+    if (!showTranscript) return;
+
+    updatePopoverPosition();
+    const rafId = requestAnimationFrame(updatePopoverPosition);
+
+    const handleUpdate = () => {
+      updatePopoverPosition();
+    };
+
+    window.addEventListener('resize', handleUpdate, { passive: true });
+    window.addEventListener('scroll', handleUpdate, { passive: true, capture: true });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', handleUpdate);
+      window.removeEventListener('scroll', handleUpdate, true);
+    };
+  }, [showTranscript, updatePopoverPosition]);
 
   // Reset state when source or step changes
   useEffect(() => {
@@ -53,10 +174,10 @@ export default function AudioPlayer({
     };
   }, []);
 
-  // Close transcript when clicking outside
+  // Close transcript when clicking outside or pressing Escape (WCAG 1.4.13)
   useEffect(() => {
     if (!showTranscript) return;
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (
         transcriptPopoverRef.current &&
         !transcriptPopoverRef.current.contains(e.target as Node)
@@ -64,8 +185,21 @@ export default function AudioPlayer({
         setShowTranscript(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowTranscript(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [showTranscript]);
 
   const speakText = (text: string) => {
@@ -266,31 +400,32 @@ export default function AudioPlayer({
           </svg>
         </button>
 
-        {/* Captions / Transcript Dropdown Popover (Opens Upward) */}
+        {/* Captions / Transcript Dropdown Popover */}
         {showTranscript && (
           <div
             id="audio-transcript-popover"
             role="region"
             aria-label={locale === 'es' ? 'Transcripción de audio' : 'Audio transcript'}
-            className="absolute right-0 bottom-full mb-3 w-72 sm:w-80 max-h-60 overflow-y-auto z-50 bg-white/95 backdrop-blur-md border border-slate-300 text-slate-800 p-3.5 rounded-2xl shadow-2xl space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-150"
+            style={popoverStyle}
+            className="audio-transcript-popover absolute z-50 bg-white/95 backdrop-blur-md border border-slate-300 text-slate-800 p-3.5 rounded-2xl shadow-2xl space-y-2 animate-in fade-in duration-150 overflow-y-auto box-border pointer-events-auto"
           >
-            <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#236f7a]" aria-hidden="true"></span>
-                <span className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 gap-2">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="w-2 h-2 rounded-full bg-[#236f7a] shrink-0" aria-hidden="true"></span>
+                <span className="text-[11px] font-bold text-slate-900 uppercase tracking-wider truncate">
                   {locale === 'es' ? 'Transcripción de Audio' : 'Audio Transcript'}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowTranscript(false)}
-                className="text-slate-400 hover:text-slate-700 text-xs font-bold px-1.5 py-0.5 rounded cursor-pointer focus:outline-none"
+                className="text-slate-400 hover:text-slate-700 text-xs font-bold px-1.5 py-0.5 rounded cursor-pointer focus:outline-none shrink-0"
                 aria-label={locale === 'es' ? 'Cerrar transcripción' : 'Close transcript'}
               >
                 ✕
               </button>
             </div>
-            <p className="text-xs text-slate-700 leading-relaxed font-medium select-text whitespace-pre-line">
+            <p className="text-xs text-slate-700 leading-relaxed font-medium select-text whitespace-pre-line break-words">
               {transcriptText ||
                 (locale === 'es'
                   ? 'Transcripción de la grabación de audio.'
