@@ -168,30 +168,30 @@ const SLIDE10_SURVEY_INTRO_CSS = `
    ========================================================== */
 @media (max-width: 767px) {
   .s10b-root {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
-    min-height: auto !important;
-    flex: none !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    padding: 0.85rem 0.85rem 1rem 0.85rem !important;
+    padding: 0.45rem 0.65rem !important;
     gap: 0 !important;
   }
   .s10b-stage {
     position: relative !important;
     width: 100% !important;
-    max-width: 360px !important;
-    height: auto !important;
-    min-height: auto !important;
+    max-width: 380px !important;
+    height: 100% !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
@@ -200,13 +200,13 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   .s10b-bubble {
     order: 1 !important;
     position: relative !important;
-    left: 40px !important;
-    top: 28px !important;
-    width: 100% !important;
-    max-width: 290px !important;
+    left: auto !important;
+    top: auto !important;
+    width: clamp(190px, 58vw, 235px) !important;
+    max-width: 235px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
-    margin: 4px auto 0 auto !important;
+    margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
     pointer-events: none !important;
@@ -223,7 +223,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     left: 54% !important;
     transform: translate(-50%, -50%) !important;
     width: 78% !important;
-    max-width: 255px !important;
+    max-width: 235px !important;
     padding: 0 !important;
     margin: 0 !important;
     display: flex !important;
@@ -233,8 +233,8 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     text-align: center !important;
   }
   .s10b-bubble-text {
-    font-size: 11.5px !important;
-    line-height: 1.4 !important;
+    font-size: clamp(11px, 1.55vh, 12.5px) !important;
+    line-height: 1.38 !important;
     font-weight: 700 !important;
     color: #232323 !important;
     text-align: center !important;
@@ -243,11 +243,11 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   .s10b-nurse {
     order: 2 !important;
     position: relative !important;
-    left: -77PX !important;
+    left: auto !important;
     top: auto !important;
-    width: 125px !important;
-    height: 215px !important;
-    margin: -10px auto 0 auto !important;
+    width: clamp(65px, 16vw, 85px) !important;
+    height: clamp(85px, 13vh, 115px) !important;
+    margin: -10px auto 0 16% !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -266,15 +266,15 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     left: auto !important;
     bottom: auto !important;
     top: auto !important;
-    margin: 8px auto 0 auto !important;
+    margin: 2px auto 0 auto !important;
     z-index: 25 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 5px !important;
+    gap: 6px !important;
   }
   .s10b-root .slide-nav {
-    margin: 10px auto 0.25rem auto !important;
+    margin: 4px auto 0 auto !important;
   }
 }
 

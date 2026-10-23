@@ -260,37 +260,47 @@ const SLIDE8_COMPONENT_CSS = `
      ------------------------------------------------------------- */
   .s8-component-card.is-mobile {
     aspect-ratio: auto !important;
-    max-height: none !important;
+    max-height: 100% !important;
     height: 100% !important;
-    border-radius: 24px !important;
-    padding: 16px 14px 12px 14px !important;
-    overflow-y: auto !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    border-radius: 20px !important;
+    padding: 0.45rem 0.65rem !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
   }
   .s8-component-card.is-mobile .s8-stage-body {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-evenly !important;
-    gap: 8px !important;
+    gap: 4px !important;
   }
   .s8-component-card.is-mobile .s8-bubble-wrap {
-    width: 100% !important;
-    max-width: 320px !important;
+    width: clamp(195px, 58vw, 235px) !important;
+    max-width: 235px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
   }
   .s8-component-card.is-mobile .s8-heading {
-    font-size: 14.5px !important;
-    line-height: 1.38 !important;
+    font-size: clamp(11px, 1.55vh, 12.5px) !important;
+    line-height: 1.35 !important;
   }
   .s8-component-card.is-mobile .s8-nurse-wrap {
-    width: 125px !important;
-    height: 215px !important;
-    margin-top: -24px !important;
+    width: clamp(65px, 16vw, 85px) !important;
+    height: clamp(85px, 13vh, 115px) !important;
+    margin-top: -12px !important;
     margin-left: auto !important;
-    margin-right: 48px !important;
+    margin-right: 14% !important;
   }
   .s8-component-card.is-mobile .s8-bottom-bar {
     flex: 0 0 auto !important;
@@ -298,10 +308,10 @@ const SLIDE8_COMPONENT_CSS = `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 10px !important;
+    gap: 4px !important;
     width: 100% !important;
-    margin-top: auto !important;
-    padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    padding: 2px 0 0 0 !important;
   }
   .s8-component-card.is-mobile .s8-spacer-side {
     display: none !important;
@@ -319,48 +329,56 @@ const SLIDE8_COMPONENT_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
     width: auto !important;
-    margin: 0 auto !important;
+    margin: 4px auto 0 auto !important;
   }
 
   /* Responsive Fallback (< 768px) */
   @media (max-width: 767px) {
     .s8-component-card {
-      aspect-ratio: auto;
-      max-height: none;
-      height: 100%;
-      border-radius: 24px;
-      padding: 16px 14px 12px 14px;
-      overflow-y: auto;
+      aspect-ratio: auto !important;
+      max-height: 100% !important;
+      height: 100% !important;
+      flex: 1 1 0% !important;
+      min-height: 0 !important;
+      border-radius: 20px !important;
+      padding: 0.45rem 0.65rem !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
     }
     .s8-stage-body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-evenly;
-      gap: 8px;
+      flex: 1 1 0% !important;
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: space-evenly !important;
+      gap: 4px !important;
     }
     .s8-bubble-wrap {
-      width: 100%;
-      max-width: 280px;
-      aspect-ratio: 510 / 315;
-      height: auto;
-      margin: 0 auto;
-      filter: drop-shadow(2px 3px 0px #1a3532);
-      left: -45px;
-      top: 26px;
+      width: clamp(195px, 58vw, 235px) !important;
+      max-width: 235px !important;
+      aspect-ratio: 510 / 315 !important;
+      height: auto !important;
+      margin: 0 auto !important;
+      filter: drop-shadow(2px 3px 0px #1a3532) !important;
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
     }
     .s8-heading {
-      font-size: 11.5px;
-      line-height: 1.38;
+      font-size: clamp(11px, 1.55vh, 12.5px) !important;
+      line-height: 1.35 !important;
     }
     .s8-nurse-wrap {
-      width: 125px;
-      height: 215px;
-      margin-top: -24px;
-      margin-left: auto;
-      margin-right: 48px;
+      width: clamp(65px, 16vw, 85px) !important;
+      height: clamp(85px, 13vh, 115px) !important;
+      margin-top: -12px !important;
+      margin-left: auto !important;
+      margin-right: 14% !important;
     }
     .s8-bottom-bar {
       flex: 0 0 auto !important;
@@ -368,10 +386,10 @@ const SLIDE8_COMPONENT_CSS = `
       flex-direction: column !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 10px !important;
+      gap: 4px !important;
       width: 100% !important;
-      margin-top: auto !important;
-      padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      padding: 2px 0 0 0 !important;
     }
     .s8-spacer-side {
       display: none !important;
@@ -389,9 +407,9 @@ const SLIDE8_COMPONENT_CSS = `
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 12px !important;
+      gap: 10px !important;
       width: auto !important;
-      margin: 0 auto !important;
+      margin: 4px auto 0 auto !important;
     }
   }
 

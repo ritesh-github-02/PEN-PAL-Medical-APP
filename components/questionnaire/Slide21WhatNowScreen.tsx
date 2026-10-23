@@ -134,9 +134,79 @@ const SLIDE21_CSS = `
 }
 
 /* ---------- Small phones ---------- */
-@media (max-width: 599px) {
-  .s21-root { --s21-nav-space: 96px; }
-  .s21-figure { min-height: 180px; }
+@media (max-width: 767px) {
+  .s21-root {
+    --s21-nav-space: 0px !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.45rem 0.65rem !important;
+    gap: 0.25rem !important;
+  }
+  .s21-content {
+    max-width: 440px !important;
+    width: 100% !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 4px !important;
+  }
+  .s21-badge {
+    min-width: 120px !important;
+    height: clamp(30px, 4.2vh, 36px) !important;
+    padding: 0 14px !important;
+    margin-bottom: 2px !important;
+    border-radius: 12px !important;
+  }
+  .s21-badge-title {
+    font-size: clamp(12px, 1.8vh, 14px) !important;
+  }
+  .s21-heading,
+  .s21-bullet {
+    font-size: clamp(10.5px, 1.45vh, 12px) !important;
+    line-height: 1.3 !important;
+  }
+  .s21-bullets {
+    padding-left: 18px !important;
+    margin: 2px 0 !important;
+  }
+  .s21-figure {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: clamp(80px, 15vh, 115px) !important;
+    max-height: 115px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .s21-image {
+    position: relative !important;
+    inset: auto !important;
+    max-height: clamp(80px, 15vh, 115px) !important;
+    height: 100% !important;
+    width: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
+    object-fit: contain !important;
+  }
+  .s21-audio {
+    margin: 2px auto 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  .s21-root .slide-nav {
+    margin: 4px auto 0 auto !important;
+  }
 }
 
 /* ---------- Phone landscape: text left, image right ---------- */

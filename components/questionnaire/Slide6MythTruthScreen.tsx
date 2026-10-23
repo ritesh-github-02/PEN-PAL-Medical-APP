@@ -86,49 +86,64 @@ const stripPrefix = (text: string) =>
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    height: auto;
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 0.85rem 0.75rem 1rem;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.45rem 0.65rem !important;
   }
   ${scope} .s6-stage {
-    width: 100%;
-    max-width: 380px;
-    height: auto;
-    padding: 16px 14px 12px;
+    width: 100% !important;
+    max-width: 440px !important;
+    height: 100% !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
     transform: none !important;
   }
   ${scope} .s6-heading {
-    font-size: 15px;
-    margin-bottom: 10px;
+    font-size: clamp(11.5px, 1.7vh, 13px) !important;
+    line-height: 1.3 !important;
+    margin-bottom: 2px !important;
   }
   ${scope} .s6-cards {
-    gap: 8px;
+    gap: clamp(4px, 0.8vh, 6px) !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
   }
   ${scope} .s6-card {
-    min-height: 48px;
-    padding: 10px 12px;
-    gap: 10px;
-    border-radius: 12px;
+    min-height: clamp(38px, 5.8vh, 48px) !important;
+    padding: 4px 8px !important;
+    gap: 6px !important;
+    border-radius: 10px !important;
   }
   ${scope} .s6-card-tag {
-    font-size: 10px;
-    padding: 3px 7px;
+    font-size: 9.5px !important;
+    padding: 2px 6px !important;
   }
   ${scope} .s6-card-text {
-    font-size: 12.5px;
-    line-height: 1.35;
+    font-size: clamp(10.5px, 1.4vh, 11.5px) !important;
+    line-height: 1.25 !important;
   }
   ${scope} .s6-audio {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
+    display: flex !important;
+    justify-content: center !important;
+    margin-top: 2px !important;
   }
   ${scope} .slide-nav {
-    margin: 10px auto 0.25rem auto !important;
+    margin: 4px auto 0 auto !important;
   }
 `;
 

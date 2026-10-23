@@ -126,44 +126,57 @@ const SLIDE1_COMPONENT_CSS = `
   /* -------------------------------------------------------------
      Mobile Layout (.is-mobile or screen width < 768px)
      ------------------------------------------------------------- */
-  .s1-component-root.is-mobile .s1-content-container,
+  .s1-component-root.is-mobile,
   @media (max-width: 767px) {
+    .s1-component-root {
+      overflow: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 0 !important;
+      padding: 0.45rem 0.65rem !important;
+      justify-content: space-evenly !important;
+    }
     .s1-content-container {
       flex-direction: column !important;
       align-items: center !important;
       text-align: center !important;
       justify-content: center !important;
-      gap: 14px !important;
+      gap: 8px !important;
     }
     .s1-nurse-col {
       order: -1 !important;
-      margin: 0 auto 4px auto !important;
+      margin: 0 auto 2px auto !important;
+    }
+    .s1-nurse-col img {
+      max-height: clamp(80px, 14vh, 115px) !important;
+      width: auto !important;
     }
     .s1-left-col {
       align-items: center !important;
       text-align: center !important;
       max-width: 100% !important;
-      gap: 10px !important;
+      gap: 6px !important;
     }
     .s1-title {
-      font-size: 2.25rem !important;
-      line-height: 1.15 !important;
+      font-size: clamp(1.8rem, 6vh, 2.2rem) !important;
+      line-height: 1.1 !important;
       white-space: nowrap !important;
     }
     .s1-subtitle {
-      font-size: 1rem !important;
-      margin-top: 4px !important;
+      font-size: clamp(0.85rem, 2.2vh, 0.95rem) !important;
+      margin-top: 2px !important;
     }
     .s1-copy {
-      font-size: 0.95rem !important;
+      font-size: clamp(0.8rem, 2vh, 0.9rem) !important;
+      line-height: 1.35 !important;
       margin: 0 auto !important;
-      max-width: 300px !important;
+      max-width: 290px !important;
     }
     .s1-btn-start {
-      min-height: 44px !important;
-      min-width: 130px !important;
-      font-size: 15px !important;
-      padding: 0 24px !important;
+      min-height: 38px !important;
+      min-width: 120px !important;
+      font-size: 14px !important;
+      padding: 0 20px !important;
     }
   }
 

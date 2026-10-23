@@ -304,23 +304,75 @@ const SLIDE12_CSS = `
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .s12-root {
-    overflow-y: auto;
-    height: auto;
-    min-height: auto;
-    flex: none;
-    padding: 0.85rem 0.75rem 1rem 0.75rem !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.45rem 0.65rem !important;
+    gap: 0.25rem !important;
+  }
+  .s12-top-section {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .s12-heading {
+    font-size: clamp(12px, 1.8vh, 14px) !important;
+    line-height: 1.3 !important;
+  }
+  .s12-middle {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
   }
   .s12-cohorts-grid {
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.35rem 0.6rem !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
+    max-width: 360px !important;
+    width: 100% !important;
   }
   .s12-cohort-col {
-    flex: 1 1 40%;
+    flex: 0 0 47% !important;
+    max-width: 48% !important;
   }
   .s12-cohort-img-wrap {
-    height: 130px;
+    height: clamp(52px, 8.5vh, 68px) !important;
+    margin-bottom: 0 !important;
+  }
+  .s12-cohort-img {
+    max-height: clamp(52px, 8.5vh, 68px) !important;
+    height: 100% !important;
+  }
+  .s12-cohort-btn {
+    min-height: clamp(34px, 4.8vh, 40px) !important;
+    padding: 0.25rem 0.25rem !important;
+    border-radius: 8px !important;
+  }
+  .s12-cohort-title {
+    font-size: clamp(10.5px, 1.4vh, 12px) !important;
+    line-height: 1.2 !important;
+  }
+  .s12-cohort-subtitle {
+    font-size: clamp(8.5px, 1.2vh, 9.5px) !important;
+    line-height: 1.2 !important;
+  }
+  .s12-audio {
+    margin: 2px auto 0 auto !important;
+  }
+  .s12-root .slide-nav {
+    margin: 4px auto 0 auto !important;
   }
 }
 

@@ -335,19 +335,73 @@ const SLIDE14_CSS = `
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
+  .s14-root {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    padding: 0.45rem 0.65rem !important;
+    gap: 0.25rem !important;
+  }
+  .s14-top-section {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .s14-heading {
+    font-size: clamp(12px, 1.8vh, 14px) !important;
+    line-height: 1.3 !important;
+  }
   .s14-middle {
-    flex-direction: column-reverse;
-    gap: 1rem;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-evenly !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+  }
+  .s14-card {
+    max-width: 380px !important;
+    width: 100% !important;
+    padding: 0.65rem 0.75rem !important;
+    border-radius: 14px !important;
   }
   .s14-options-row {
-    flex-wrap: wrap;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
   }
   .s14-option-btn {
-    flex: 1 1 45%;
+    flex: 1 1 0% !important;
+    min-height: clamp(34px, 4.8vh, 40px) !important;
+    font-size: 0.82rem !important;
+    padding: 0.35rem 0.5rem !important;
+  }
+  .s14-nurse-wrap {
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
   }
   .s14-nurse-img {
-    height: 150px;
+    height: clamp(68px, 11vh, 90px) !important;
+    max-height: 90px !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+  .s14-audio {
+    margin: 2px auto 0 auto !important;
+  }
+  .s14-root .slide-nav {
+    margin: 4px auto 0 auto !important;
   }
 }
 

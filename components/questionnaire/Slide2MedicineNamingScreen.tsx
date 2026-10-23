@@ -386,111 +386,68 @@ const SLIDE2_COMPONENT_CSS = `
 
   /* -------------------------------------------------------------
      Mobile Layout (< 768px) & explicit .is-mobile
+     Fills screen without scrolling - all elements visible
      ------------------------------------------------------------- */
   @media (max-width: 767px) {
     .s2-root {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
-      height: auto !important;
+      overflow: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
       min-height: 0 !important;
+      flex: 1 1 0% !important;
       flex-direction: column !important;
-      justify-content: flex-start !important;
+      justify-content: space-between !important;
       align-items: stretch !important;
-      padding: 0.75rem 0.75rem 1.5rem !important;
-      gap: 0.75rem !important;
+      padding: 0.35rem 0.65rem 0.45rem !important;
+      gap: 2px !important;
     }
     .s2-banner-wrap {
       width: 100% !important;
       max-width: 100% !important;
-      margin: 0 !important;
-      border-radius: 18px !important;
-      padding: 9px 14px !important;
+      margin: 0 auto !important;
+      border-radius: 9999px !important;
+      padding: 4px 10px !important;
+      flex-shrink: 0 !important;
     }
     .s2-heading {
-      font-size: 15.5px !important;
-      line-height: 1.3 !important;
+      font-size: clamp(12px, 1.8vh, 14px) !important;
+      line-height: 1.25 !important;
     }
 
-    /* Stage: natural content height (no stretched 380px flex basis) */
+    /* Stage: fills space flexibly, zero scrolling */
     .s2-stage-middle {
-      flex: 0 0 auto !important;
+      flex: 1 1 0% !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
       flex-direction: column !important;
-      align-items: stretch !important;
-      justify-content: flex-start !important;
+      align-items: center !important;
+      justify-content: space-evenly !important;
       width: 100% !important;
       max-width: 100% !important;
-      gap: 0.85rem !important;
+      gap: 2px !important;
       padding: 0 !important;
       margin: 0 !important;
     }
 
-    /* 2. Speech bubble with Nurse Anna tucked directly beneath its tail */
-    .s2-character-col {
-      order: 2 !important;
-      position: relative !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: flex-end !important;
-      gap: 0 !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      height: auto !important;
-      margin: 0.15rem 0 0 0 !important;
-    }
-    .s2-bubble-wrap {
-      position: relative !important;
-      left: auto !important;
-      top: auto !important;
-      width: min(228px, 100%) !important;
-      height: auto !important;
-      aspect-ratio: 520 / 340 !important;
-      flex: 0 0 auto !important;
-      margin: 0 auto !important;
-    }
-    .s2-bubble-text-wrap {
-      top: 45% !important;
-      left: 47% !important;
-      width: 84% !important;
-      max-width: 190px !important;
-    }
-    .s2-bubble-text {
-      font-size: 12.5px !important;
-      line-height: 1.34 !important;
-    }
-    .s2-nurse-wrap {
-      position: relative !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: 84px !important;
-      height: 112px !important;
-      flex: 0 0 auto !important;
-      align-self: flex-end !important;
-      margin: -8px 10% 0 0 !important;
-      display: flex !important;
-      align-items: flex-end !important;
-      justify-content: center !important;
-    }
-    .s2-nurse-img {
-      max-height: 112px !important;
-    }
-
-    /* 1. Options block centered on screen: bottle + hugging checkbox list */
+    /* 1. Options block: bottle + compact checkbox list */
     .s2-options-col {
       order: 1 !important;
       display: flex !important;
-      flex: 0 0 auto !important;
+      flex: 0 1 auto !important;
       align-items: center !important;
       justify-content: center !important;
       width: 100% !important;
       max-width: 100% !important;
-      gap: 12px !important;
+      gap: 8px !important;
     }
     .s2-bottle-wrap {
-      width: 52px !important;
-      height: 104px !important;
+      width: clamp(32px, 7vw, 40px) !important;
+      height: auto !important;
       flex: 0 0 auto !important;
+    }
+    .s2-bottle-img {
+      max-height: clamp(55px, 8.5vh, 75px) !important;
+      object-fit: contain !important;
     }
     .s2-radiogroup {
       display: flex !important;
@@ -505,32 +462,86 @@ const SLIDE2_COMPONENT_CSS = `
     }
     .s2-option-row {
       width: 100% !important;
-      min-height: 44px !important;
-      gap: 10px !important;
-      padding: 4px 8px !important;
+      min-height: clamp(26px, 3.6vh, 32px) !important;
+      gap: 8px !important;
+      padding: 1px 6px !important;
       justify-content: flex-start !important;
     }
     .s2-checkbox-box {
-      width: 24px !important;
-      height: 24px !important;
+      width: 18px !important;
+      height: 18px !important;
       flex-shrink: 0 !important;
     }
     .s2-option-text {
-      font-size: 15px !important;
-      line-height: 1.25 !important;
+      font-size: clamp(12px, 1.6vh, 13.5px) !important;
+      line-height: 1.15 !important;
     }
 
-    /* 3. Bottom bar: CC + play sits ABOVE Back/Next centered with matching 10px spacing */
+    /* 2. Speech bubble with Nurse Anna tucked directly beneath its tail */
+    .s2-character-col {
+      order: 2 !important;
+      position: relative !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 0 1 auto !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+    }
+    .s2-bubble-wrap {
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      width: clamp(160px, 46vw, 190px) !important;
+      height: auto !important;
+      aspect-ratio: 520 / 340 !important;
+      flex: 0 0 auto !important;
+      margin: 0 auto !important;
+    }
+    .s2-bubble-text-wrap {
+      top: 45% !important;
+      left: 47% !important;
+      width: 84% !important;
+      max-width: 155px !important;
+    }
+    .s2-bubble-text {
+      font-size: clamp(9.5px, 1.35vh, 11px) !important;
+      line-height: 1.25 !important;
+    }
+    .s2-nurse-wrap {
+      position: relative !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: clamp(48px, 12vw, 60px) !important;
+      height: clamp(68px, 9.5vh, 84px) !important;
+      flex: 0 0 auto !important;
+      align-self: flex-end !important;
+      margin: -14px 10% 0 auto !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+    }
+    .s2-nurse-img {
+      max-height: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+    }
+
+    /* 3. Bottom bar: CC + play sits ABOVE Back/Next centered with matching 4px spacing */
     .s2-bottom-bar {
       flex: 0 0 auto !important;
       display: flex !important;
       flex-direction: column !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 10px !important;
+      gap: 4px !important;
       width: 100% !important;
-      margin-top: auto !important;
-      padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 !important;
+      padding: 0 2px calc(0.2rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     .s2-spacer-side {
       display: none !important;
@@ -552,40 +563,50 @@ const SLIDE2_COMPONENT_CSS = `
       width: auto !important;
       margin: 0 auto !important;
     }
+    .s2-btn-nav {
+      height: 34px !important;
+      min-height: 34px !important;
+      font-size: 14px !important;
+      padding: 0 16px !important;
+      min-width: 68px !important;
+    }
   }
 
   /* Explicit .is-mobile preview variant mirrors the mobile layout */
   .s2-root.is-mobile {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
     min-height: 0 !important;
+    flex: 1 1 0% !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
     align-items: stretch !important;
-    padding: 0.75rem 0.75rem 1.5rem !important;
-    gap: 0.75rem !important;
+    padding: 0.35rem 0.65rem 0.45rem !important;
+    gap: 2px !important;
   }
   .s2-root.is-mobile .s2-banner-wrap {
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 !important;
-    border-radius: 18px !important;
-    padding: 9px 14px !important;
+    margin: 0 auto !important;
+    border-radius: 9999px !important;
+    padding: 4px 10px !important;
+    flex-shrink: 0 !important;
   }
   .s2-root.is-mobile .s2-heading {
-    font-size: 15.5px !important;
-    line-height: 1.3 !important;
+    font-size: clamp(12px, 1.8vh, 14px) !important;
+    line-height: 1.25 !important;
   }
   .s2-root.is-mobile .s2-stage-middle {
-    flex: 0 0 auto !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
     flex-direction: column !important;
-    align-items: stretch !important;
-    justify-content: flex-start !important;
+    align-items: center !important;
+    justify-content: space-evenly !important;
     width: 100% !important;
     max-width: 100% !important;
-    gap: 0.85rem !important;
+    gap: 2px !important;
     padding: 0 !important;
     margin: 0 !important;
   }
@@ -595,18 +616,19 @@ const SLIDE2_COMPONENT_CSS = `
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-end !important;
+    justify-content: center !important;
     gap: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    height: auto !important;
-    margin: 0.15rem 0 0 0 !important;
+    flex: 0 1 auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
   }
   .s2-root.is-mobile .s2-bubble-wrap {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: min(228px, 100%) !important;
+    width: clamp(160px, 46vw, 190px) !important;
     height: auto !important;
     aspect-ratio: 520 / 340 !important;
     flex: 0 0 auto !important;
@@ -616,42 +638,48 @@ const SLIDE2_COMPONENT_CSS = `
     top: 45% !important;
     left: 47% !important;
     width: 84% !important;
-    max-width: 190px !important;
+    max-width: 155px !important;
   }
   .s2-root.is-mobile .s2-bubble-text {
-    font-size: 12.5px !important;
-    line-height: 1.34 !important;
+    font-size: clamp(9.5px, 1.35vh, 11px) !important;
+    line-height: 1.25 !important;
   }
   .s2-root.is-mobile .s2-nurse-wrap {
     position: relative !important;
     right: auto !important;
     bottom: auto !important;
-    width: 84px !important;
-    height: 112px !important;
+    width: clamp(48px, 12vw, 60px) !important;
+    height: clamp(68px, 9.5vh, 84px) !important;
     flex: 0 0 auto !important;
     align-self: flex-end !important;
-    margin: -8px 10% 0 0 !important;
+    margin: -14px 10% 0 auto !important;
     display: flex !important;
     align-items: flex-end !important;
     justify-content: center !important;
   }
   .s2-root.is-mobile .s2-nurse-img {
-    max-height: 112px !important;
+    max-height: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
   }
   .s2-root.is-mobile .s2-options-col {
     order: 1 !important;
     display: flex !important;
-    flex: 0 0 auto !important;
+    flex: 0 1 auto !important;
     align-items: center !important;
     justify-content: center !important;
     width: 100% !important;
     max-width: 100% !important;
-    gap: 12px !important;
+    gap: 8px !important;
   }
   .s2-root.is-mobile .s2-bottle-wrap {
-    width: 52px !important;
-    height: 104px !important;
+    width: clamp(32px, 7vw, 40px) !important;
+    height: auto !important;
     flex: 0 0 auto !important;
+  }
+  .s2-root.is-mobile .s2-bottle-img {
+    max-height: clamp(55px, 8.5vh, 75px) !important;
+    object-fit: contain !important;
   }
   .s2-root.is-mobile .s2-radiogroup {
     display: flex !important;
@@ -666,19 +694,19 @@ const SLIDE2_COMPONENT_CSS = `
   }
   .s2-root.is-mobile .s2-option-row {
     width: 100% !important;
-    min-height: 44px !important;
-    gap: 10px !important;
-    padding: 4px 8px !important;
+    min-height: clamp(26px, 3.6vh, 32px) !important;
+    gap: 8px !important;
+    padding: 1px 6px !important;
     justify-content: flex-start !important;
   }
   .s2-root.is-mobile .s2-checkbox-box {
-    width: 24px !important;
-    height: 24px !important;
+    width: 18px !important;
+    height: 18px !important;
     flex-shrink: 0 !important;
   }
   .s2-root.is-mobile .s2-option-text {
-    font-size: 15px !important;
-    line-height: 1.25 !important;
+    font-size: clamp(12px, 1.6vh, 13.5px) !important;
+    line-height: 1.15 !important;
   }
   .s2-root.is-mobile .s2-bottom-bar {
     flex: 0 0 auto !important;
@@ -686,10 +714,10 @@ const SLIDE2_COMPONENT_CSS = `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 10px !important;
+    gap: 4px !important;
     width: 100% !important;
-    margin-top: auto !important;
-    padding: 0.35rem 2px calc(0.4rem + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 !important;
+    padding: 0 2px calc(0.2rem + env(safe-area-inset-bottom, 0px)) !important;
   }
   .s2-root.is-mobile .s2-spacer-side {
     display: none !important;
@@ -710,6 +738,13 @@ const SLIDE2_COMPONENT_CSS = `
     gap: 12px !important;
     width: auto !important;
     margin: 0 auto !important;
+  }
+  .s2-root.is-mobile .s2-btn-nav {
+    height: 34px !important;
+    min-height: 34px !important;
+    font-size: 14px !important;
+    padding: 0 16px !important;
+    min-width: 68px !important;
   }
 
   /* Short landscape phones: compact but complete */

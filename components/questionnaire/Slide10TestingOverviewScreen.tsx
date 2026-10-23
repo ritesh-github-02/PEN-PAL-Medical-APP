@@ -89,83 +89,120 @@ const COPY = {
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    height: auto;
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 0.85rem 0.75rem 1rem;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.45rem 0.65rem !important;
   }
   ${scope} .s10-stage {
-    width: 100%;
-    max-width: 380px;
-    height: auto;
-    padding: 16px 14px 12px;
+    width: 100% !important;
+    max-width: 440px !important;
+    height: 100% !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
     transform: none !important;
   }
   ${scope} .s10-body {
-    position: static;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    justify-content: space-between !important;
+    gap: 4px !important;
   }
   ${scope} .s10-left {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 8px;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
   }
   ${scope} .s10-heading {
-    margin-bottom: 0;
-    font-size: 13.5px;
-    line-height: 1.35;
+    margin-bottom: 0 !important;
+    font-size: clamp(11.5px, 1.7vh, 13px) !important;
+    line-height: 1.3 !important;
   }
   ${scope} .s10-subheading {
-    margin-bottom: 0;
-    font-size: 14px;
-    line-height: 1.3;
+    margin-bottom: 0 !important;
+    font-size: clamp(12px, 1.8vh, 13.5px) !important;
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+    color: #1c5249 !important;
   }
   ${scope} .s10-bullets {
-    gap: 7px;
+    gap: clamp(3px, 0.7vh, 5px) !important;
+    margin: 0 !important;
   }
   ${scope} .s10-bullet-item {
-    font-size: 12.5px;
-    line-height: 1.35;
-    gap: 8px;
+    font-size: clamp(10px, 1.4vh, 11px) !important;
+    line-height: 1.25 !important;
+    gap: 6px !important;
   }
   ${scope} .s10-bullet-dot {
-    width: 6px;
-    height: 6px;
-    margin-top: 6px;
+    width: 5px !important;
+    height: 5px !important;
+    margin-top: 5px !important;
   }
   ${scope} .s10-right {
-    width: 100%;
-    flex-direction: column;
-    gap: 0;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin: 0 auto !important;
+    gap: 0 !important;
   }
   ${scope} .s10-bubble {
-    width: 206px;
-    height: auto;
-    aspect-ratio: 520 / 330;
-    margin: 0 auto;
-    left: -83px;
+    width: clamp(155px, 46vw, 185px) !important;
+    max-width: 185px !important;
+    height: auto !important;
+    aspect-ratio: 520 / 330 !important;
+    margin: 0 auto !important;
+    position: relative !important;
+    left: -10px !important;
+    top: auto !important;
+    filter: drop-shadow(2px 3px 0 #1a3532) !important;
   }
   ${scope} .s10-bubble-text {
-    font-size: 12.5px;
+    font-size: clamp(10px, 1.35vh, 11.5px) !important;
+    line-height: 1.25 !important;
   }
   ${scope} .s10-nurse {
-    width: 75px;
-    height: 146px;
-    margin-top: -14px;
-    z-index: 20;
+    width: clamp(48px, 13vw, 62px) !important;
+    height: clamp(68px, 10.5vh, 88px) !important;
+    max-height: 88px !important;
+    margin-top: -12px !important;
+    margin-left: auto !important;
+    margin-right: 18% !important;
+    z-index: 20 !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+  }
+  ${scope} .s10-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
   }
   ${scope} .s10-audio {
-    display: flex;
-    justify-content: center;
-    margin-top: 8px;
+    display: flex !important;
+    justify-content: center !important;
+    margin-top: 2px !important;
+    z-index: 25 !important;
   }
   ${scope} .slide-nav {
-    margin: 10px auto 0.25rem auto !important;
+    margin: 4px auto 0 auto !important;
   }
 `;
 

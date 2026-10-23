@@ -27,42 +27,44 @@ const STAGE_H = 427;
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
     min-height: 0 !important;
+    flex: 1 1 0% !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    padding: 0.85rem 0.75rem 1.25rem !important;
+    padding: 0.45rem 0.65rem !important;
+    gap: 0 !important;
   }
   ${scope} .s5-stage {
     position: relative !important;
     width: 100% !important;
-    max-width: 380px !important;
-    height: auto !important;
+    max-width: 440px !important;
+    height: 100% !important;
+    flex: 1 1 0% !important;
     min-height: 0 !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
-    gap: 10px !important;
+    gap: 4px !important;
   }
   ${scope} .s5-badge {
     position: static !important;
-    min-width: 160px !important;
-    height: 44px !important;
-    border-radius: 14px !important;
+    min-width: 130px !important;
+    height: clamp(30px, 4.2vh, 36px) !important;
+    border-radius: 12px !important;
     margin: 0 auto 0 0 !important;
-    padding: 0 16px !important;
+    padding: 0 14px !important;
   }
   ${scope} .s5-badge-title {
-    font-size: 16px !important;
+    font-size: clamp(12px, 1.8vh, 14px) !important;
   }
   ${scope} .s5-text-wrap {
     position: static !important;
@@ -71,24 +73,31 @@ const mobileLayout = (scope: string) => `
     padding: 0 !important;
   }
   ${scope} .s5-heading {
-    font-size: 16px !important;
-    line-height: 1.42 !important;
+    font-size: clamp(12px, 1.7vh, 14px) !important;
+    line-height: 1.35 !important;
     text-align: left !important;
     margin: 0 !important;
   }
   ${scope} .s5-bold {
-    font-size: 18px !important;
+    font-size: clamp(13px, 1.9vh, 15px) !important;
   }
   ${scope} .s5-nurse {
     position: static !important;
     left: auto !important;
     top: auto !important;
-    width: 140px !important;
-    height: 250px !important;
-    margin: 4px auto 0 auto !important;
+    width: auto !important;
+    height: clamp(80px, 13vh, 115px) !important;
+    max-height: 115px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
   ${scope} .s5-nurse-img {
-    max-height: 250px !important;
+    height: 100% !important;
+    max-height: clamp(80px, 13vh, 115px) !important;
+    width: auto !important;
+    object-fit: contain !important;
   }
   ${scope} .s5-audio {
     position: static !important;
@@ -96,11 +105,11 @@ const mobileLayout = (scope: string) => `
     bottom: auto !important;
     display: flex !important;
     justify-content: center !important;
-    margin: 10px auto 0 auto !important;
+    margin: 2px auto 0 auto !important;
     z-index: 25 !important;
   }
   ${scope} .slide-nav {
-    margin: 10px auto 0.25rem auto !important;
+    margin: 4px auto 0 auto !important;
   }
 `;
 

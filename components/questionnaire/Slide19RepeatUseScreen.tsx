@@ -418,39 +418,80 @@ const SLIDE19_CSS = `
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
+  .s19-root {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    padding: 0.45rem 0.65rem !important;
+    gap: 0.25rem !important;
+  }
+  .s19-top-section {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .s19-heading {
+    font-size: clamp(12px, 1.8vh, 14px) !important;
+    line-height: 1.3 !important;
+  }
   .s19-middle {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-evenly !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+  }
+  .s19-card {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    max-width: 380px !important;
+    width: 100% !important;
+    padding: 0.65rem 0.75rem !important;
+    border-radius: 14px !important;
   }
   .s19-options-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
   }
   .s19-option-btn {
-    width: 100%;
-    min-height: 42px;
-    font-size: 0.88rem;
-    padding: 0.5rem 0.75rem;
+    width: 100% !important;
+    min-height: clamp(32px, 4.4vh, 38px) !important;
+    font-size: 0.82rem !important;
+    padding: 0.35rem 0.65rem !important;
   }
   .s19-nurse-wrap {
-    margin: 0.35rem auto 0 auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
   }
   .s19-nurse-img {
-    height: clamp(140px, 21vh, 185px);
-    max-height: 185px;
-    width: auto;
-    object-fit: contain;
+    height: clamp(68px, 11vh, 90px) !important;
+    max-height: 90px !important;
+    width: auto !important;
+    object-fit: contain !important;
   }
   .s19-modal-row {
-    flex-direction: column;
+    flex-direction: column !important;
+  }
+  .s19-audio {
+    margin: 2px auto 0 auto !important;
+  }
+  .s19-root .slide-nav {
+    margin: 4px auto 0 auto !important;
   }
 }
 

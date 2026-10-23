@@ -463,108 +463,134 @@ const SLIDE11_CSS = `
 /* ==========================================================
    Mobile-First Enhanced Responsive Layout (<= 640px)
    ========================================================== */
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .s11-root {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden !important;
     height: 100% !important;
-    min-height: 100% !important;
-    flex: 1 1 auto !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
-    padding: 0.75rem 0.75rem 5.5rem 0.75rem !important;
-    gap: 0.65rem !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.45rem 0.65rem !important;
+    gap: 0.25rem !important;
   }
 
   .s11-top-section {
-    padding: 0 0.25rem;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .s11-heading {
-    font-size: 1rem;
-    line-height: 1.32;
-    text-align: left;
+    font-size: clamp(12px, 1.8vh, 13.5px) !important;
+    line-height: 1.3 !important;
+    text-align: left !important;
   }
 
   .s11-middle {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
   }
 
   .s11-card {
-    max-width: 100%;
-    width: 100%;
-    padding: 0.85rem 0.75rem;
-    border-radius: 16px;
-    gap: 0.45rem;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0.55rem 0.75rem !important;
+    border-radius: 14px !important;
+    gap: 0.35rem !important;
   }
 
   .s11-chip-row {
-    gap: 0.4rem;
+    gap: 0.35rem !important;
   }
 
   .s11-chip {
-    padding: 0.38rem 0.65rem;
-    font-size: 0.78rem;
-    line-height: 1.25;
-    border-radius: 8px;
-    white-space: normal;
-    text-align: left;
-    word-break: break-word;
-    max-width: 100%;
+    padding: 0.28rem 0.55rem !important;
+    font-size: clamp(10px, 1.4vh, 11px) !important;
+    line-height: 1.2 !important;
+    border-radius: 7px !important;
+    white-space: normal !important;
+    text-align: left !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
   }
 
-  /* Row 5: Stack Other describe input and Unsure chip vertically */
+  /* Row 5: Stack Other describe input and Unsure chip */
   .s11-row-bottom {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.65rem;
-    margin-top: 0.35rem;
-    padding-top: 0.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.45rem !important;
+    margin-top: 0.15rem !important;
+    padding-top: 0.15rem !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
   }
 
   .s11-other-wrap {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
   }
 
   .s11-other-label {
-    font-size: 0.78rem;
-    white-space: nowrap;
+    font-size: clamp(9.5px, 1.3vh, 10.5px) !important;
+    white-space: nowrap !important;
   }
 
   .s11-other-input {
-    width: 100%;
-    min-width: 0;
-    font-size: 0.82rem;
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: clamp(10px, 1.35vh, 11px) !important;
+    padding: 1px 3px !important;
   }
 
   .s11-row-bottom .s11-chip {
-    align-self: flex-start;
+    align-self: center !important;
+    flex-shrink: 0 !important;
   }
 
   /* Nurse Anna sizing on mobile */
   .s11-right {
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
-    display: flex;
-    justify-content: center;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
+    flex-shrink: 0 !important;
   }
 
   .s11-nurse {
-    width: 75px;
-    max-height: 130px;
+    width: auto !important;
+    height: clamp(60px, 9.5vh, 75px) !important;
+    max-height: 75px !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
   }
 
   .s11-nurse-img {
-    max-height: 130px;
+    height: 100% !important;
+    max-height: clamp(60px, 9.5vh, 75px) !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+
+  .s11-audio {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 2px auto 0 auto !important;
+    z-index: 25 !important;
+  }
+
+  .s11-root .slide-nav {
+    margin: 4px auto 0 auto !important;
   }
 
   /* Modal 11B (Rash) Mobile Overrides */
