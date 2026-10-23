@@ -212,9 +212,9 @@ const SLIDE8_COMPONENT_CSS = `
     gap: 14px !important;
   }
 
-  /* Audio Controls wrap */
+  /* Audio Controls wrap (hidden on desktop; handled by PenpalIntervention tablet frame) */
   .s8-audio-wrap {
-    display: flex;
+    display: none !important;
     align-items: center;
     justify-content: flex-end;
     width: 110px;
@@ -260,29 +260,31 @@ const SLIDE8_COMPONENT_CSS = `
      ------------------------------------------------------------- */
   .s8-component-card.is-mobile {
     aspect-ratio: auto !important;
-    max-height: 100% !important;
-    height: 100% !important;
-    flex: 1 1 0% !important;
+    height: auto !important;
+    max-height: calc(100dvh - 80px) !important;
+    flex: 0 1 auto !important;
     min-height: 0 !important;
     border-radius: 20px !important;
-    padding: 0.45rem 0.65rem !important;
-    overflow: hidden !important;
+    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+    overflow: visible !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
+    gap: clamp(8px, 1.8vh, 14px) !important;
   }
   .s8-component-card.is-mobile .s8-stage-body {
-    flex: 1 1 0% !important;
+    flex: 0 1 auto !important;
+    height: auto !important;
     min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-evenly !important;
-    gap: 4px !important;
+    justify-content: center !important;
+    gap: 0 !important;
   }
   .s8-component-card.is-mobile .s8-bubble-wrap {
-    width: clamp(195px, 58vw, 235px) !important;
-    max-width: 235px !important;
+    width: clamp(240px, 72vw, 305px) !important;
+    max-width: 305px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
     position: relative !important;
@@ -291,16 +293,43 @@ const SLIDE8_COMPONENT_CSS = `
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
   }
+  .s8-component-card.is-mobile .s8-bubble-text-wrap {
+    position: absolute !important;
+    top: 44% !important;
+    left: 46% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 84% !important;
+    max-width: 86% !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
   .s8-component-card.is-mobile .s8-heading {
-    font-size: clamp(11px, 1.55vh, 12.5px) !important;
-    line-height: 1.35 !important;
+    font-size: clamp(11.5px, 1.5vh, 12.5px) !important;
+    line-height: 1.34 !important;
+    font-weight: 700 !important;
+    color: #142724 !important;
+    text-align: center !important;
+    letter-spacing: -0.012em !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+  .s8-component-card.is-mobile .s8-heading-line {
+    display: block !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    width: 100% !important;
   }
   .s8-component-card.is-mobile .s8-nurse-wrap {
     width: clamp(65px, 16vw, 85px) !important;
     height: clamp(85px, 13vh, 115px) !important;
-    margin-top: -12px !important;
-    margin-left: auto !important;
-    margin-right: 14% !important;
+    margin: -14px 12% 0 auto !important;
+    z-index: 2 !important;
   }
   .s8-component-card.is-mobile .s8-bottom-bar {
     flex: 0 0 auto !important;
@@ -322,7 +351,8 @@ const SLIDE8_COMPONENT_CSS = `
     align-items: center !important;
     justify-content: center !important;
     width: 100% !important;
-    margin: 0 auto !important;
+    margin: 2px auto 0 auto !important;
+    z-index: 25 !important;
   }
   .s8-component-card.is-mobile .s8-bottom-bar .slide-nav {
     order: 2 !important;
@@ -338,29 +368,31 @@ const SLIDE8_COMPONENT_CSS = `
   @media (max-width: 767px) {
     .s8-component-card {
       aspect-ratio: auto !important;
-      max-height: 100% !important;
-      height: 100% !important;
-      flex: 1 1 0% !important;
+      height: auto !important;
+      max-height: calc(100dvh - 80px) !important;
+      flex: 0 1 auto !important;
       min-height: 0 !important;
       border-radius: 20px !important;
-      padding: 0.45rem 0.65rem !important;
-      overflow: hidden !important;
+      padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+      overflow: visible !important;
       display: flex !important;
       flex-direction: column !important;
-      justify-content: space-between !important;
+      justify-content: center !important;
+      gap: clamp(8px, 1.8vh, 14px) !important;
     }
     .s8-stage-body {
-      flex: 1 1 0% !important;
+      flex: 0 1 auto !important;
+      height: auto !important;
       min-height: 0 !important;
       display: flex !important;
       flex-direction: column !important;
       align-items: center !important;
-      justify-content: space-evenly !important;
-      gap: 4px !important;
+      justify-content: center !important;
+      gap: 0 !important;
     }
     .s8-bubble-wrap {
-      width: clamp(195px, 58vw, 235px) !important;
-      max-width: 235px !important;
+      width: clamp(240px, 72vw, 305px) !important;
+      max-width: 305px !important;
       aspect-ratio: 510 / 315 !important;
       height: auto !important;
       margin: 0 auto !important;
@@ -369,16 +401,43 @@ const SLIDE8_COMPONENT_CSS = `
       left: auto !important;
       top: auto !important;
     }
+    .s8-bubble-text-wrap {
+      position: absolute !important;
+      top: 44% !important;
+      left: 46% !important;
+      transform: translate(-50%, -50%) !important;
+      width: 84% !important;
+      max-width: 86% !important;
+      padding: 0 8px !important;
+      margin: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      box-sizing: border-box !important;
+    }
     .s8-heading {
-      font-size: clamp(11px, 1.55vh, 12.5px) !important;
-      line-height: 1.35 !important;
+      font-size: clamp(11.5px, 1.5vh, 12.5px) !important;
+      line-height: 1.34 !important;
+      font-weight: 700 !important;
+      color: #142724 !important;
+      text-align: center !important;
+      letter-spacing: -0.012em !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+    }
+    .s8-heading-line {
+      display: block !important;
+      text-align: center !important;
+      margin: 0 auto !important;
+      width: 100% !important;
     }
     .s8-nurse-wrap {
       width: clamp(65px, 16vw, 85px) !important;
       height: clamp(85px, 13vh, 115px) !important;
-      margin-top: -12px !important;
-      margin-left: auto !important;
-      margin-right: 14% !important;
+      margin: -14px 12% 0 auto !important;
+      z-index: 2 !important;
     }
     .s8-bottom-bar {
       flex: 0 0 auto !important;
@@ -400,7 +459,8 @@ const SLIDE8_COMPONENT_CSS = `
       align-items: center !important;
       justify-content: center !important;
       width: 100% !important;
-      margin: 0 auto !important;
+      margin: 2px auto 0 auto !important;
+      z-index: 25 !important;
     }
     .s8-bottom-bar .slide-nav {
       order: 2 !important;
@@ -513,13 +573,15 @@ export function Slide8MilestoneScreen({
             <h1 ref={headingRef} tabIndex={-1} className="s8-heading" id="slide8-heading">
               {isEs ? (
                 <>
-                  <span className="s8-heading-line">¡Buen trabajo! ¡Ahora ya sabe lo que</span>
-                  <span className="s8-heading-line">es verdad sobre las alergias a la penicilina!</span>
+                  <span className="s8-heading-line">¡Buen trabajo!</span>
+                  <span className="s8-heading-line">¡Ahora ya sabe lo que es verdad</span>
+                  <span className="s8-heading-line">sobre las alergias a la penicilina!</span>
                 </>
               ) : (
                 <>
-                  <span className="s8-heading-line">Great job! Now you know what</span>
-                  <span className="s8-heading-line">is true about penicillin allergies!</span>
+                  <span className="s8-heading-line">Great job!</span>
+                  <span className="s8-heading-line">Now you know what is true</span>
+                  <span className="s8-heading-line">about penicillin allergies!</span>
                 </>
               )}
             </h1>
@@ -555,13 +617,13 @@ export function Slide8MilestoneScreen({
 
         {/* Audio narration & CC controls */}
         <div className="s8-audio-wrap s8-spacer-side">
-          {/* <AudioPlayer
+          <AudioPlayer
             audioSrc={effectiveAudioSrc}
             stepId={stepId}
             locale={isEs ? "es" : "en"}
             transcriptText={spokenText}
             size="large"
-          /> */}
+          />
         </div>
       </footer>
     </section>

@@ -6,14 +6,25 @@ import { parseUserAgent } from '@/lib/device-detector';
 const STUDY_SLIDES_CONFIG = [
   { id: 'screen1_intro', slideNumber: 1, title: 'Introduction & Consent Briefing', type: 'Intro' },
   { id: 'screen2_naming', slideNumber: 2, title: 'Medication Naming', type: 'Question' },
+  { id: 'slide2_naming', slideNumber: 2, title: 'Medication Naming', type: 'Question' },
+  { id: 'medicationName', slideNumber: 2, title: 'Medication Naming', type: 'Question' },
+  { id: 'slide3_efficacy', slideNumber: 3, title: 'Pediatric Indications & Efficacy', type: 'Education' },
+  { id: 'slide4_barrier', slideNumber: 4, title: 'Believed Allergy Barrier', type: 'Education' },
   { id: 'screen2_statistics', slideNumber: 5, title: 'Safety Statistics (95% Not Allergic)', type: 'Statistics' },
+  { id: 'slide5_prevalence', slideNumber: 5, title: 'Safety Statistics (95% Not Allergic)', type: 'Statistics' },
   { id: 'screen3_5_knowledge_test', slideNumber: 6, title: 'Penicillin Myths & Facts', type: 'Quiz' },
+  { id: 'slide6_myths', slideNumber: 6, title: 'Penicillin Myths vs. Truths', type: 'Quiz' },
+  { id: 'revealedMyths', slideNumber: 6, title: 'Revealed Myths Summary', type: 'Quiz' },
   { id: 'screen3_6_all_correct', slideNumber: 7, title: 'Penicillin Statements Verified', type: 'Education' },
+  { id: 'slide8_milestone', slideNumber: 8, title: 'Milestone Encouragement', type: 'Education' },
+  { id: 'slide9_why_it_matters', slideNumber: 9, title: 'Why It Matters', type: 'Education' },
   { id: 'screen4_testing', slideNumber: 10, title: 'Allergy Testing Education', type: 'Education' },
+  { id: 'slide10_testing', slideNumber: 10, title: 'Allergy Testing Education', type: 'Education' },
   { id: 'screen6_survey_intro', slideNumber: 10, title: 'Clinical Survey Overview', type: 'Info' },
   { id: 'screen6_1_symptoms', slideNumber: 11, title: 'Reported Symptoms Assessment', type: 'Question' },
   { id: 'symptomsOther', slideNumber: 11, title: 'Other Symptoms Described', type: 'Question' },
   { id: 'rashDetails', slideNumber: 11, title: 'Rash Characteristics (Modal 11B)', type: 'Question' },
+  { id: 'swellingDetails', slideNumber: 11, title: 'Swelling Characteristics (Modal 11C)', type: 'Question' },
   { id: 'screen6_2_timing', slideNumber: 12, title: 'Age Cohort at Reaction', type: 'Question' },
   { id: 'screen6_3_onset', slideNumber: 13, title: 'Time to Symptom Onset', type: 'Question' },
   { id: 'screen6_4_resolution', slideNumber: 14, title: 'Medical Care Received', type: 'Question' },
@@ -24,6 +35,7 @@ const STUDY_SLIDES_CONFIG = [
   { id: 'screen6_4b_route', slideNumber: 18, title: 'Medication Intake Route (Modal 18)', type: 'Question' },
   { id: 'screen6_5_yetagain', slideNumber: 19, title: 'Subsequent Penicillin Exposure', type: 'Question' },
   { id: 'screen6_5_reaction_detail', slideNumber: 20, title: 'Subsequent Reaction History (Modal 20)', type: 'Question' },
+  { id: 'slide21_what_now', slideNumber: 21, title: 'Next Steps & Doctor Discussion', type: 'Education' },
   { id: 'screen7_summary', slideNumber: 22, title: 'Action Steps & Clinical Summary', type: 'Summary' },
   { id: 'screen_end', slideNumber: 23, title: 'Non-Participant End Screen', type: 'Exit' },
   { id: 'control_baseline_page', slideNumber: 1, title: 'Educational Handout Website (Control Arm)', type: 'Handout' },
@@ -165,17 +177,22 @@ export async function GET(request: Request) {
     const campaignId = searchParams.get('campaignId');
 
     // ─────────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
     // 1. RESPONSES EXPORT
     // ─────────────────────────────────────────────────────────────────────────────
     if (type === 'responses' || type === 'participant_responses') {
       const whereClause = participantId ? { participantId } : {};
       const questionIds = [
         'screen1_intro',
+        'slide2_naming',
         'screen2_naming',
+        'medicationName',
         'screen3_5_knowledge_test',
+        'slide6_myths',
         'screen6_1_symptoms',
         'symptomsOther',
         'rashDetails',
+        'swellingDetails',
         'screen6_2_timing',
         'screen6_3_onset',
         'screen6_4_resolution',
@@ -201,15 +218,50 @@ export async function GET(request: Request) {
         orderBy: [{ participantId: 'asc' }, { createdAt: 'asc' }]
       });
 
-      // Sort responses in clinical study order
-      responses.sort((a, b) => {
-        if (a.participantId !== b.participantId) return 0;
-        const idxA = questionIds.indexOf(a.questionId);
-        const idxB = questionIds.indexOf(b.questionId);
-        return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+      // Clinical question rank mapping for proper sequential sorting
+      const stepOrderMap: Record<string, number> = {
+        'screen1_intro': 1,
+        'slide2_naming': 2,
+        'screen2_naming': 2,
+        'medicationName': 2,
+        'screen3_5_knowledge_test': 6,
+        'slide6_myths': 6,
+        'screen6_1_symptoms': 11,
+        'symptomsOther': 11.1,
+        'rashDetails': 11.2,
+        'swellingDetails': 11.3,
+        'screen6_2_timing': 12,
+        'screen6_3_onset': 13,
+        'screen6_4_resolution': 14,
+        'screen6_4_location': 15,
+        'screen6_4b_resolution_type': 16,
+        'resolutionMedicines': 17,
+        'screen6_4b_medicine': 17.1,
+        'screen6_4b_route': 18,
+        'screen6_5_yetagain': 19,
+        'screen6_5_reaction_detail': 20,
+      };
+
+      // Filter out redundant medicationName if slide2_naming or screen2_naming already exists for the same participant
+      const filteredResponses = responses.filter((r) => {
+        if (r.questionId === 'medicationName') {
+          const hasCanonicalNaming = responses.some(
+            (other) => other.participantId === r.participantId && (other.questionId === 'slide2_naming' || other.questionId === 'screen2_naming')
+          );
+          if (hasCanonicalNaming) return false;
+        }
+        return true;
       });
 
-      data = responses.map((r, idx) => {
+      // Sort responses in clinical study order
+      filteredResponses.sort((a, b) => {
+        if (a.participantId !== b.participantId) return 0;
+        const rankA = stepOrderMap[a.questionId] ?? 999;
+        const rankB = stepOrderMap[b.questionId] ?? 999;
+        return rankA - rankB;
+      });
+
+      data = filteredResponses.map((r, idx) => {
         const stepInfo = STEP_LABELS_MAP[r.questionId] || { slideNumber: 0, title: r.questionId, type: 'Field' };
         const dwellSeconds = r.timeSpentMs ? (r.timeSpentMs / 1000).toFixed(2) : '0.00';
 
@@ -269,7 +321,10 @@ export async function GET(request: Request) {
           ? { slideNumber: 1, title: 'Educational Handout Website (Control Arm)', type: 'Handout' }
           : (STEP_LABELS_MAP[m.stepId] || { slideNumber: m.stepIndex + 1, title: m.stepId, type: 'Slide' });
 
-        const matchingResponse = m.participant?.responses?.find((r: any) => r.questionId === m.stepId);
+        let matchingResponse = m.participant?.responses?.find((r: any) => r.questionId === m.stepId);
+        if (!matchingResponse && (m.stepId === 'slide2_naming' || m.stepId === 'screen2_naming')) {
+          matchingResponse = m.participant?.responses?.find((r: any) => r.questionId === 'slide2_naming' || r.questionId === 'screen2_naming' || r.questionId === 'medicationName');
+        }
         const locResp = m.participant?.responses?.find((r: any) => r.questionId === 'screen6_4_location');
         const medResp = m.participant?.responses?.find((r: any) => r.questionId === 'screen6_4b_medicine');
         const routeResp = m.participant?.responses?.find((r: any) => r.questionId === 'screen6_4b_route');
@@ -284,7 +339,19 @@ export async function GET(request: Request) {
           effectiveAnswerValue = 'Yes';
         }
 
-        const isQuestionStep = ['screen1_intro', 'screen3_5_knowledge_test', 'screen6_1_symptoms', 'screen6_2_timing', 'screen6_3_onset', 'screen6_4_resolution', 'screen6_4b_resolution_type', 'screen6_5_yetagain'].includes(m.stepId);
+        const isQuestionStep = [
+          'screen1_intro',
+          'slide2_naming',
+          'screen2_naming',
+          'screen3_5_knowledge_test',
+          'slide6_myths',
+          'screen6_1_symptoms',
+          'screen6_2_timing',
+          'screen6_3_onset',
+          'screen6_4_resolution',
+          'screen6_4b_resolution_type',
+          'screen6_5_yetagain'
+        ].includes(m.stepId);
         const recordedAnswer = isControl
           ? 'N/A (Control Educational Handout - No Questionnaire)'
           : ((effectiveAnswerValue && isQuestionStep && effectiveAnswerValue !== 'acknowledged')

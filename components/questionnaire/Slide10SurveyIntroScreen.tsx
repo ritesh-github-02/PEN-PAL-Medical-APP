@@ -168,30 +168,30 @@ const SLIDE10_SURVEY_INTRO_CSS = `
    ========================================================== */
 @media (max-width: 767px) {
   .s10b-root {
-    overflow: hidden !important;
-    height: 100% !important;
-    max-height: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: calc(100dvh - 80px) !important;
     min-height: 0 !important;
-    flex: 1 1 0% !important;
+    flex: 0 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    padding: 0.45rem 0.65rem !important;
-    gap: 0 !important;
+    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+    gap: clamp(8px, 1.8vh, 14px) !important;
   }
   .s10b-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 380px !important;
-    height: 100% !important;
-    flex: 1 1 0% !important;
+    height: auto !important;
+    flex: 0 1 auto !important;
     min-height: 0 !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
@@ -202,8 +202,8 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(190px, 58vw, 235px) !important;
-    max-width: 235px !important;
+    width: clamp(240px, 72vw, 300px) !important;
+    max-width: 300px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
     margin: 0 auto !important;
@@ -219,26 +219,35 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   }
   .s10b-bubble-text-wrap {
     position: absolute !important;
-    top: 48% !important;
+    top: 42% !important;
     left: 54% !important;
     transform: translate(-50%, -50%) !important;
-    width: 78% !important;
-    max-width: 235px !important;
-    padding: 0 !important;
+    width: 84% !important;
+    max-width: 86% !important;
+    padding: 0 8px !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
+    box-sizing: border-box !important;
   }
   .s10b-bubble-text {
-    font-size: clamp(11px, 1.55vh, 12.5px) !important;
-    line-height: 1.38 !important;
+    font-size: clamp(11px, 1.5vh, 12.5px) !important;
+    line-height: 1.34 !important;
     font-weight: 700 !important;
     color: #232323 !important;
     text-align: center !important;
     letter-spacing: -0.012em !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+  .s10b-bubble-line {
+    display: block !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    width: 100% !important;
   }
   .s10b-nurse {
     order: 2 !important;
@@ -247,7 +256,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     top: auto !important;
     width: clamp(65px, 16vw, 85px) !important;
     height: clamp(85px, 13vh, 115px) !important;
-    margin: -10px auto 0 16% !important;
+    margin: -14px auto 0 16% !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -266,7 +275,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     left: auto !important;
     bottom: auto !important;
     top: auto !important;
-    margin: 2px auto 0 auto !important;
+    margin: 4px auto 0 auto !important;
     z-index: 25 !important;
     display: flex !important;
     align-items: center !important;
@@ -274,7 +283,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     gap: 6px !important;
   }
   .s10b-root .slide-nav {
-    margin: 4px auto 0 auto !important;
+    margin: 6px auto 0 auto !important;
   }
 }
 
@@ -495,15 +504,15 @@ export function Slide10SurveyIntroScreen({
             <h1 ref={headingRef} tabIndex={-1} className="s10b-bubble-text">
               {isSpanish ? (
                 <>
-                  <span className="s10b-bubble-line">El siguiente conjunto de preguntas puede</span>
-                  <span className="s10b-bubble-line">ayudarlo a usted y al médico a decidir</span>
-                  <span className="s10b-bubble-line">qué es lo mejor para su hijo.</span>
+                  <span className="s10b-bubble-line">El siguiente conjunto de preguntas</span>
+                  <span className="s10b-bubble-line">puede ayudarlo a usted y al médico</span>
+                  <span className="s10b-bubble-line">a decidir qué es mejor para su hijo.</span>
                 </>
               ) : (
                 <>
-                  <span className="s10b-bubble-line">The next set of questions can help</span>
-                  <span className="s10b-bubble-line">you and the doctor see what’s best</span>
-                  <span className="s10b-bubble-line">for your child.</span>
+                  <span className="s10b-bubble-line">The next set of questions</span>
+                  <span className="s10b-bubble-line">can help you and the doctor see</span>
+                  <span className="s10b-bubble-line">what’s best for your child.</span>
                 </>
               )}
             </h1>

@@ -42,32 +42,35 @@ const mobileLayout = (scope: string) => `
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
-    max-height: 100% !important;
+    height: auto !important;
+    max-height: calc(100dvh - 80px) !important;
     min-height: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
+    flex: 0 1 auto !important;
+    display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    padding: 0.45rem 0.65rem 0.35rem !important;
+    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+    gap: clamp(8px, 1.8vh, 14px) !important;
   }
   ${scope} .s3-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 380px !important;
     height: auto !important;
-    flex: 1 1 0% !important;
+    flex: 0 1 auto !important;
     min-height: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-evenly !important;
+    justify-content: center !important;
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
-    gap: 4px !important;
+    gap: 8px !important;
   }
   ${scope} .s3-left-col {
     position: static !important;
@@ -101,21 +104,25 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(180px, 54vw, 215px) !important;
+    width: clamp(220px, 66vw, 275px) !important;
     aspect-ratio: 380 / 250 !important;
     height: auto !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
   }
   ${scope} .s3-bubble-text-wrap {
-    top: 40% !important;
+    top: 42% !important;
     left: 48% !important;
-    width: 76% !important;
-    max-width: 185px !important;
+    width: 82% !important;
+    max-width: 240px !important;
+    padding: 0 6px !important;
+    box-sizing: border-box !important;
   }
   ${scope} .s3-bubble-text {
-    font-size: clamp(10px, 1.4vh, 11.5px) !important;
-    line-height: 1.3 !important;
+    font-size: clamp(10.5px, 1.45vh, 12px) !important;
+    line-height: 1.34 !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
   }
   ${scope} .s3-nurse {
     position: relative !important;
@@ -123,7 +130,7 @@ const mobileLayout = (scope: string) => `
     top: auto !important;
     width: clamp(55px, 14vw, 75px) !important;
     height: clamp(80px, 12vh, 105px) !important;
-    margin-top: -12px !important;
+    margin-top: -14px !important;
     margin-left: auto !important;
     margin-right: 14% !important;
   }

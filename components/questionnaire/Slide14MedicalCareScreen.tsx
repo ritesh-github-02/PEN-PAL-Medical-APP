@@ -339,15 +339,16 @@ const SLIDE14_CSS = `
   .s14-root {
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    overflow: hidden !important;
-    height: 100% !important;
-    max-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    max-height: calc(100dvh - 80px) !important;
     min-height: 0 !important;
-    flex: 1 1 0% !important;
-    padding: 0.45rem 0.65rem !important;
-    gap: 0.25rem !important;
+    flex: 0 1 auto !important;
+    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+    gap: clamp(8px, 1.8vh, 14px) !important;
   }
   .s14-top-section {
     width: 100% !important;
@@ -361,10 +362,11 @@ const SLIDE14_CSS = `
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-evenly !important;
-    flex: 1 1 0% !important;
+    justify-content: center !important;
+    flex: 0 1 auto !important;
+    height: auto !important;
     min-height: 0 !important;
-    gap: 0.35rem !important;
+    gap: 8px !important;
     width: 100% !important;
   }
   .s14-card {

@@ -89,38 +89,40 @@ const COPY = {
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    height: 100% !important;
-    max-height: 100% !important;
+    height: auto !important;
+    max-height: calc(100dvh - 80px) !important;
     min-height: 0 !important;
-    flex: 1 1 0% !important;
-    overflow: hidden !important;
+    flex: 0 1 auto !important;
+    overflow: visible !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    padding: 0.45rem 0.65rem !important;
+    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+    gap: clamp(8px, 1.8vh, 14px) !important;
   }
   ${scope} .s10-stage {
     width: 100% !important;
     max-width: 440px !important;
-    height: 100% !important;
-    flex: 1 1 0% !important;
+    height: auto !important;
+    flex: 0 1 auto !important;
     min-height: 0 !important;
     padding: 0 !important;
     margin: 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     transform: none !important;
+    gap: 8px !important;
   }
   ${scope} .s10-body {
     position: static !important;
     display: flex !important;
     flex-direction: column !important;
-    flex: 1 1 0% !important;
+    flex: 0 1 auto !important;
     min-height: 0 !important;
-    justify-content: space-between !important;
-    gap: 4px !important;
+    justify-content: center !important;
+    gap: 8px !important;
   }
   ${scope} .s10-left {
     width: 100% !important;

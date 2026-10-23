@@ -129,12 +129,14 @@ const SLIDE1_COMPONENT_CSS = `
   .s1-component-root.is-mobile,
   @media (max-width: 767px) {
     .s1-component-root {
-      overflow: hidden !important;
-      height: 100% !important;
-      max-height: 100% !important;
+      overflow: visible !important;
+      height: auto !important;
+      max-height: calc(100dvh - 80px) !important;
       min-height: 0 !important;
-      padding: 0.45rem 0.65rem !important;
-      justify-content: space-evenly !important;
+      flex: 0 1 auto !important;
+      padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+      justify-content: center !important;
+      gap: 12px !important;
     }
     .s1-content-container {
       flex-direction: column !important;

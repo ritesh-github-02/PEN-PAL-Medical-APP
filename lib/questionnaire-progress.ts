@@ -26,6 +26,7 @@ export function findNextUnansweredStepIndex(answers: Record<string, any>): {
       ans !== undefined &&
       ans !== null &&
       ans !== 'undefined' &&
+      ans !== '' &&
       (Array.isArray(ans) ? ans.length > 0 : true);
 
     if (!isAnswered) {

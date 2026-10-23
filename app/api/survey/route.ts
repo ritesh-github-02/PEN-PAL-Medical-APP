@@ -4,10 +4,54 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
-    // Get participant and session from cookies
+    // Parse request body
+    const body = await request.json();
+    const { answers, surveyType = 'FINAL_EVALUATION', token } = body;
+
+    // Get participant and session from cookies or fallback token
     const cookieStore = await cookies();
-    const participantId = cookieStore.get('penpal_participant')?.value;
-    const sessionId = cookieStore.get('penpal_session')?.value;
+    let participantId = cookieStore.get('penpal_participant')?.value;
+    let sessionId = cookieStore.get('penpal_session')?.value;
+
+    if ((!participantId || !sessionId) && token) {
+      const cleanTok = String(token).trim();
+      const normTok = cleanTok.toUpperCase();
+      const rawWithoutPrefix = normTok.replace(/^(?:PEN|P)-/i, '');
+
+      const foundToken = await prisma.participantToken.findFirst({
+        where: {
+          OR: [
+            { tokenHash: { equals: normTok, mode: 'insensitive' } },
+            { tokenHash: { equals: cleanTok, mode: 'insensitive' } },
+            { tokenPayload: { equals: normTok, mode: 'insensitive' } },
+            { tokenPayload: { equals: rawWithoutPrefix, mode: 'insensitive' } },
+            { participant: { externalId: { equals: normTok, mode: 'insensitive' } } },
+            { participant: { externalId: { equals: cleanTok, mode: 'insensitive' } } },
+          ],
+        },
+        include: { participant: true },
+      });
+
+      if (foundToken) {
+        participantId = foundToken.participantId;
+        const existingSession = await prisma.session.findFirst({
+          where: { participantId },
+          orderBy: { createdAt: 'desc' },
+        });
+        if (existingSession) {
+          sessionId = existingSession.id;
+        } else {
+          const newSess = await prisma.session.create({
+            data: {
+              participantId,
+              status: 'IN_PROGRESS',
+              startTime: new Date(),
+            },
+          });
+          sessionId = newSess.id;
+        }
+      }
+    }
 
     if (!participantId || !sessionId) {
       return NextResponse.json(
@@ -15,10 +59,6 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-
-    // Parse request body
-    const body = await request.json();
-    const { answers, surveyType = 'FINAL_EVALUATION' } = body;
 
     if (!answers || typeof answers !== 'object') {
       return NextResponse.json(

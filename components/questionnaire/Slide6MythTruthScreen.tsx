@@ -86,29 +86,31 @@ const stripPrefix = (text: string) =>
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    height: 100% !important;
-    max-height: 100% !important;
+    height: auto !important;
+    max-height: calc(100dvh - 80px) !important;
     min-height: 0 !important;
-    flex: 1 1 0% !important;
-    overflow: hidden !important;
+    flex: 0 1 auto !important;
+    overflow: visible !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    padding: 0.45rem 0.65rem !important;
+    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+    gap: clamp(8px, 1.8vh, 14px) !important;
   }
   ${scope} .s6-stage {
     width: 100% !important;
     max-width: 440px !important;
-    height: 100% !important;
-    flex: 1 1 0% !important;
+    height: auto !important;
+    flex: 0 1 auto !important;
     min-height: 0 !important;
     padding: 0 !important;
     margin: 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     transform: none !important;
+    gap: 8px !important;
   }
   ${scope} .s6-heading {
     font-size: clamp(11.5px, 1.7vh, 13px) !important;
@@ -116,12 +118,12 @@ const mobileLayout = (scope: string) => `
     margin-bottom: 2px !important;
   }
   ${scope} .s6-cards {
-    gap: clamp(4px, 0.8vh, 6px) !important;
-    flex: 1 1 0% !important;
+    gap: clamp(6px, 1.2vh, 8px) !important;
+    flex: 0 1 auto !important;
     min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-evenly !important;
+    justify-content: center !important;
   }
   ${scope} .s6-card {
     min-height: clamp(38px, 5.8vh, 48px) !important;

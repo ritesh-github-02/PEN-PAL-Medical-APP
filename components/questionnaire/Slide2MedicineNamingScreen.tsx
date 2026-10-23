@@ -390,16 +390,16 @@ const SLIDE2_COMPONENT_CSS = `
      ------------------------------------------------------------- */
   @media (max-width: 767px) {
     .s2-root {
-      overflow: hidden !important;
-      height: 100% !important;
-      max-height: 100% !important;
+      overflow: visible !important;
+      height: auto !important;
+      max-height: calc(100dvh - 80px) !important;
       min-height: 0 !important;
-      flex: 1 1 0% !important;
+      flex: 0 1 auto !important;
       flex-direction: column !important;
-      justify-content: space-between !important;
-      align-items: stretch !important;
-      padding: 0.35rem 0.65rem 0.45rem !important;
-      gap: 2px !important;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+      gap: clamp(8px, 1.8vh, 14px) !important;
     }
     .s2-banner-wrap {
       width: 100% !important;
@@ -414,17 +414,18 @@ const SLIDE2_COMPONENT_CSS = `
       line-height: 1.25 !important;
     }
 
-    /* Stage: fills space flexibly, zero scrolling */
+    /* Stage: natural content height, centered */
     .s2-stage-middle {
-      flex: 1 1 0% !important;
+      flex: 0 1 auto !important;
+      height: auto !important;
       min-height: 0 !important;
-      overflow: hidden !important;
+      overflow: visible !important;
       flex-direction: column !important;
       align-items: center !important;
-      justify-content: space-evenly !important;
+      justify-content: center !important;
       width: 100% !important;
       max-width: 100% !important;
-      gap: 2px !important;
+      gap: 10px !important;
       padding: 0 !important;
       margin: 0 !important;
     }
@@ -574,16 +575,16 @@ const SLIDE2_COMPONENT_CSS = `
 
   /* Explicit .is-mobile preview variant mirrors the mobile layout */
   .s2-root.is-mobile {
-    overflow: hidden !important;
-    height: 100% !important;
-    max-height: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: calc(100dvh - 80px) !important;
     min-height: 0 !important;
-    flex: 1 1 0% !important;
+    flex: 0 1 auto !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
-    align-items: stretch !important;
-    padding: 0.35rem 0.65rem 0.45rem !important;
-    gap: 2px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+    gap: clamp(8px, 1.8vh, 14px) !important;
   }
   .s2-root.is-mobile .s2-banner-wrap {
     width: 100% !important;
@@ -598,15 +599,16 @@ const SLIDE2_COMPONENT_CSS = `
     line-height: 1.25 !important;
   }
   .s2-root.is-mobile .s2-stage-middle {
-    flex: 1 1 0% !important;
+    flex: 0 1 auto !important;
+    height: auto !important;
     min-height: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-evenly !important;
+    justify-content: center !important;
     width: 100% !important;
     max-width: 100% !important;
-    gap: 2px !important;
+    gap: 10px !important;
     padding: 0 !important;
     margin: 0 !important;
   }

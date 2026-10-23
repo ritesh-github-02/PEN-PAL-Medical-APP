@@ -681,17 +681,17 @@ export default function PenpalIntervention() {
         {/* =========================================================================
             SLIDE FRAME (Clean Presentation Card without Black Border)
             ========================================================================= */}
-        <div className="w-full flex items-center justify-center relative print:block print:w-full print:m-0 print:p-0">
+        <div className="w-full flex-1 min-h-0 flex items-center justify-center relative print:block print:w-full print:m-0 print:p-0">
           {/* Outer Slide Frame: Clean presentation card with consistent light background and no black border */}
           <div 
             className="tablet-mockup-frame relative bg-[#f4f8ec] p-0 rounded-2xl md:rounded-[2rem] border-0 shadow-md md:shadow-lg flex flex-col mx-auto w-full print:bg-transparent print:p-0 print:m-0 print:border-none print:rounded-none print:shadow-none print:aspect-auto print:max-h-none print:h-auto print:w-full print:block overflow-hidden"
           >
             {/* Slide Inner Screen with Clean Unified Background */}
             <div 
-              className="tablet-screen-inner relative w-full h-full flex-1 min-h-0 rounded-2xl md:rounded-[2rem] overflow-y-auto md:overflow-hidden border-0 shadow-none flex flex-col justify-start md:justify-center items-center bg-[#f4f8ec] print:bg-transparent print:rounded-none print:shadow-none print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0"
+              className="tablet-screen-inner relative w-full h-full flex-1 min-h-0 rounded-2xl md:rounded-[2rem] overflow-y-auto md:overflow-hidden border-0 shadow-none flex flex-col justify-center items-center bg-[#f4f8ec] print:bg-transparent print:rounded-none print:shadow-none print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0"
             >
               {/* Slide Content */}
-              <div className="tablet-slide-content relative w-full h-full flex-1 min-h-0 flex flex-col justify-start md:justify-center items-center overflow-y-auto md:overflow-hidden print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0">
+              <div className="tablet-slide-content relative w-full h-full flex-1 min-h-0 flex flex-col justify-center items-center overflow-y-auto md:overflow-hidden print:overflow-visible print:h-auto print:min-h-0 print:w-full print:block print:p-0 print:m-0">
               {isTerminated ? (
                 <div className="w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center p-6 sm:p-10 text-center bg-[#f4f8ec]">
                   <div className="max-w-xl space-y-4">

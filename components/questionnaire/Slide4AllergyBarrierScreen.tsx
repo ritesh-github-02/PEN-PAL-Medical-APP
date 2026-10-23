@@ -156,33 +156,34 @@ const SLIDE4_CSS = `
    ========================================================== */
 @media (max-width: 767px) {
   .s4-root {
-    overflow: hidden !important;
-    height: 100% !important;
-    max-height: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: calc(100dvh - 80px) !important;
     min-height: 0 !important;
-    flex: 1 1 0% !important;
+    flex: 0 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    padding: 0.45rem 0.65rem !important;
-    gap: 0 !important;
+    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
+    gap: clamp(8px, 1.8vh, 14px) !important;
   }
   .s4-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 380px !important;
-    height: 100% !important;
-    flex: 1 1 0% !important;
+    height: auto !important;
+    flex: 0 1 auto !important;
     min-height: 0 !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
+    gap: 0 !important;
   }
   .s4-bubble {
     order: 1 !important;
@@ -190,8 +191,8 @@ const SLIDE4_CSS = `
     left: auto !important;
     top: auto !important;
     transform: none !important;
-    width: clamp(190px, 58vw, 235px) !important;
-    max-width: 235px !important;
+    width: clamp(240px, 72vw, 305px) !important;
+    max-width: 305px !important;
     aspect-ratio: 510 / 315 !important;
     height: auto !important;
     margin: 0 auto !important;
@@ -207,29 +208,35 @@ const SLIDE4_CSS = `
   }
   .s4-bubble-text-wrap {
     position: absolute !important;
-    top: 50% !important;
-    left: 55% !important;
+    top: 42% !important;
+    left: 54% !important;
     transform: translate(-50%, -50%) !important;
-    width: 74% !important;
-    max-width: 220px !important;
-    padding: 0 4px !important;
+    width: 84% !important;
+    max-width: 86% !important;
+    padding: 0 8px !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
+    box-sizing: border-box !important;
   }
   .s4-bubble-text {
-    font-size: clamp(10.5px, 1.5vh, 12px) !important;
-    line-height: 1.35 !important;
+    font-size: clamp(10.5px, 1.4vh, 12px) !important;
+    line-height: 1.32 !important;
     font-weight: 700 !important;
     color: #232323 !important;
     text-align: center !important;
     letter-spacing: -0.012em !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
   }
   .s4-bubble-line {
-    display: inline !important;
+    display: block !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    width: 100% !important;
   }
   .s4-nurse {
     order: 2 !important;
@@ -238,7 +245,7 @@ const SLIDE4_CSS = `
     top: auto !important;
     width: clamp(65px, 16vw, 85px) !important;
     height: clamp(85px, 13vh, 115px) !important;
-    margin: -10px auto 0 auto !important;
+    margin: -14px auto 0 16% !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -257,7 +264,7 @@ const SLIDE4_CSS = `
     left: auto !important;
     bottom: auto !important;
     top: auto !important;
-    margin: 2px auto 0 auto !important;
+    margin: 4px auto 0 auto !important;
     z-index: 25 !important;
     display: flex !important;
     align-items: center !important;
@@ -265,7 +272,7 @@ const SLIDE4_CSS = `
     gap: 6px !important;
   }
   .s4-root .slide-nav {
-    margin: 4px auto 0 auto !important;
+    margin: 6px auto 0 auto !important;
   }
 }
 
