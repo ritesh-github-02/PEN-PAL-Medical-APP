@@ -212,9 +212,9 @@ const SLIDE8_COMPONENT_CSS = `
     gap: 14px !important;
   }
 
-  /* Audio Controls wrap (hidden on desktop; handled by PenpalIntervention tablet frame) */
+  /* Audio Controls wrap (bottom-right like Slide 5) */
   .s8-audio-wrap {
-    display: none !important;
+    display: flex;
     align-items: center;
     justify-content: flex-end;
     width: 110px;
@@ -346,13 +346,17 @@ const SLIDE8_COMPONENT_CSS = `
     display: none !important;
   }
   .s8-component-card.is-mobile .s8-audio-wrap {
-    order: 1 !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    margin: 2px auto 0 auto !important;
-    z-index: 25 !important;
+    justify-content: flex-end !important;
+    width: auto !important;
+    margin: 0 !important;
+    z-index: 35 !important;
   }
   .s8-component-card.is-mobile .s8-bottom-bar .slide-nav {
     order: 2 !important;
@@ -454,13 +458,17 @@ const SLIDE8_COMPONENT_CSS = `
       display: none !important;
     }
     .s8-audio-wrap {
-      order: 1 !important;
+      position: absolute !important;
+      right: clamp(14px, 3.5vw, 22px) !important;
+      bottom: clamp(14px, 2.5vh, 22px) !important;
+      top: auto !important;
+      left: auto !important;
       display: flex !important;
       align-items: center !important;
-      justify-content: center !important;
-      width: 100% !important;
-      margin: 2px auto 0 auto !important;
-      z-index: 25 !important;
+      justify-content: flex-end !important;
+      width: auto !important;
+      margin: 0 !important;
+      z-index: 35 !important;
     }
     .s8-bottom-bar .slide-nav {
       order: 2 !important;

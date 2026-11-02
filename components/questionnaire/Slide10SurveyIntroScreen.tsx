@@ -158,9 +158,18 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   width: 100%;
 }
 
-/* ---------- 3. Caption (CC) & Play/Pause Controls ---------- */
+/* ---------- 3. Caption (CC) & Play/Pause Controls (bottom-right like Slide 5) ---------- */
 .s10b-audio {
-  display: none !important;
+  position: absolute !important;
+  right: clamp(14px, 3.5vw, 22px) !important;
+  bottom: clamp(14px, 2.5vh, 22px) !important;
+  top: auto !important;
+  left: auto !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  z-index: 35 !important;
 }
 
 /* ==========================================================
@@ -270,17 +279,16 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     transform: none !important;
   }
   .s10b-audio {
-    order: 3 !important;
-    position: relative !important;
-    left: auto !important;
-    bottom: auto !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
     top: auto !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
+    left: auto !important;
+    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
+    justify-content: flex-end !important;
+    z-index: 35 !important;
   }
   .s10b-root .slide-nav {
     margin: 6px auto 0 auto !important;
@@ -368,16 +376,16 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     line-height: 1.35 !important;
   }
   .s10b-audio {
-    order: 3 !important;
-    position: relative !important;
-    left: auto !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
     top: auto !important;
-    bottom: auto !important;
+    left: auto !important;
     margin: 0 !important;
-    flex-shrink: 0 !important;
     display: flex !important;
     align-items: center !important;
-    gap: 4px !important;
+    justify-content: flex-end !important;
+    z-index: 35 !important;
   }
 }
 `;
@@ -518,17 +526,17 @@ export function Slide10SurveyIntroScreen({
             </h1>
           </div>
         </div>
+      </div>
 
-        {/* 3. Caption (CC) & Play/Pause Controls */}
-        <div className="s10b-audio">
-          <AudioPlayer
-            audioSrc={audioSrc}
-            stepId={stepId}
-            locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={transcriptText || spokenText}
-            size="large"
-          />
-        </div>
+      {/* 3. Audio narration & CC controls (bottom-right like Slide 5) */}
+      <div className="s10b-audio">
+        <AudioPlayer
+          audioSrc={audioSrc}
+          stepId={stepId}
+          locale={locale || (isSpanish ? "es" : "en")}
+          transcriptText={transcriptText || spokenText}
+          size="large"
+        />
       </div>
 
       {/* 4. Standardized Navigation Buttons (Back & Next) pinned at bottom */}

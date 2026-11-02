@@ -140,10 +140,16 @@ const mobileLayout = (scope: string) => `
     object-fit: contain !important;
   }
   ${scope} .s3-audio {
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
     display: flex !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    z-index: 35 !important;
   }
   ${scope} .slide-nav {
     margin: 4px auto 0.15rem auto !important;
@@ -286,9 +292,15 @@ const SLIDE3_CSS = `
     filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.08));
   }
 
-  /* Audio Player: Desktop provided by PenpalIntervention tablet frame, mobile inline */
+  /* Audio Player: Bottom-right like Slide 5 */
   .s3-audio {
-    display: none !important;
+    position: absolute;
+    right: 22px;
+    bottom: clamp(16px, 3vh, 22px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 30;
   }
 
   @media (max-width: 767px) {
@@ -457,17 +469,17 @@ export function Slide3EfficacyScreen({
             draggable={false}
           />
         </div>
+      </div>
 
-        {/* 4. Inline Audio Player for Mobile (hidden on desktop; desktop uses PenpalIntervention frame player) */}
-        <div className="s3-audio">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId}
-            locale={isEs ? "es" : "en"}
-            transcriptText={captionText}
-            size="large"
-          />
-        </div>
+      {/* 4. Audio narration & CC controls (bottom-right like Slide 5) */}
+      <div className="s3-audio">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId}
+          locale={isEs ? "es" : "en"}
+          transcriptText={captionText}
+          size="large"
+        />
       </div>
 
       {/* 5. Fixed Centered Bottom Navigation (Back & Next) */}

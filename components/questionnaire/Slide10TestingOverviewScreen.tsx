@@ -198,10 +198,16 @@ const mobileLayout = (scope: string) => `
     object-fit: contain !important;
   }
   ${scope} .s10-audio {
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
     display: flex !important;
-    justify-content: center !important;
-    margin-top: 2px !important;
-    z-index: 25 !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    z-index: 35 !important;
   }
   ${scope} .slide-nav {
     margin: 4px auto 0 auto !important;
@@ -391,9 +397,15 @@ const SLIDE10_CSS = `
   -webkit-user-drag: none;
 }
 
-/* 3. Audio controls — desktop uses the shared player in the tablet frame */
+/* 3. Audio controls — bottom-right like Slide 5 */
 .s10-audio {
-  display: none;
+  position: absolute;
+  right: 22px;
+  bottom: clamp(16px, 3vh, 22px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 30;
 }
 
 @media (max-width: 767px) {
@@ -559,16 +571,16 @@ export function Slide10TestingOverviewScreen({
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="s10-audio">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId}
-            locale={activeLocale}
-            transcriptText={spokenText}
-            size="large"
-          />
-        </div>
+      <div className="s10-audio">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId}
+          locale={activeLocale}
+          transcriptText={spokenText}
+          size="large"
+        />
       </div>
 
       <SlideNavigationButtons

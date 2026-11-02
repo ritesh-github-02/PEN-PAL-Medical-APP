@@ -400,7 +400,16 @@ const SLIDE14_CSS = `
     object-fit: contain !important;
   }
   .s14-audio {
-    margin: 2px auto 0 auto !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    z-index: 35 !important;
   }
   .s14-root .slide-nav {
     margin: 4px auto 0 auto !important;
@@ -408,11 +417,13 @@ const SLIDE14_CSS = `
 }
 
 .s14-audio {
+  position: absolute;
+  right: 22px;
+  bottom: clamp(16px, 3vh, 22px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 10px auto 0 auto;
-  z-index: 25;
+  justify-content: flex-end;
+  z-index: 30;
 }
 .s14-root .slide-nav {
   margin: 10px auto 0.25rem auto !important;
@@ -665,8 +676,8 @@ export function Slide14MedicalCareScreen({
         </div>
       </div>
 
-      {/* 3. Audio Player for Mobile (sits centered directly above Back & Next) */}
-      <div className="s14-audio md:hidden">
+      {/* 3. Audio Player (bottom-right like Slide 5) */}
+      <div className="s14-audio">
         <AudioPlayer
           audioSrc={effectiveAudioSrc}
           stepId={stepId || "screen6_4_resolution"}

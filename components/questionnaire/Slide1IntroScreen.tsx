@@ -329,7 +329,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
 
       {/* Bottom-Right Audio (CC & Play/Pause) Controls */}
       <footer
-        className="absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-30 flex items-center"
+        className="s1-audio absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-30 flex items-center"
         role="toolbar"
         aria-label={isSpanish ? "Controles de audio y subtítulos" : "Slide audio and caption controls"}
       >

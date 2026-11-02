@@ -141,14 +141,18 @@ const SLIDE4_CSS = `
   width: 100%;
 }
 
-/* ---------- 3. CC & Play/Pause Controls ---------- */
-/* Hidden on desktop/tablet web layout (the floating player handles those);
-   the mobile layout below reveals this in-slide control row. */
+/* ---------- 3. CC & Play/Pause Controls (bottom-right like Slide 5) ---------- */
 .s4-audio {
-  display: none !important;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  position: absolute !important;
+  right: clamp(14px, 3.5vw, 22px) !important;
+  bottom: clamp(14px, 2.5vh, 22px) !important;
+  top: auto !important;
+  left: auto !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  z-index: 35 !important;
 }
 
 /* ==========================================================
@@ -357,23 +361,16 @@ const SLIDE4_CSS = `
     line-height: 1.35 !important;
   }
   .s4-audio {
-    order: 3 !important;
-    position: relative !important;
-    left: auto !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
     top: auto !important;
-    bottom: auto !important;
+    left: auto !important;
     margin: 0 !important;
-    flex-shrink: 0 !important;
-    display: none !important;
+    display: flex !important;
     align-items: center !important;
-    gap: 5px !important;
-  }
-  /* Mobile landscape only: reveal the in-slide controls */
-  @media (max-width: 767px) {
-    .s4-audio {
-      display: flex !important;
-      justify-content: center !important;
-    }
+    justify-content: flex-end !important;
+    z-index: 35 !important;
   }
 }
 `;
@@ -521,17 +518,17 @@ export function Slide4AllergyBarrierScreen({
             </h1>
           </div>
         </div>
+      </div>
 
-        {/* 3. Caption (CC) & Play/Pause Controls – rendered in the mobile layout only */}
-        <div className="s4-audio">
-          <AudioPlayer
-            audioSrc={audioSrc}
-            stepId={stepId || "slide4_barrier"}
-            locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={transcriptText || titleText}
-            size="large"
-          />
-        </div>
+      {/* 3. Audio narration & CC controls (bottom-right like Slide 5) */}
+      <div className="s4-audio">
+        <AudioPlayer
+          audioSrc={audioSrc}
+          stepId={stepId || "slide4_barrier"}
+          locale={locale || (isSpanish ? "es" : "en")}
+          transcriptText={transcriptText || titleText}
+          size="large"
+        />
       </div>
 
       {/* 4. Navigation Buttons (Back & Next) */}

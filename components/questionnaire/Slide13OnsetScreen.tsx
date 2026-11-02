@@ -332,7 +332,16 @@ const SLIDE13_CSS = `
     object-fit: contain !important;
   }
   .s13-audio {
-    margin: 2px auto 0 auto !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    z-index: 35 !important;
   }
   .s13-root .slide-nav {
     margin: 4px auto 0 auto !important;
@@ -340,11 +349,13 @@ const SLIDE13_CSS = `
 }
 
 .s13-audio {
+  position: absolute;
+  right: 22px;
+  bottom: clamp(16px, 3vh, 22px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 10px auto 0 auto;
-  z-index: 25;
+  justify-content: flex-end;
+  z-index: 30;
 }
 .s13-root .slide-nav {
   margin: 10px auto 0.25rem auto !important;
@@ -540,8 +551,8 @@ export function Slide13OnsetScreen({
         </div>
       </div>
 
-      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
-      <div className="s13-audio md:hidden">
+      {/* Audio narration & CC controls (bottom-right like Slide 5) */}
+      <div className="s13-audio">
         <AudioPlayer
           audioSrc={effectiveAudioSrc}
           stepId={stepId || "screen6_3_onset"}

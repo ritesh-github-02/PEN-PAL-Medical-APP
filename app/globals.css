@@ -834,5 +834,43 @@ body::-webkit-scrollbar,
   }
 }
 
+/* ==========================================================================
+   Universal Right-Bottom Audio Controls (WCAG AAA - Standardized like Slide 5)
+   Applies to every single step: desktop, tablet, and mobile with 0 duplicates
+   ========================================================================== */
+.s1-audio,
+.s2-audio-wrap,
+.s3-audio,
+.s4-audio,
+.s5-audio,
+.s6-audio,
+.s8-audio-wrap,
+.s9-audio,
+.s10-audio,
+.s10b-audio,
+.s11-audio,
+.s12-audio,
+.s13-audio,
+.s14-audio,
+.s16-audio,
+.s18-audio,
+.s19-audio,
+.s21-audio {
+  position: absolute !important;
+  right: clamp(14px, 3.5vw, 22px) !important;
+  bottom: clamp(14px, 2.5vh, 22px) !important;
+  top: auto !important;
+  left: auto !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  z-index: 35 !important;
+  pointer-events: auto !important;
+  width: auto !important;
+  order: unset !important;
+}
+
+
 
 

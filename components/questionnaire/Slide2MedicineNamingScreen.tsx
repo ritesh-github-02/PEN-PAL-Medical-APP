@@ -532,14 +532,15 @@ const SLIDE2_COMPONENT_CSS = `
       object-fit: contain !important;
     }
 
-    /* 3. Bottom bar: CC + play sits ABOVE Back/Next centered with matching 4px spacing */
+    /* 3. Bottom bar: Back/Next centered, CC + play absolute right-bottom like Slide 5 */
     .s2-bottom-bar {
       flex: 0 0 auto !important;
+      position: relative !important;
       display: flex !important;
-      flex-direction: column !important;
+      flex-direction: row !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 4px !important;
+      gap: 12px !important;
       width: 100% !important;
       margin: 0 !important;
       padding: 0 2px calc(0.2rem + env(safe-area-inset-bottom, 0px)) !important;
@@ -548,15 +549,20 @@ const SLIDE2_COMPONENT_CSS = `
       display: none !important;
     }
     .s2-audio-wrap {
-      order: 1 !important;
+      position: absolute !important;
+      right: clamp(14px, 3.5vw, 22px) !important;
+      bottom: clamp(14px, 2.5vh, 22px) !important;
+      top: auto !important;
+      left: auto !important;
+      width: auto !important;
+      margin: 0 !important;
       display: flex !important;
       align-items: center !important;
-      justify-content: center !important;
-      width: 100% !important;
-      margin: 0 auto !important;
+      justify-content: flex-end !important;
+      z-index: 35 !important;
     }
     .s2-nav-center {
-      order: 2 !important;
+      order: 1 !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -712,11 +718,12 @@ const SLIDE2_COMPONENT_CSS = `
   }
   .s2-root.is-mobile .s2-bottom-bar {
     flex: 0 0 auto !important;
+    position: relative !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
+    gap: 12px !important;
     width: 100% !important;
     margin: 0 !important;
     padding: 0 2px calc(0.2rem + env(safe-area-inset-bottom, 0px)) !important;
@@ -725,15 +732,20 @@ const SLIDE2_COMPONENT_CSS = `
     display: none !important;
   }
   .s2-root.is-mobile .s2-audio-wrap {
-    order: 1 !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
+    width: auto !important;
+    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    margin: 0 auto !important;
+    justify-content: flex-end !important;
+    z-index: 35 !important;
   }
   .s2-root.is-mobile .s2-nav-center {
-    order: 2 !important;
+    order: 1 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;

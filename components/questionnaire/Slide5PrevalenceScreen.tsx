@@ -101,13 +101,16 @@ const mobileLayout = (scope: string) => `
     object-fit: contain !important;
   }
   ${scope} .s5-audio {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
     display: flex !important;
-    justify-content: center !important;
-    margin: 2px auto 0 auto !important;
-    z-index: 25 !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    z-index: 35 !important;
   }
   ${scope} .slide-nav {
     margin: 4px auto 0 auto !important;

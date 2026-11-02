@@ -631,7 +631,16 @@ const SLIDE16_CSS = `
     flex: 1 1 45% !important;
   }
   .s16-audio {
-    margin: 2px auto 0 auto !important;
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    z-index: 35 !important;
   }
   .s16-root .slide-nav {
     margin: 4px auto 0 auto !important;
@@ -639,11 +648,13 @@ const SLIDE16_CSS = `
 }
 
 .s16-audio {
+  position: absolute;
+  right: 22px;
+  bottom: clamp(16px, 3vh, 22px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 10px auto 0 auto;
-  z-index: 25;
+  justify-content: flex-end;
+  z-index: 30;
 }
 .s16-root .slide-nav {
   margin: 10px auto 0.25rem auto !important;
@@ -981,8 +992,8 @@ export function Slide16ResolutionScreen({
         </div>
       </div>
 
-      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
-      <div className="s16-audio md:hidden">
+      {/* Audio narration & CC controls (bottom-right like Slide 5) */}
+      <div className="s16-audio">
         <AudioPlayer
           audioSrc={effectiveAudioSrc}
           stepId={stepId || "screen6_4b_resolution_type"}

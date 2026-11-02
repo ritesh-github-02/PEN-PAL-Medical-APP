@@ -491,11 +491,13 @@ const SLIDE18_CSS = `
 }
 
 .s18-audio {
+  position: absolute;
+  right: 22px;
+  bottom: clamp(16px, 3vh, 22px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 10px auto 0 auto;
-  z-index: 25;
+  justify-content: flex-end;
+  z-index: 30;
 }
 `;
 
@@ -729,8 +731,8 @@ export function Slide18SummaryScreen({
         </div>
       </div>
 
-      {/* Audio narration & CC controls (mobile: centered above Back & Next) */}
-      <div className="s18-audio md:hidden">
+      {/* Audio narration & CC controls (bottom-right like Slide 5) */}
+      <div className="s18-audio">
         <AudioPlayer
           audioSrc={audioSrc || (isSpanish ? "/audio/es/step-7.mp3" : "/audio/en/step-7.mp3")}
           stepId={stepId || "screen7_summary"}

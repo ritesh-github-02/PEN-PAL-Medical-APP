@@ -14,7 +14,6 @@ import {
 } from "./actions";
 import { logout } from "@/app/[locale]/intervention/actions";
 import Loader from "@/components/common/Loader";
-import AudioPlayer from "./AudioPlayer";
 import { NurseAnna } from "./NurseAnna";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
 import { SuccessScreen } from "./SuccessScreen";
@@ -39,6 +38,7 @@ import { Slide18SummaryScreen } from "./Slide18SummaryScreen";
 import { SlideNavigationButtons } from "./SlideNavigationButtons";
 import esMessages from "@/messages/es.json";
 import enMessages from "@/messages/en.json";
+
 
 function LanguageSwitcher({ locale, onSwitch }: { locale: string; onSwitch: (newLocale: string) => void }) {
   return (
@@ -1228,54 +1228,6 @@ export default function PenpalIntervention() {
                 </>
               )}
               </div>
-
-              {/* Bottom-Right Audio & CC Controls inside the tablet screen */}
-              {(!isTerminated && !showSuccess && currentStep && currentStep.id !== "screen1_intro" && currentStep.id !== "slide2_naming" && currentStep.id !== "slide5_prevalence" && currentStep.id !== "screen2_statistics" && (currentStep.audioEn || currentStep.audioEs)) && (() => {
-                // slide2_naming & slide5_prevalence render their own footer AudioPlayer on every breakpoint.
-                const hasInternalMobilePlayer = [
-                  "slide2_naming",
-                  "slide3_efficacy",
-                  "slide4_barrier",
-                  "slide5_prevalence",
-                  "screen2_statistics",
-                  "slide6_myths",
-                  "slide8_milestone",
-                  "slide9_why_it_matters",
-                  "slide10_testing",
-                  "screen4_testing",
-                  "screen3_5_knowledge_test",
-                  "screen3_6_all_correct",
-                  "screen6_survey_intro",
-                  "slide10_survey_intro",
-                  "screen6_1_symptoms",
-                  "screen6_2_timing",
-                  "screen6_3_onset",
-                  "screen6_4_resolution",
-                  "screen6_4_care",
-                  "screen6_4b_resolution_type",
-                  "screen6_5_yetagain",
-                  "screen6_5_reaction_detail",
-                  "slide21_what_now",
-                  "screen7_summary",
-                ].includes(currentStep.id) || currentStep.type === "summary";
-
-                return (
-                  <div className={`absolute bottom-[14px] md:bottom-[22px] right-4 sm:right-5 md:right-7 z-40 ${hasInternalMobilePlayer ? "hidden md:flex" : "flex"} items-center pointer-events-auto`}>
-                    <AudioPlayer
-                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
-                      stepId={currentStep.id}
-                      locale={locale}
-                      size="large"
-                      transcriptText={
-                        (locale === "es"
-                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}${currentStep.contentEs ? ". " + currentStep.contentEs : ""}`
-                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}${currentStep.contentEn ? ". " + currentStep.contentEn : ""}`
-                        ).replace(/\[name\]/gi, medicationName).trim()
-                      }
-                    />
-                  </div>
-                );
-              })()}
             </div>
           </div>
         </div>
