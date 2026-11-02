@@ -490,6 +490,18 @@ const SLIDE18_CSS = `
   }
 }
 
+@media (max-width: 767px) {
+  .s18-audio {
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin: 4px auto 0 auto !important;
+    z-index: 25 !important;
+  }
+}
+
 .s18-audio {
   position: absolute;
   right: 22px;

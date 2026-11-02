@@ -536,6 +536,39 @@ body::-webkit-scrollbar,
     align-items: center !important;
   }
 
+  /* Mobile: Audio narration & CC controls sit centered directly ABOVE Back and Next buttons */
+  .s1-audio,
+  .s2-audio-wrap,
+  .s3-audio,
+  .s4-audio,
+  .s5-audio,
+  .s6-audio,
+  .s8-audio-wrap,
+  .s9-audio,
+  .s10-audio,
+  .s10b-audio,
+  .s11-audio,
+  .s12-audio,
+  .s13-audio,
+  .s14-audio,
+  .s16-audio,
+  .s18-audio,
+  .s19-audio,
+  .s21-audio {
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 4px auto 0 auto !important;
+    z-index: 25 !important;
+    order: 1 !important;
+  }
+
   .slide-nav,
   .slide-nav-stage,
   .slide-nav-flow {
@@ -544,13 +577,14 @@ body::-webkit-scrollbar,
     left: auto !important;
     right: auto !important;
     top: auto !important;
-    margin: 6px auto 0 auto !important;
+    margin: 4px auto 0.15rem auto !important;
     gap: 12px !important;
     width: 100% !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     z-index: 30 !important;
+    order: 2 !important;
   }
 
   .slide-nav-btn {
@@ -836,39 +870,41 @@ body::-webkit-scrollbar,
 
 /* ==========================================================================
    Universal Right-Bottom Audio Controls (WCAG AAA - Standardized like Slide 5)
-   Applies to every single step: desktop, tablet, and mobile with 0 duplicates
+   Applies to every single step on desktop & tablet with 0 duplicates
    ========================================================================== */
-.s1-audio,
-.s2-audio-wrap,
-.s3-audio,
-.s4-audio,
-.s5-audio,
-.s6-audio,
-.s8-audio-wrap,
-.s9-audio,
-.s10-audio,
-.s10b-audio,
-.s11-audio,
-.s12-audio,
-.s13-audio,
-.s14-audio,
-.s16-audio,
-.s18-audio,
-.s19-audio,
-.s21-audio {
-  position: absolute !important;
-  right: clamp(14px, 3.5vw, 22px) !important;
-  bottom: clamp(14px, 2.5vh, 22px) !important;
-  top: auto !important;
-  left: auto !important;
-  margin: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  z-index: 35 !important;
-  pointer-events: auto !important;
-  width: auto !important;
-  order: unset !important;
+@media (min-width: 768px) {
+  .s1-audio,
+  .s2-audio-wrap,
+  .s3-audio,
+  .s4-audio,
+  .s5-audio,
+  .s6-audio,
+  .s8-audio-wrap,
+  .s9-audio,
+  .s10-audio,
+  .s10b-audio,
+  .s11-audio,
+  .s12-audio,
+  .s13-audio,
+  .s14-audio,
+  .s16-audio,
+  .s18-audio,
+  .s19-audio,
+  .s21-audio {
+    position: absolute !important;
+    right: clamp(14px, 3.5vw, 22px) !important;
+    bottom: clamp(14px, 2.5vh, 22px) !important;
+    top: auto !important;
+    left: auto !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    z-index: 35 !important;
+    pointer-events: auto !important;
+    width: auto !important;
+    order: unset !important;
+  }
 }
 
 

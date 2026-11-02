@@ -279,16 +279,16 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     transform: none !important;
   }
   .s10b-audio {
-    position: absolute !important;
-    right: clamp(14px, 3.5vw, 22px) !important;
-    bottom: clamp(14px, 2.5vh, 22px) !important;
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
     top: auto !important;
     left: auto !important;
-    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-end !important;
-    z-index: 35 !important;
+    justify-content: center !important;
+    margin: 4px auto 0 auto !important;
+    z-index: 25 !important;
   }
   .s10b-root .slide-nav {
     margin: 6px auto 0 auto !important;
@@ -376,16 +376,16 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     line-height: 1.35 !important;
   }
   .s10b-audio {
-    position: absolute !important;
-    right: clamp(14px, 3.5vw, 22px) !important;
-    bottom: clamp(14px, 2.5vh, 22px) !important;
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
     top: auto !important;
     left: auto !important;
-    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-end !important;
-    z-index: 35 !important;
+    justify-content: center !important;
+    margin: 4px auto 0 auto !important;
+    z-index: 25 !important;
   }
 }
 `;
