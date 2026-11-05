@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { logInteraction } from "@/lib/tracking";
+import React, { useState, useRef, useEffect } from "react";
 
 export interface Slide2MedicineNamingScreenProps {
   isSpanish?: boolean;
@@ -25,7 +24,7 @@ export const MEDICINE_OPTIONS_DISPLAY = [
   { value: "Augmentin", labelEn: "Augmentin", labelEs: "Augmentin" },
 ];
 
-/* Hand-drawn style bubble body + sharp tail pointing toward Nurse Anna */
+/* Hand-drawn style bubble body + sharp tail matching Slide 2 reference */
 const BUBBLE_PATH =
   "M 397.9,283.4 " +
   "C 395.8,284.6 391.2,287.9 385.1,290.7 " +
@@ -78,15 +77,8 @@ const BUBBLE_PATH =
 const SLIDE2_COMPONENT_CSS = `
   /* ------------------------------------------------------------
      Slide 2: WCAG 2.1 / 2.2 Level AAA, WAVE & Karen Accessibility Rules
-     Clean presentation filling the frame with responsive scaling.
+     Fully responsive across MacBook Pro 17", iPad Pro, iPhone 16
      ------------------------------------------------------------ */
-
-  .s2-component-card,
-  .s2-component-card *,
-  .s2-component-card *::before,
-  .s2-component-card *::after {
-    box-sizing: border-box;
-  }
 
   .s2-sr-only {
     position: absolute !important;
@@ -111,41 +103,42 @@ const SLIDE2_COMPONENT_CSS = `
     outline: none !important;
   }
 
-  /* Base Desktop Slide Container */
   .s2-component-card {
     position: relative;
     width: 100%;
+    max-width: 896px;
     height: 100%;
-    flex: 1 1 0%;
-    min-height: 0;
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
+    max-height: 100%;
+    aspect-ratio: 896 / 620;
+    background-color: #fafdf3;
+    border-radius: 28px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(120, 165, 155, 0.28);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    padding: clamp(14px, 2.4vh, 22px) clamp(16px, 3.2vw, 36px) clamp(10px, 1.8vh, 16px);
+    padding: clamp(16px, 2.5vh, 24px) clamp(20px, 3.5vw, 38px) clamp(14px, 2vh, 20px) clamp(20px, 3.5vw, 38px);
+    box-sizing: border-box;
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #232323;
   }
 
   /* 1. Yellow Banner & Heading (WCAG AAA Contrast: #142724 on #feff9f = 14.2:1) */
   .s2-banner-wrap {
     width: 100%;
     max-width: 760px;
-    margin: 0 auto;
+    margin: 0 auto clamp(8px, 1.5vh, 12px) auto;
     background-color: #feff9f;
     border: 2px solid #236f7a;
     border-radius: 9999px;
     box-shadow: 0 4px 6px rgba(34, 105, 118, 0.25);
-    padding: clamp(8px, 1.2vh, 10px) clamp(16px, 2.2vw, 24px);
+    padding: clamp(8px, 1.2vh, 12px) clamp(16px, 2.5vw, 24px);
     text-align: center;
     flex-shrink: 0;
   }
   .s2-heading {
     margin: 0;
-    font-size: clamp(16px, 1.95vw, 20px);
+    font-size: clamp(17px, 2.1vw, 21px);
     line-height: 1.3;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -153,33 +146,31 @@ const SLIDE2_COMPONENT_CSS = `
     outline: none;
   }
 
-  /* 2. Middle Content Area (Desktop) */
+  /* 2. Middle Content Area (Flexible 2-column layout preventing overlaps on MacBook & scaling cleanly on iPad) */
   .s2-stage-middle {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 860px;
-    margin: 0 auto;
     min-height: 0;
-    padding: 0 8px;
-    gap: clamp(12px, 2.2vw, 28px);
+    padding: 0 4px;
+    gap: clamp(16px, 2.8vw, 32px);
   }
 
   .s2-options-col {
     display: flex;
     align-items: center;
-    gap: clamp(12px, 2.2vw, 24px);
-    flex: 1 1 380px;
-    max-width: 480px;
+    gap: clamp(14px, 2.2vw, 22px);
+    flex: 1 1 auto;
     min-width: 0;
+    max-width: 480px;
   }
 
   .s2-bottle-wrap {
     flex-shrink: 0;
-    width: clamp(66px, 8.5vw, 88px);
-    height: clamp(130px, 16.5vw, 170px);
+    width: clamp(75px, 9vw, 92px);
+    height: clamp(145px, 22vh, 180px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -196,8 +187,8 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-radiogroup {
     display: flex;
     flex-direction: column;
-    gap: clamp(6px, 1vh, 10px);
-    flex: 1;
+    gap: clamp(8px, 1.2vh, 12px);
+    flex: 1 1 auto;
     min-width: 0;
   }
 
@@ -205,10 +196,10 @@ const SLIDE2_COMPONENT_CSS = `
     display: flex;
     align-items: center;
     gap: 12px;
-    min-height: clamp(38px, 4.4vh, 44px);
+    min-height: 44px;
     cursor: pointer;
     user-select: none;
-    padding: 3px 8px;
+    padding: 4px 8px;
     border-radius: 10px;
     transition: background-color 0.12s ease;
   }
@@ -221,10 +212,10 @@ const SLIDE2_COMPONENT_CSS = `
   }
 
   .s2-checkbox-box {
-    width: clamp(23px, 2.4vw, 26px);
-    height: clamp(23px, 2.4vw, 26px);
+    width: clamp(24px, 2.5vw, 28px);
+    height: clamp(24px, 2.5vw, 28px);
     flex-shrink: 0;
-    border-radius: 5px;
+    border-radius: 6px;
     border: 2px solid #236f7a;
     background-color: #e8ece9;
     display: flex;
@@ -239,29 +230,30 @@ const SLIDE2_COMPONENT_CSS = `
   }
 
   .s2-option-text {
-    font-size: clamp(15px, 1.7vw, 17.5px);
+    font-size: clamp(15.5px, 1.7vw, 18px);
     line-height: 1.3;
     font-weight: 500;
     color: #142724;
     transition: color 0.12s ease, font-weight 0.12s ease;
+    word-break: break-word;
   }
   .s2-option-text.checked {
     font-weight: 700;
     color: #0a1c1a;
   }
 
-  /* Character & Bubble Area (Desktop) */
+  /* Character & Bubble Area */
   .s2-character-col {
     position: relative;
-    width: clamp(240px, 32vw, 330px);
-    height: clamp(210px, 27vh, 265px);
+    width: clamp(260px, 32vw, 320px);
+    height: clamp(210px, 28vh, 265px);
     flex-shrink: 0;
   }
   .s2-bubble-wrap {
     position: absolute;
-    left: -24px;
-    top: -40px;
-    width: 80%;
+    left: 0;
+    top: 0;
+    width: clamp(200px, 25vw, 245px);
     aspect-ratio: 520 / 340;
     z-index: 5;
     pointer-events: none;
@@ -288,28 +280,29 @@ const SLIDE2_COMPONENT_CSS = `
     text-align: center;
     pointer-events: none;
   }
+  /* Unified talking bubble typography across the app */
   .s2-bubble-text {
     margin: 0;
     padding: 0;
-    font-size: clamp(11.5px, 1.2vw, 13px);
+    font-size: 14px;
     line-height: 1.4;
     font-weight: 600;
     color: #142724;
     text-align: center;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
-  /* Nurse Anna (Desktop) */
+  /* Nurse Anna (Post-Slide 1 Decorative Character) */
   .s2-nurse-wrap {
     position: absolute;
-    right: 0;
-    bottom: -32px;
-    width: 35%;
-    height: auto;
-    aspect-ratio: 118 / 252;
+    right: 8px;
+    bottom: 2px;
+    width: clamp(85px, 10vw, 105px);
+    height: clamp(160px, 21vh, 195px);
     z-index: 6;
     pointer-events: none;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
   }
   .s2-nurse-img {
@@ -320,44 +313,9 @@ const SLIDE2_COMPONENT_CSS = `
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
   }
 
-  /* Closed Captions Panel (WCAG 1.2.2 Captions) */
-  .s2-captions-panel {
-    background: #143833;
-    color: #ffffff;
-    border: 1.5px solid #bddfd8;
-    border-radius: 12px;
-    padding: 8px 14px;
-    margin: 6px auto;
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-    z-index: 25;
-    max-height: 120px;
-    overflow-y: auto;
-  }
-  .s2-captions-tag {
-    background: #fdee8e;
-    color: #1a2624;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 4px;
-    flex-shrink: 0;
-    letter-spacing: 0.05em;
-  }
-  .s2-captions-text {
-    font-size: 13.5px;
-    line-height: 1.4;
-    margin: 0;
-    font-weight: 500;
-    color: #ffffff;
-  }
-
-  /* 3. Bottom Controls Bar (Desktop) */
+  /* ------------------------------------------------------------
+     Bottom Bar: Centered Navigation & Bottom-Right Audio Controls
+     ------------------------------------------------------------ */
   .s2-bottom-bar {
     width: 100%;
     display: flex;
@@ -385,17 +343,16 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-btn-nav {
     border-radius: 9999px;
     font-weight: 700;
-    border: 1.5px solid transparent;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-height: clamp(40px, 4.5vh, 46px);
-    min-width: clamp(86px, 10vw, 98px);
-    font-size: clamp(14.5px, 1.6vw, 16px);
+    min-height: 48px;
+    min-width: 98px;
+    font-size: 16px;
     padding: 0 24px;
-    transition: transform 0.1s ease, background-color 0.15s ease;
+    transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
   }
   .s2-btn-nav:hover:not(:disabled) {
     transform: translateY(-1px);
@@ -411,10 +368,11 @@ const SLIDE2_COMPONENT_CSS = `
     box-shadow: none;
   }
 
+  /* High contrast outline (WCAG AAA) on both Back and Next buttons */
   .s2-btn-back {
     background-color: #bddfd8;
     color: #11332e;
-    border-color: #78a59b;
+    border: 1.5px solid #143833;
   }
   .s2-btn-back:hover:not(:disabled) {
     background-color: #a8d5cc;
@@ -423,7 +381,7 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-btn-next {
     background-color: #fdee8e;
     color: #1a2624;
-    border-color: #c8b746;
+    border: 1.5px solid #143833; /* Dark blue outline matching Back button and Figma spec */
   }
   .s2-btn-next:hover:not(:disabled) {
     background-color: #f5e478;
@@ -456,254 +414,47 @@ const SLIDE2_COMPONENT_CSS = `
     opacity: 0.85;
   }
 
-  /* -------------------------------------------------------------
-     Mobile Layout (.is-mobile or screen width < 768px)
-     Refined UX/UI for vertical ratio:
-     - Header -> Character (Anna + Bubble) -> Options list -> 2-tier Controls
-     - Symmetrical card items with generous 44px touch targets
-     - Single centered CC & Play audio controls above Back/Next
-     ------------------------------------------------------------- */
-  @media (max-width: 767px) {
-    .s2-component-card {
-      aspect-ratio: auto !important;
-      max-height: none !important;
-      height: 100% !important;
-      background-color: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      padding: clamp(10px, 1.6vh, 14px) clamp(12px, 3.5vw, 18px) calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      overflow-y: auto !important;
-      gap: clamp(6px, 1.2vh, 12px) !important;
-    }
-    .s2-banner-wrap {
-      width: 100% !important;
-      max-width: 100% !important;
-      border-radius: 20px !important;
-      padding: 6px 14px !important;
-      margin: 0 0 2px 0 !important;
-      box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2) !important;
-      flex-shrink: 0 !important;
-    }
-    .s2-heading {
-      font-size: clamp(12.5px, 1.8vh, 14.5px) !important;
-      line-height: 1.3 !important;
-      text-align: center !important;
-    }
-
-    .s2-stage-middle {
-      flex: 1 1 auto !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: clamp(8px, 1.5vh, 14px) !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      padding: 0 !important;
-      min-height: 0 !important;
-    }
-
-    /* 1. Character Area: Nurse Anna + Speech Bubble side-by-side */
-    .s2-character-col {
-      order: 1 !important;
-      position: relative !important;
-      width: 100% !important;
-      max-width: 340px !important;
-      height: auto !important;
-      display: flex !important;
-      flex-direction: row !important;
-      align-items: flex-end !important;
-      justify-content: center !important;
-      gap: 8px !important;
-      margin: 0 auto !important;
-      padding: 0 4px !important;
-      flex-shrink: 0 !important;
-    }
-    .s2-bubble-wrap {
-      position: relative !important;
-      left: auto !important;
-      top: auto !important;
-      width: clamp(180px, 56vw, 215px) !important;
-      max-width: 70% !important;
-      aspect-ratio: 520 / 340 !important;
-      flex-shrink: 1 !important;
-      margin-bottom: 8px !important;
-      filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12)) !important;
-    }
-    .s2-bubble-text-wrap {
-      top: 45% !important;
-      left: 48% !important;
-      width: 82% !important;
-      max-width: 175px !important;
-    }
-    .s2-bubble-text {
-      font-size: clamp(10px, 1.35vh, 11.5px) !important;
-      line-height: 1.32 !important;
-      font-weight: 600 !important;
-      color: #143833 !important;
-    }
-    .s2-nurse-wrap {
-      position: relative !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: clamp(56px, 16vw, 72px) !important;
-      height: clamp(105px, 15vh, 138px) !important;
-      flex-shrink: 0 !important;
-      display: flex !important;
-      align-items: flex-end !important;
-      justify-content: center !important;
-    }
-    .s2-nurse-img {
-      max-height: 100% !important;
-      width: auto !important;
-      object-fit: contain !important;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)) !important;
-    }
-
-    /* 2. Options Area: Bottle hidden on mobile for balanced card checklist */
-    .s2-options-col {
-      order: 2 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100% !important;
-      max-width: 330px !important;
-      margin: 0 auto !important;
-      margin-bottom: 4px !important;
-      flex-shrink: 0 !important;
-    }
-    .s2-bottle-wrap {
-      display: none !important;
-    }
-    .s2-radiogroup {
-      width: 100% !important;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 6px !important;
-    }
-    .s2-option-row {
-      width: 100% !important;
-      min-height: 42px !important;
-      gap: 12px !important;
-      padding: 6px 12px !important;
-      border-radius: 12px !important;
-      border: 1.5px solid rgba(35, 111, 122, 0.22) !important;
-      background-color: rgba(255, 255, 255, 0.85) !important;
-      box-shadow: 0 1px 3px rgba(20, 56, 51, 0.06) !important;
-      transition: all 0.15s ease !important;
-      justify-content: flex-start !important;
-    }
-    .s2-option-row:hover,
-    .s2-option-row:active {
-      background-color: rgba(189, 223, 216, 0.45) !important;
-      border-color: #236f7a !important;
-      transform: translateY(-1px) !important;
-    }
-    .s2-checkbox-box {
-      width: 22px !important;
-      height: 22px !important;
-      border-radius: 5px !important;
-      border: 2px solid #236f7a !important;
-      flex-shrink: 0 !important;
-    }
-    .s2-checkbox-box.checked {
-      background-color: #144e57 !important;
-      border-color: #143833 !important;
-    }
-    .s2-option-text {
-      font-size: clamp(13.5px, 1.8vh, 14.5px) !important;
-      line-height: 1.3 !important;
-      font-weight: 600 !important;
-      color: #143833 !important;
-    }
-
-    /* Captions Panel (Mobile) */
-    .s2-captions-panel {
-      max-width: 320px !important;
-      padding: 6px 10px !important;
-      font-size: 12px !important;
-      max-height: 90px !important;
-      margin: 4px auto !important;
-    }
-
-    /* 3. Bottom Controls Bar: Two-tier stack with Play/CC ABOVE and Back/Next BELOW */
-    .s2-bottom-bar {
-      width: 100% !important;
-      max-width: 330px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: clamp(8px, 1.6vh, 14px) !important;
-      padding-top: 4px !important;
-      padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px)) !important;
-      margin: 0 auto !important;
-      flex-shrink: 0 !important;
-    }
-    .s2-spacer-side {
-      display: none !important;
-    }
-    /* Tier 1 (TOP): CC & Audio player centered */
-    .s2-audio-controls {
-      order: 1 !important;
-      width: auto !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 10px !important;
-      margin: 0 auto !important;
-      background-color: transparent !important;
-      padding: 0 !important;
-      border: none !important;
-      box-shadow: none !important;
-    }
-    .s2-audio-btn {
-      min-width: 44px !important;
-      min-height: 44px !important;
-      padding: 4px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-    }
-    .s2-audio-btn svg {
-      height: 28px !important;
-      width: auto !important;
-      transition: transform 0.12s ease !important;
-    }
-    .s2-audio-btn:hover svg,
-    .s2-audio-btn:active svg {
-      transform: scale(0.96) !important;
-    }
-
-    /* Tier 2 (BOTTOM): Back & Next full-width side-by-side */
-    .s2-nav-center {
-      order: 2 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      gap: 12px !important;
-      width: 100% !important;
-      margin: 0 !important;
-    }
-    .s2-btn-nav {
-      flex: 1 1 0% !important;
-      min-height: 44px !important;
-      height: 44px !important;
-      font-size: 15px !important;
-      font-weight: 700 !important;
-      padding: 0 16px !important;
-      border-radius: 9999px !important;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
-      text-align: center !important;
-    }
+  /* Closed Captions Panel (WCAG 1.2.2 Captions) */
+  .s2-captions-panel {
+    background: #143833;
+    color: #ffffff;
+    border: 1.5px solid #bddfd8;
+    border-radius: 12px;
+    padding: 8px 14px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    z-index: 15;
+  }
+  .s2-captions-tag {
+    background: #fdee8e;
+    color: #1a2624;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+  .s2-captions-text {
+    font-size: 13.5px;
+    line-height: 1.4;
+    margin: 0;
+    font-weight: 500;
+    color: #ffffff;
   }
 
-  /* Explicit .is-mobile preview variant */
+  /* -------------------------------------------------------------
+     Mobile Layout (.is-mobile or screen width < 768px)
+     Refined UX/UI for 9:16 vertical ratio:
+     - Clear visual hierarchy & generous touch targets (Fitts's Law)
+     - Optimal reading flow: Header -> Character cue -> Options -> Actions
+     - Polished contrast, consistent spacing & zero clipped elements
+     ------------------------------------------------------------- */
   .s2-component-card.is-mobile {
     aspect-ratio: auto !important;
     max-height: none !important;
@@ -712,39 +463,42 @@ const SLIDE2_COMPONENT_CSS = `
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
-    padding: clamp(10px, 1.6vh, 14px) clamp(12px, 3.5vw, 18px) calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 14px 16px 12px 16px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     overflow-y: auto !important;
-    gap: clamp(6px, 1.2vh, 12px) !important;
+    gap: 10px !important;
   }
   .s2-component-card.is-mobile .s2-banner-wrap {
     width: 100% !important;
     max-width: 100% !important;
     border-radius: 20px !important;
-    padding: 6px 14px !important;
-    margin: 0 0 2px 0 !important;
+    padding: 10px 16px !important;
+    margin: 0 0 4px 0 !important;
     box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2) !important;
     flex-shrink: 0 !important;
   }
   .s2-component-card.is-mobile .s2-heading {
-    font-size: clamp(12.5px, 1.8vh, 14.5px) !important;
-    line-height: 1.3 !important;
+    font-size: 15px !important;
+    line-height: 1.35 !important;
     text-align: center !important;
   }
+
   .s2-component-card.is-mobile .s2-stage-middle {
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: clamp(8px, 1.5vh, 14px) !important;
+    gap: 16px !important;
     width: 100% !important;
     max-width: 100% !important;
     padding: 0 !important;
     min-height: 0 !important;
   }
+
+  /* 1. Character Area: Nurse Anna + Speech Bubble side-by-side */
   .s2-component-card.is-mobile .s2-character-col {
     order: 1 !important;
     position: relative !important;
@@ -764,11 +518,11 @@ const SLIDE2_COMPONENT_CSS = `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(180px, 56vw, 215px) !important;
-    max-width: 70% !important;
+    width: 210px !important;
+    max-width: 68% !important;
     aspect-ratio: 520 / 340 !important;
     flex-shrink: 1 !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 12px !important;
     filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12)) !important;
   }
   .s2-component-card.is-mobile .s2-bubble-text-wrap {
@@ -778,8 +532,8 @@ const SLIDE2_COMPONENT_CSS = `
     max-width: 175px !important;
   }
   .s2-component-card.is-mobile .s2-bubble-text {
-    font-size: clamp(10px, 1.35vh, 11.5px) !important;
-    line-height: 1.32 !important;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
     font-weight: 600 !important;
     color: #143833 !important;
   }
@@ -787,8 +541,8 @@ const SLIDE2_COMPONENT_CSS = `
     position: relative !important;
     right: auto !important;
     bottom: auto !important;
-    width: clamp(56px, 16vw, 72px) !important;
-    height: clamp(105px, 15vh, 138px) !important;
+    width: 72px !important;
+    height: 138px !important;
     flex-shrink: 0 !important;
     display: flex !important;
     align-items: flex-end !important;
@@ -800,6 +554,8 @@ const SLIDE2_COMPONENT_CSS = `
     object-fit: contain !important;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)) !important;
   }
+
+  /* 2. Options Area: Bottle hidden on mobile for perfect horizontal symmetry and centered checklist */
   .s2-component-card.is-mobile .s2-options-col {
     order: 2 !important;
     display: flex !important;
@@ -807,9 +563,8 @@ const SLIDE2_COMPONENT_CSS = `
     align-items: center !important;
     justify-content: center !important;
     width: 100% !important;
-    max-width: 330px !important;
-    margin: 0 auto !important;
-    margin-bottom: 4px !important;
+    max-width: 320px !important;
+    margin: 0 auto 14px auto !important;
     flex-shrink: 0 !important;
   }
   .s2-component-card.is-mobile .s2-bottle-wrap {
@@ -819,23 +574,23 @@ const SLIDE2_COMPONENT_CSS = `
     width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 6px !important;
+    gap: 8px !important;
   }
   .s2-component-card.is-mobile .s2-option-row {
     width: 100% !important;
-    min-height: 42px !important;
+    min-height: 44px !important;
     gap: 12px !important;
-    padding: 6px 12px !important;
+    padding: 8px 14px !important;
     border-radius: 12px !important;
-    border: 1.5px solid rgba(35, 111, 122, 0.22) !important;
-    background-color: rgba(255, 255, 255, 0.85) !important;
+    border: 1.5px solid rgba(35, 111, 122, 0.2) !important;
+    background-color: rgba(255, 255, 255, 0.75) !important;
     box-shadow: 0 1px 3px rgba(20, 56, 51, 0.06) !important;
     transition: all 0.15s ease !important;
     justify-content: flex-start !important;
   }
   .s2-component-card.is-mobile .s2-option-row:hover,
   .s2-component-card.is-mobile .s2-option-row:active {
-    background-color: rgba(189, 223, 216, 0.45) !important;
+    background-color: rgba(189, 223, 216, 0.4) !important;
     border-color: #236f7a !important;
     transform: translateY(-1px) !important;
   }
@@ -851,41 +606,37 @@ const SLIDE2_COMPONENT_CSS = `
     border-color: #143833 !important;
   }
   .s2-component-card.is-mobile .s2-option-text {
-    font-size: clamp(13.5px, 1.8vh, 14.5px) !important;
+    font-size: 14.5px !important;
     line-height: 1.3 !important;
     font-weight: 600 !important;
     color: #143833 !important;
   }
-  .s2-component-card.is-mobile .s2-captions-panel {
-    max-width: 320px !important;
-    padding: 6px 10px !important;
-    font-size: 12px !important;
-    max-height: 90px !important;
-    margin: 4px auto !important;
-  }
+
+  /* 3. Bottom Controls Bar: Two-tier stack with Play/CC ABOVE and Back/Next BELOW */
   .s2-component-card.is-mobile .s2-bottom-bar {
     width: 100% !important;
-    max-width: 330px !important;
+    max-width: 320px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: clamp(8px, 1.6vh, 14px) !important;
-    padding-top: 4px !important;
-    padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 30px !important;
+    padding-top: 10px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
   }
   .s2-component-card.is-mobile .s2-spacer-side {
     display: none !important;
   }
+  /* Tier 1 (TOP): CC & Audio player nicely centered */
   .s2-component-card.is-mobile .s2-audio-controls {
     order: 1 !important;
     width: auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 10px !important;
+    gap: 8px !important;
     margin: 0 auto !important;
     background-color: transparent !important;
     padding: 0 !important;
@@ -909,59 +660,250 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-component-card.is-mobile .s2-audio-btn:active svg {
     transform: scale(0.96) !important;
   }
+  /* Tier 2 (BOTTOM): Back & Next full-width side-by-side with generous gap */
   .s2-component-card.is-mobile .s2-nav-center {
     order: 2 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 12px !important;
+    gap: 14px !important;
     width: 100% !important;
     margin: 0 !important;
   }
   .s2-component-card.is-mobile .s2-btn-nav {
     flex: 1 1 0% !important;
-    min-height: 44px !important;
-    height: 44px !important;
-    font-size: 15px !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    font-size: 16px !important;
     font-weight: 700 !important;
     padding: 0 16px !important;
     border-radius: 9999px !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
     text-align: center !important;
+    border: 1.5px solid #143833 !important;
   }
 
-  /* Short landscape phones */
-  @media (max-width: 767px) and (orientation: landscape) and (max-height: 520px) {
+  @media (max-width: 767px) {
     .s2-component-card {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      padding: 6px 12px 10px !important;
-      gap: 6px !important;
+      aspect-ratio: auto;
+      max-height: none;
+      height: 100%;
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 14px 16px 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+      gap: 10px;
+    }
+    .s2-banner-wrap {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 20px;
+      padding: 10px 16px;
+      margin: 0 0 4px 0;
+      box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2);
+      flex-shrink: 0;
+    }
+    .s2-heading {
+      font-size: 15px;
+      line-height: 1.35;
+      text-align: center;
     }
     .s2-stage-middle {
-      flex-direction: row !important;
-      gap: 10px !important;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+      min-height: 0;
     }
+    /* 1. Character Area */
     .s2-character-col {
-      max-width: 240px !important;
+      order: 1;
+      position: relative;
+      width: 100%;
+      max-width: 340px;
+      height: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 auto;
+      padding: 0 4px;
+      flex-shrink: 0;
     }
     .s2-bubble-wrap {
-      width: 150px !important;
+      position: relative;
+      left: auto;
+      top: auto;
+      width: 210px;
+      max-width: 68%;
+      aspect-ratio: 520 / 340;
+      flex-shrink: 1;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12));
+    }
+    .s2-bubble-text-wrap {
+      top: 45%;
+      left: 48%;
+      width: 82%;
+      max-width: 175px;
+    }
+    .s2-bubble-text {
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 600;
+      color: #143833;
     }
     .s2-nurse-wrap {
-      width: 50px !important;
-      height: 90px !important;
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: 72px;
+      height: 138px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
     }
+    .s2-nurse-img {
+      max-height: 100%;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    }
+    /* 2. Options Area */
     .s2-options-col {
-      max-width: 280px !important;
+      order: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto 14px auto;
+      flex-shrink: 0;
+    }
+    .s2-bottle-wrap {
+      display: none;
+    }
+    .s2-radiogroup {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
     .s2-option-row {
-      min-height: 34px !important;
-      padding: 3px 8px !important;
+      width: 100%;
+      min-height: 44px;
+      gap: 12px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(35, 111, 122, 0.2);
+      background-color: rgba(255, 255, 255, 0.75);
+      box-shadow: 0 1px 3px rgba(20, 56, 51, 0.06);
+      transition: all 0.15s ease;
+      justify-content: flex-start;
+    }
+    .s2-option-row:hover,
+    .s2-option-row:active {
+      background-color: rgba(189, 223, 216, 0.4);
+      border-color: #236f7a;
+      transform: translateY(-1px);
+    }
+    .s2-checkbox-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      border: 2px solid #236f7a;
+      flex-shrink: 0;
+    }
+    .s2-checkbox-box.checked {
+      background-color: #144e57;
+      border-color: #143833;
+    }
+    .s2-option-text {
+      font-size: 14.5px;
+      line-height: 1.3;
+      font-weight: 600;
+      color: #143833;
+    }
+    /* 3. Bottom Controls: Two-tier layout with Play/CC ABOVE and Back/Next BELOW */
+    .s2-bottom-bar {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      padding-top: 10px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .s2-spacer-side {
+      display: none;
+    }
+    .s2-audio-controls {
+      order: 1;
+      width: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 auto;
+      background-color: transparent;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+    }
+    .s2-audio-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .s2-audio-btn svg {
+      height: 28px !important;
+      width: auto !important;
+      transition: transform 0.12s ease;
+    }
+    .s2-audio-btn:hover svg,
+    .s2-audio-btn:active svg {
+      transform: scale(0.96);
+    }
+    .s2-nav-center {
+      order: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+      margin: 0;
     }
     .s2-btn-nav {
-      min-height: 38px !important;
-      height: 38px !important;
+      flex: 1 1 0%;
+      min-height: 48px;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 0 16px;
+      border-radius: 9999px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      text-align: center;
+      border: 1.5px solid #143833;
     }
   }
 
@@ -1077,7 +1019,7 @@ export function Slide2MedicineNamingScreen({
     };
   }, [effectiveAudioSrc, stepId]);
 
-  const toggleAudio = useCallback(() => {
+  const toggleAudio = () => {
     const audioEl = audioRef.current;
     const willPlay = !audioPlaying;
 
@@ -1090,14 +1032,6 @@ export function Slide2MedicineNamingScreen({
         ? "Narración de audio pausada"
         : "Audio narration paused"
     );
-
-    if (typeof window !== "undefined") {
-      logInteraction(
-        willPlay ? "AUDIO_PLAY" : "AUDIO_PAUSE",
-        { stepId, src: effectiveAudioSrc },
-        window.location.pathname
-      ).catch(() => {});
-    }
 
     if (willPlay) {
       if (audioEl && audioEl.src && !audioEl.src.endsWith(".undefined")) {
@@ -1132,9 +1066,9 @@ export function Slide2MedicineNamingScreen({
       }
       setAudioPlaying(false);
     }
-  }, [audioPlaying, effectiveAudioSrc, effectiveTranscript, isEs, stepId]);
+  };
 
-  const toggleCaptions = useCallback(() => {
+  const toggleCaptions = () => {
     const next = !showCaptions;
     setShowCaptions(next);
     setLiveAnnouncement(
@@ -1146,38 +1080,6 @@ export function Slide2MedicineNamingScreen({
         ? "Subtítulos ocultados"
         : "Closed captions hidden"
     );
-
-    if (typeof window !== "undefined") {
-      logInteraction(
-        "TRANSCRIPT_TOGGLE",
-        { stepId, visible: next },
-        window.location.pathname
-      ).catch(() => {});
-    }
-  }, [isEs, showCaptions, stepId]);
-
-  const handleNextClick = () => {
-    if (!nextEnabled) return;
-    // Stop audio on slide advance
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
-    onNext();
-  };
-
-  const handleBackClick = () => {
-    if (loading) return;
-    // Stop audio on slide retreat
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
-    onBack();
   };
 
   const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
@@ -1223,9 +1125,9 @@ export function Slide2MedicineNamingScreen({
 
       {/* 2. Middle Interactive Content Area */}
       <div className="s2-stage-middle">
-        {/* Left Column: Pink Bottle (Desktop) + Accessible Radio Options */}
+        {/* Left Column: Pink Bottle + Accessible Radio Options */}
         <div className="s2-options-col">
-          {/* Pink Bottle (WCAG 1.1.1 Non-text Content - Desktop) */}
+          {/* Pink Bottle (WCAG 1.1.1 Non-text Content) */}
           <div className="s2-bottle-wrap">
             <img
               src="/images/amoxicillin-bottle.png"
@@ -1404,7 +1306,7 @@ export function Slide2MedicineNamingScreen({
         >
           <button
             type="button"
-            onClick={handleBackClick}
+            onClick={onBack}
             disabled={loading}
             className="s2-btn-nav s2-btn-back"
             aria-label={isEs ? "Volver a la diapositiva anterior" : "Back to previous slide"}
@@ -1413,7 +1315,7 @@ export function Slide2MedicineNamingScreen({
           </button>
           <button
             type="button"
-            onClick={handleNextClick}
+            onClick={onNext}
             disabled={!nextEnabled}
             aria-disabled={!nextEnabled}
             className="s2-btn-nav s2-btn-next"
