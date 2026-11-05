@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import AudioPlayer from "./AudioPlayer";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
@@ -31,6 +31,7 @@ const BUBBLE_PATH_RIGHT =
 const SLIDE8_COMPONENT_CSS = `
   /* ------------------------------------------------------------
      WCAG 2.1 / 2.2 Level AAA & WAVE Immunity Accessibility Rules
+     Slide 7 (Milestone Celebration)
      ------------------------------------------------------------ */
 
   /* Screen Reader Only Utility (WCAG 1.3.1, 4.1.2, 4.1.3) */
@@ -46,7 +47,7 @@ const SLIDE8_COMPONENT_CSS = `
     border: 0 !important;
   }
 
-  /* Universal High Contrast Focus Indicator (WCAG 2.4.7, 2.4.11, 2.4.13 Level AAA) */
+  /* Universal High Contrast Focus Indicator (WCAG 2.4.7 Level AAA) */
   .s8-component-card button:focus-visible,
   .s8-component-card [tabindex="0"]:focus-visible {
     outline: 3px solid #143833 !important;
@@ -67,10 +68,6 @@ const SLIDE8_COMPONENT_CSS = `
     height: 100%;
     max-height: 100%;
     aspect-ratio: 896 / 620;
-    background-color: #fafdf3;
-    border-radius: 28px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(120, 165, 155, 0.28);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -92,16 +89,19 @@ const SLIDE8_COMPONENT_CSS = `
   }
 
   /* 1. Speech Bubble on Left (Tail pointing rightward toward Nurse Anna) */
-  .s8-bubble-wrap {
-    position: relative;
-    width: 500px;
-    max-width: 60%;
-    aspect-ratio: 510 / 315;
-    flex-shrink: 0;
-    filter: drop-shadow(2.5px 3.5px 0px #1a3532);
-    margin-right: -23px;
-    margin-top: -216px;
-    z-index: 5;
+
+
+  .s8-bubble-wrap
+  {
+      position: relative;
+      width: 500px;
+      max-width: 58%;
+      aspect-ratio: 510 / 315;
+      flex-shrink: 0;
+      filter: drop-shadow(2.5px 3.5px 0px #1a3532);
+      margin-right: -31px;
+      margin-top: -233px;
+      z-index: 5;
   }
 
   .s8-bubble-svg {
@@ -136,14 +136,15 @@ const SLIDE8_COMPONENT_CSS = `
     padding: 0;
     width: 100%;
     font-size: 14.5px;
-    line-height: 1.42;
-    font-weight: 700;
+    line-height: 1.4;
+    font-weight: 600;
     color: #142724;
     text-align: center;
-    letter-spacing: -0.012em;
+    letter-spacing: -0.01em;
     outline: none;
     word-break: break-word;
     overflow-wrap: break-word;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
   .s8-heading-line {
@@ -179,84 +180,45 @@ const SLIDE8_COMPONENT_CSS = `
   }
 
   /* ------------------------------------------------------------
-     Bottom Bar: Centered Navigation & Bottom-Right Audio Controls
+     Bottom Audio Narration & CC Controls (Bottom-Right like Slide 5)
      ------------------------------------------------------------ */
-  .s8-bottom-bar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    padding-top: 10px;
-    position: relative;
-    z-index: 20;
-  }
-
-  .s8-spacer-side {
-    width: 110px;
-    flex-shrink: 0;
-  }
-
-  /* Shared SlideNavigationButtons kept inline inside the footer bar */
-  .s8-bottom-bar .slide-nav {
-    position: static !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    top: auto !important;
-    flex: 1 1 auto !important;
-    width: auto !important;
-    max-width: none !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    gap: 14px !important;
-  }
-
-  /* Audio Controls wrap (bottom-right like Slide 5) */
   .s8-audio-wrap {
+    position: absolute;
+    right: 22px;
+    bottom: clamp(16px, 3vh, 22px);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 110px;
-    flex-shrink: 0;
+    z-index: 35;
+    pointer-events: auto;
   }
 
-  /* Closed Captions Panel (WCAG 1.2.2 Captions, Contrast 14.8:1 AAA) */
-  .s8-captions-panel {
-    background: #143833;
-    color: #ffffff;
-    border: 1.5px solid #bddfd8;
-    border-radius: 12px;
-    padding: 8px 14px;
-    margin-top: 6px;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-    z-index: 15;
+  /* ------------------------------------------------------------
+     Centered SlideNavigationButtons (100% Centered horizontally across card)
+     ------------------------------------------------------------ */
+  .s8-component-card .slide-nav {
+    position: absolute !important;
+    bottom: clamp(16px, 3vh, 22px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    z-index: 30 !important;
+    pointer-events: none !important;
   }
-  .s8-captions-tag {
-    background: #fdee8e;
-    color: #1a2624;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 4px;
-    flex-shrink: 0;
-    letter-spacing: 0.05em;
-  }
-  .s8-captions-text {
-    font-size: 13.5px;
-    line-height: 1.4;
-    margin: 0;
-    font-weight: 500;
-    color: #ffffff;
+
+  .s8-component-card .slide-nav-btn {
+    pointer-events: auto !important;
   }
 
   /* -------------------------------------------------------------
-     EXPLICIT PREVIEW & MOBILE EMBEDDED MODES (.is-mobile)
+     EXPLICIT PREVIEW & MOBILE EMBEDDED MODES (.is-mobile & < 768px)
      ------------------------------------------------------------- */
   .s8-component-card.is-mobile {
     aspect-ratio: auto !important;
@@ -310,12 +272,12 @@ const SLIDE8_COMPONENT_CSS = `
     box-sizing: border-box !important;
   }
   .s8-component-card.is-mobile .s8-heading {
-    font-size: clamp(11.5px, 1.5vh, 12.5px) !important;
-    line-height: 1.34 !important;
-    font-weight: 700 !important;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
     color: #142724 !important;
     text-align: center !important;
-    letter-spacing: -0.012em !important;
+    letter-spacing: -0.01em !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
   }
@@ -331,22 +293,10 @@ const SLIDE8_COMPONENT_CSS = `
     margin: -14px 12% 0 auto !important;
     z-index: 2 !important;
   }
-  .s8-component-card.is-mobile .s8-bottom-bar {
-    flex: 0 0 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 4px !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-    padding: 2px 0 0 0 !important;
-  }
-  .s8-component-card.is-mobile .s8-spacer-side {
-    display: none !important;
-  }
   .s8-component-card.is-mobile .s8-audio-wrap {
-    order: 1 !important;
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -354,14 +304,18 @@ const SLIDE8_COMPONENT_CSS = `
     margin: 4px auto 0 auto !important;
     z-index: 25 !important;
   }
-  .s8-component-card.is-mobile .s8-bottom-bar .slide-nav {
-    order: 2 !important;
+  .s8-component-card.is-mobile .slide-nav {
+    position: static !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 10px !important;
-    width: auto !important;
+    width: 100% !important;
     margin: 4px auto 0 auto !important;
+    pointer-events: auto !important;
   }
 
   /* Responsive Fallback (< 768px) */
@@ -395,11 +349,11 @@ const SLIDE8_COMPONENT_CSS = `
       max-width: 305px !important;
       aspect-ratio: 510 / 315 !important;
       height: auto !important;
-      margin: 0 auto !important;
-      filter: drop-shadow(2px 3px 0px #1a3532) !important;
       position: relative !important;
       left: auto !important;
       top: auto !important;
+      margin: 0 auto !important;
+      filter: drop-shadow(2px 3px 0px #1a3532) !important;
     }
     .s8-bubble-text-wrap {
       position: absolute !important;
@@ -418,12 +372,12 @@ const SLIDE8_COMPONENT_CSS = `
       box-sizing: border-box !important;
     }
     .s8-heading {
-      font-size: clamp(11.5px, 1.5vh, 12.5px) !important;
-      line-height: 1.34 !important;
-      font-weight: 700 !important;
+      font-size: 12px !important;
+      line-height: 1.35 !important;
+      font-weight: 600 !important;
       color: #142724 !important;
       text-align: center !important;
-      letter-spacing: -0.012em !important;
+      letter-spacing: -0.01em !important;
       word-break: normal !important;
       overflow-wrap: break-word !important;
     }
@@ -439,22 +393,10 @@ const SLIDE8_COMPONENT_CSS = `
       margin: -14px 12% 0 auto !important;
       z-index: 2 !important;
     }
-    .s8-bottom-bar {
-      flex: 0 0 auto !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 4px !important;
-      width: 100% !important;
-      margin: 0 auto !important;
-      padding: 2px 0 0 0 !important;
-    }
-    .s8-spacer-side {
-      display: none !important;
-    }
     .s8-audio-wrap {
-      order: 1 !important;
+      position: static !important;
+      right: auto !important;
+      bottom: auto !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -462,14 +404,18 @@ const SLIDE8_COMPONENT_CSS = `
       margin: 4px auto 0 auto !important;
       z-index: 25 !important;
     }
-    .s8-bottom-bar .slide-nav {
-      order: 2 !important;
+    .s8-component-card .slide-nav {
+      position: static !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       gap: 10px !important;
-      width: auto !important;
+      width: 100% !important;
       margin: 4px auto 0 auto !important;
+      pointer-events: auto !important;
     }
   }
 
@@ -599,33 +545,24 @@ export function Slide8MilestoneScreen({
         </div>
       </div>
 
-      {/* 3. Bottom Navigation & Audio Controls (WCAG 2.4.1 Toolbar) */}
-      <footer
-        className="s8-bottom-bar"
-        role="toolbar"
-        aria-label={isEs ? "Controles de navegación y audio" : "Slide navigation and media controls"}
-      >
-        <div className="s8-spacer-side" aria-hidden="true" />
-
-        {/* Centered Navigation Buttons (Back & Next) */}
-        <SlideNavigationButtons
-          onBack={onBack}
-          onNext={onNext}
-          isSpanish={isEs}
-          loading={loading}
+      {/* 2. Audio narration & CC controls (bottom-right on desktop/tablet, centered on mobile) */}
+      <div className="s8-audio-wrap">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId}
+          locale={isEs ? "es" : "en"}
+          transcriptText={spokenText}
+          size="large"
         />
+      </div>
 
-        {/* Audio narration & CC controls */}
-        <div className="s8-audio-wrap s8-spacer-side">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId}
-            locale={isEs ? "es" : "en"}
-            transcriptText={spokenText}
-            size="large"
-          />
-        </div>
-      </footer>
+      {/* 3. Centered Back & Next Navigation Buttons (Identical to Slide 5 & other slides) */}
+      <SlideNavigationButtons
+        onBack={onBack}
+        onNext={onNext}
+        isSpanish={isEs}
+        loading={loading}
+      />
     </section>
   );
 }
