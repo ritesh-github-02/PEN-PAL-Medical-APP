@@ -239,7 +239,7 @@ export default function InterventionEntryPage() {
 
   // --- MAIN PORTAL ENTRY FORM ---
   return (
-    <main className="h-screen w-screen flex flex-col items-center justify-between py-6 px-4 font-sans text-[#2d3748] bg-[#f4f8e8]" role="main">
+    <main className="h-screen w-screen flex flex-col items-center justify-between py-6 px-4 font-sans text-[#2d3748] bg-[#6dc1c1]" role="main">
       <div className="flex-1 flex flex-col justify-center max-w-sm w-full space-y-5">
         {/* App Branding Header */}
         <div className="space-y-2 text-center">

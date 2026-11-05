@@ -3,7 +3,7 @@ import Link from 'next/link';
 export default function NotFound() {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="h-screen w-screen flex flex-col items-center justify-between py-8 px-4 font-sans text-[#2d3748] bg-[#f4f8e8] select-none" suppressHydrationWarning>
+      <body className="h-screen w-screen flex flex-col items-center justify-between py-8 px-4 font-sans text-[#2d3748] bg-[#6dc1c1] select-none" suppressHydrationWarning>
         <div className="flex-1 flex flex-col justify-center max-w-md w-full space-y-6 text-center">
           <div className="space-y-2">
             <h1 className="text-4xl font-black tracking-tight text-[#35727f] font-display">

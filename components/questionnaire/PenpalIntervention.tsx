@@ -631,7 +631,7 @@ export default function PenpalIntervention() {
 
   return (
     <main
-      className="intervention-main-shell h-dvh max-h-dvh w-full max-w-full flex flex-col items-center justify-center p-1.5 sm:p-2 md:p-2.5 relative font-sans bg-[#f4f8ec] overflow-hidden select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
+      className="intervention-main-shell h-dvh max-h-dvh w-full max-w-full flex flex-col items-center justify-center p-1.5 sm:p-2 md:p-2.5 relative font-sans bg-[#6dc1c1] overflow-hidden select-none print:h-auto print:max-h-none print:min-h-0 print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:static"
       role="main"
       aria-label={locale === "es" ? "Evaluación Interactiva PEN-PAL" : "PEN-PAL Interactive Assessment"}
     >
@@ -642,12 +642,6 @@ export default function PenpalIntervention() {
       >
         {locale === "es" ? "Saltar al contenido principal" : "Skip to main content"}
       </a>
-
-      {/* Decorative ambient background glows with motion-reduce safety */}
-      <div className="no-print print:hidden absolute inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
-        <div className="absolute -top-40 -left-40 w-[40rem] h-[40rem] bg-teal-300/10 rounded-full mix-blend-multiply filter blur-[120px] animate-pulse motion-reduce:animate-none"></div>
-        <div className="absolute -bottom-40 -right-40 w-[40rem] h-[40rem] bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-[120px] animate-pulse motion-reduce:animate-none"></div>
-      </div>
 
       {loading && <Loader fullScreen />}
       {navigating && <Loader fullScreen />}

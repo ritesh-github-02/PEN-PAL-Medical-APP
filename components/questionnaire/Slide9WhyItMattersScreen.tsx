@@ -414,6 +414,7 @@ export function Slide9WhyItMattersScreen({
           <div className="s9-nurse" aria-hidden="true">
             <img
               src="/images/nurse-anna-explaining.png"
+              srcSet="/images/nurse-anna-explaining.png 1x, /images/nurse-anna-explaining-hd.png 2x"
               alt=""
               className="s9-nurse-img"
               draggable={false}

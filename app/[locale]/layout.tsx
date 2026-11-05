@@ -109,7 +109,7 @@ export default async function LocaleLayout({
           }}
         />
       </head>
-      <body className="bg-[#f4f8e8] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans overflow-x-hidden" suppressHydrationWarning>
+      <body className="bg-[#6dc1c1] text-[#2d3748] min-h-screen antialiased selection:bg-[#35727f]/10 selection:text-[#35727f] font-sans overflow-x-hidden" suppressHydrationWarning>
 
         {/* WCAG 2.1 AA Skip to Content Link */}
         <a

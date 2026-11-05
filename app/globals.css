@@ -82,6 +82,15 @@ h3:focus-visible,
 html, body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+  background-color: #6dc1c1;
+}
+
+body {
+  background-color: #6dc1c1;
+}
+
+.intervention-main-shell {
+  background-color: #6dc1c1 !important;
 }
 
 html::-webkit-scrollbar,

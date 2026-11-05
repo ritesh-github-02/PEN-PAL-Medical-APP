@@ -412,6 +412,7 @@ export function Slide5PrevalenceScreen({
         <div className="s5-nurse" aria-hidden="true">
           <img
             src="/images/nurse-anna-holding-bottle.png"
+            srcSet="/images/nurse-anna-holding-bottle.png 1x, /images/nurse-anna-holding-bottle-hd.png 2x"
             alt=""
             className="s5-nurse-img"
             draggable={false}
