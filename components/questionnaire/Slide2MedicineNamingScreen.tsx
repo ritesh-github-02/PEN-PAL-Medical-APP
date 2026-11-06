@@ -77,7 +77,6 @@ const BUBBLE_PATH =
 const SLIDE2_COMPONENT_CSS = `
   /* ------------------------------------------------------------
      Slide 2: WCAG 2.1 / 2.2 Level AAA, WAVE & Karen Accessibility Rules
-     Fully responsive across MacBook Pro 17", iPad Pro, iPhone 16
      ------------------------------------------------------------ */
 
   .s2-sr-only {
@@ -106,10 +105,9 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-component-card {
     position: relative;
     width: 100%;
-    max-width: 896px;
+    max-width: 1000px;
     height: 100%;
     max-height: 100%;
-    aspect-ratio: 896 / 620;
     background-color: #fafdf3;
     border-radius: 28px;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
@@ -118,27 +116,42 @@ const SLIDE2_COMPONENT_CSS = `
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    padding: clamp(16px, 2.5vh, 24px) clamp(20px, 3.5vw, 38px) clamp(14px, 2vh, 20px) clamp(20px, 3.5vw, 38px);
+    padding: 24px 38px 20px 38px;
     box-sizing: border-box;
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Seamless fill when placed inside an outer app frame (prevents double rectangle / empty bottom canvas) */
+  .tablet-mockup-frame .s2-component-card,
+  .tablet-screen-inner .s2-component-card,
+  .tablet-slide-content .s2-component-card,
+  .intervention-frame-outer .s2-component-card {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 24px 38px 20px 38px !important;
   }
 
   /* 1. Yellow Banner & Heading (WCAG AAA Contrast: #142724 on #feff9f = 14.2:1) */
   .s2-banner-wrap {
     width: 100%;
     max-width: 760px;
-    margin: 0 auto clamp(8px, 1.5vh, 12px) auto;
+    margin: 0 auto 10px auto;
     background-color: #feff9f;
     border: 2px solid #236f7a;
     border-radius: 9999px;
     box-shadow: 0 4px 6px rgba(34, 105, 118, 0.25);
-    padding: clamp(8px, 1.2vh, 12px) clamp(16px, 2.5vw, 24px);
+    padding: 10px 24px;
     text-align: center;
     flex-shrink: 0;
   }
   .s2-heading {
     margin: 0;
-    font-size: clamp(17px, 2.1vw, 21px);
+    font-size: 20px;
     line-height: 1.3;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -146,31 +159,31 @@ const SLIDE2_COMPONENT_CSS = `
     outline: none;
   }
 
-  /* 2. Middle Content Area (Flexible 2-column layout preventing overlaps on MacBook & scaling cleanly on iPad) */
+  /* 2. Middle Content Area */
   .s2-stage-middle {
-    flex: 1 1 auto;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     min-height: 0;
     padding: 0 4px;
-    gap: clamp(16px, 2.8vw, 32px);
+    gap: 20px;
   }
 
   .s2-options-col {
     display: flex;
     align-items: center;
-    gap: clamp(14px, 2.2vw, 22px);
-    flex: 1 1 auto;
+    gap: 22px;
+    flex: 1;
     min-width: 0;
     max-width: 480px;
   }
 
   .s2-bottle-wrap {
     flex-shrink: 0;
-    width: clamp(75px, 9vw, 92px);
-    height: clamp(145px, 22vh, 180px);
+    width: 90px;
+    height: 175px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -187,9 +200,8 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-radiogroup {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1.2vh, 12px);
-    flex: 1 1 auto;
-    min-width: 0;
+    gap: 10px;
+    flex: 1;
   }
 
   .s2-option-row {
@@ -212,8 +224,8 @@ const SLIDE2_COMPONENT_CSS = `
   }
 
   .s2-checkbox-box {
-    width: clamp(24px, 2.5vw, 28px);
-    height: clamp(24px, 2.5vw, 28px);
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
     border-radius: 6px;
     border: 2px solid #236f7a;
@@ -230,7 +242,7 @@ const SLIDE2_COMPONENT_CSS = `
   }
 
   .s2-option-text {
-    font-size: clamp(15.5px, 1.7vw, 18px);
+    font-size: 17.5px;
     line-height: 1.3;
     font-weight: 500;
     color: #142724;
@@ -245,15 +257,15 @@ const SLIDE2_COMPONENT_CSS = `
   /* Character & Bubble Area */
   .s2-character-col {
     position: relative;
-    width: clamp(260px, 32vw, 320px);
-    height: clamp(210px, 28vh, 265px);
+    width: 320px;
+    height: 265px;
     flex-shrink: 0;
   }
   .s2-bubble-wrap {
     position: absolute;
     left: 0;
     top: 0;
-    width: clamp(200px, 25vw, 245px);
+    width: 245px;
     aspect-ratio: 520 / 340;
     z-index: 5;
     pointer-events: none;
@@ -280,16 +292,14 @@ const SLIDE2_COMPONENT_CSS = `
     text-align: center;
     pointer-events: none;
   }
-  /* Unified talking bubble typography across the app */
   .s2-bubble-text {
     margin: 0;
     padding: 0;
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 13.5px;
+    line-height: 1.42;
     font-weight: 600;
     color: #142724;
     text-align: center;
-    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
   /* Nurse Anna (Post-Slide 1 Decorative Character) */
@@ -297,8 +307,8 @@ const SLIDE2_COMPONENT_CSS = `
     position: absolute;
     right: 8px;
     bottom: 2px;
-    width: clamp(85px, 10vw, 105px);
-    height: clamp(160px, 21vh, 195px);
+    width: 105px;
+    height: 195px;
     z-index: 6;
     pointer-events: none;
     display: flex;
@@ -343,6 +353,7 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-btn-nav {
     border-radius: 9999px;
     font-weight: 700;
+    border: 1.5px solid transparent;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -352,7 +363,7 @@ const SLIDE2_COMPONENT_CSS = `
     min-width: 98px;
     font-size: 16px;
     padding: 0 24px;
-    transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.1s ease, background-color 0.15s ease;
   }
   .s2-btn-nav:hover:not(:disabled) {
     transform: translateY(-1px);
@@ -368,11 +379,10 @@ const SLIDE2_COMPONENT_CSS = `
     box-shadow: none;
   }
 
-  /* High contrast outline (WCAG AAA) on both Back and Next buttons */
   .s2-btn-back {
     background-color: #bddfd8;
     color: #11332e;
-    border: 1.5px solid #143833;
+    border-color: #78a59b;
   }
   .s2-btn-back:hover:not(:disabled) {
     background-color: #a8d5cc;
@@ -381,7 +391,7 @@ const SLIDE2_COMPONENT_CSS = `
   .s2-btn-next {
     background-color: #fdee8e;
     color: #1a2624;
-    border: 1.5px solid #143833; /* Dark blue outline matching Back button and Figma spec */
+    border-color: #c8b746;
   }
   .s2-btn-next:hover:not(:disabled) {
     background-color: #f5e478;
@@ -532,7 +542,7 @@ const SLIDE2_COMPONENT_CSS = `
     max-width: 175px !important;
   }
   .s2-component-card.is-mobile .s2-bubble-text {
-    font-size: 12px !important;
+    font-size: 11.5px !important;
     line-height: 1.35 !important;
     font-weight: 600 !important;
     color: #143833 !important;
@@ -564,7 +574,8 @@ const SLIDE2_COMPONENT_CSS = `
     justify-content: center !important;
     width: 100% !important;
     max-width: 320px !important;
-    margin: 0 auto 14px auto !important;
+    margin: 0 auto !important;
+    margin-bottom: 14px !important;
     flex-shrink: 0 !important;
   }
   .s2-component-card.is-mobile .s2-bottle-wrap {
@@ -680,7 +691,6 @@ const SLIDE2_COMPONENT_CSS = `
     border-radius: 9999px !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
     text-align: center !important;
-    border: 1.5px solid #143833 !important;
   }
 
   @media (max-width: 767px) {
@@ -759,7 +769,7 @@ const SLIDE2_COMPONENT_CSS = `
       max-width: 175px;
     }
     .s2-bubble-text {
-      font-size: 12px;
+      font-size: 11.5px;
       line-height: 1.35;
       font-weight: 600;
       color: #143833;
@@ -790,7 +800,8 @@ const SLIDE2_COMPONENT_CSS = `
       justify-content: center;
       width: 100%;
       max-width: 320px;
-      margin: 0 auto 14px auto;
+      margin: 0 auto;
+      margin-bottom: 14px;
       flex-shrink: 0;
     }
     .s2-bottle-wrap {
@@ -903,7 +914,6 @@ const SLIDE2_COMPONENT_CSS = `
       border-radius: 9999px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
       text-align: center;
-      border: 1.5px solid #143833;
     }
   }
 
