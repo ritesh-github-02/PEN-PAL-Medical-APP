@@ -179,20 +179,33 @@ const SLIDE11_CSS = `
 
 .s11-other-input {
   flex: 1;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid #142724;
+  background-color: rgba(16, 44, 40, 0.28);
+  border: 2px solid #ffd41d !important;
+  border-radius: 8px;
   outline: none;
   font-size: 0.88rem;
   font-weight: 500;
-  color: #142724;
-  padding: 2px 4px;
+  color: #ffffff !important;
+  caret-color: #ffd41d;
+  padding: 4px 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: all 0.15s ease;
 }
 
-.s11-other-input:focus {
-  border-bottom-color: #0b1f1c;
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 4px 4px 0 0;
+input.s11-other-input:focus,
+input.s11-other-input:focus-visible,
+.s11-other-input:focus,
+.s11-other-input:focus-visible {
+  border-color: #ffd41d !important;
+  outline: 2px solid #ffd41d !important;
+  outline-offset: 1px !important;
+  background-color: rgba(16, 44, 40, 0.42) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(255, 212, 29, 0.28) !important;
+}
+
+.s11-other-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* ==========================================================
@@ -551,7 +564,11 @@ const SLIDE11_CSS = `
     width: 100% !important;
     min-width: 0 !important;
     font-size: clamp(10px, 1.35vh, 11px) !important;
-    padding: 1px 3px !important;
+    padding: 3px 6px !important;
+    color: #ffffff !important;
+    border: 2px solid #ffd41d !important;
+    border-radius: 6px !important;
+    background-color: rgba(16, 44, 40, 0.28) !important;
   }
 
   .s11-row-bottom .s11-chip {

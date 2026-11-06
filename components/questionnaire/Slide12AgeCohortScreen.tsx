@@ -436,7 +436,7 @@ export const AGE_COHORTS: AgeCohortOption[] = [
     subtitleEn: "(4-12 years)",
     titleEs: "Edad escolar",
     subtitleEs: "(4-12 años)",
-    imageSrc: "/images/cohorts/school-aged.png?v=4",
+    imageSrc: "/images/cohorts/school-aged.png?v=6",
     altEn: "School-aged child aged 4 to 12 years",
     altEs: "Niño en edad escolar de 4 a 12 años",
   },
@@ -605,12 +605,12 @@ export function Slide12AgeCohortScreen({
                 }}
               >
                 {/* Character Illustration standing right above button */}
-                <div className="s12-cohort-img-wrap">
+                <div className={`s12-cohort-img-wrap s12-cohort-img-wrap--${cohort.titleEn.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
                   <img
                     src={cohort.imageSrc}
                     alt=""
                     aria-hidden="true"
-                    className="s12-cohort-img"
+                    className={`s12-cohort-img s12-cohort-img--${cohort.titleEn.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                   />
                 </div>
 
