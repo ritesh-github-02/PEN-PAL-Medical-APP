@@ -168,22 +168,23 @@ const SLIDE18_CSS = `
 }
 
 .s18-btn {
-  padding: 0.38rem 1.35rem;
-  min-height: 38px;
+  padding: 0 24px;
+  min-height: 48px;
+  height: 48px;
   border-radius: 9999px;
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: #143833;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   outline: none;
   cursor: pointer;
-  border: 1px solid #91b5ae;
+  border: 1.5px solid #91b5ae;
   background-color: #adcac4;
-  transition: all 0.15s ease;
+  transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
   white-space: nowrap;
 }
 
@@ -250,9 +251,11 @@ const SLIDE18_CSS = `
     flex-wrap: wrap !important;
   }
   .s18-btn {
-    min-height: 34px;
-    padding: 0.3rem 0.95rem;
-    font-size: 0.82rem;
+    min-height: 48px;
+    height: 48px;
+    padding: 0 18px;
+    font-size: 15px;
+    font-weight: 700;
     gap: 0.35rem;
   }
   .s18-btn-icon {

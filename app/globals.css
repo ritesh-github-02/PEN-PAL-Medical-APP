@@ -358,7 +358,7 @@ body::-webkit-scrollbar,
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  gap: 16px !important;
+  gap: 14px !important;
   width: 100% !important;
   max-width: 100% !important;
   z-index: 30 !important;
@@ -366,15 +366,15 @@ body::-webkit-scrollbar,
 }
 
 .slide-nav-btn {
-  height: 35px;
-  min-height: 35px;
-  padding: 0 16px;
-  min-width: 68px;
-  border-radius: 9999px;
+  height: 48px !important;
+  min-height: 48px !important;
+  min-width: 98px !important;
+  padding: 0 24px !important;
+  border-radius: 9999px !important;
   font-family: inherit;
   pointer-events: auto !important;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px !important;
+  font-weight: 700 !important;
   outline: none;
   cursor: pointer;
   border: 1.5px solid transparent;
@@ -383,12 +383,18 @@ body::-webkit-scrollbar,
   justify-content: center;
   text-decoration: none;
   user-select: none;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.slide-nav-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.14) !important;
 }
 
 .slide-nav-btn:active:not(:disabled) {
-  transform: scale(0.96);
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
 }
 
 .slide-nav-btn:focus-visible {
@@ -397,28 +403,28 @@ body::-webkit-scrollbar,
 }
 
 .slide-nav-btn--back {
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
-  color: #143833;
+  background-color: #bddfd8 !important;
+  border-color: #78a59b !important;
+  color: #11332e !important;
 }
 
 .slide-nav-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
+  background-color: #a8d5cc !important;
 }
 
 .slide-nav-btn--next {
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
+  background-color: #fdee8e !important;
+  border-color: #c8b746 !important;
+  color: #1a2624 !important;
 }
 
 .slide-nav-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
+  background-color: #f5e478 !important;
 }
 
 .slide-nav-btn--disabled,
 .slide-nav-btn:disabled {
-  opacity: 0.45 !important;
+  opacity: 0.55 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
   box-shadow: none !important;
@@ -587,7 +593,7 @@ body::-webkit-scrollbar,
     right: auto !important;
     top: auto !important;
     margin: 4px auto 0.15rem auto !important;
-    gap: 12px !important;
+    gap: 14px !important;
     width: 100% !important;
     display: flex !important;
     justify-content: center !important;
@@ -596,12 +602,16 @@ body::-webkit-scrollbar,
     order: 2 !important;
   }
 
-  .slide-nav-btn {
-    height: 36px !important;
-    min-height: 36px !important;
-    font-size: 14px !important;
-    padding: 0 18px !important;
-    min-width: 72px !important;
+  .slide-nav-btn,
+  .is-mobile .slide-nav-btn {
+    height: 48px !important;
+    min-height: 48px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    padding: 0 24px !important;
+    min-width: 98px !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
   }
 
   /* All slide roots take ONLY content size height, centered with clean compact spacing */
@@ -868,12 +878,15 @@ body::-webkit-scrollbar,
     max-width: 100% !important;
   }
 
-  /* Global Navigation Buttons Touch Accessibility */
+  /* Global Navigation Buttons Touch Accessibility (Standardized to Slide 2 specifications) */
+  .s1-btn-start, .s2-btn-nav, .slide-nav-btn,
   .s2-btn, .s3-btn, .s4-btn, .s5-btn, .s6-btn, .s8-btn, .s9-btn, .s10-btn, .s10b-btn, 
   .s11-btn, .s12-btn, .s13-btn, .s14-btn, .s16-btn, .s18-btn, .s19-btn, .s21-btn {
-    min-height: 42px !important;
-    padding: 0.4rem 1.4rem !important;
-    font-size: 0.88rem !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    border-radius: 9999px !important;
   }
 }
 

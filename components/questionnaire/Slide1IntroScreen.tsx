@@ -184,6 +184,7 @@ const SLIDE1_COMPONENT_CSS = `
 
   /* Prefers Reduced Motion (WCAG 2.3.3) */
   @media (prefers-reduced-motion: reduce) {
+  @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;

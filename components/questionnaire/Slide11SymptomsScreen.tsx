@@ -208,6 +208,16 @@ input.s11-other-input:focus-visible,
   color: rgba(255, 255, 255, 0.7);
 }
 
+.s11-other-input::selection {
+  background-color: #ffffff !important;
+  color: #143833 !important;
+}
+
+.s11-other-input::-moz-selection {
+  background-color: #ffffff !important;
+  color: #143833 !important;
+}
+
 /* ==========================================================
    Rash Pop-up (Figma 7-1-1) Pixel-Perfect Styles
    ========================================================== */
