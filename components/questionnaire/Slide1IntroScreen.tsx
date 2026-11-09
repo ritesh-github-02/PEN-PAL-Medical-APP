@@ -186,6 +186,7 @@ const SLIDE1_COMPONENT_CSS = `
       display: none !important;
     }
     .s1-mobile-nav {
+      display: flex !important;
       order: 2 !important;
       margin: 4px auto 0.15rem auto !important;
     }
@@ -197,10 +198,14 @@ const SLIDE1_COMPONENT_CSS = `
   .s1-component-root.is-mobile .s1-mobile-nav {
     display: flex !important;
     order: 2 !important;
+    margin: 4px auto 0.15rem auto !important;
   }
 
   @media (min-width: 768px) {
-    .s1-mobile-nav {
+    .s1-component-root:not(.is-mobile) .s1-desktop-start {
+      display: block !important;
+    }
+    .s1-component-root:not(.is-mobile) .s1-mobile-nav {
       display: none !important;
     }
   }
@@ -366,7 +371,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
       </footer>
 
       {/* Mobile "Get Started!" Action Button (Placed directly below Audio Controls on mobile) */}
-      <div className="s1-mobile-nav md:hidden flex justify-center items-center w-full z-30">
+      <div className="s1-mobile-nav flex justify-center items-center w-full z-30">
         <button
           type="button"
           onClick={handleStart}

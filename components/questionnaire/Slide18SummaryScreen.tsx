@@ -245,12 +245,6 @@ const SLIDE18_CSS = `
     font-size: 0.76rem;
     padding: 0.22rem 0.55rem;
   }
-  .s18-nav {
-    margin-top: 0.35rem;
-    gap: 0.6rem !important;
-    flex-wrap: wrap !important;
-    order: 2 !important;
-  }
   .s18-btn {
     min-height: 48px;
     height: 48px;
@@ -508,6 +502,8 @@ const SLIDE18_CSS = `
   .s18-nav {
     order: 2 !important;
     margin: 4px auto 0 auto !important;
+    gap: 0.6rem !important;
+    flex-wrap: wrap !important;
   }
 }
 

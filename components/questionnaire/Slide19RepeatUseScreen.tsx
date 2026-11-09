@@ -196,11 +196,11 @@ const SLIDE19_CSS = `
 }
 
 .s19-nurse-img {
-  height: clamp(170px, 24vh, 215px);
+  height: 270px;
   width: auto;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.1));
+  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
 /* Navigation Bar */
@@ -409,7 +409,7 @@ const SLIDE19_CSS = `
     padding: 0.45rem 0.85rem;
   }
   .s19-nurse-img {
-    height: 195px;
+    height: 220px;
   }
   .s19-btn {
     padding: 0.38rem 1.8rem;
@@ -479,10 +479,17 @@ const SLIDE19_CSS = `
     align-items: flex-end !important;
   }
   .s19-nurse-img {
-    height: clamp(68px, 11vh, 90px) !important;
-    max-height: 90px !important;
+    height: clamp(85px, 13.5vh, 110px) !important;
+    max-height: 110px !important;
     width: auto !important;
     object-fit: contain !important;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+  }
+  @media (max-height: 560px) {
+    .s19-nurse-img {
+      height: 75px !important;
+      max-height: 75px !important;
+    }
   }
   .s19-modal-row {
     flex-direction: column !important;
