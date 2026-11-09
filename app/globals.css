@@ -704,14 +704,24 @@ body::-webkit-scrollbar,
   .s11-nurse {
     display: flex !important;
     width: auto !important;
-    height: clamp(60px, 9.5vh, 75px) !important;
-    max-height: 75px !important;
+    height: clamp(80px, 12.5vh, 105px) !important;
+    max-height: 105px !important;
   }
   .s11-nurse-img {
     height: 100% !important;
-    max-height: clamp(60px, 9.5vh, 75px) !important;
+    max-height: clamp(80px, 12.5vh, 105px) !important;
     width: auto !important;
     object-fit: contain !important;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+  }
+  @media (max-height: 560px) {
+    .s11-nurse {
+      height: 75px !important;
+      max-height: 75px !important;
+    }
+    .s11-nurse-img {
+      max-height: 75px !important;
+    }
   }
 
   /* Slide 12: Age cohorts */
@@ -818,8 +828,8 @@ body::-webkit-scrollbar,
   }
 
   /* Nurse Anna sizing on mobile: properly proportioned, clearly visible, and vertically balanced */
-  .s13-nurse-wrap, .s14-nurse-wrap, .s16-nurse-wrap, .s19-nurse-wrap {
-    max-height: 95px !important;
+  .s13-nurse-wrap, .s14-nurse-wrap, .s15-nurse-wrap, .s16-nurse-wrap, .s19-nurse-wrap {
+    max-height: 115px !important;
     height: auto !important;
     width: 100% !important;
     margin: 0 auto !important;
@@ -828,9 +838,9 @@ body::-webkit-scrollbar,
     align-items: flex-end !important;
     flex-shrink: 0 !important;
   }
-  .s13-nurse-img, .s14-nurse-img, .s16-nurse-img, .s19-nurse-img {
-    height: clamp(68px, 11vh, 90px) !important;
-    max-height: 90px !important;
+  .s13-nurse-img, .s14-nurse-img, .s15-nurse-img, .s16-nurse-img, .s19-nurse-img {
+    height: clamp(85px, 13.5vh, 110px) !important;
+    max-height: 110px !important;
     width: auto !important;
     object-fit: contain !important;
     display: block !important;
@@ -839,13 +849,14 @@ body::-webkit-scrollbar,
 
   .s13-root .slide-nav,
   .s14-root .slide-nav,
+  .s15-root .slide-nav,
   .s16-root .slide-nav,
   .s19-root .slide-nav {
     margin: 4px auto 0.15rem auto !important;
   }
 
   @media (max-height: 560px) {
-    .s13-nurse-img, .s14-nurse-img, .s16-nurse-img, .s19-nurse-img {
+    .s13-nurse-img, .s14-nurse-img, .s15-nurse-img, .s16-nurse-img, .s19-nurse-img {
       height: 75px !important;
       max-height: 75px !important;
     }
@@ -870,6 +881,7 @@ body::-webkit-scrollbar,
     gap: 0.6rem !important;
     flex-wrap: wrap !important;
     justify-content: center !important;
+    order: 2 !important;
   }
 
   /* Slide 21: What Now */

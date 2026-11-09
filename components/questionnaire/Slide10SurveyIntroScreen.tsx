@@ -69,8 +69,8 @@ const SLIDE10_SURVEY_INTRO_CSS = `
 /* ---------- 1. Nurse Anna on the LEFT (Gesturing right toward bubble) ---------- */
 .s10b-nurse {
   position: relative;
-  width: 175px;
-  height: 340px;
+  width: 190px;
+  height: 355px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -88,6 +88,7 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   user-select: none;
   -webkit-user-drag: none;
   transform: none;
+  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
 /* ---------- 2. Speech Bubble on the RIGHT ---------- */
@@ -263,9 +264,9 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(65px, 16vw, 85px) !important;
-    height: clamp(85px, 13vh, 115px) !important;
-    margin: -14px auto 0 16% !important;
+    width: clamp(75px, 18vw, 105px) !important;
+    height: clamp(100px, 15.5vh, 135px) !important;
+    margin: -18px auto 0 14% !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -277,6 +278,13 @@ const SLIDE10_SURVEY_INTRO_CSS = `
     height: 100% !important;
     object-fit: contain !important;
     transform: none !important;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+  }
+  @media (max-height: 560px) {
+    .s10b-nurse {
+      height: 85px !important;
+      max-height: 85px !important;
+    }
   }
   .s10b-audio {
     position: static !important;

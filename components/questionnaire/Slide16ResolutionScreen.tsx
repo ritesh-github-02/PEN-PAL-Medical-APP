@@ -191,11 +191,11 @@ const SLIDE16_CSS = `
 }
 
 .s16-nurse-img {
-  height: 240px;
+  height: 270px;
   width: auto;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.1));
+  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
 /* Navigation Bar */
@@ -547,7 +547,7 @@ const SLIDE16_CSS = `
     padding: 0.45rem 0.65rem;
   }
   .s16-nurse-img {
-    height: 195px;
+    height: 220px;
   }
   .s16-btn {
     padding: 0.38rem 1.8rem;
@@ -619,10 +619,17 @@ const SLIDE16_CSS = `
     align-items: flex-end !important;
   }
   .s16-nurse-img {
-    height: clamp(68px, 11vh, 90px) !important;
-    max-height: 90px !important;
+    height: clamp(85px, 13.5vh, 110px) !important;
+    max-height: 110px !important;
     width: auto !important;
     object-fit: contain !important;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+  }
+  @media (max-height: 560px) {
+    .s16-nurse-img {
+      height: 75px !important;
+      max-height: 75px !important;
+    }
   }
   .s16-modal18-row {
     flex-wrap: wrap !important;

@@ -307,11 +307,11 @@ const SLIDE15_CSS = `
 }
 
 .s15-nurse-img {
-  height: clamp(180px, 26vh, 230px);
+  height: clamp(210px, 28vh, 265px);
   width: auto;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12));
+  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
 /* ==========================================================
@@ -754,7 +754,7 @@ const SLIDE15_CSS = `
     max-width: 100%;
   }
   .s15-nurse-img {
-    height: clamp(140px, 20vh, 180px);
+    height: clamp(160px, 22vh, 205px);
   }
   .s15-spacer-side {
     width: auto;
@@ -838,7 +838,7 @@ const SLIDE15_CSS = `
     white-space: nowrap;
   }
   .s15-nurse-img {
-    height: 130px;
+    height: 150px;
   }
   .s15-footer {
     padding-top: 4px;
@@ -885,7 +885,8 @@ const SLIDE15_CSS = `
   margin-top: 2px !important;
 }
 .s15-root.is-mobile .s15-nurse-img {
-  height: clamp(120px, 16vh, 145px) !important;
+  height: clamp(135px, 18vh, 165px) !important;
+  filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
 }
 .s15-root.is-mobile .s15-modal17-grid {
   grid-template-columns: 1fr !important;

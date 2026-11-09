@@ -164,7 +164,7 @@ const SLIDE21_CSS = `
     min-width: 120px !important;
     height: clamp(30px, 4.2vh, 36px) !important;
     padding: 0 14px !important;
-    margin-bottom: 2px !important;
+    margin-bottom: 12px !important;
     border-radius: 12px !important;
   }
   .s21-badge-title {

@@ -126,7 +126,6 @@ const SLIDE1_COMPONENT_CSS = `
   /* -------------------------------------------------------------
      Mobile Layout (.is-mobile or screen width < 768px)
      ------------------------------------------------------------- */
-  .s1-component-root.is-mobile,
   @media (max-width: 767px) {
     .s1-component-root {
       overflow: visible !important;
@@ -175,15 +174,38 @@ const SLIDE1_COMPONENT_CSS = `
       max-width: 290px !important;
     }
     .s1-btn-start {
-      min-height: 38px !important;
-      min-width: 120px !important;
-      font-size: 14px !important;
-      padding: 0 20px !important;
+      min-height: 48px !important;
+      height: 48px !important;
+      min-width: 140px !important;
+      font-size: 16px !important;
+      font-weight: 700 !important;
+      padding: 0 24px !important;
+      border-radius: 9999px !important;
+    }
+    .s1-desktop-start {
+      display: none !important;
+    }
+    .s1-mobile-nav {
+      order: 2 !important;
+      margin: 4px auto 0.15rem auto !important;
+    }
+  }
+
+  .s1-component-root.is-mobile .s1-desktop-start {
+    display: none !important;
+  }
+  .s1-component-root.is-mobile .s1-mobile-nav {
+    display: flex !important;
+    order: 2 !important;
+  }
+
+  @media (min-width: 768px) {
+    .s1-mobile-nav {
+      display: none !important;
     }
   }
 
   /* Prefers Reduced Motion (WCAG 2.3.3) */
-  @media (prefers-reduced-motion: reduce) {
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.001ms !important;
@@ -299,8 +321,8 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
             {mainCopy}
           </p>
 
-          {/* Pastel Butter-Yellow Pill Button: "Get Started!" (Guaranteed >= 44px Touch Target) */}
-          <div className="pt-2 sm:pt-4">
+          {/* Desktop "Get Started!" Action Button */}
+          <div className="s1-desktop-start pt-2 sm:pt-4">
             <button
               type="button"
               onClick={handleStart}
@@ -328,7 +350,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
         </div>
       </div>
 
-      {/* Bottom-Right Audio (CC & Play/Pause) Controls */}
+      {/* Audio (CC & Play/Pause) Controls */}
       <footer
         className="s1-audio absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-30 flex items-center"
         role="toolbar"
@@ -342,6 +364,23 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
           size="large"
         />
       </footer>
+
+      {/* Mobile "Get Started!" Action Button (Placed directly below Audio Controls on mobile) */}
+      <div className="s1-mobile-nav md:hidden flex justify-center items-center w-full z-30">
+        <button
+          type="button"
+          onClick={handleStart}
+          disabled={loading}
+          className="s1-btn-start"
+          aria-label={
+            isSpanish
+              ? "Comenzar - Iniciar la guía PEN-PAL"
+              : "Get Started - Begin the PEN-PAL guide"
+          }
+        >
+          {loading ? "..." : isSpanish ? "¡Comenzar!" : "Get Started!"}
+        </button>
+      </div>
     </section>
   );
 });

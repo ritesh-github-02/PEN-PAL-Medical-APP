@@ -181,12 +181,12 @@ const mobileLayout = (scope: string) => `
     line-height: 1.25 !important;
   }
   ${scope} .s10-nurse {
-    width: clamp(48px, 13vw, 62px) !important;
-    height: clamp(68px, 10.5vh, 88px) !important;
-    max-height: 88px !important;
-    margin-top: -12px !important;
+    width: clamp(65px, 16vw, 85px) !important;
+    height: clamp(90px, 14.5vh, 125px) !important;
+    max-height: 125px !important;
+    margin-top: -14px !important;
     margin-left: auto !important;
-    margin-right: 18% !important;
+    margin-right: 16% !important;
     z-index: 20 !important;
     display: flex !important;
     align-items: flex-end !important;
@@ -196,6 +196,16 @@ const mobileLayout = (scope: string) => `
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+  }
+  @media (max-height: 560px) {
+    ${scope} .s10-nurse {
+      height: 80px !important;
+      max-height: 80px !important;
+    }
+    ${scope} .s10-nurse-img {
+      max-height: 80px !important;
+    }
   }
   ${scope} .s10-audio {
     position: static !important;
@@ -378,7 +388,7 @@ const SLIDE10_CSS = `
   flex: 1 1 auto;
   align-items: flex-end;
   justify-content: center;
-  width: 127px;
+  width: 155px;
   min-height: 0;
   margin-top: -6px;
   pointer-events: none;
@@ -392,6 +402,7 @@ const SLIDE10_CSS = `
   object-position: bottom center;
   user-select: none;
   -webkit-user-drag: none;
+  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
 /* 3. Audio controls — bottom-right like Slide 5 */

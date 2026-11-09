@@ -249,6 +249,7 @@ const SLIDE18_CSS = `
     margin-top: 0.35rem;
     gap: 0.6rem !important;
     flex-wrap: wrap !important;
+    order: 2 !important;
   }
   .s18-btn {
     min-height: 48px;
@@ -502,17 +503,24 @@ const SLIDE18_CSS = `
     justify-content: center !important;
     margin: 4px auto 0 auto !important;
     z-index: 25 !important;
+    order: 1 !important;
+  }
+  .s18-nav {
+    order: 2 !important;
+    margin: 4px auto 0 auto !important;
   }
 }
 
-.s18-audio {
-  position: absolute;
-  right: 22px;
-  bottom: clamp(16px, 3vh, 22px);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  z-index: 30;
+@media (min-width: 768px) {
+  .s18-audio {
+    position: absolute;
+    right: 22px;
+    bottom: clamp(16px, 3vh, 22px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 30;
+  }
 }
 `;
 

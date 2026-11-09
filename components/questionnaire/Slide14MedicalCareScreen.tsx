@@ -180,11 +180,11 @@ const SLIDE14_CSS = `
 }
 
 .s14-nurse-img {
-  height: 240px;
+  height: 270px;
   width: auto;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.1));
+  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
 /* ==========================================================
@@ -331,7 +331,7 @@ const SLIDE14_CSS = `
     padding: 0.45rem 0.65rem;
   }
   .s14-nurse-img {
-    height: 195px;
+    height: 220px;
   }
 }
 
@@ -394,10 +394,17 @@ const SLIDE14_CSS = `
     align-items: flex-end !important;
   }
   .s14-nurse-img {
-    height: clamp(68px, 11vh, 90px) !important;
-    max-height: 90px !important;
+    height: clamp(85px, 13.5vh, 110px) !important;
+    max-height: 110px !important;
     width: auto !important;
     object-fit: contain !important;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+  }
+  @media (max-height: 560px) {
+    .s14-nurse-img {
+      height: 75px !important;
+      max-height: 75px !important;
+    }
   }
   .s14-audio {
     position: static !important;

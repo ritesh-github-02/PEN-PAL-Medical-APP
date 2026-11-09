@@ -105,18 +105,28 @@ const mobileLayout = (scope: string) => `
   ${scope} .s9-nurse {
     order: 2 !important;
     width: auto !important;
-    height: clamp(65px, 10.5vh, 88px) !important;
-    max-height: 88px !important;
-    margin: 0 auto !important;
+    height: clamp(90px, 14.5vh, 128px) !important;
+    max-height: 128px !important;
+    margin: 2px auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
   }
   ${scope} .s9-nurse-img {
     height: 100% !important;
-    max-height: clamp(65px, 10.5vh, 88px) !important;
+    max-height: clamp(90px, 14.5vh, 128px) !important;
     width: auto !important;
     object-fit: contain !important;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+  }
+  @media (max-height: 560px) {
+    ${scope} .s9-nurse {
+      height: 80px !important;
+      max-height: 80px !important;
+    }
+    ${scope} .s9-nurse-img {
+      max-height: 80px !important;
+    }
   }
   ${scope} .s9-content {
     order: 1 !important;
@@ -235,8 +245,8 @@ const SLIDE9_CSS = `
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 150px;
-  height: 300px;
+  width: 175px;
+  height: 330px;
   pointer-events: none;
   user-select: none;
 }
@@ -249,6 +259,7 @@ const SLIDE9_CSS = `
   object-position: bottom center;
   user-select: none;
   -webkit-user-drag: none;
+  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
 .s9-content {

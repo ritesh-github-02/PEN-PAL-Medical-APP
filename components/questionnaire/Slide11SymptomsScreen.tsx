@@ -439,17 +439,18 @@ input.s11-other-input:focus-visible,
 }
 
 .s11-nurse {
-  width: 105px;
+  width: 125px;
   height: auto;
-  max-height: 220px;
+  max-height: 250px;
 }
 
 .s11-nurse-img {
   width: 100%;
   height: auto;
-  max-height: 220px;
+  max-height: 250px;
   object-fit: contain;
   display: block;
+  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
 /* Tablet & Smaller Screens Scaling */
@@ -459,7 +460,7 @@ input.s11-other-input:focus-visible,
   }
   .s11-top-section,
   .s11-middle {
-    max-width: 620px;
+    max-width: 630px;
     gap: 1.25rem;
   }
   .s11-card {
@@ -475,11 +476,11 @@ input.s11-other-input:focus-visible,
     font-size: 0.8rem;
   }
   .s11-nurse {
-    width: 95px;
-    max-height: 215px;
+    width: 110px;
+    max-height: 230px;
   }
   .s11-nurse-img {
-    max-height: 215px;
+    max-height: 230px;
   }
 }
 
@@ -597,8 +598,8 @@ input.s11-other-input:focus-visible,
 
   .s11-nurse {
     width: auto !important;
-    height: clamp(60px, 9.5vh, 75px) !important;
-    max-height: 75px !important;
+    height: clamp(80px, 12.5vh, 105px) !important;
+    max-height: 105px !important;
     display: flex !important;
     align-items: flex-end !important;
     justify-content: center !important;
@@ -606,9 +607,17 @@ input.s11-other-input:focus-visible,
 
   .s11-nurse-img {
     height: 100% !important;
-    max-height: clamp(60px, 9.5vh, 75px) !important;
+    max-height: clamp(80px, 12.5vh, 105px) !important;
     width: auto !important;
     object-fit: contain !important;
+    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+  }
+
+  @media (max-height: 560px) {
+    .s11-nurse {
+      height: 75px !important;
+      max-height: 75px !important;
+    }
   }
 
   .s11-audio {
