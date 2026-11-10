@@ -36,30 +36,35 @@ const BUBBLE_BEZIER_PATH =
 /**
  * Stacked layout for phones (< 768px). Declared once and reused for both
  * the media query and the explicit `variant="mobile"` mode.
+ * Matches Slide 2 mobile canvas hierarchy and spacing.
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    flex: 0 1 auto !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
+    padding: 14px 16px 12px 16px !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
   ${scope} .s3-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 380px !important;
     height: auto !important;
-    flex: 0 1 auto !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
     overflow: visible !important;
     transform: none !important;
@@ -70,41 +75,41 @@ const mobileLayout = (scope: string) => `
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
-    gap: 8px !important;
+    gap: 16px !important;
   }
   ${scope} .s3-left-col {
     position: static !important;
     width: 100% !important;
-    margin: 0 !important;
+    max-width: 340px !important;
+    margin: 0 auto !important;
     padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    text-align: center !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s3-heading {
     position: static !important;
     width: 100% !important;
-    font-size: clamp(12.5px, 1.8vh, 14.5px) !important;
-    line-height: 1.3 !important;
+    font-size: clamp(16px, 2.4vh, 18.5px) !important;
+    line-height: 1.38 !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.015em !important;
     text-align: center !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
+    color: #142724 !important;
+    border: none !important;
+    outline: none !important;
   }
-  ${scope} .s3-character-wrap {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: 100% !important;
-    height: auto !important;
-    flex: 0 1 auto !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 !important;
+  ${scope} .s3-heading:focus,
+  ${scope} .s3-heading:focus-visible {
+    outline: none !important;
   }
   ${scope} .s3-bubble {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(220px, 66vw, 275px) !important;
+    width: clamp(240px, 72vw, 290px) !important;
     aspect-ratio: 380 / 250 !important;
     height: auto !important;
     margin: 0 auto !important;
@@ -114,30 +119,46 @@ const mobileLayout = (scope: string) => `
     top: 42% !important;
     left: 48% !important;
     width: 82% !important;
-    max-width: 240px !important;
+    max-width: 250px !important;
     padding: 0 6px !important;
     box-sizing: border-box !important;
   }
   ${scope} .s3-bubble-text {
-    font-size: clamp(10.5px, 1.45vh, 12px) !important;
-    line-height: 1.34 !important;
+    font-size: clamp(12px, 1.7vh, 13.5px) !important;
+    line-height: 1.38 !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
+    text-align: center !important;
   }
   ${scope} .s3-nurse {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(55px, 14vw, 75px) !important;
-    height: clamp(80px, 12vh, 105px) !important;
-    margin-top: -14px !important;
+    width: clamp(80px, 20vw, 105px) !important;
+    height: clamp(125px, 17vh, 160px) !important;
+    margin-top: -20px !important;
     margin-left: auto !important;
-    margin-right: 14% !important;
+    margin-right: 10% !important;
   }
   ${scope} .s3-nurse-img {
     height: 100% !important;
     max-height: 100% !important;
     object-fit: contain !important;
+  }
+  /* Bottom Controls Bar: Two-tier stack matching Slide 2 canvas */
+  ${scope} .s3-bottom-bar-mobile {
+    width: 100% !important;
+    max-width: 340px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 30px !important;
+    padding-top: 10px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+    z-index: 25 !important;
   }
   ${scope} .s3-audio {
     position: static !important;
@@ -145,11 +166,15 @@ const mobileLayout = (scope: string) => `
     bottom: auto !important;
     display: flex !important;
     justify-content: center !important;
-    margin: 4px auto 0 auto !important;
+    align-items: center !important;
+    margin: 0 auto !important;
     z-index: 25 !important;
   }
-  ${scope} .slide-nav {
-    margin: 4px auto 0.15rem auto !important;
+  ${scope} .slide-nav-container {
+    margin: 0 auto !important;
+    justify-content: center !important;
+    width: 100% !important;
+    gap: 16px !important;
   }
 `;
 
@@ -188,8 +213,6 @@ const SLIDE3_CSS = `
     background-color: transparent;
   }
 
-
-
   .s3-left-col {
     position: absolute;
     left: 40px;
@@ -198,7 +221,7 @@ const SLIDE3_CSS = `
     margin: 0;
     padding: 0;
     z-index: 5;
-}
+  }
 
   .s3-heading {
     margin: 0;
@@ -222,7 +245,7 @@ const SLIDE3_CSS = `
     position: absolute;
     left: 378px;
     top: 106px;
-    width:  297px;
+    width: 297px;
     aspect-ratio: 380 / 250;
     height: auto;
     filter: drop-shadow(2.5px 3.5px 0px #1a3532);
@@ -289,8 +312,11 @@ const SLIDE3_CSS = `
     filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.08));
   }
 
-  /* Audio Player: Bottom-right like Slide 5 */
-  .s3-audio {
+  /* Desktop Layout: Bottom controls */
+  .s3-bottom-bar-mobile {
+    display: none;
+  }
+  .s3-audio-desktop {
     position: absolute;
     right: 22px;
     bottom: clamp(16px, 3vh, 22px);
@@ -299,12 +325,41 @@ const SLIDE3_CSS = `
     justify-content: flex-end;
     z-index: 30;
   }
+  .s3-nav-desktop {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: clamp(16px, 3vh, 22px);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    z-index: 25;
+  }
 
   @media (max-width: 767px) {
     ${mobileLayout(".s3-root")}
+    .s3-audio-desktop {
+      display: none !important;
+    }
+    .s3-nav-desktop {
+      display: none !important;
+    }
+    .s3-bottom-bar-mobile {
+      display: flex !important;
+    }
   }
 
   ${mobileLayout(".s3-root.is-mobile")}
+  .s3-root.is-mobile .s3-audio-desktop {
+    display: none !important;
+  }
+  .s3-root.is-mobile .s3-nav-desktop {
+    display: none !important;
+  }
+  .s3-root.is-mobile .s3-bottom-bar-mobile {
+    display: flex !important;
+  }
 
   /* Prefers-Reduced-Motion (WCAG 2.3.3) */
   @media (prefers-reduced-motion: reduce) {
@@ -468,8 +523,8 @@ export function Slide3EfficacyScreen({
         </div>
       </div>
 
-      {/* 4. Audio narration & CC controls (bottom-right like Slide 5) */}
-      <div className="s3-audio">
+      {/* 4. Desktop Audio narration & CC controls (bottom-right) */}
+      <div className="s3-audio-desktop">
         <AudioPlayer
           audioSrc={effectiveAudioSrc}
           stepId={stepId}
@@ -479,13 +534,35 @@ export function Slide3EfficacyScreen({
         />
       </div>
 
-      {/* 5. Fixed Centered Bottom Navigation (Back & Next) */}
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isEs}
-        loading={loading}
-      />
+      {/* 5. Desktop Centered Bottom Navigation (Back & Next) */}
+      <div className="s3-nav-desktop">
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
+        />
+      </div>
+
+      {/* 6. Mobile Centered Stacked Bottom Bar: Audio on top, Navigation below */}
+      <div className="s3-bottom-bar-mobile">
+        <div className="s3-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={isEs ? "es" : "en"}
+            transcriptText={captionText}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
+        />
+      </div>
     </div>
   );
 }
