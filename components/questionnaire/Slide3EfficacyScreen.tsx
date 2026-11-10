@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import AudioPlayer from "./AudioPlayer";
-import SlideNavigationButtons from "./SlideNavigationButtons";
-import { resolveMedicineToken } from "@/lib/token-engine";
 
+// ============================================================================
+// Types & Interfaces
+// ============================================================================
 export interface Slide3EfficacyScreenProps {
   isSpanish?: boolean;
   medicationName?: string;
@@ -18,10 +18,419 @@ export interface Slide3EfficacyScreenProps {
   transcriptText?: string;
 }
 
+export interface AudioPlayerProps {
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
+  size?: "small" | "medium" | "large";
+  onAudioToggle?: (playing: boolean) => void;
+  onCaptionsToggle?: (showing: boolean) => void;
+  className?: string;
+}
+
+export interface SlideNavigationButtonsProps {
+  onBack?: () => void;
+  onNext?: () => void;
+  isSpanish?: boolean;
+  loading?: boolean;
+  nextDisabled?: boolean;
+  variant?: string;
+  className?: string;
+}
+
+// ============================================================================
+// Helper: Medicine Token Resolution
+// ============================================================================
+function resolveMedicineToken(
+  text: string,
+  medicationName?: string,
+  isSpanish?: boolean
+): string {
+  const medicine =
+    medicationName && medicationName.trim()
+      ? medicationName
+      : isSpanish
+        ? "la amoxicilina"
+        : "amoxicillin";
+  return text.replace(/name /g, medicine);
+}
+
+// ============================================================================
+// Subcomponent 1: Self-contained AudioPlayer (Play/Pause & Closed Captions)
+// ============================================================================
+function InternalAudioPlayer({
+  audioSrc,
+  stepId,
+  locale = "en",
+  transcriptText,
+  size = "large",
+  onAudioToggle,
+  onCaptionsToggle,
+  className = "",
+}: AudioPlayerProps) {
+  const isSpanish = locale === "es";
+
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [showCaptions, setShowCaptions] = useState<boolean>(false);
+  const [liveAnnouncement, setLiveAnnouncement] = useState<string>("");
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Stop audio on unmount or slide change
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [stepId]);
+
+  // Dismiss captions on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showCaptions) {
+        e.preventDefault();
+        setShowCaptions(false);
+        onCaptionsToggle?.(false);
+        setLiveAnnouncement(
+          isSpanish ? "Subtítulos ocultados" : "Closed captions hidden"
+        );
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showCaptions, isSpanish, onCaptionsToggle]);
+
+  const toggleCaptions = () => {
+    const next = !showCaptions;
+    setShowCaptions(next);
+    onCaptionsToggle?.(next);
+    setLiveAnnouncement(
+      next
+        ? isSpanish
+          ? "Subtítulos mostrados"
+          : "Closed captions displayed"
+        : isSpanish
+          ? "Subtítulos ocultados"
+          : "Closed captions hidden"
+    );
+  };
+
+  const toggleAudio = () => {
+    const next = !isPlaying;
+
+    if (!next) {
+      if (audioRef.current && !audioRef.current.paused) {
+        audioRef.current.pause();
+      }
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setIsPlaying(false);
+      onAudioToggle?.(false);
+      setLiveAnnouncement(
+        isSpanish ? "Narración de audio en pausa" : "Audio narration paused"
+      );
+      return;
+    }
+
+    if (audioSrc && audioRef.current) {
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          onAudioToggle?.(true);
+          setLiveAnnouncement(
+            isSpanish
+              ? "Narración de audio en reproducción"
+              : "Audio narration playing"
+          );
+        })
+        .catch(() => {
+          fallbackSpeechSynthesis();
+        });
+    } else {
+      fallbackSpeechSynthesis();
+    }
+  };
+
+  const fallbackSpeechSynthesis = () => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const textToRead = transcriptText || "";
+      const utterance = new SpeechSynthesisUtterance(textToRead);
+      utterance.lang = isSpanish ? "es-ES" : "en-US";
+      utterance.rate = 0.95;
+
+      utterance.onstart = () => {
+        setIsPlaying(true);
+        onAudioToggle?.(true);
+        setLiveAnnouncement(
+          isSpanish
+            ? "Narración de audio en reproducción"
+            : "Audio narration playing"
+        );
+      };
+
+      utterance.onend = () => {
+        setIsPlaying(false);
+        onAudioToggle?.(false);
+      };
+
+      utterance.onerror = () => {
+        setIsPlaying(false);
+        onAudioToggle?.(false);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } else {
+      setIsPlaying(false);
+    }
+  };
+
+  const buttonSizeClass =
+    size === "large" ? "min-w-[52px] min-h-[50px]" : "min-w-[46px] min-h-[46px]";
+
+  return (
+    <div className={`relative flex flex-col items-end ${className}`}>
+      {/* HTML5 Audio Element */}
+      {audioSrc && (
+        <audio
+          ref={audioRef}
+          src={audioSrc}
+          onEnded={() => {
+            setIsPlaying(false);
+            onAudioToggle?.(false);
+          }}
+          className="hidden"
+          preload="metadata"
+        />
+      )}
+
+      {/* Screen Reader Live Status Region */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {liveAnnouncement}
+      </div>
+
+      {/* Closed Captions Panel */}
+      {showCaptions && transcriptText && (
+        <div
+          role="region"
+          aria-label={isSpanish ? "Subtítulos de narración" : "Audio narration captions"}
+          className="mb-2 max-w-sm sm:max-w-md bg-[#143833] text-white p-3 rounded-xl shadow-xl border border-[#bddfd8] text-xs sm:text-sm font-medium leading-relaxed flex items-start gap-2.5 z-30 animate-fadeIn"
+        >
+          <span
+            aria-hidden="true"
+            className="bg-[#fdee8e] text-[#1a2624] font-extrabold text-[10px] sm:text-xs px-1.5 py-0.5 rounded flex-shrink-0 uppercase tracking-wider"
+          >
+            CC
+          </span>
+          <p className="m-0 text-slate-100 flex-1">{transcriptText}</p>
+        </div>
+      )}
+
+      {/* Audio Controls Bar */}
+      <div
+        className="flex items-center gap-1.5 sm:gap-2"
+        role="toolbar"
+        aria-label={isSpanish ? "Controles de audio" : "Media controls"}
+      >
+        {/* Closed Captions Button */}
+        <button
+          type="button"
+          onClick={toggleCaptions}
+          aria-pressed={showCaptions}
+          aria-label={
+            showCaptions
+              ? isSpanish
+                ? "Ocultar subtítulos"
+                : "Hide closed captions"
+              : isSpanish
+                ? "Mostrar subtítulos"
+                : "Show closed captions"
+          }
+          title={
+            showCaptions
+              ? isSpanish
+                ? "Ocultar subtítulos"
+                : "Hide closed captions"
+              : isSpanish
+                ? "Mostrar subtítulos"
+                : "Show closed captions"
+          }
+          className={`${buttonSizeClass} p-1 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#143833] focus-visible:ring-offset-2 active:scale-95`}
+        >
+          <svg
+            width="42"
+            height="36"
+            viewBox="0 0 52 47"
+            fill="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <rect
+              x="2"
+              y="2"
+              width="48"
+              height="43"
+              rx="10"
+              fill={showCaptions ? "#144e57" : "#e6f4f1"}
+              stroke="#144e57"
+              strokeWidth="2.5"
+            />
+            <text
+              x="26"
+              y="28"
+              textAnchor="middle"
+              fill={showCaptions ? "#ffffff" : "#144e57"}
+              fontSize="18"
+              fontFamily="Plus Jakarta Sans, sans-serif"
+              fontWeight="800"
+              letterSpacing="1"
+              aria-hidden="true"
+            >
+              CC
+            </text>
+          </svg>
+        </button>
+
+        {/* Play/Pause Button */}
+        <button
+          type="button"
+          onClick={toggleAudio}
+          aria-pressed={isPlaying}
+          aria-label={
+            isPlaying
+              ? isSpanish
+                ? "Pausar narración de audio"
+                : "Pause audio narration"
+              : isSpanish
+                ? "Reproducir narración de audio"
+                : "Play audio narration"
+          }
+          title={
+            isPlaying
+              ? isSpanish
+                ? "Pausar narración de audio"
+                : "Pause audio narration"
+              : isSpanish
+                ? "Reproducir narración de audio"
+                : "Play audio narration"
+          }
+          className={`${buttonSizeClass} p-1 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#143833] focus-visible:ring-offset-2 active:scale-95`}
+        >
+          {isPlaying ? (
+            <svg
+              width="54"
+              height="36"
+              viewBox="0 0 70 47"
+              fill="none"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <rect
+                x="2"
+                y="2"
+                width="66"
+                height="43"
+                rx="10"
+                fill="#144e57"
+                stroke="#144e57"
+                strokeWidth="2.5"
+              />
+              <rect x="25" y="14" width="6" height="19" rx="2" fill="#ffffff" />
+              <rect x="39" y="14" width="6" height="19" rx="2" fill="#ffffff" />
+            </svg>
+          ) : (
+            <svg
+              width="54"
+              height="36"
+              viewBox="0 0 70 47"
+              fill="none"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <rect
+                x="2"
+                y="2"
+                width="66"
+                height="43"
+                rx="10"
+                fill="#e6f4f1"
+                stroke="#144e57"
+                strokeWidth="2.5"
+              />
+              <polygon points="28,14 46,23.5 28,33" fill="#144e57" />
+            </svg>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Subcomponent 2: Self-contained SlideNavigationButtons (Back & Next)
+// ============================================================================
+function InternalSlideNavigationButtons({
+  onBack,
+  onNext,
+  isSpanish,
+  loading = false,
+  nextDisabled = false,
+  className = "",
+}: SlideNavigationButtonsProps) {
+  return (
+    <nav className={`slide-nav-container ${className}`} aria-label="Slide navigation">
+      <button
+        type="button"
+        className="slide-nav-btn slide-nav-btn--back"
+        onClick={onBack}
+        aria-label={isSpanish ? "Ir a la diapositiva anterior" : "Go to previous slide"}
+      >
+        {isSpanish ? "Atrás" : "Back"}
+      </button>
+
+      <button
+        type="button"
+        className="slide-nav-btn slide-nav-btn--next"
+        onClick={onNext}
+        disabled={loading || nextDisabled}
+        aria-label={
+          loading
+            ? isSpanish
+              ? "Cargando siguiente diapositiva"
+              : "Loading next slide"
+            : isSpanish
+              ? "Ir a la siguiente diapositiva"
+              : "Go to next slide"
+        }
+      >
+        {loading ? (
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-4 h-4 border-2 border-slate-700 border-t-transparent rounded-full animate-spin" />
+            <span>{isSpanish ? "Cargando..." : "Loading..."}</span>
+          </span>
+        ) : isSpanish ? (
+          "Siguiente"
+        ) : (
+          "Next"
+        )}
+      </button>
+    </nav>
+  );
+}
+
+// ============================================================================
+// Constants & Vectors
+// ============================================================================
 const STAGE_W = 750;
 const STAGE_H = 530;
 
-/** Speech-bubble smooth curved Bezier artwork pointing down-right toward Nurse Anna. */
 const BUBBLE_BEZIER_PATH =
   "M 182.5 12 " +
   "C 275 12, 350 52, 350 101 " +
@@ -33,11 +442,9 @@ const BUBBLE_BEZIER_PATH =
   "C 15 52, 90 12, 182.5 12 " +
   "Z";
 
-/**
- * Stacked layout for phones (< 768px). Declared once and reused for both
- * the media query and the explicit `variant="mobile"` mode.
- * Matches Slide 2 mobile canvas hierarchy and spacing.
- */
+// ============================================================================
+// Responsive Styles
+// ============================================================================
 const mobileLayout = (scope: string) => `
   ${scope} {
     overflow-y: auto !important;
@@ -81,7 +488,7 @@ const mobileLayout = (scope: string) => `
     position: static !important;
     width: 100% !important;
     max-width: 340px !important;
-    margin: 0 auto !important;
+    margin: 18px auto 0 auto !important;
     padding: 0 !important;
     display: flex !important;
     justify-content: center !important;
@@ -109,7 +516,7 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(240px, 72vw, 290px) !important;
+    width: clamp(255px, 76vw, 305px) !important;
     aspect-ratio: 380 / 250 !important;
     height: auto !important;
     margin: 0 auto !important;
@@ -119,12 +526,12 @@ const mobileLayout = (scope: string) => `
     top: 42% !important;
     left: 48% !important;
     width: 82% !important;
-    max-width: 250px !important;
-    padding: 0 6px !important;
+    max-width: 255px !important;
+    padding: 0 4px !important;
     box-sizing: border-box !important;
   }
   ${scope} .s3-bubble-text {
-    font-size: clamp(12px, 1.7vh, 13.5px) !important;
+    font-size: clamp(13px, 1.85vh, 14.5px) !important;
     line-height: 1.38 !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
@@ -145,16 +552,16 @@ const mobileLayout = (scope: string) => `
     max-height: 100% !important;
     object-fit: contain !important;
   }
-  /* Bottom Controls Bar: Two-tier stack matching Slide 2 canvas */
+  /* Two-tier bottom bar with generous separation */
   ${scope} .s3-bottom-bar-mobile {
     width: 100% !important;
-    max-width: 340px !important;
+    max-width: 360px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 30px !important;
-    padding-top: 10px !important;
+    gap: 26px !important;
+    padding-top: 8px !important;
     padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
@@ -176,12 +583,13 @@ const mobileLayout = (scope: string) => `
     width: 100% !important;
     gap: 16px !important;
   }
+  ${scope} .slide-nav-btn {
+    min-width: 128px !important;
+    padding: 0 32px !important;
+  }
 `;
 
 const SLIDE3_CSS = `
-  /* ------------------------------------------------------------
-     WCAG 2.1 / 2.2 Level AAA Accessibility & Stage Layout
-     ------------------------------------------------------------ */
   .s3-root,
   .s3-root *,
   .s3-root *::before,
@@ -216,7 +624,7 @@ const SLIDE3_CSS = `
   .s3-left-col {
     position: absolute;
     left: 40px;
-    top: 33px;
+    top: 42px;
     width: 440px;
     margin: 0;
     padding: 0;
@@ -240,12 +648,12 @@ const SLIDE3_CSS = `
     border-radius: 4px;
   }
 
-  /* 2. Speech Bubble (Oval with tail pointing down-right toward Nurse Anna) */
+  /* Speech Bubble */
   .s3-bubble {
     position: absolute;
     left: 378px;
     top: 106px;
-    width: 297px;
+    width: 308px;
     aspect-ratio: 380 / 250;
     height: auto;
     filter: drop-shadow(2.5px 3.5px 0px #1a3532);
@@ -267,8 +675,8 @@ const SLIDE3_CSS = `
     top: 40%;
     left: 48%;
     transform: translate(-50%, -50%);
-    width: 76%;
-    max-width: 220px;
+    width: 78%;
+    max-width: 235px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -280,7 +688,7 @@ const SLIDE3_CSS = `
   .s3-bubble-text {
     margin: 0;
     padding: 0;
-    font-size: 13px;
+    font-size: 14.5px;
     line-height: 1.45;
     font-weight: 600;
     color: #142724;
@@ -288,7 +696,7 @@ const SLIDE3_CSS = `
     letter-spacing: -0.01em;
   }
 
-  /* 3. Nurse Anna standing on Right under bubble tail */
+  /* Nurse Anna */
   .s3-nurse {
     position: absolute;
     left: 585px;
@@ -310,6 +718,76 @@ const SLIDE3_CSS = `
     object-fit: contain;
     display: block;
     filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.08));
+  }
+
+  /* Navigation Buttons */
+  .slide-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 30;
+  }
+
+  .slide-nav-btn {
+    min-height: 48px;
+    height: 48px;
+    min-width: 124px;
+    padding: 0 32px;
+    border-radius: 9999px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .slide-nav-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.14);
+  }
+
+  .slide-nav-btn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .slide-nav-btn:focus-visible {
+    outline: 3px solid #143833 !important;
+    outline-offset: 3px !important;
+  }
+
+  .slide-nav-btn--back {
+    background-color: #bddfd8;
+    border-color: #78a59b;
+    color: #11332e;
+  }
+  .slide-nav-btn--back:hover:not(:disabled) {
+    background-color: #a8d5cc;
+  }
+
+  .slide-nav-btn--next {
+    background-color: #fdee8e;
+    border-color: #c8b746;
+    color: #1a2624;
+  }
+  .slide-nav-btn--next:hover:not(:disabled) {
+    background-color: #f5e478;
+  }
+
+  .slide-nav-btn:disabled,
+  .slide-nav-btn--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
   }
 
   /* Desktop Layout: Bottom controls */
@@ -361,7 +839,7 @@ const SLIDE3_CSS = `
     display: flex !important;
   }
 
-  /* Prefers-Reduced-Motion (WCAG 2.3.3) */
+  /* Accessibility: Prefers-Reduced-Motion */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.001ms !important;
@@ -371,6 +849,9 @@ const SLIDE3_CSS = `
   }
 `;
 
+// ============================================================================
+// Main Component: Slide3EfficacyScreen
+// ============================================================================
 export function Slide3EfficacyScreen({
   isSpanish = false,
   medicationName,
@@ -424,11 +905,12 @@ export function Slide3EfficacyScreen({
     };
   }, [variant]);
 
-  const rawMed = medicationName && medicationName.trim()
-    ? medicationName.trim()
-    : isEs
-      ? "la amoxicilina"
-      : "amoxicillin";
+  const rawMed =
+    medicationName && medicationName.trim()
+      ? medicationName.trim()
+      : isEs
+        ? "la amoxicilina"
+        : "amoxicillin";
 
   const rawHeadingEn = `Many kids have had [name] because it's the best for treating common ear, sinus and throat infections. It is also one of the best antibiotics in adults, too.`;
   const rawHeadingEs = `Muchos niños han tomado [name] porque es el mejor para tratar infecciones comunes de oído, senos paranasales y garganta. También es uno de los mejores antibióticos para adultos.`;
@@ -447,7 +929,8 @@ export function Slide3EfficacyScreen({
       ? "/audio/exported/slide3_efficacy_es.mp3"
       : "/audio/exported/slide3_efficacy_en.mp3");
 
-  const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
     <div
@@ -461,9 +944,9 @@ export function Slide3EfficacyScreen({
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE3_CSS }} />
 
-      {/* Scaled stage container (Seamless with tablet frame — no double card borders/shadows) */}
+      {/* Scaled stage container */}
       <div className="s3-stage" style={{ transform: `scale(${scale})` }}>
-        {/* 1. Left Column: Statement Heading */}
+        {/* 1. Statement Heading */}
         <div className="s3-left-col">
           <h1
             ref={headingRef}
@@ -475,7 +958,7 @@ export function Slide3EfficacyScreen({
           </h1>
         </div>
 
-        {/* 2. Speech Bubble pointing down-right toward Nurse Anna */}
+        {/* 2. Speech Bubble */}
         <figure
           className="s3-bubble"
           role="group"
@@ -506,13 +989,11 @@ export function Slide3EfficacyScreen({
           </svg>
 
           <div className="s3-bubble-text-wrap">
-            <blockquote className="s3-bubble-text">
-              {bubbleText}
-            </blockquote>
+            <blockquote className="s3-bubble-text">{bubbleText}</blockquote>
           </div>
         </figure>
 
-        {/* 3. Nurse Anna standing on Right under bubble tail */}
+        {/* 3. Nurse Anna */}
         <div className="s3-nurse" aria-hidden="true">
           <img
             src="/images/nurse-anna.png"
@@ -523,9 +1004,9 @@ export function Slide3EfficacyScreen({
         </div>
       </div>
 
-      {/* 4. Desktop Audio narration & CC controls (bottom-right) */}
+      {/* 4. Desktop Audio narration & CC controls */}
       <div className="s3-audio-desktop">
-        <AudioPlayer
+        <InternalAudioPlayer
           audioSrc={effectiveAudioSrc}
           stepId={stepId}
           locale={isEs ? "es" : "en"}
@@ -534,9 +1015,9 @@ export function Slide3EfficacyScreen({
         />
       </div>
 
-      {/* 5. Desktop Centered Bottom Navigation (Back & Next) */}
+      {/* 5. Desktop Centered Navigation */}
       <div className="s3-nav-desktop">
-        <SlideNavigationButtons
+        <InternalSlideNavigationButtons
           onBack={onBack}
           onNext={onNext}
           isSpanish={isEs}
@@ -544,10 +1025,10 @@ export function Slide3EfficacyScreen({
         />
       </div>
 
-      {/* 6. Mobile Centered Stacked Bottom Bar: Audio on top, Navigation below */}
+      {/* 6. Mobile Centered Stacked Bottom Bar */}
       <div className="s3-bottom-bar-mobile">
         <div className="s3-audio">
-          <AudioPlayer
+          <InternalAudioPlayer
             audioSrc={effectiveAudioSrc}
             stepId={stepId}
             locale={isEs ? "es" : "en"}
@@ -556,7 +1037,7 @@ export function Slide3EfficacyScreen({
           />
         </div>
 
-        <SlideNavigationButtons
+        <InternalSlideNavigationButtons
           onBack={onBack}
           onNext={onNext}
           isSpanish={isEs}
@@ -568,3 +1049,5 @@ export function Slide3EfficacyScreen({
 }
 
 export default Slide3EfficacyScreen;
+
+
