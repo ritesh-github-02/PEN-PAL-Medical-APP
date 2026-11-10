@@ -388,7 +388,7 @@ const SLIDE10_CSS = `
   flex: 1 1 auto;
   align-items: flex-end;
   justify-content: center;
-  width: 155px;
+  width: 118px;
   min-height: 0;
   margin-top: -6px;
   pointer-events: none;

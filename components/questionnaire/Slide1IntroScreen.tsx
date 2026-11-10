@@ -125,85 +125,137 @@ const SLIDE1_COMPONENT_CSS = `
 
   /* -------------------------------------------------------------
      Mobile Layout (.is-mobile or screen width < 768px)
+     - Content scaled up generously to fill modern tall phone screens
+     - Clear vertical breathing room, centered illustration & bold copy
+     - Seamless mobile controls toolbar
      ------------------------------------------------------------- */
   @media (max-width: 767px) {
     .s1-component-root {
-      overflow: visible !important;
-      height: auto !important;
-      max-height: calc(100dvh - 80px) !important;
-      min-height: 0 !important;
-      flex: 0 1 auto !important;
-      padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-      justify-content: center !important;
-      gap: 12px !important;
+      overflow-y: auto !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 100% !important;
+      flex: 1 1 auto !important;
+      padding: clamp(16px, 3.5vh, 28px) clamp(16px, 5vw, 24px) clamp(16px, 3vh, 24px) clamp(16px, 5vw, 24px) !important;
+      justify-content: space-between !important;
+      box-sizing: border-box !important;
     }
     .s1-content-container {
+      flex: 1 1 auto !important;
       flex-direction: column !important;
       align-items: center !important;
       text-align: center !important;
       justify-content: center !important;
-      gap: 8px !important;
+      gap: 0 !important;
+      width: 100% !important;
+      max-width: 420px !important;
+      margin: auto !important;
+      padding: 0 !important;
     }
-    .s1-nurse-col {
+    .s1-header-group {
       order: -1 !important;
-      margin: 0 auto 2px auto !important;
-    }
-    .s1-nurse-col img {
-      max-height: clamp(80px, 14vh, 115px) !important;
-      width: auto !important;
-    }
-    .s1-left-col {
+      display: flex !important;
+      flex-direction: column !important;
       align-items: center !important;
       text-align: center !important;
-      max-width: 100% !important;
-      gap: 6px !important;
+      gap: 4px !important;
+      width: 100% !important;
+      margin-bottom: clamp(14px, 2.5vh, 22px) !important;
+    }
+    .s1-nurse-col {
+      order: 0 !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
+    }
+    .s1-nurse-col img {
+      max-height: clamp(155px, 24vh, 220px) !important;
+      width: auto !important;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12)) !important;
+    }
+    .s1-left-col {
+      display: contents !important;
     }
     .s1-title {
-      font-size: clamp(1.8rem, 6vh, 2.2rem) !important;
-      line-height: 1.1 !important;
+      font-size: clamp(3.8rem, 14vw, 5.2rem) !important;
+      line-height: 0.98 !important;
       white-space: nowrap !important;
+      letter-spacing: -0.03em !important;
+      text-align: center !important;
+      margin: 0 !important;
     }
     .s1-subtitle {
-      font-size: clamp(0.85rem, 2.2vh, 0.95rem) !important;
-      margin-top: 2px !important;
+      font-size: clamp(1.25rem, 4.6vw, 1.6rem) !important;
+      line-height: 1.25 !important;
+      margin-top: 6px !important;
+      max-width: 380px !important;
+      color: #143e3b !important;
+      text-align: center !important;
     }
     .s1-copy {
-      font-size: clamp(0.8rem, 2vh, 0.9rem) !important;
-      line-height: 1.35 !important;
-      margin: 0 auto !important;
-      max-width: 290px !important;
+      order: 1 !important;
+      font-size: clamp(1rem, 3.8vw, 1.15rem) !important;
+      line-height: 1.45 !important;
+      margin-top: clamp(14px, 2.4vh, 22px) !important;
+      margin-bottom: 0 !important;
+      max-width: 340px !important;
+      color: #143833 !important;
+      text-align: center !important;
     }
     .s1-btn-start {
-      min-height: 48px !important;
-      height: 48px !important;
-      min-width: 140px !important;
-      font-size: 16px !important;
-      font-weight: 700 !important;
-      padding: 0 24px !important;
+      min-height: 52px !important;
+      height: 52px !important;
+      min-width: 180px !important;
+      font-size: 18px !important;
+      font-weight: 800 !important;
+      padding: 0 36px !important;
       border-radius: 9999px !important;
+      box-shadow: 0 4px 12px rgba(18, 64, 61, 0.18) !important;
     }
     .s1-desktop-start {
       display: none !important;
     }
     .s1-mobile-nav {
       display: flex !important;
-      order: 2 !important;
-      margin: 4px auto 0.15rem auto !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 320px !important;
+      margin: clamp(14px, 2.5vh, 24px) auto 0 auto !important;
+      gap: 12px !important;
+    }
+    .s1-mobile-nav .s1-audio-wrapper {
+      width: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-bottom: 2px !important;
+    }
+    .s1-mobile-nav .s1-btn-start {
+      width: 100% !important;
+      max-width: 260px !important;
+    }
+    .s1-audio-desktop {
+      display: none !important;
     }
   }
 
   .s1-component-root.is-mobile .s1-desktop-start {
     display: none !important;
   }
+  .s1-component-root.is-mobile .s1-audio-desktop {
+    display: none !important;
+  }
   .s1-component-root.is-mobile .s1-mobile-nav {
     display: flex !important;
-    order: 2 !important;
-    margin: 4px auto 0.15rem auto !important;
   }
 
   @media (min-width: 768px) {
     .s1-component-root:not(.is-mobile) .s1-desktop-start {
       display: block !important;
+    }
+    .s1-component-root:not(.is-mobile) .s1-audio-desktop {
+      display: flex !important;
     }
     .s1-component-root:not(.is-mobile) .s1-mobile-nav {
       display: none !important;
@@ -302,7 +354,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
       <div className="s1-content-container">
         {/* Left Column: Heading, Subtitle, Copy, and CTA Button */}
         <div className="s1-left-col">
-          <div>
+          <div className="s1-header-group">
             {/* Golden-Yellow Title with Dark Teal Stroke & Drop Shadow (Level AAA Contrast > 9.5:1) */}
             <h1
               id="slide1-primary-heading"
@@ -355,9 +407,9 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
         </div>
       </div>
 
-      {/* Audio (CC & Play/Pause) Controls */}
+      {/* Audio (CC & Play/Pause) Controls - Desktop only */}
       <footer
-        className="s1-audio absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-30 flex items-center"
+        className="s1-audio-desktop absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-30 flex items-center"
         role="toolbar"
         aria-label={isSpanish ? "Controles de audio y subtítulos" : "Slide audio and caption controls"}
       >
@@ -370,8 +422,18 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
         />
       </footer>
 
-      {/* Mobile "Get Started!" Action Button (Placed directly below Audio Controls on mobile) */}
-      <div className="s1-mobile-nav flex justify-center items-center w-full z-30">
+      {/* Mobile Action & Audio Controls Toolbar: Audio on top, Get Started below */}
+      <div className="s1-mobile-nav z-30">
+        <div className="s1-audio-wrapper">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={isSpanish ? "es" : "en"}
+            transcriptText={effectiveTranscript}
+            size="large"
+          />
+        </div>
+
         <button
           type="button"
           onClick={handleStart}
@@ -391,3 +453,4 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
 });
 
 export default Slide1IntroScreen;
+
