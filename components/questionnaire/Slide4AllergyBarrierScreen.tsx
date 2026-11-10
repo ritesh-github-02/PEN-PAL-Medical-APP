@@ -51,7 +51,7 @@ const mobileLayout = (scope: string) => `
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
     align-items: center !important;
     padding: 14px 16px 12px 16px !important;
     gap: 10px !important;
@@ -73,7 +73,7 @@ const mobileLayout = (scope: string) => `
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
@@ -85,11 +85,11 @@ const mobileLayout = (scope: string) => `
     left: auto !important;
     top: auto !important;
     transform: none !important;
-    width: clamp(285px, 84vw, 345px) !important;
-    max-width: 345px !important;
+    width: clamp(285px, 88vw, 360px) !important;
+    max-width: 360px !important;
     aspect-ratio: 380 / 250 !important;
     height: auto !important;
-    margin: 14px auto 0 auto !important;
+    margin: 20px auto 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
     pointer-events: none !important;
@@ -145,7 +145,7 @@ const mobileLayout = (scope: string) => `
     left: auto !important;
     top: auto !important;
     width: clamp(90px, 23vw, 120px) !important;
-    height: clamp(140px, 19vh, 180px) !important;
+    height: clamp(140px, 22vh, 200px) !important;
     margin-top: 4px !important;
     margin-left: auto !important;
     margin-right: 6% !important;
@@ -154,6 +154,7 @@ const mobileLayout = (scope: string) => `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s4-nurse-img {
     width: 100% !important;
@@ -169,10 +170,10 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 26px !important;
+    gap: 16px !important;
     padding-top: 8px !important;
     padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-    margin: 0 auto !important;
+    margin: auto auto 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
   }
