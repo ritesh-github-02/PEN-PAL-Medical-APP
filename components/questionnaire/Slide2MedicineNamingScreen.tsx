@@ -19,8 +19,8 @@ export interface Slide2MedicineNamingScreenProps {
 
 export const MEDICINE_OPTIONS_DISPLAY = [
  { value: "Penicillin", labelEn: "Penicillin", labelEs: "Penicilina" },
- { value: "Pink medicine", labelEn: "“Pink medicine”", labelEs: "“Medicina rosa”" },
  { value: "Amoxicillin", labelEn: "Amoxicillin", labelEs: "Amoxicilina" },
+ { value: "Pink medicine", labelEn: "“Pink medicine”", labelEs: "“Medicina rosa”" },
  { value: "Amoxicillin Clavulanate", labelEn: "Amoxicillin Clavulanate", labelEs: "Amoxicilina Clavulanato" },
  { value: "Augmentin", labelEn: "Augmentin", labelEs: "Augmentin" },
 ];

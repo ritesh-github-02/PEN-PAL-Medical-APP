@@ -5,8 +5,8 @@
 
 export const MEDICINE_OPTIONS = [
   { value: "Penicillin", labelEn: "Penicillin", labelEs: "Penicilina" },
-  { value: "Pink medicine", labelEn: '"Pink medicine"', labelEs: '"Medicina rosa"' },
   { value: "Amoxicillin", labelEn: "Amoxicillin", labelEs: "Amoxicilina" },
+  { value: "Pink medicine", labelEn: '"Pink medicine"', labelEs: '"Medicina rosa"' },
   { value: "Amoxicillin Clavulanate", labelEn: "Amoxicillin Clavulanate", labelEs: "Amoxicilina clavulanato" },
   { value: "Augmentin", labelEn: "Augmentin", labelEs: "Augmentin" },
 ] as const;
