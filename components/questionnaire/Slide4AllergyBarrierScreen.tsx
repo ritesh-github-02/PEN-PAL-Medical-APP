@@ -28,13 +28,13 @@ const BUBBLE_PATH_LEFT =
   "C 230 278, 160 262, 125 242 Z";
 
 /* Dedicated Smooth Curved Silhouette for Mobile Portrait (Tail pointing downward toward Nurse Anna)
-   Has a wide, symmetrical oval bulb (viewBox 0 0 380 250) providing maximum internal volume */
+   Tail tip at (312, 230), cleanly reaching toward Nurse Anna without penetrating her head */
 const BUBBLE_PATH_MOBILE =
   "M 190 12 " +
   "C 285 12, 362 52, 362 101 " +
   "C 362 138, 330 168, 278 180 " +
-  "C 295 198, 315 222, 322 244 " +
-  "C 300 226, 268 206, 230 188 " +
+  "C 292 195, 306 214, 312 230 " +
+  "C 292 216, 264 200, 230 188 " +
   "C 217 189.5, 203 190, 190 190 " +
   "C 95 190, 18 150, 18 101 " +
   "C 18 52, 95 12, 190 12 " +
@@ -146,7 +146,9 @@ const mobileLayout = (scope: string) => `
     top: auto !important;
     width: clamp(90px, 23vw, 120px) !important;
     height: clamp(140px, 19vh, 180px) !important;
-    margin: -18px 8% 0 auto !important;
+    margin-top: 4px !important;
+    margin-left: auto !important;
+    margin-right: 6% !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
