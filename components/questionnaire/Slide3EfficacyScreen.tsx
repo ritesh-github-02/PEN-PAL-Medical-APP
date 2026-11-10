@@ -199,9 +199,6 @@ function InternalAudioPlayer({
     }
   };
 
-  const buttonSizeClass =
-    size === "large" ? "min-w-[52px] min-h-[50px]" : "min-w-[46px] min-h-[46px]";
-
   return (
     <div className={`relative flex flex-col items-end ${className}`}>
       {/* HTML5 Audio Element */}
@@ -242,9 +239,10 @@ function InternalAudioPlayer({
 
       {/* Audio Controls Bar */}
       <div
-        className="flex items-center gap-1.5 sm:gap-2"
+        className="flex items-center gap-2"
         role="toolbar"
         aria-label={isSpanish ? "Controles de audio" : "Media controls"}
+        style={{ color: "#144e57" }}
       >
         {/* Closed Captions Button */}
         <button
@@ -269,7 +267,7 @@ function InternalAudioPlayer({
                 ? "Mostrar subtítulos"
                 : "Show closed captions"
           }
-          className={`${buttonSizeClass} p-1 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#143833] focus-visible:ring-offset-2 active:scale-95`}
+          className="s3-audio-btn"
         >
           <svg
             width="40"
@@ -327,7 +325,7 @@ function InternalAudioPlayer({
                 ? "Reproducir narración de audio"
                 : "Play audio narration"
           }
-          className={`${buttonSizeClass} p-1 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#143833] focus-visible:ring-offset-2 active:scale-95`}
+          className="s3-audio-btn"
         >
           {isPlaying ? (
             <svg
@@ -618,6 +616,34 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     margin: 0 auto !important;
     z-index: 25 !important;
+    color: #144e57 !important;
+  }
+  ${scope} .s3-audio-btn {
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #144e57 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 8px !important;
+    transition: transform 0.12s ease, opacity 0.15s ease !important;
+  }
+  ${scope} .s3-audio-btn:hover {
+    transform: scale(1.08) !important;
+    opacity: 0.85 !important;
+  }
+  ${scope} .s3-audio-btn svg {
+    height: 28px !important;
+    width: auto !important;
+    transition: transform 0.12s ease !important;
+  }
+  ${scope} .s3-audio-btn:hover svg,
+  ${scope} .s3-audio-btn:active svg {
+    transform: scale(0.96) !important;
   }
   ${scope} .slide-nav,
   ${scope} .slide-nav-container {
@@ -848,6 +874,25 @@ const SLIDE3_CSS = `
     align-items: center;
     justify-content: flex-end;
     z-index: 30;
+    color: #144e57;
+  }
+  .s3-audio-desktop .s3-audio-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #144e57;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 8px;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+  }
+  .s3-audio-desktop .s3-audio-btn svg {
+    height: 28px !important;
+    width: auto !important;
   }
   .s3-nav-desktop {
     display: flex;
