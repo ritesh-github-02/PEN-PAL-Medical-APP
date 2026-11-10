@@ -2,6 +2,8 @@
 
 import React, { useState, useRef, useEffect } from "react";
 
+import { resolveMedicineToken as engineResolveMedicineToken } from "@/lib/token-engine";
+
 // ============================================================================
 // Types & Interfaces
 // ============================================================================
@@ -49,11 +51,16 @@ function resolveMedicineToken(
 ): string {
   const medicine =
     medicationName && medicationName.trim()
-      ? medicationName
+      ? medicationName.trim()
       : isSpanish
         ? "la amoxicilina"
         : "amoxicillin";
-  return text.replace(/name /g, medicine);
+
+  return engineResolveMedicineToken(text, medicine, isSpanish)
+    .replace(/\[\s*name\s*\]/gi, medicine)
+    .replace(/\[name\]/gi, medicine)
+    .replace(/\[Name\]/g, medicine)
+    .replace(/name /g, medicine);
 }
 
 // ============================================================================
@@ -385,7 +392,7 @@ function InternalSlideNavigationButtons({
   className = "",
 }: SlideNavigationButtonsProps) {
   return (
-    <nav className={`slide-nav-container ${className}`} aria-label="Slide navigation">
+    <nav className={`slide-nav slide-nav-container ${className}`} aria-label="Slide navigation">
       <button
         type="button"
         className="slide-nav-btn slide-nav-btn--back"
@@ -560,26 +567,34 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 26px !important;
-    padding-top: 8px !important;
+    gap: clamp(10px, 1.8vh, 16px) !important;
+    padding-top: 6px !important;
     padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
   }
   ${scope} .s3-audio {
+    order: 1 !important;
     position: static !important;
     right: auto !important;
     bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     margin: 0 auto !important;
     z-index: 25 !important;
   }
+  ${scope} .slide-nav,
   ${scope} .slide-nav-container {
+    order: 2 !important;
     margin: 0 auto !important;
+    display: flex !important;
     justify-content: center !important;
+    align-items: center !important;
     width: 100% !important;
     gap: 16px !important;
   }

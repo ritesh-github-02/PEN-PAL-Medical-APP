@@ -267,10 +267,12 @@ const SLIDE4_CSS = `
   }
   .s4-audio {
     order: 1 !important;
-    position: relative !important;
+    position: static !important;
     left: auto !important;
+    right: auto !important;
     bottom: auto !important;
     top: auto !important;
+    width: 100% !important;
     margin: 4px auto 0 auto !important;
     z-index: 25 !important;
     display: flex !important;
