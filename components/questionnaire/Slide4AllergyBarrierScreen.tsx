@@ -10,13 +10,13 @@ import SlideNavigationButtons from "./SlideNavigationButtons";
    - Nurse Anna standing on left gesturing toward bubble on desktop
    - Improved smooth Bezier speech bubble with crisp tail & paper dot grid
    - Mobile portrait: bubble on top, Nurse Anna below, audio controls,
-     and navigation buttons with ZERO empty bottom space
+     and navigation buttons matching Slide 2 & 3 canvas hierarchy
    ========================================================== */
 
 const STAGE_W = 750;
 const STAGE_H = 530;
 
-/* Smooth Bezier Silhouette from AI-improved design */
+/* Smooth Bezier Silhouette for Desktop (Tail pointing left toward Anna) */
 const BUBBLE_PATH_LEFT =
   "M 125 242 " +
   "C 95 255, 40 270, 18 276 " +
@@ -26,6 +26,177 @@ const BUBBLE_PATH_LEFT =
   "C 460 46, 495 112, 485 168 " +
   "C 475 224, 420 264, 310 272 " +
   "C 230 278, 160 262, 125 242 Z";
+
+/* Dedicated Smooth Curved Silhouette for Mobile Portrait (Tail pointing downward toward Nurse Anna)
+   Has a wide, symmetrical oval bulb (viewBox 0 0 380 250) providing maximum internal volume */
+const BUBBLE_PATH_MOBILE =
+  "M 190 12 " +
+  "C 285 12, 362 52, 362 101 " +
+  "C 362 138, 330 168, 278 180 " +
+  "C 295 198, 315 222, 322 244 " +
+  "C 300 226, 268 206, 230 188 " +
+  "C 217 189.5, 203 190, 190 190 " +
+  "C 95 190, 18 150, 18 101 " +
+  "C 18 52, 95 12, 190 12 " +
+  "Z";
+
+const mobileLayout = (scope: string) => `
+  ${scope} {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 14px 16px 12px 16px !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  ${scope} .s4-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    height: auto !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    gap: 0 !important;
+  }
+  ${scope} .s4-bubble {
+    order: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: clamp(285px, 84vw, 345px) !important;
+    max-width: 345px !important;
+    aspect-ratio: 380 / 250 !important;
+    height: auto !important;
+    margin: 14px auto 0 auto !important;
+    filter: drop-shadow(2px 3px 0px #1a3532) !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+  ${scope} .s4-bubble-desktop-svg {
+    display: none !important;
+  }
+  ${scope} .s4-bubble-mobile-svg {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  ${scope} .s4-bubble-text-wrap {
+    position: absolute !important;
+    top: 41% !important;
+    left: 49% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 82% !important;
+    max-width: 275px !important;
+    padding: 0 4px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+  ${scope} .s4-bubble-text {
+    font-size: clamp(13px, 1.85vh, 15px) !important;
+    line-height: 1.38 !important;
+    font-weight: 700 !important;
+    color: #142724 !important;
+    text-align: center !important;
+    letter-spacing: -0.015em !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    outline: none !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    display: block !important;
+  }
+  ${scope} .s4-bubble-text:focus,
+  ${scope} .s4-bubble-text:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  ${scope} .s4-nurse {
+    order: 2 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: clamp(90px, 23vw, 120px) !important;
+    height: clamp(140px, 19vh, 180px) !important;
+    margin: -18px 8% 0 auto !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  ${scope} .s4-nurse-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: none !important;
+  }
+  /* Bottom Controls Bar: Two-tier stack matching Slide 2 & 3 */
+  ${scope} .s4-bottom-bar-mobile {
+    width: 100% !important;
+    max-width: 360px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 26px !important;
+    padding-top: 8px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+    z-index: 25 !important;
+  }
+  ${scope} .s4-audio {
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    z-index: 25 !important;
+  }
+  ${scope} .slide-nav-container {
+    margin: 0 auto !important;
+    justify-content: center !important;
+    width: 100% !important;
+    gap: 16px !important;
+  }
+  ${scope} .slide-nav-btn {
+    min-width: 128px !important;
+    padding: 0 32px !important;
+    white-space: nowrap !important;
+    flex: 0 1 auto !important;
+  }
+`;
 
 const SLIDE4_CSS = `
 .s4-root,
@@ -93,12 +264,15 @@ const SLIDE4_CSS = `
   z-index: 1;
   filter: drop-shadow(2.5px 3.5px 0px #1a3532);
 }
-.s4-bubble-svg {
+.s4-bubble-desktop-svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   overflow: visible;
+}
+.s4-bubble-mobile-svg {
+  display: none;
 }
 .s4-bubble-text-wrap {
   position: absolute;
@@ -141,252 +315,62 @@ const SLIDE4_CSS = `
   width: 100%;
 }
 
-/* ---------- 3. CC & Play/Pause Controls (bottom-right like Slide 5) ---------- */
-.s4-audio {
-  position: absolute !important;
-  right: clamp(14px, 3.5vw, 22px) !important;
-  bottom: clamp(14px, 2.5vh, 22px) !important;
-  top: auto !important;
-  left: auto !important;
-  margin: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  z-index: 35 !important;
+/* Desktop Bottom Controls */
+.s4-bottom-bar-mobile {
+  display: none;
+}
+.s4-audio-desktop {
+  position: absolute;
+  right: clamp(14px, 3.5vw, 22px);
+  bottom: clamp(14px, 2.5vh, 22px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 35;
+}
+.s4-nav-desktop {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  bottom: clamp(14px, 2.5vh, 22px);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  z-index: 30;
 }
 
-/* ==========================================================
-   Mobile-First Responsive Layout (< 768px)
-   ========================================================== */
 @media (max-width: 767px) {
-  .s4-root {
-    overflow: visible !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
+  ${mobileLayout(".s4-root")}
+  .s4-audio-desktop {
+    display: none !important;
+  }
+  .s4-nav-desktop {
+    display: none !important;
+  }
+  .s4-bottom-bar-mobile {
     display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
-  }
-  .s4-stage {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 380px !important;
-    height: auto !important;
-    flex: 0 1 auto !important;
-    min-height: 0 !important;
-    transform: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: transparent !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-    gap: 0 !important;
-  }
-  .s4-bubble {
-    order: 1 !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    transform: none !important;
-    width: clamp(240px, 72vw, 305px) !important;
-    max-width: 305px !important;
-    aspect-ratio: 510 / 315 !important;
-    height: auto !important;
-    margin: 0 auto !important;
-    filter: drop-shadow(2px 3px 0px #1a3532) !important;
-    z-index: 1 !important;
-    pointer-events: none !important;
-  }
-  .s4-bubble-svg {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-  .s4-bubble-text-wrap {
-    position: absolute !important;
-    top: 42% !important;
-    left: 54% !important;
-    transform: translate(-50%, -50%) !important;
-    width: 84% !important;
-    max-width: 86% !important;
-    padding: 0 8px !important;
-    margin: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    box-sizing: border-box !important;
-  }
-  .s4-bubble-text {
-    font-size: clamp(10.5px, 1.4vh, 12px) !important;
-    line-height: 1.32 !important;
-    font-weight: 700 !important;
-    color: #232323 !important;
-    text-align: center !important;
-    letter-spacing: -0.012em !important;
-    word-break: normal !important;
-    overflow-wrap: break-word !important;
-  }
-  .s4-bubble-line {
-    display: block !important;
-    text-align: center !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-  }
-  .s4-nurse {
-    order: 2 !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: clamp(65px, 16vw, 85px) !important;
-    height: clamp(85px, 13vh, 115px) !important;
-    margin: -14px auto 0 16% !important;
-    z-index: 2 !important;
-    pointer-events: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s4-nurse-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    transform: none !important;
-  }
-  .s4-stage {
-    order: 0 !important;
-  }
-  .s4-audio {
-    order: 1 !important;
-    position: static !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    top: auto !important;
-    width: 100% !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-  }
-  .s4-root .slide-nav {
-    order: 2 !important;
-    margin: 4px auto 0 auto !important;
   }
 }
 
-/* Tablet Portrait Enhancements (481px to 767px) */
-@media (min-width: 481px) and (max-width: 767px) {
-  .s4-stage {
-    max-width: 430px !important;
-  }
-  .s4-bubble {
-    max-width: 390px !important;
-  }
-  .s4-bubble-text-wrap {
-    max-width: 300px !important;
-  }
-  .s4-bubble-text {
-    font-size: 16px !important;
-  }
-  .s4-nurse {
-    width: 135px !important;
-    height: 225px !important;
-  }
+${mobileLayout(".s4-root.is-mobile")}
+.s4-root.is-mobile .s4-audio-desktop {
+  display: none !important;
 }
-
-/* ==========================================================
-   Mobile & Tablet Landscape Layout (< 520px height)
-   ========================================================== */
-@media (orientation: landscape) and (max-height: 520px) {
-  .s4-root {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 0.5rem 1rem 3.5rem 1rem !important;
-  }
-  .s4-stage {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 16px !important;
-    width: 100% !important;
-    max-width: 680px !important;
-    height: auto !important;
-    min-height: auto !important;
-    transform: none !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-  }
-  .s4-nurse {
-    order: 1 !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: 100px !important;
-    height: 185px !important;
-    margin: 0 !important;
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s4-nurse-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    transform: scaleX(-1) !important;
-  }
-  .s4-bubble {
-    order: 2 !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: 320px !important;
-    aspect-ratio: 510 / 315 !important;
-    margin: 0 !important;
-    filter: drop-shadow(2px 3px 0px #1a3532) !important;
-    flex-shrink: 0 !important;
-  }
-  .s4-bubble-text-wrap {
-    width: 82% !important;
-  }
-  .s4-bubble-text {
-    font-size: 13.5px !important;
-    line-height: 1.35 !important;
-  }
-  .s4-audio {
-    order: 1 !important;
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-  }
-  .s4-root .slide-nav {
-    order: 2 !important;
-  }
+.s4-root.is-mobile .s4-nav-desktop {
+  display: none !important;
+}
+.s4-root.is-mobile .s4-bottom-bar-mobile {
+  display: flex !important;
 }
 `;
 
 export interface Slide4AllergyBarrierScreenProps {
-  isSpanish: boolean;
+  isSpanish?: boolean;
   medicationName?: string;
-  onNext: () => void;
-  onBack: () => void;
+  variant?: "auto" | "desktop" | "mobile";
+  onNext?: () => void;
+  onBack?: () => void;
   loading?: boolean;
   audioSrc?: string;
   stepId?: string;
@@ -395,12 +379,13 @@ export interface Slide4AllergyBarrierScreenProps {
 }
 
 export function Slide4AllergyBarrierScreen({
-  isSpanish,
+  isSpanish = false,
   medicationName,
+  variant = "auto",
   onNext,
   onBack,
   loading = false,
-  audioSrc = isSpanish ? "/audio/exported/slide4_barrier_es.mp3" : "/audio/exported/slide4_barrier_en.mp3",
+  audioSrc,
   stepId = "slide4_barrier",
   locale,
   transcriptText,
@@ -408,6 +393,8 @@ export function Slide4AllergyBarrierScreen({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const [scale, setScale] = useState(1);
+
+  const isEs = (locale ?? "").startsWith("es") || isSpanish;
 
   useEffect(() => {
     const timer = setTimeout(() => headingRef.current?.focus(), 50);
@@ -422,13 +409,7 @@ export function Slide4AllergyBarrierScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        if (typeof window !== "undefined" && window.innerWidth < 768) {
-          setScale(1);
-        } else if (
-          typeof window !== "undefined" &&
-          window.innerHeight < 520 &&
-          window.innerWidth > window.innerHeight
-        ) {
+        if (variant === "mobile" || window.innerWidth < 768) {
           setScale(1);
         } else {
           const safeW = Math.max(0, w - 24);
@@ -445,20 +426,28 @@ export function Slide4AllergyBarrierScreen({
       ro.disconnect();
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [variant]);
 
-  const rawText = isSpanish
+  const rawText = isEs
     ? "[name] es uno de los mejores antibióticos. Pero muchos niños no lo reciben porque se cree que son alérgicos a él."
     : "[name] is one of the best antibiotics. But many kids do not get it because they are believed to be allergic to it.";
 
   const resolvedName = medicationName && medicationName.trim()
-    ? medicationName
-    : (isSpanish ? "[Nombre]" : "[Name]");
+    ? medicationName.trim()
+    : (isEs ? "la amoxicilina" : "amoxicillin");
 
-  const titleText = resolveMedicineToken(rawText, resolvedName, isSpanish);
+  const titleText = resolveMedicineToken(rawText, resolvedName, isEs);
+
+  const effectiveAudioSrc =
+    audioSrc ||
+    (isEs
+      ? "/audio/exported/slide4_barrier_es.mp3"
+      : "/audio/exported/slide4_barrier_en.mp3");
+
+  const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
-    <div id="slide-content" className="s4-root" ref={rootRef}>
+    <div id="slide-content" className={`s4-root${variantClass}`} ref={rootRef}>
       <style>{SLIDE4_CSS}</style>
 
       <div className="s4-stage" style={{ transform: `scale(${scale})` }}>
@@ -466,7 +455,7 @@ export function Slide4AllergyBarrierScreen({
         <div className="s4-nurse">
           <img
             src="/images/nurse-anna.png"
-            alt={isSpanish ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
+            alt={isEs ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
             className="s4-nurse-img"
             draggable={false}
             aria-hidden="true"
@@ -475,8 +464,9 @@ export function Slide4AllergyBarrierScreen({
 
         {/* 2. Speech Bubble on Right with smooth Bezier curve & drop shadow */}
         <div className="s4-bubble">
+          {/* Desktop Bezier SVG (Pointing left toward Anna) */}
           <svg
-            className="s4-bubble-svg"
+            className="s4-bubble-desktop-svg"
             viewBox="-20 -10 540 330"
             fill="none"
             aria-hidden="true"
@@ -504,49 +494,87 @@ export function Slide4AllergyBarrierScreen({
             />
           </svg>
 
+          {/* Mobile Bezier SVG (Pointing down-right toward Anna below) */}
+          <svg
+            className="s4-bubble-mobile-svg"
+            viewBox="0 0 380 250"
+            fill="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern id="s4-card-dot-pattern-m" width="16" height="16" patternUnits="userSpaceOnUse">
+                <circle cx="8" cy="8" r="0.75" fill="#cadada" opacity="0.6" />
+              </pattern>
+            </defs>
+
+            <path
+              d={BUBBLE_PATH_MOBILE}
+              fill="#ffffff"
+              stroke="#7baea9"
+              strokeWidth="3.5"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+
+            <path
+              d={BUBBLE_PATH_MOBILE}
+              fill="url(#s4-card-dot-pattern-m)"
+            />
+          </svg>
+
           {/* Centered Speech Text inside oval body */}
           <div className="s4-bubble-text-wrap">
             <h1 ref={headingRef} tabIndex={-1} className="s4-bubble-text">
-              {isSpanish ? (
-                <>
-                  <span className="s4-bubble-line">{resolvedName} es uno de los mejores </span>
-                  <span className="s4-bubble-line">antibióticos. Pero muchos niños no </span>
-                  <span className="s4-bubble-line">lo reciben porque se cree </span>
-                  <span className="s4-bubble-line">que son alérgicos a él.</span>
-                </>
-              ) : (
-                <>
-                  <span className="s4-bubble-line">{resolvedName} is one of the best </span>
-                  <span className="s4-bubble-line">antibiotics. But many kids do </span>
-                  <span className="s4-bubble-line">not get it because they are </span>
-                  <span className="s4-bubble-line">believed to be allergic to it.</span>
-                </>
-              )}
+              {titleText}
             </h1>
           </div>
         </div>
       </div>
 
-      {/* 3. Audio narration & CC controls (bottom-right like Slide 5) */}
-      <div className="s4-audio">
+      {/* 3. Desktop Audio narration & CC controls */}
+      <div className="s4-audio-desktop">
         <AudioPlayer
-          audioSrc={audioSrc}
+          audioSrc={effectiveAudioSrc}
           stepId={stepId || "slide4_barrier"}
-          locale={locale || (isSpanish ? "es" : "en")}
+          locale={locale || (isEs ? "es" : "en")}
           transcriptText={transcriptText || titleText}
           size="large"
         />
       </div>
 
-      {/* 4. Navigation Buttons (Back & Next) */}
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isSpanish}
-        loading={loading}
-      />
+      {/* 4. Desktop Centered Navigation Buttons (Back & Next) */}
+      <div className="s4-nav-desktop">
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
+        />
+      </div>
+
+      {/* 5. Mobile Centered Stacked Bottom Bar: Audio on top, Navigation below */}
+      <div className="s4-bottom-bar-mobile">
+        <div className="s4-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId || "slide4_barrier"}
+            locale={locale || (isEs ? "es" : "en")}
+            transcriptText={transcriptText || titleText}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
+        />
+      </div>
     </div>
   );
 }
 
 export default Slide4AllergyBarrierScreen;
+
+
