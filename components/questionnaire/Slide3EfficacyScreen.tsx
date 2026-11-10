@@ -270,8 +270,8 @@ function InternalAudioPlayer({
           className="s3-audio-btn"
         >
           <svg
-            width="40"
-            height="36"
+            width="46"
+            height="42"
             viewBox="0 0 40 36"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -329,8 +329,8 @@ function InternalAudioPlayer({
         >
           {isPlaying ? (
             <svg
-              width="50"
-              height="36"
+              width="58"
+              height="42"
               viewBox="0 0 50 36"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -361,8 +361,8 @@ function InternalAudioPlayer({
             </svg>
           ) : (
             <svg
-              width="50"
-              height="36"
+              width="58"
+              height="42"
               viewBox="0 0 50 36"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -637,7 +637,7 @@ const mobileLayout = (scope: string) => `
     opacity: 0.85 !important;
   }
   ${scope} .s3-audio-btn svg {
-    height: 28px !important;
+    height: 34px !important;
     width: auto !important;
     transition: transform 0.12s ease !important;
   }
@@ -723,9 +723,9 @@ const SLIDE3_CSS = `
   /* Speech Bubble */
   .s3-bubble {
     position: absolute;
-    left: 378px;
-    top: 106px;
-    width: 308px;
+    left: 371px;
+    top: 119px;
+    width: 290px;
     aspect-ratio: 380 / 250;
     height: auto;
     filter: drop-shadow(2.5px 3.5px 0px #1a3532);
@@ -771,10 +771,10 @@ const SLIDE3_CSS = `
   /* Nurse Anna */
   .s3-nurse {
     position: absolute;
-    left: 585px;
-    top: 228px;
-    width: 120px;
-    height: 236px;
+    left: 620px;
+    top: 240px;
+    width: 100px;
+    height: 200px;
     z-index: 20;
     pointer-events: none;
     display: flex;
@@ -891,7 +891,7 @@ const SLIDE3_CSS = `
     transition: transform 0.12s ease, opacity 0.15s ease;
   }
   .s3-audio-desktop .s3-audio-btn svg {
-    height: 28px !important;
+    height: 34px !important;
     width: auto !important;
   }
   .s3-nav-desktop {

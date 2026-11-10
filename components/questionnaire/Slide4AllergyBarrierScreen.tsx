@@ -330,6 +330,16 @@ const SLIDE4_CSS = `
   justify-content: flex-end;
   z-index: 35;
 }
+.s4-audio-desktop .audio-cc-btn svg,
+.s4-audio .audio-cc-btn svg {
+  height: 38px !important;
+  width: auto !important;
+}
+.s4-audio-desktop .audio-play-btn svg,
+.s4-audio .audio-play-btn svg {
+  height: 38px !important;
+  width: auto !important;
+}
 .s4-nav-desktop {
   display: flex;
   justify-content: center;
@@ -352,6 +362,11 @@ const SLIDE4_CSS = `
   }
   .s4-bottom-bar-mobile {
     display: flex !important;
+  }
+  .s4-audio .audio-cc-btn svg,
+  .s4-audio .audio-play-btn svg {
+    height: 34px !important;
+    width: auto !important;
   }
 }
 

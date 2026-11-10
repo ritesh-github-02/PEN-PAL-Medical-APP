@@ -696,7 +696,7 @@ const SLIDE2_COMPONENT_CSS = `
    justify-content: center !important;
  }
  .s2-component-card.is-mobile .s2-audio-btn svg {
-   height: 28px !important;
+   height: 34px !important;
    width: auto !important;
    transition: transform 0.12s ease !important;
  }
@@ -921,7 +921,7 @@ const SLIDE2_COMPONENT_CSS = `
      justify-content: center;
    }
    .s2-audio-btn svg {
-     height: 28px !important;
+     height: 34px !important;
      width: auto !important;
      transition: transform 0.12s ease;
    }
@@ -1434,8 +1434,8 @@ export function Slide2MedicineNamingScreen({
            }
          >
            <svg
-             width="40"
-             height="36"
+             width="46"
+             height="42"
              viewBox="0 0 40 36"
              fill="none"
              xmlns="http://www.w3.org/2000/svg"
@@ -1493,8 +1493,8 @@ export function Slide2MedicineNamingScreen({
          >
            {audioPlaying ? (
              <svg
-               width="50"
-               height="36"
+               width="58"
+               height="42"
                viewBox="0 0 50 36"
                fill="none"
                xmlns="http://www.w3.org/2000/svg"
@@ -1525,8 +1525,8 @@ export function Slide2MedicineNamingScreen({
              </svg>
            ) : (
              <svg
-               width="50"
-               height="36"
+               width="58"
+               height="42"
                viewBox="0 0 50 36"
                fill="none"
                xmlns="http://www.w3.org/2000/svg"
