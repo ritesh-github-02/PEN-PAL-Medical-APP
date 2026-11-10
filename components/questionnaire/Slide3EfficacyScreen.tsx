@@ -272,33 +272,32 @@ function InternalAudioPlayer({
           className={`${buttonSizeClass} p-1 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[#143833] focus-visible:ring-offset-2 active:scale-95`}
         >
           <svg
-            width="42"
+            width="40"
             height="36"
-            viewBox="0 0 52 47"
+            viewBox="0 0 40 36"
             fill="none"
+            xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
             focusable="false"
           >
-            <rect
-              x="2"
-              y="2"
-              width="48"
-              height="43"
-              rx="10"
-              fill={showCaptions ? "#144e57" : "#e6f4f1"}
-              stroke="#144e57"
-              strokeWidth="2.5"
+            <path
+              d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill={showCaptions ? "currentColor" : "none"}
             />
             <text
-              x="26"
-              y="28"
+              x="20"
+              y="15.5"
               textAnchor="middle"
-              fill={showCaptions ? "#ffffff" : "#144e57"}
-              fontSize="18"
-              fontFamily="Plus Jakarta Sans, sans-serif"
-              fontWeight="800"
-              letterSpacing="1"
-              aria-hidden="true"
+              dominantBaseline="central"
+              fill={showCaptions ? "#ffffff" : "currentColor"}
+              fontSize="13"
+              fontWeight="700"
+              fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+              letterSpacing="0.3px"
             >
               CC
             </text>
@@ -332,46 +331,78 @@ function InternalAudioPlayer({
         >
           {isPlaying ? (
             <svg
-              width="54"
+              width="50"
               height="36"
-              viewBox="0 0 70 47"
+              viewBox="0 0 50 36"
               fill="none"
+              xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
               focusable="false"
             >
-              <rect
-                x="2"
-                y="2"
-                width="66"
-                height="43"
-                rx="10"
-                fill="#144e57"
-                stroke="#144e57"
-                strokeWidth="2.5"
+              <path
+                d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinejoin="round"
+                fill="none"
               />
-              <rect x="25" y="14" width="6" height="19" rx="2" fill="#ffffff" />
-              <rect x="39" y="14" width="6" height="19" rx="2" fill="#ffffff" />
+              <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+              <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+              <path
+                d="M 33 11 C 37 13.5 37 22.5 33 25"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+              <path
+                d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
             </svg>
           ) : (
             <svg
-              width="54"
+              width="50"
               height="36"
-              viewBox="0 0 70 47"
+              viewBox="0 0 50 36"
               fill="none"
+              xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
               focusable="false"
             >
-              <rect
-                x="2"
-                y="2"
-                width="66"
-                height="43"
-                rx="10"
-                fill="#e6f4f1"
-                stroke="#144e57"
-                strokeWidth="2.5"
+              <path
+                d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinejoin="round"
+                fill="none"
               />
-              <polygon points="28,14 46,23.5 28,33" fill="#144e57" />
+              <text
+                x="14.8"
+                y="17.2"
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill="currentColor"
+                fontSize="8"
+                fontWeight="700"
+                fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                letterSpacing="0.1px"
+              >
+                play
+              </text>
+              <path
+                d="M 33 11 C 37 13.5 37 22.5 33 25"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+              <path
+                d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
             </svg>
           )}
         </button>
