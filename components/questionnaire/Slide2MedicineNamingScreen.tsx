@@ -502,56 +502,54 @@ const SLIDE2_COMPONENT_CSS = `
    border: none !important;
    box-shadow: none !important;
    border-radius: 0 !important;
-   padding: 14px 16px 12px 16px !important;
+   padding: 12px 16px 10px 16px !important;
    display: flex !important;
    flex-direction: column !important;
    justify-content: space-between !important;
    overflow-y: auto !important;
-   gap: 10px !important;
+   gap: 6px !important;
  }
  .s2-component-card.is-mobile .s2-banner-wrap {
    width: 100% !important;
    max-width: 100% !important;
    border-radius: 20px !important;
-   padding: 10px 16px !important;
-   margin: 0 0 4px 0 !important;
+   padding: 8px 16px !important;
+   margin: 0 auto 6px auto !important;
    box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2) !important;
    flex-shrink: 0 !important;
  }
  .s2-component-card.is-mobile .s2-heading {
-   font-size: 15px !important;
-   line-height: 1.35 !important;
+   font-size: 14.5px !important;
+   line-height: 1.32 !important;
    text-align: center !important;
  }
-
 
  .s2-component-card.is-mobile .s2-stage-middle {
    flex: 1 1 auto !important;
    display: flex !important;
    flex-direction: column !important;
    align-items: center !important;
-   justify-content: center !important;
-   gap: 16px !important;
+   justify-content: flex-start !important;
+   gap: 6px !important;
    width: 100% !important;
    max-width: 100% !important;
    padding: 0 !important;
    min-height: 0 !important;
  }
 
-
- /* 1. Character Area: Nurse Anna + Speech Bubble side-by-side */
+ /* 1. Character Area: Nurse Anna + Speech Bubble side-by-side with clear top margin */
  .s2-component-card.is-mobile .s2-character-col {
    order: 1 !important;
    position: relative !important;
    width: 100% !important;
-   max-width: 340px !important;
+   max-width: 350px !important;
    height: auto !important;
    display: flex !important;
    flex-direction: row !important;
-   align-items: flex-end !important;
+   align-items: center !important;
    justify-content: center !important;
-   gap: 8px !important;
-   margin: 0 auto !important;
+   gap: 10px !important;
+   margin: 0 auto 4px auto !important;
    padding: 0 4px !important;
    flex-shrink: 0 !important;
  }
@@ -559,34 +557,38 @@ const SLIDE2_COMPONENT_CSS = `
    position: relative !important;
    left: auto !important;
    top: auto !important;
-   width: 210px !important;
-   max-width: 68% !important;
+   width: 215px !important;
+   max-width: 70% !important;
    aspect-ratio: 520 / 340 !important;
    flex-shrink: 1 !important;
-   margin-bottom: 12px !important;
+   margin-bottom: 0 !important;
    filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12)) !important;
  }
  .s2-component-card.is-mobile .s2-bubble-text-wrap {
    top: 45% !important;
    left: 48% !important;
+   transform: translate(-50%, -50%) !important;
    width: 82% !important;
-   max-width: 175px !important;
+   max-width: 180px !important;
+   padding: 0 !important;
+   box-sizing: border-box !important;
  }
  .s2-component-card.is-mobile .s2-bubble-text {
    font-size: 11.5px !important;
    line-height: 1.35 !important;
    font-weight: 600 !important;
    color: #143833 !important;
+   text-align: center !important;
  }
  .s2-component-card.is-mobile .s2-nurse-wrap {
    position: relative !important;
    right: auto !important;
    bottom: auto !important;
-   width: 72px !important;
-   height: 138px !important;
+   width: 60px !important;
+   height: 120px !important;
    flex-shrink: 0 !important;
    display: flex !important;
-   align-items: flex-end !important;
+   align-items: center !important;
    justify-content: center !important;
  }
  .s2-component-card.is-mobile .s2-nurse-img {
@@ -595,7 +597,6 @@ const SLIDE2_COMPONENT_CSS = `
    object-fit: contain !important;
    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)) !important;
  }
-
 
  /* 2. Options Area: Bottle hidden on mobile for perfect horizontal symmetry and centered checklist */
  .s2-component-card.is-mobile .s2-options-col {
@@ -607,7 +608,7 @@ const SLIDE2_COMPONENT_CSS = `
    width: 100% !important;
    max-width: 320px !important;
    margin: 0 auto !important;
-   margin-bottom: 14px !important;
+   margin-bottom: 6px !important;
    flex-shrink: 0 !important;
  }
  .s2-component-card.is-mobile .s2-bottle-wrap {
@@ -617,13 +618,13 @@ const SLIDE2_COMPONENT_CSS = `
    width: 100% !important;
    display: flex !important;
    flex-direction: column !important;
-   gap: 8px !important;
+   gap: 6px !important;
  }
  .s2-component-card.is-mobile .s2-option-row {
    width: 100% !important;
-   min-height: 44px !important;
+   min-height: 40px !important;
    gap: 12px !important;
-   padding: 8px 14px !important;
+   padding: 6px 14px !important;
    border-radius: 12px !important;
    border: 1.5px solid rgba(35, 111, 122, 0.2) !important;
    background-color: rgba(255, 255, 255, 0.75) !important;
@@ -649,14 +650,13 @@ const SLIDE2_COMPONENT_CSS = `
    border-color: #143833 !important;
  }
  .s2-component-card.is-mobile .s2-option-text {
-   font-size: 14.5px !important;
+   font-size: 14px !important;
    line-height: 1.3 !important;
    font-weight: 600 !important;
    color: #143833 !important;
  }
 
-
- /* 3. Bottom Controls Bar: Two-tier stack with Play/CC ABOVE and Back/Next BELOW */
+ /* 3. Bottom Controls: Two-tier layout with Play/CC ABOVE and Back/Next BELOW */
  .s2-component-card.is-mobile .s2-bottom-bar {
    width: 100% !important;
    max-width: 320px !important;
@@ -664,16 +664,15 @@ const SLIDE2_COMPONENT_CSS = `
    flex-direction: column !important;
    align-items: center !important;
    justify-content: center !important;
-   gap: 30px !important;
-   padding-top: 10px !important;
-   padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+   gap: clamp(8px, 1.6vh, 14px) !important;
+   padding-top: 4px !important;
+   padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
    margin: 0 auto !important;
    flex-shrink: 0 !important;
  }
  .s2-component-card.is-mobile .s2-spacer-side {
    display: none !important;
  }
- /* Tier 1 (TOP): CC & Audio player nicely centered */
  .s2-component-card.is-mobile .s2-audio-controls {
    order: 1 !important;
    width: auto !important;
@@ -704,7 +703,6 @@ const SLIDE2_COMPONENT_CSS = `
  .s2-component-card.is-mobile .s2-audio-btn:active svg {
    transform: scale(0.96) !important;
  }
- /* Tier 2 (BOTTOM): Back & Next full-width side-by-side with generous gap */
  .s2-component-card.is-mobile .s2-nav-center {
    order: 2 !important;
    display: flex !important;
@@ -726,7 +724,6 @@ const SLIDE2_COMPONENT_CSS = `
    text-align: center !important;
  }
 
-
  @media (max-width: 767px) {
    .s2-component-card {
      aspect-ratio: auto;
@@ -736,25 +733,25 @@ const SLIDE2_COMPONENT_CSS = `
      border: none;
      box-shadow: none;
      border-radius: 0;
-     padding: 14px 16px 12px 16px;
+     padding: 12px 16px 10px 16px;
      display: flex;
      flex-direction: column;
      justify-content: space-between;
      overflow-y: auto;
-     gap: 10px;
+     gap: 6px;
    }
    .s2-banner-wrap {
      width: 100%;
      max-width: 100%;
      border-radius: 20px;
-     padding: 10px 16px;
-     margin: 0 0 4px 0;
+     padding: 8px 16px;
+     margin: 0 auto 6px auto;
      box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2);
      flex-shrink: 0;
    }
    .s2-heading {
-     font-size: 15px;
-     line-height: 1.35;
+     font-size: 14.5px;
+     line-height: 1.32;
      text-align: center;
    }
    .s2-stage-middle {
@@ -762,26 +759,26 @@ const SLIDE2_COMPONENT_CSS = `
      display: flex;
      flex-direction: column;
      align-items: center;
-     justify-content: center;
-     gap: 16px;
+     justify-content: flex-start;
+     gap: 6px;
      width: 100%;
      max-width: 100%;
      padding: 0;
      min-height: 0;
    }
-   /* 1. Character Area */
+   /* 1. Character Area: Nurse Anna + Speech Bubble side-by-side with clear top margin */
    .s2-character-col {
      order: 1;
      position: relative;
      width: 100%;
-     max-width: 340px;
+     max-width: 350px;
      height: auto;
      display: flex;
      flex-direction: row;
-     align-items: flex-end;
+     align-items: center;
      justify-content: center;
-     gap: 8px;
-     margin: 0 auto;
+     gap: 10px;
+     margin: 0 auto 4px auto;
      padding: 0 4px;
      flex-shrink: 0;
    }
@@ -789,34 +786,38 @@ const SLIDE2_COMPONENT_CSS = `
      position: relative;
      left: auto;
      top: auto;
-     width: 210px;
-     max-width: 68%;
+     width: 215px;
+     max-width: 70%;
      aspect-ratio: 520 / 340;
      flex-shrink: 1;
-     margin-bottom: 12px;
+     margin-bottom: 0;
      filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12));
    }
    .s2-bubble-text-wrap {
      top: 45%;
      left: 48%;
+     transform: translate(-50%, -50%);
      width: 82%;
-     max-width: 175px;
+     max-width: 180px;
+     padding: 0;
+     box-sizing: border-box;
    }
    .s2-bubble-text {
      font-size: 11.5px;
      line-height: 1.35;
      font-weight: 600;
      color: #143833;
+     text-align: center;
    }
    .s2-nurse-wrap {
      position: relative;
      right: auto;
      bottom: auto;
-     width: 72px;
-     height: 138px;
+     width: 60px;
+     height: 120px;
      flex-shrink: 0;
      display: flex;
-     align-items: flex-end;
+     align-items: center;
      justify-content: center;
    }
    .s2-nurse-img {
@@ -825,7 +826,7 @@ const SLIDE2_COMPONENT_CSS = `
      object-fit: contain;
      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
    }
-   /* 2. Options Area */
+   /* 2. Options Area: Bottle hidden on mobile for perfect horizontal symmetry and centered checklist */
    .s2-options-col {
      order: 2;
      display: flex;
@@ -835,7 +836,7 @@ const SLIDE2_COMPONENT_CSS = `
      width: 100%;
      max-width: 320px;
      margin: 0 auto;
-     margin-bottom: 14px;
+     margin-bottom: 6px;
      flex-shrink: 0;
    }
    .s2-bottle-wrap {
@@ -845,13 +846,13 @@ const SLIDE2_COMPONENT_CSS = `
      width: 100%;
      display: flex;
      flex-direction: column;
-     gap: 8px;
+     gap: 6px;
    }
    .s2-option-row {
      width: 100%;
-     min-height: 44px;
+     min-height: 40px;
      gap: 12px;
-     padding: 8px 14px;
+     padding: 6px 14px;
      border-radius: 12px;
      border: 1.5px solid rgba(35, 111, 122, 0.2);
      background-color: rgba(255, 255, 255, 0.75);
@@ -877,7 +878,7 @@ const SLIDE2_COMPONENT_CSS = `
      border-color: #143833;
    }
    .s2-option-text {
-     font-size: 14.5px;
+     font-size: 14px;
      line-height: 1.3;
      font-weight: 600;
      color: #143833;
@@ -890,9 +891,9 @@ const SLIDE2_COMPONENT_CSS = `
      flex-direction: column;
      align-items: center;
      justify-content: center;
-     gap: 30px;
-     padding-top: 10px;
-     padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+     gap: clamp(8px, 1.6vh, 14px);
+     padding-top: 4px;
+     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
      margin: 0 auto;
      flex-shrink: 0;
    }
@@ -950,7 +951,6 @@ const SLIDE2_COMPONENT_CSS = `
      text-align: center;
    }
  }
-
 
  /* Prefers Reduced Motion (WCAG 2.3.3) */
  @media (prefers-reduced-motion: reduce) {
@@ -1323,20 +1323,20 @@ export function Slide2MedicineNamingScreen({
 
            <div className="s2-bubble-text-wrap">
              <p className="s2-bubble-text">
-               {isEs ? (
-                 <>
-                   ¡Seleccione cómo lo llama!<br />
-                   Usaremos el nombre que elija<br />
-                   durante nuestro tiempo juntos.
-                 </>
-               ) : (
-                 <>
-                   Select what you call it! We&apos;ll<br />
-                   use the name you choose<br />
-                   during our time together.
-                 </>
-               )}
-             </p>
+              {isEs ? (
+                <>
+                  ¡Seleccione cómo lo llama!<br />
+                  Usaremos el nombre que elija<br />
+                  during our time together.
+                </>
+              ) : (
+                <>
+                  Select what you call it!<br />
+                  We&apos;ll use the name you choose<br />
+                  durante nuestro tiempo juntos.
+                </>
+              )}
+            </p>
            </div>
          </div>
 
