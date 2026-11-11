@@ -77,6 +77,249 @@ const BUBBLE_PATH =
  "Z";
 
 
+const s2MobileLayout = (scope: string) => `
+  .tablet-mockup-frame ${scope},
+  .tablet-screen-inner ${scope},
+  .tablet-slide-content ${scope},
+  .intervention-frame-outer ${scope},
+  ${scope} {
+    aspect-ratio: auto !important;
+    max-height: none !important;
+    height: 100% !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 12px 14px 10px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow-y: auto !important;
+    gap: 6px !important;
+  }
+  ${scope} .s2-banner-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px !important;
+    padding: 8px 16px !important;
+    margin: 0 auto 6px auto !important;
+    box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2) !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s2-heading {
+    font-size: 14.5px !important;
+    line-height: 1.32 !important;
+    text-align: center !important;
+  }
+  ${scope} .s2-stage-middle {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+  }
+  /* 1. Character Area: Nurse Anna + auto-sizing Speech Bubble side-by-side */
+  ${scope} .s2-character-col {
+    order: 1 !important;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin: 2px auto 6px auto !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s2-bubble-wrap {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: 268px !important;
+    min-height: auto !important;
+    aspect-ratio: 520 / 340 !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 0 !important;
+    filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12)) !important;
+  }
+  ${scope} .s2-bubble-text-wrap {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 30px 36px 34px 34px !important;
+    box-sizing: border-box !important;
+  }
+  ${scope} .s2-bubble-text {
+    width: 100% !important;
+    font-size: clamp(11.5px, 3.1vw, 12.5px) !important;
+    line-height: 1.38 !important;
+    font-weight: 600 !important;
+    color: #143833 !important;
+    text-align: center !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+  }
+  ${scope} .s2-nurse-wrap {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: clamp(54px, 16vw, 66px) !important;
+    height: clamp(108px, 31vw, 130px) !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  ${scope} .s2-nurse-img {
+    max-height: 100% !important;
+    width: auto !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)) !important;
+  }
+  /* 2. Options Area: Bottle hidden on mobile for horizontal symmetry and centered checklist */
+  ${scope} .s2-options-col {
+    order: 2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    margin: 0 auto 6px auto !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s2-bottle-wrap {
+    display: none !important;
+  }
+  ${scope} .s2-radiogroup {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+  ${scope} .s2-option-row {
+    width: 100% !important;
+    min-height: 40px !important;
+    gap: 12px !important;
+    padding: 6px 14px !important;
+    border-radius: 12px !important;
+    border: 1.5px solid rgba(35, 111, 122, 0.2) !important;
+    background-color: rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 0 1px 3px rgba(20, 56, 51, 0.06) !important;
+    transition: all 0.15s ease !important;
+    justify-content: flex-start !important;
+  }
+  ${scope} .s2-option-row:hover,
+  ${scope} .s2-option-row:active {
+    background-color: rgba(189, 223, 216, 0.4) !important;
+    border-color: #236f7a !important;
+    transform: translateY(-1px) !important;
+  }
+  ${scope} .s2-checkbox-box {
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 5px !important;
+    border: 2px solid #236f7a !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s2-checkbox-box.checked {
+    background-color: #144e57 !important;
+    border-color: #143833 !important;
+  }
+  ${scope} .s2-option-text {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
+    color: #143833 !important;
+  }
+  /* 3. Bottom Controls: Two-tier layout with Play/CC ABOVE and Back/Next BELOW */
+  ${scope} .s2-bottom-bar {
+    width: 100% !important;
+    max-width: 340px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(8px, 1.6vh, 14px) !important;
+    padding-top: 4px !important;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s2-spacer-side {
+    display: none !important;
+  }
+  ${scope} .s2-audio-controls {
+    order: 1 !important;
+    width: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin: 0 auto !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  ${scope} .s2-audio-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  ${scope} .s2-audio-btn svg {
+    height: 34px !important;
+    width: auto !important;
+    transition: transform 0.12s ease !important;
+  }
+  ${scope} .s2-audio-btn:hover svg,
+  ${scope} .s2-audio-btn:active svg {
+    transform: scale(0.96) !important;
+  }
+  ${scope} .s2-nav-center {
+    order: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  ${scope} .s2-btn-nav {
+    flex: 1 1 0% !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    padding: 0 16px !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+    text-align: center !important;
+  }
+`;
+
+
 const SLIDE2_COMPONENT_CSS = `
  /* ------------------------------------------------------------
     Slide 2: WCAG 2.1 / 2.2 Level AAA, WAVE & Karen Accessibility Rules
@@ -285,7 +528,12 @@ const SLIDE2_COMPONENT_CSS = `
    left: 0;
    top: 0;
    width: 245px;
+   min-height: 160px;
    aspect-ratio: 520 / 340;
+   height: auto;
+   display: flex;
+   align-items: center;
+   justify-content: center;
    z-index: 5;
    pointer-events: none;
    filter: drop-shadow(2px 3px 0px #1a3532);
@@ -298,12 +546,11 @@ const SLIDE2_COMPONENT_CSS = `
    overflow: visible;
  }
  .s2-bubble-text-wrap {
-   position: absolute;
-   top: 45%;
-   left: 48%;
-   transform: translate(-50%, -50%);
-   width: 78%;
-   max-width: 200px;
+   position: relative;
+   z-index: 1;
+   width: 100%;
+   padding: 30px 38px 34px 36px;
+   box-sizing: border-box;
    display: flex;
    flex-direction: column;
    align-items: center;
@@ -314,11 +561,14 @@ const SLIDE2_COMPONENT_CSS = `
  .s2-bubble-text {
    margin: 0;
    padding: 0;
-   font-size: 13.5px;
-   line-height: 1.42;
+   width: 100%;
+   font-size: 13px;
+   line-height: 1.38;
    font-weight: 600;
    color: #142724;
    text-align: center;
+   overflow-wrap: break-word;
+   word-break: normal;
  }
 
 
@@ -489,467 +739,11 @@ const SLIDE2_COMPONENT_CSS = `
 
  /* -------------------------------------------------------------
     Mobile Layout (.is-mobile or screen width < 768px)
-    Refined UX/UI for 9:16 vertical ratio:
-    - Clear visual hierarchy & generous touch targets (Fitts's Law)
-    - Optimal reading flow: Header -> Character cue -> Options -> Actions
-    - Polished contrast, consistent spacing & zero clipped elements
     ------------------------------------------------------------- */
- .s2-component-card.is-mobile {
-   aspect-ratio: auto !important;
-   max-height: none !important;
-   height: 100% !important;
-   background-color: transparent !important;
-   border: none !important;
-   box-shadow: none !important;
-   border-radius: 0 !important;
-   padding: 12px 16px 10px 16px !important;
-   display: flex !important;
-   flex-direction: column !important;
-   justify-content: space-between !important;
-   overflow-y: auto !important;
-   gap: 6px !important;
- }
- .s2-component-card.is-mobile .s2-banner-wrap {
-   width: 100% !important;
-   max-width: 100% !important;
-   border-radius: 20px !important;
-   padding: 8px 16px !important;
-   margin: 0 auto 6px auto !important;
-   box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2) !important;
-   flex-shrink: 0 !important;
- }
- .s2-component-card.is-mobile .s2-heading {
-   font-size: 14.5px !important;
-   line-height: 1.32 !important;
-   text-align: center !important;
- }
-
- .s2-component-card.is-mobile .s2-stage-middle {
-   flex: 1 1 auto !important;
-   display: flex !important;
-   flex-direction: column !important;
-   align-items: center !important;
-   justify-content: flex-start !important;
-   gap: 6px !important;
-   width: 100% !important;
-   max-width: 100% !important;
-   padding: 0 !important;
-   min-height: 0 !important;
- }
-
- /* 1. Character Area: Nurse Anna + Speech Bubble side-by-side with clear top margin */
- .s2-component-card.is-mobile .s2-character-col {
-   order: 1 !important;
-   position: relative !important;
-   width: 100% !important;
-   max-width: 350px !important;
-   height: auto !important;
-   display: flex !important;
-   flex-direction: row !important;
-   align-items: center !important;
-   justify-content: center !important;
-   gap: 10px !important;
-   margin: 0 auto 4px auto !important;
-   padding: 0 4px !important;
-   flex-shrink: 0 !important;
- }
- .s2-component-card.is-mobile .s2-bubble-wrap {
-   position: relative !important;
-   left: auto !important;
-   top: auto !important;
-   width: 215px !important;
-   max-width: 70% !important;
-   aspect-ratio: 520 / 340 !important;
-   flex-shrink: 1 !important;
-   margin-bottom: 0 !important;
-   filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12)) !important;
- }
- .s2-component-card.is-mobile .s2-bubble-text-wrap {
-   top: 45% !important;
-   left: 48% !important;
-   transform: translate(-50%, -50%) !important;
-   width: 82% !important;
-   max-width: 180px !important;
-   padding: 0 !important;
-   box-sizing: border-box !important;
- }
- .s2-component-card.is-mobile .s2-bubble-text {
-   font-size: 11.5px !important;
-   line-height: 1.35 !important;
-   font-weight: 600 !important;
-   color: #143833 !important;
-   text-align: center !important;
- }
- .s2-component-card.is-mobile .s2-nurse-wrap {
-   position: relative !important;
-   right: auto !important;
-   bottom: auto !important;
-   width: 60px !important;
-   height: 120px !important;
-   flex-shrink: 0 !important;
-   display: flex !important;
-   align-items: center !important;
-   justify-content: center !important;
- }
- .s2-component-card.is-mobile .s2-nurse-img {
-   max-height: 100% !important;
-   width: auto !important;
-   object-fit: contain !important;
-   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)) !important;
- }
-
- /* 2. Options Area: Bottle hidden on mobile for perfect horizontal symmetry and centered checklist */
- .s2-component-card.is-mobile .s2-options-col {
-   order: 2 !important;
-   display: flex !important;
-   flex-direction: column !important;
-   align-items: center !important;
-   justify-content: center !important;
-   width: 100% !important;
-   max-width: 320px !important;
-   margin: 0 auto !important;
-   margin-bottom: 6px !important;
-   flex-shrink: 0 !important;
- }
- .s2-component-card.is-mobile .s2-bottle-wrap {
-   display: none !important;
- }
- .s2-component-card.is-mobile .s2-radiogroup {
-   width: 100% !important;
-   display: flex !important;
-   flex-direction: column !important;
-   gap: 6px !important;
- }
- .s2-component-card.is-mobile .s2-option-row {
-   width: 100% !important;
-   min-height: 40px !important;
-   gap: 12px !important;
-   padding: 6px 14px !important;
-   border-radius: 12px !important;
-   border: 1.5px solid rgba(35, 111, 122, 0.2) !important;
-   background-color: rgba(255, 255, 255, 0.75) !important;
-   box-shadow: 0 1px 3px rgba(20, 56, 51, 0.06) !important;
-   transition: all 0.15s ease !important;
-   justify-content: flex-start !important;
- }
- .s2-component-card.is-mobile .s2-option-row:hover,
- .s2-component-card.is-mobile .s2-option-row:active {
-   background-color: rgba(189, 223, 216, 0.4) !important;
-   border-color: #236f7a !important;
-   transform: translateY(-1px) !important;
- }
- .s2-component-card.is-mobile .s2-checkbox-box {
-   width: 22px !important;
-   height: 22px !important;
-   border-radius: 5px !important;
-   border: 2px solid #236f7a !important;
-   flex-shrink: 0 !important;
- }
- .s2-component-card.is-mobile .s2-checkbox-box.checked {
-   background-color: #144e57 !important;
-   border-color: #143833 !important;
- }
- .s2-component-card.is-mobile .s2-option-text {
-   font-size: 14px !important;
-   line-height: 1.3 !important;
-   font-weight: 600 !important;
-   color: #143833 !important;
- }
-
- /* 3. Bottom Controls: Two-tier layout with Play/CC ABOVE and Back/Next BELOW */
- .s2-component-card.is-mobile .s2-bottom-bar {
-   width: 100% !important;
-   max-width: 320px !important;
-   display: flex !important;
-   flex-direction: column !important;
-   align-items: center !important;
-   justify-content: center !important;
-   gap: clamp(8px, 1.6vh, 14px) !important;
-   padding-top: 4px !important;
-   padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
-   margin: 0 auto !important;
-   flex-shrink: 0 !important;
- }
- .s2-component-card.is-mobile .s2-spacer-side {
-   display: none !important;
- }
- .s2-component-card.is-mobile .s2-audio-controls {
-   order: 1 !important;
-   width: auto !important;
-   display: flex !important;
-   align-items: center !important;
-   justify-content: center !important;
-   gap: 8px !important;
-   margin: 0 auto !important;
-   background-color: transparent !important;
-   padding: 0 !important;
-   border: none !important;
-   box-shadow: none !important;
- }
- .s2-component-card.is-mobile .s2-audio-btn {
-   min-width: 44px !important;
-   min-height: 44px !important;
-   padding: 4px !important;
-   display: flex !important;
-   align-items: center !important;
-   justify-content: center !important;
- }
- .s2-component-card.is-mobile .s2-audio-btn svg {
-   height: 34px !important;
-   width: auto !important;
-   transition: transform 0.12s ease !important;
- }
- .s2-component-card.is-mobile .s2-audio-btn:hover svg,
- .s2-component-card.is-mobile .s2-audio-btn:active svg {
-   transform: scale(0.96) !important;
- }
- .s2-component-card.is-mobile .s2-nav-center {
-   order: 2 !important;
-   display: flex !important;
-   align-items: center !important;
-   justify-content: space-between !important;
-   gap: 14px !important;
-   width: 100% !important;
-   margin: 0 !important;
- }
- .s2-component-card.is-mobile .s2-btn-nav {
-   flex: 1 1 0% !important;
-   min-height: 48px !important;
-   height: 48px !important;
-   font-size: 16px !important;
-   font-weight: 700 !important;
-   padding: 0 16px !important;
-   border-radius: 9999px !important;
-   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
-   text-align: center !important;
- }
+ ${s2MobileLayout(".s2-component-card.is-mobile")}
 
  @media (max-width: 767px) {
-   .s2-component-card {
-     aspect-ratio: auto;
-     max-height: none;
-     height: 100%;
-     background-color: transparent;
-     border: none;
-     box-shadow: none;
-     border-radius: 0;
-     padding: 12px 16px 10px 16px;
-     display: flex;
-     flex-direction: column;
-     justify-content: space-between;
-     overflow-y: auto;
-     gap: 6px;
-   }
-   .s2-banner-wrap {
-     width: 100%;
-     max-width: 100%;
-     border-radius: 20px;
-     padding: 8px 16px;
-     margin: 0 auto 6px auto;
-     box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2);
-     flex-shrink: 0;
-   }
-   .s2-heading {
-     font-size: 14.5px;
-     line-height: 1.32;
-     text-align: center;
-   }
-   .s2-stage-middle {
-     flex: 1 1 auto;
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: flex-start;
-     gap: 6px;
-     width: 100%;
-     max-width: 100%;
-     padding: 0;
-     min-height: 0;
-   }
-   /* 1. Character Area: Nurse Anna + Speech Bubble side-by-side with clear top margin */
-   .s2-character-col {
-     order: 1;
-     position: relative;
-     width: 100%;
-     max-width: 350px;
-     height: auto;
-     display: flex;
-     flex-direction: row;
-     align-items: center;
-     justify-content: center;
-     gap: 10px;
-     margin: 0 auto 4px auto;
-     padding: 0 4px;
-     flex-shrink: 0;
-   }
-   .s2-bubble-wrap {
-     position: relative;
-     left: auto;
-     top: auto;
-     width: 215px;
-     max-width: 70%;
-     aspect-ratio: 520 / 340;
-     flex-shrink: 1;
-     margin-bottom: 0;
-     filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12));
-   }
-   .s2-bubble-text-wrap {
-     top: 45%;
-     left: 48%;
-     transform: translate(-50%, -50%);
-     width: 82%;
-     max-width: 180px;
-     padding: 0;
-     box-sizing: border-box;
-   }
-   .s2-bubble-text {
-     font-size: 11.5px;
-     line-height: 1.35;
-     font-weight: 600;
-     color: #143833;
-     text-align: center;
-   }
-   .s2-nurse-wrap {
-     position: relative;
-     right: auto;
-     bottom: auto;
-     width: 60px;
-     height: 120px;
-     flex-shrink: 0;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-   }
-   .s2-nurse-img {
-     max-height: 100%;
-     width: auto;
-     object-fit: contain;
-     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-   }
-   /* 2. Options Area: Bottle hidden on mobile for perfect horizontal symmetry and centered checklist */
-   .s2-options-col {
-     order: 2;
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: center;
-     width: 100%;
-     max-width: 320px;
-     margin: 0 auto;
-     margin-bottom: 6px;
-     flex-shrink: 0;
-   }
-   .s2-bottle-wrap {
-     display: none;
-   }
-   .s2-radiogroup {
-     width: 100%;
-     display: flex;
-     flex-direction: column;
-     gap: 6px;
-   }
-   .s2-option-row {
-     width: 100%;
-     min-height: 40px;
-     gap: 12px;
-     padding: 6px 14px;
-     border-radius: 12px;
-     border: 1.5px solid rgba(35, 111, 122, 0.2);
-     background-color: rgba(255, 255, 255, 0.75);
-     box-shadow: 0 1px 3px rgba(20, 56, 51, 0.06);
-     transition: all 0.15s ease;
-     justify-content: flex-start;
-   }
-   .s2-option-row:hover,
-   .s2-option-row:active {
-     background-color: rgba(189, 223, 216, 0.4);
-     border-color: #236f7a;
-     transform: translateY(-1px);
-   }
-   .s2-checkbox-box {
-     width: 22px;
-     height: 22px;
-     border-radius: 5px;
-     border: 2px solid #236f7a;
-     flex-shrink: 0;
-   }
-   .s2-checkbox-box.checked {
-     background-color: #144e57;
-     border-color: #143833;
-   }
-   .s2-option-text {
-     font-size: 14px;
-     line-height: 1.3;
-     font-weight: 600;
-     color: #143833;
-   }
-   /* 3. Bottom Controls: Two-tier layout with Play/CC ABOVE and Back/Next BELOW */
-   .s2-bottom-bar {
-     width: 100%;
-     max-width: 320px;
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: center;
-     gap: clamp(8px, 1.6vh, 14px);
-     padding-top: 4px;
-     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-     margin: 0 auto;
-     flex-shrink: 0;
-   }
-   .s2-spacer-side {
-     display: none;
-   }
-   .s2-audio-controls {
-     order: 1;
-     width: auto;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     gap: 8px;
-     margin: 0 auto;
-     background-color: transparent;
-     padding: 0;
-     border: none;
-     box-shadow: none;
-   }
-   .s2-audio-btn {
-     min-width: 44px;
-     min-height: 44px;
-     padding: 4px;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-   }
-   .s2-audio-btn svg {
-     height: 34px !important;
-     width: auto !important;
-     transition: transform 0.12s ease;
-   }
-   .s2-audio-btn:hover svg,
-   .s2-audio-btn:active svg {
-     transform: scale(0.96);
-   }
-   .s2-nav-center {
-     order: 2;
-     display: flex;
-     align-items: center;
-     justify-content: space-between;
-     gap: 14px;
-     width: 100%;
-     margin: 0;
-   }
-   .s2-btn-nav {
-     flex: 1 1 0%;
-     min-height: 48px;
-     height: 48px;
-     font-size: 16px;
-     font-weight: 700;
-     padding: 0 16px;
-     border-radius: 9999px;
-     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-     text-align: center;
-   }
+   ${s2MobileLayout(".s2-component-card:not(.is-desktop)")}
  }
 
  /* Prefers Reduced Motion (WCAG 2.3.3) */
@@ -1278,6 +1072,7 @@ export function Slide2MedicineNamingScreen({
            <svg
              className="s2-bubble-svg"
              viewBox="0 0 520 340"
+             preserveAspectRatio="none"
              fill="none"
              aria-hidden="true"
              focusable="false"
@@ -1295,7 +1090,8 @@ export function Slide2MedicineNamingScreen({
                transform="translate(4, 5)"
                fill="#1a3532"
                stroke="#1a3532"
-               strokeWidth="4"
+               strokeWidth="2"
+               vectorEffect="non-scaling-stroke"
                strokeLinecap="round"
                strokeLinejoin="round"
              />
@@ -1314,7 +1110,8 @@ export function Slide2MedicineNamingScreen({
                d={BUBBLE_PATH}
                fill="none"
                stroke="#8ebfbb"
-               strokeWidth="5"
+               strokeWidth="2.4"
+               vectorEffect="non-scaling-stroke"
                strokeLinecap="round"
                strokeLinejoin="round"
              />
@@ -1326,14 +1123,12 @@ export function Slide2MedicineNamingScreen({
               {isEs ? (
                 <>
                   ¡Seleccione cómo lo llama!<br />
-                  Usaremos el nombre que elija<br />
-                  during our time together.
+                  Usaremos el nombre que elija durante nuestro tiempo juntos.
                 </>
               ) : (
                 <>
                   Select what you call it!<br />
-                  We&apos;ll use the name you choose<br />
-                  durante nuestro tiempo juntos.
+                  We&apos;ll use the name you choose during our time together.
                 </>
               )}
             </p>
