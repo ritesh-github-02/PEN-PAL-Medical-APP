@@ -54,7 +54,7 @@ const mobileLayout = (scope: string) => `
     justify-content: flex-start !important;
     align-items: center !important;
     padding: 30px 16px 30px 16px !important;
-    gap: 10px !important;
+    gap: 25px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
@@ -77,7 +77,7 @@ const mobileLayout = (scope: string) => `
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
-    gap: 0 !important;
+    gap: 6px !important;
   }
   ${scope} .s4-bubble {
     order: 1 !important;

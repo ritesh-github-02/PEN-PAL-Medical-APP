@@ -518,7 +518,7 @@ const mobileLayout = (scope: string) => `
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
-    gap: 16px !important;
+    gap: 30px !important;
   }
   ${scope} .s3-left-col {
     position: static !important;
