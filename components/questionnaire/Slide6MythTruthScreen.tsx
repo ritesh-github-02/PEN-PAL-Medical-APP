@@ -88,16 +88,16 @@ const mobileLayout = (scope: string) => `
   ${scope} {
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    height: 100% !important;
+    height: auto !important;
     max-height: 100% !important;
-    min-height: 100% !important;
+    min-height: 0 !important;
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 14px 16px 12px 16px !important;
-    gap: 10px !important;
+    padding: 10px 14px 10px 14px !important;
+    gap: clamp(6px, 1.2vh, 10px) !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
@@ -110,7 +110,7 @@ const mobileLayout = (scope: string) => `
     height: auto !important;
     flex: 1 1 auto !important;
     min-height: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     padding: 0 !important;
     margin: 0 auto !important;
     display: flex !important;
@@ -118,17 +118,18 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     justify-content: center !important;
     transform: none !important;
-    gap: clamp(14px, 2.4vh, 22px) !important;
+    gap: clamp(8px, 1.5vh, 14px) !important;
   }
   ${scope} .s6-heading {
     width: 100% !important;
-    max-width: 345px !important;
-    font-size: clamp(14.5px, 2.15vh, 17px) !important;
-    line-height: 1.36 !important;
+    max-width: 100% !important;
+    font-size: clamp(13.5px, 1.95vh, 15.5px) !important;
+    line-height: 1.32 !important;
     font-weight: 700 !important;
     letter-spacing: -0.015em !important;
     text-align: center !important;
-    margin: 6px auto 0 auto !important;
+    margin: 2px auto 0 auto !important;
+    padding: 0 2px !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s6-heading:focus:not(:focus-visible) {
@@ -136,34 +137,36 @@ const mobileLayout = (scope: string) => `
   }
   ${scope} .s6-cards {
     width: 100% !important;
-    gap: clamp(10px, 1.6vh, 12px) !important;
+    gap: clamp(6px, 1.1vh, 9px) !important;
     flex: 0 1 auto !important;
     min-height: 0 !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    padding: 4px 6px !important;
+    overflow: visible !important;
+    padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
   }
   ${scope} .s6-card {
-    min-height: clamp(56px, 8.2vh, 70px) !important;
-    padding: 10px 12px !important;
-    gap: 10px !important;
-    border-radius: 14px !important;
+    min-height: clamp(44px, 6.2vh, 54px) !important;
+    padding: 7px 10px !important;
+    gap: 8px !important;
+    border-radius: 13px !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s6-card-tag {
-    font-size: 10.5px !important;
-    padding: 3px 8px !important;
+    min-width: 58px !important;
+    text-align: center !important;
+    font-size: 10px !important;
+    letter-spacing: 0.03em !important;
+    padding: 3px 7px !important;
   }
   ${scope} .s6-card-text {
-    font-size: clamp(12.5px, 1.75vh, 13.5px) !important;
-    line-height: 1.34 !important;
+    font-size: clamp(11.5px, 1.6vh, 12.2px) !important;
+    line-height: 1.3 !important;
   }
   ${scope} .s6-card-icon svg {
-    width: 18px !important;
-    height: 18px !important;
+    width: 16px !important;
+    height: 16px !important;
   }
   ${scope} .s6-bottom-bar {
     width: 100% !important;
@@ -172,9 +175,9 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: clamp(10px, 1.8vh, 16px) !important;
-    padding-top: 6px !important;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: clamp(6px, 1.2vh, 12px) !important;
+    padding-top: 2px !important;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
@@ -345,6 +348,7 @@ const SLIDE6_CSS = `
 
 .s6-card-tag {
   flex-shrink: 0;
+  min-width: 68px;
   padding: 4px 9px;
   border-radius: 9999px;
   background-color: #7a4526;
@@ -353,6 +357,7 @@ const SLIDE6_CSS = `
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: 0.04em;
+  text-align: center;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -368,7 +373,7 @@ const SLIDE6_CSS = `
   font-weight: 600;
   line-height: 1.38;
   letter-spacing: -0.01em;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .s6-card-icon {
@@ -399,7 +404,7 @@ const SLIDE6_CSS = `
 @media (max-width: 767px) {
 ${mobileLayout(".s6-root:not(.is-desktop)")}
   .s6-root:not(.is-desktop) {
-    min-height: min(640px, calc(100dvh - 80px)) !important;
+    min-height: min(560px, calc(100dvh - 80px)) !important;
     max-height: calc(100dvh - 72px) !important;
   }
 }
