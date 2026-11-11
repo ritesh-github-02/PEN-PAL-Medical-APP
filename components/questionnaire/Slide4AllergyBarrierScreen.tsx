@@ -53,7 +53,7 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 14px 16px 12px 16px !important;
+    padding: 30px 16px 30px 16px !important;
     gap: 10px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
