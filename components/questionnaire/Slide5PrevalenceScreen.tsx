@@ -27,25 +27,32 @@ const STAGE_H = 427;
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    overflow: visible !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
+    padding: 14px 16px 12px 16px !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
   ${scope} .s5-stage {
     position: relative !important;
     width: 100% !important;
-    max-width: 440px !important;
+    max-width: 380px !important;
     height: auto !important;
-    flex: 0 1 auto !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
+    overflow: visible !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
@@ -54,63 +61,119 @@ const mobileLayout = (scope: string) => `
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
-    gap: 8px !important;
+    gap: clamp(22px, 3.6vh, 32px) !important;
   }
   ${scope} .s5-badge {
     position: static !important;
-    min-width: 130px !important;
-    height: clamp(30px, 4.2vh, 36px) !important;
-    border-radius: 12px !important;
-    margin: 0 auto 0 0 !important;
-    padding: 0 14px !important;
+    min-width: 190px !important;
+    height: clamp(44px, 6vh, 52px) !important;
+    border-radius: 18px !important;
+    margin: 12px auto 0 auto !important;
+    padding: 0 24px !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s5-badge-title {
-    font-size: clamp(12px, 1.8vh, 14px) !important;
+    font-size: clamp(16.5px, 2.35vh, 19.5px) !important;
   }
   ${scope} .s5-text-wrap {
     position: static !important;
     width: 100% !important;
-    margin: 0 !important;
+    max-width: 340px !important;
+    margin: 0 auto !important;
     padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s5-heading {
-    font-size: clamp(12px, 1.7vh, 14px) !important;
-    line-height: 1.35 !important;
-    text-align: left !important;
+    font-size: clamp(16px, 2.35vh, 18.5px) !important;
+    line-height: 1.42 !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.015em !important;
+    color: #142724 !important;
+    text-align: center !important;
     margin: 0 !important;
   }
+  ${scope} .s5-heading:focus {
+    outline: none !important;
+  }
   ${scope} .s5-bold {
-    font-size: clamp(13px, 1.9vh, 15px) !important;
+    font-size: clamp(17.5px, 2.55vh, 20.5px) !important;
+    font-weight: 800 !important;
   }
   ${scope} .s5-nurse {
     position: static !important;
     left: auto !important;
     top: auto !important;
     width: auto !important;
-    height: clamp(80px, 13vh, 115px) !important;
-    max-height: 115px !important;
+    height: clamp(150px, 24vh, 215px) !important;
+    max-height: 215px !important;
     margin: 0 auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s5-nurse-img {
     height: 100% !important;
-    max-height: clamp(80px, 13vh, 115px) !important;
+    max-height: 100% !important;
     width: auto !important;
     object-fit: contain !important;
   }
+  ${scope} .s5-bottom-bar {
+    width: 100% !important;
+    max-width: 360px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(10px, 1.8vh, 16px) !important;
+    padding-top: 6px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+    z-index: 25 !important;
+  }
   ${scope} .s5-audio {
+    order: 1 !important;
     position: static !important;
     right: auto !important;
     bottom: auto !important;
+    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
-    margin: 4px auto 0 auto !important;
+    margin: 0 auto !important;
+    color: #144e57 !important;
     z-index: 25 !important;
   }
+  ${scope} .s5-audio > div {
+    gap: 8px !important;
+  }
+  ${scope} .s5-audio .audio-cc-btn,
+  ${scope} .s5-audio .audio-play-btn {
+    color: #144e57 !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 4px !important;
+  }
+  ${scope} .s5-audio .audio-cc-btn svg,
+  ${scope} .s5-audio .audio-play-btn svg {
+    height: 34px !important;
+    width: auto !important;
+  }
   ${scope} .slide-nav {
-    margin: 4px auto 0 auto !important;
+    order: 2 !important;
+    position: relative !important;
+    bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 auto !important;
+    gap: 16px !important;
+  }
+  ${scope} .slide-nav-btn {
+    min-width: 128px !important;
+    padding: 0 32px !important;
   }
 `;
 
@@ -258,7 +321,12 @@ const SLIDE5_CSS = `
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
   }
 
-  /* Audio narration & CC controls: bottom-right on desktop, centered on mobile */
+  /* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
+  .s5-bottom-bar {
+    display: contents;
+  }
+
+  /* Audio narration & CC controls: bottom-right on desktop, centered above nav on mobile */
   .s5-audio {
     position: absolute;
     right: 22px;
@@ -270,7 +338,11 @@ const SLIDE5_CSS = `
   }
 
   @media (max-width: 767px) {
-    ${mobileLayout(".s5-root")}
+    ${mobileLayout(".s5-root:not(.is-desktop)")}
+    .s5-root:not(.is-desktop) {
+      min-height: min(640px, calc(100dvh - 80px)) !important;
+      max-height: calc(100dvh - 72px) !important;
+    }
   }
 
   ${mobileLayout(".s5-root.is-mobile")}
@@ -420,24 +492,25 @@ export function Slide5PrevalenceScreen({
         </div>
       </div>
 
-      {/* 4. Audio narration & CC controls (bottom-right on desktop, centered above nav on mobile) */}
-      <div className="s5-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId}
-          locale={isEs ? "es" : "en"}
-          transcriptText={captionText}
-          size="large"
+      {/* 4. Bottom Controls (Audio above Back/Next on mobile; independent on desktop) */}
+      <div className="s5-bottom-bar">
+        <div className="s5-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={isEs ? "es" : "en"}
+            transcriptText={captionText}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
         />
       </div>
-
-      {/* 5. Fixed Centered Bottom Navigation (Back & Next) */}
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isEs}
-        loading={loading}
-      />
     </div>
   );
 }

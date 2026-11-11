@@ -86,70 +86,139 @@ const stripPrefix = (text: string) =>
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
-    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
+    padding: 14px 16px 12px 16px !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
   ${scope} .s6-stage {
     width: 100% !important;
-    max-width: 440px !important;
+    max-width: 380px !important;
     height: auto !important;
-    flex: 0 1 auto !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
+    overflow: hidden !important;
     padding: 0 !important;
     margin: 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
+    align-items: center !important;
     justify-content: center !important;
     transform: none !important;
-    gap: 8px !important;
+    gap: clamp(14px, 2.4vh, 22px) !important;
   }
   ${scope} .s6-heading {
-    font-size: clamp(11.5px, 1.7vh, 13px) !important;
-    line-height: 1.3 !important;
-    margin-bottom: 2px !important;
+    width: 100% !important;
+    max-width: 345px !important;
+    font-size: clamp(14.5px, 2.15vh, 17px) !important;
+    line-height: 1.36 !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.015em !important;
+    text-align: center !important;
+    margin: 6px auto 0 auto !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s6-heading:focus:not(:focus-visible) {
+    outline: none !important;
   }
   ${scope} .s6-cards {
-    gap: clamp(6px, 1.2vh, 8px) !important;
+    width: 100% !important;
+    gap: clamp(10px, 1.6vh, 12px) !important;
     flex: 0 1 auto !important;
     min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 4px 6px !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
   }
   ${scope} .s6-card {
-    min-height: clamp(38px, 5.8vh, 48px) !important;
-    padding: 4px 8px !important;
-    gap: 6px !important;
-    border-radius: 10px !important;
+    min-height: clamp(56px, 8.2vh, 70px) !important;
+    padding: 10px 12px !important;
+    gap: 10px !important;
+    border-radius: 14px !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s6-card-tag {
-    font-size: 9.5px !important;
-    padding: 2px 6px !important;
+    font-size: 10.5px !important;
+    padding: 3px 8px !important;
   }
   ${scope} .s6-card-text {
-    font-size: clamp(10.5px, 1.4vh, 11.5px) !important;
-    line-height: 1.25 !important;
+    font-size: clamp(12.5px, 1.75vh, 13.5px) !important;
+    line-height: 1.34 !important;
+  }
+  ${scope} .s6-card-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  ${scope} .s6-bottom-bar {
+    width: 100% !important;
+    max-width: 360px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(10px, 1.8vh, 16px) !important;
+    padding-top: 6px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+    z-index: 25 !important;
   }
   ${scope} .s6-audio {
+    order: 1 !important;
     position: static !important;
     right: auto !important;
     bottom: auto !important;
+    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
-    margin: 4px auto 0 auto !important;
+    margin: 0 auto !important;
+    color: #144e57 !important;
     z-index: 25 !important;
   }
+  ${scope} .s6-audio > div {
+    gap: 8px !important;
+  }
+  ${scope} .s6-audio .audio-cc-btn,
+  ${scope} .s6-audio .audio-play-btn {
+    color: #144e57 !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 4px !important;
+  }
+  ${scope} .s6-audio .audio-cc-btn svg,
+  ${scope} .s6-audio .audio-play-btn svg {
+    height: 34px !important;
+    width: auto !important;
+  }
   ${scope} .slide-nav {
-    margin: 4px auto 0 auto !important;
+    order: 2 !important;
+    position: relative !important;
+    bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 auto !important;
+    gap: 16px !important;
+  }
+  ${scope} .slide-nav-btn {
+    min-width: 128px !important;
+    padding: 0 32px !important;
   }
 `;
 
@@ -311,7 +380,12 @@ const SLIDE6_CSS = `
   opacity: 0.75;
 }
 
-/* 3. Audio controls — bottom-right like Slide 5 */
+/* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
+.s6-bottom-bar {
+  display: contents;
+}
+
+/* 3. Audio controls — bottom-right on desktop, centered above nav on mobile */
 .s6-audio {
   position: absolute;
   right: 22px;
@@ -323,7 +397,11 @@ const SLIDE6_CSS = `
 }
 
 @media (max-width: 767px) {
-${mobileLayout(".s6-root")}
+${mobileLayout(".s6-root:not(.is-desktop)")}
+  .s6-root:not(.is-desktop) {
+    min-height: min(640px, calc(100dvh - 80px)) !important;
+    max-height: calc(100dvh - 72px) !important;
+  }
 }
 
 ${mobileLayout(".s6-root.is-mobile")}
@@ -527,16 +605,6 @@ export function Slide6MythTruthScreen({
         </div>
       </div>
 
-      <div className="s6-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId}
-          locale={activeLocale}
-          transcriptText={plainTranscript}
-          size="large"
-        />
-      </div>
-
       <p className="s6-sr-only">
         {allRevealed
           ? isEs
@@ -547,13 +615,25 @@ export function Slide6MythTruthScreen({
             : "The Next button is enabled once all four myths are revealed."}
       </p>
 
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isEs}
-        loading={loading}
-        nextDisabled={!allRevealed}
-      />
+      <div className="s6-bottom-bar">
+        <div className="s6-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={activeLocale}
+            transcriptText={plainTranscript}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
+          nextDisabled={!allRevealed}
+        />
+      </div>
     </div>
   );
 }
