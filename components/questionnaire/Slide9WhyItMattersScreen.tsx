@@ -57,112 +57,174 @@ const COPY = {
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
-    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
+    padding: 14px 16px 12px 16px !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
   ${scope} .s9-stage {
     width: 100% !important;
-    max-width: 440px !important;
+    max-width: 380px !important;
     height: auto !important;
-    flex: 0 1 auto !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
+    overflow: visible !important;
     padding: 0 !important;
     margin: 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
+    align-items: center !important;
     justify-content: center !important;
     transform: none !important;
-    gap: 8px !important;
+    gap: clamp(14px, 2.2vh, 22px) !important;
   }
   ${scope} .s9-badge {
-    margin: 0 auto 4px !important;
-    padding: 4px 14px !important;
-    border-radius: 12px !important;
+    margin: 4px auto 0 auto !important;
+    padding: 10px 22px !important;
+    border-radius: 16px !important;
     display: inline-flex !important;
     align-self: center !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s9-heading {
-    font-size: clamp(12px, 1.8vh, 14px) !important;
+    font-size: clamp(16px, 2.35vh, 18.5px) !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
     margin: 0 !important;
+  }
+  ${scope} .s9-heading:focus:not(:focus-visible) {
+    outline: none !important;
   }
   ${scope} .s9-main {
     flex-direction: column !important;
     align-items: center !important;
     flex: 0 1 auto !important;
     min-height: 0 !important;
+    width: 100% !important;
     justify-content: center !important;
-    gap: 8px !important;
+    gap: clamp(12px, 2vh, 18px) !important;
+    margin-top: 0 !important;
   }
   ${scope} .s9-nurse {
     order: 2 !important;
     width: auto !important;
-    height: clamp(90px, 14.5vh, 128px) !important;
-    max-height: 128px !important;
-    margin: 2px auto !important;
+    height: clamp(100px, 16vh, 145px) !important;
+    max-height: 145px !important;
+    margin: 2px auto 0 auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s9-nurse-img {
     height: 100% !important;
-    max-height: clamp(90px, 14.5vh, 128px) !important;
+    max-height: 100% !important;
     width: auto !important;
     object-fit: contain !important;
     filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
   }
-  @media (max-height: 560px) {
+  @media (max-height: 580px) {
     ${scope} .s9-nurse {
-      height: 80px !important;
-      max-height: 80px !important;
-    }
-    ${scope} .s9-nurse-img {
-      max-height: 80px !important;
+      height: 82px !important;
+      max-height: 82px !important;
     }
   }
   ${scope} .s9-content {
     order: 1 !important;
     width: 100% !important;
-    gap: 4px !important;
+    max-width: 350px !important;
+    padding: 0 4px !important;
+    gap: clamp(8px, 1.4vh, 12px) !important;
   }
   ${scope} .s9-intro {
-    font-size: clamp(10.5px, 1.45vh, 12px) !important;
-    line-height: 1.3 !important;
+    font-size: clamp(13.5px, 1.95vh, 15px) !important;
+    line-height: 1.38 !important;
+    font-weight: 700 !important;
+    color: #142724 !important;
     margin: 0 !important;
   }
   ${scope} .s9-bullets {
-    gap: clamp(2px, 0.6vh, 4px) !important;
+    gap: clamp(6px, 1.1vh, 9px) !important;
     margin: 0 !important;
   }
   ${scope} .s9-bullet {
-    gap: 6px !important;
-    font-size: clamp(10px, 1.35vh, 11px) !important;
-    line-height: 1.25 !important;
+    gap: 9px !important;
+    font-size: clamp(12.5px, 1.75vh, 14px) !important;
+    line-height: 1.35 !important;
+    color: #1f2e2b !important;
   }
   ${scope} .s9-bullet-dot {
-    width: 5px !important;
-    height: 5px !important;
-    margin-top: 5px !important;
+    width: 6px !important;
+    height: 6px !important;
+    margin-top: 7px !important;
+  }
+  ${scope} .s9-bottom-bar {
+    width: 100% !important;
+    max-width: 360px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(10px, 1.8vh, 16px) !important;
+    padding-top: 6px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+    z-index: 25 !important;
   }
   ${scope} .s9-audio {
+    order: 1 !important;
     position: static !important;
     right: auto !important;
     bottom: auto !important;
+    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
-    margin: 4px auto 0 auto !important;
+    margin: 0 auto !important;
+    color: #144e57 !important;
     z-index: 25 !important;
   }
+  ${scope} .s9-audio > div {
+    gap: 8px !important;
+  }
+  ${scope} .s9-audio .audio-cc-btn,
+  ${scope} .s9-audio .audio-play-btn {
+    color: #144e57 !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 4px !important;
+  }
+  ${scope} .s9-audio .audio-cc-btn svg,
+  ${scope} .s9-audio .audio-play-btn svg {
+    height: 34px !important;
+    width: auto !important;
+  }
   ${scope} .slide-nav {
-    margin: 4px auto 0 auto !important;
+    order: 2 !important;
+    position: relative !important;
+    bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 auto !important;
+    gap: 16px !important;
+  }
+  ${scope} .slide-nav-btn {
+    min-width: 128px !important;
+    padding: 0 32px !important;
   }
 `;
 
@@ -308,7 +370,12 @@ const SLIDE9_CSS = `
   background-color: #236f7a;
 }
 
-/* 3. Audio controls — bottom-right like Slide 5 */
+/* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
+.s9-bottom-bar {
+  display: contents;
+}
+
+/* 3. Audio controls — bottom-right on desktop, centered above nav on mobile */
 .s9-audio {
   position: absolute;
   right: 22px;
@@ -320,7 +387,11 @@ const SLIDE9_CSS = `
 }
 
 @media (max-width: 767px) {
-${mobileLayout(".s9-root")}
+${mobileLayout(".s9-root:not(.is-desktop)")}
+  .s9-root:not(.is-desktop) {
+    min-height: min(640px, calc(100dvh - 80px)) !important;
+    max-height: calc(100dvh - 72px) !important;
+  }
 }
 
 ${mobileLayout(".s9-root.is-mobile")}
@@ -447,22 +518,24 @@ export function Slide9WhyItMattersScreen({
         </div>
       </div>
 
-      <div className="s9-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId}
-          locale={activeLocale}
-          transcriptText={plainTranscript}
-          size="large"
+      <div className="s9-bottom-bar">
+        <div className="s9-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={activeLocale}
+            transcriptText={plainTranscript}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
         />
       </div>
-
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isEs}
-        loading={loading}
-      />
     </div>
   );
 }

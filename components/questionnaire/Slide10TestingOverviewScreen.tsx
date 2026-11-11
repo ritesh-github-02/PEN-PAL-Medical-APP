@@ -89,71 +89,87 @@ const COPY = {
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
-    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
+    padding: 14px 16px 12px 16px !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
   ${scope} .s10-stage {
     width: 100% !important;
-    max-width: 440px !important;
+    max-width: 380px !important;
     height: auto !important;
-    flex: 0 1 auto !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
+    overflow: visible !important;
     padding: 0 !important;
     margin: 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
+    align-items: center !important;
     justify-content: center !important;
     transform: none !important;
-    gap: 8px !important;
+    gap: 10px !important;
   }
   ${scope} .s10-body {
     position: static !important;
     display: flex !important;
     flex-direction: column !important;
+    align-items: center !important;
     flex: 0 1 auto !important;
     min-height: 0 !important;
+    width: 100% !important;
     justify-content: center !important;
-    gap: 8px !important;
+    gap: clamp(10px, 1.8vh, 16px) !important;
   }
   ${scope} .s10-left {
     width: 100% !important;
+    max-width: 350px !important;
+    padding: 0 2px !important;
     justify-content: flex-start !important;
-    gap: 4px !important;
+    gap: clamp(6px, 1vh, 9px) !important;
   }
   ${scope} .s10-heading {
     margin-bottom: 0 !important;
-    font-size: clamp(11.5px, 1.7vh, 13px) !important;
-    line-height: 1.3 !important;
+    font-size: clamp(13px, 1.85vh, 14.5px) !important;
+    line-height: 1.36 !important;
+    font-weight: 500 !important;
+  }
+  ${scope} .s10-heading:focus:not(:focus-visible) {
+    outline: none !important;
   }
   ${scope} .s10-subheading {
     margin-bottom: 0 !important;
-    font-size: clamp(12px, 1.8vh, 13.5px) !important;
+    font-size: clamp(13.5px, 1.95vh, 15.5px) !important;
     line-height: 1.3 !important;
     font-weight: 700 !important;
     color: #1c5249 !important;
   }
   ${scope} .s10-bullets {
-    gap: clamp(3px, 0.7vh, 5px) !important;
+    gap: clamp(5px, 0.9vh, 8px) !important;
     margin: 0 !important;
   }
   ${scope} .s10-bullet-item {
-    font-size: clamp(10px, 1.4vh, 11px) !important;
-    line-height: 1.25 !important;
-    gap: 6px !important;
+    font-size: clamp(12px, 1.68vh, 13.2px) !important;
+    line-height: 1.33 !important;
+    gap: 8px !important;
   }
   ${scope} .s10-bullet-dot {
-    width: 5px !important;
-    height: 5px !important;
-    margin-top: 5px !important;
+    width: 5.5px !important;
+    height: 5.5px !important;
+    margin-top: 6px !important;
   }
   ${scope} .s10-right {
     width: 100% !important;
@@ -166,8 +182,8 @@ const mobileLayout = (scope: string) => `
     gap: 0 !important;
   }
   ${scope} .s10-bubble {
-    width: clamp(155px, 46vw, 185px) !important;
-    max-width: 185px !important;
+    width: clamp(175px, 50vw, 215px) !important;
+    max-width: 215px !important;
     height: auto !important;
     aspect-ratio: 520 / 330 !important;
     margin: 0 auto !important;
@@ -177,13 +193,13 @@ const mobileLayout = (scope: string) => `
     filter: drop-shadow(2px 3px 0 #1a3532) !important;
   }
   ${scope} .s10-bubble-text {
-    font-size: clamp(10px, 1.35vh, 11.5px) !important;
-    line-height: 1.25 !important;
+    font-size: clamp(11.5px, 1.55vh, 13px) !important;
+    line-height: 1.26 !important;
   }
   ${scope} .s10-nurse {
-    width: clamp(65px, 16vw, 85px) !important;
-    height: clamp(90px, 14.5vh, 125px) !important;
-    max-height: 125px !important;
+    width: clamp(68px, 18vw, 88px) !important;
+    height: clamp(92px, 14vh, 128px) !important;
+    max-height: 128px !important;
     margin-top: -14px !important;
     margin-left: auto !important;
     margin-right: 16% !important;
@@ -193,31 +209,76 @@ const mobileLayout = (scope: string) => `
     justify-content: center !important;
   }
   ${scope} .s10-nurse-img {
-    width: 100% !important;
     height: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
     object-fit: contain !important;
     filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
   }
-  @media (max-height: 560px) {
+  @media (max-height: 580px) {
     ${scope} .s10-nurse {
-      height: 80px !important;
-      max-height: 80px !important;
+      height: 76px !important;
+      max-height: 76px !important;
     }
-    ${scope} .s10-nurse-img {
-      max-height: 80px !important;
+    ${scope} .s10-bubble {
+      width: 155px !important;
+      max-width: 155px !important;
     }
   }
+  ${scope} .s10-bottom-bar {
+    width: 100% !important;
+    max-width: 360px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(8px, 1.5vh, 14px) !important;
+    padding-top: 4px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+    z-index: 25 !important;
+  }
   ${scope} .s10-audio {
+    order: 1 !important;
     position: static !important;
     right: auto !important;
     bottom: auto !important;
+    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
-    margin: 4px auto 0 auto !important;
+    margin: 0 auto !important;
+    color: #144e57 !important;
     z-index: 25 !important;
   }
+  ${scope} .s10-audio > div {
+    gap: 8px !important;
+  }
+  ${scope} .s10-audio .audio-cc-btn,
+  ${scope} .s10-audio .audio-play-btn {
+    color: #144e57 !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 4px !important;
+  }
+  ${scope} .s10-audio .audio-cc-btn svg,
+  ${scope} .s10-audio .audio-play-btn svg {
+    height: 34px !important;
+    width: auto !important;
+  }
   ${scope} .slide-nav {
-    margin: 4px auto 0 auto !important;
+    order: 2 !important;
+    position: relative !important;
+    bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 auto !important;
+    gap: 16px !important;
+  }
+  ${scope} .slide-nav-btn {
+    min-width: 128px !important;
+    padding: 0 32px !important;
   }
 `;
 
@@ -405,7 +466,12 @@ const SLIDE10_CSS = `
   filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
-/* 3. Audio controls — bottom-right like Slide 5 */
+/* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
+.s10-bottom-bar {
+  display: contents;
+}
+
+/* 3. Audio controls — bottom-right on desktop, centered above nav on mobile */
 .s10-audio {
   position: absolute;
   right: 22px;
@@ -417,7 +483,11 @@ const SLIDE10_CSS = `
 }
 
 @media (max-width: 767px) {
-${mobileLayout(".s10-root")}
+${mobileLayout(".s10-root:not(.is-desktop)")}
+  .s10-root:not(.is-desktop) {
+    min-height: min(640px, calc(100dvh - 80px)) !important;
+    max-height: calc(100dvh - 72px) !important;
+  }
 }
 
 ${mobileLayout(".s10-root.is-mobile")}
@@ -581,22 +651,24 @@ export function Slide10TestingOverviewScreen({
         </div>
       </div>
 
-      <div className="s10-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId}
-          locale={activeLocale}
-          transcriptText={spokenText}
-          size="large"
+      <div className="s10-bottom-bar">
+        <div className="s10-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={activeLocale}
+            transcriptText={spokenText}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
         />
       </div>
-
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isEs}
-        loading={loading}
-      />
     </div>
   );
 }

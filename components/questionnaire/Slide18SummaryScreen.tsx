@@ -211,6 +211,14 @@ const SLIDE18_CSS = `
 
 
 
+/* Wrapper Containers (transparent to desktop layout, structural on mobile) */
+.s18-main-stage {
+  display: contents;
+}
+.s18-bottom-bar {
+  display: contents;
+}
+
 /* Print-only elements hidden on screen */
 .s18-print-header,
 .s18-print-footer {
@@ -488,25 +496,6 @@ const SLIDE18_CSS = `
   }
 }
 
-@media (max-width: 767px) {
-  .s18-audio {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-    order: 1 !important;
-  }
-  .s18-nav {
-    order: 2 !important;
-    margin: 4px auto 0 auto !important;
-    gap: 0.6rem !important;
-    flex-wrap: wrap !important;
-  }
-}
-
 @media (min-width: 768px) {
   .s18-audio {
     position: absolute;
@@ -518,9 +507,170 @@ const SLIDE18_CSS = `
     z-index: 30;
   }
 }
+
+${(() => {
+  const s18MobileLayout = (scope: string) => `
+    ${scope} {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 100% !important;
+      flex: 1 1 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 14px 16px 12px 16px !important;
+      gap: 10px !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      box-sizing: border-box !important;
+    }
+    ${scope} .s18-main-stage {
+      width: 100% !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      margin: auto 0 !important;
+    }
+    ${scope} .s18-content {
+      width: 100% !important;
+      max-width: 380px !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+    ${scope} .s18-badge {
+      padding: 8px 20px !important;
+      margin-bottom: 4px !important;
+      border-radius: 14px !important;
+      max-width: 100% !important;
+    }
+    ${scope} .s18-badge-title {
+      font-size: clamp(16px, 2.3vh, 19px) !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+    }
+    ${scope} .s18-badge-title:focus:not(:focus-visible) {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    ${scope} .s18-steps-list {
+      gap: 5px !important;
+      margin-bottom: 4px !important;
+      width: 100% !important;
+    }
+    ${scope} .s18-step-line {
+      font-size: clamp(12.5px, 1.7vh, 13.5px) !important;
+      line-height: 1.32 !important;
+    }
+    ${scope} .s18-quote-line {
+      font-size: clamp(12px, 1.6vh, 13px) !important;
+      line-height: 1.32 !important;
+    }
+    ${scope} .s18-table-container {
+      width: 100% !important;
+      max-width: 380px !important;
+    }
+    ${scope} .s18-table-label,
+    ${scope} .s18-table-value {
+      font-size: clamp(11.5px, 1.55vh, 12.5px) !important;
+      line-height: 1.3 !important;
+      padding: 6px 10px !important;
+      overflow-wrap: break-word !important;
+    }
+    ${scope} .s18-bottom-bar {
+      width: 100% !important;
+      max-width: 380px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: clamp(10px, 1.8vh, 14px) !important;
+      padding-top: 6px !important;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s18-audio {
+      order: 1 !important;
+      position: static !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      color: #144e57 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s18-audio > div {
+      gap: 8px !important;
+    }
+    ${scope} .s18-audio .audio-cc-btn,
+    ${scope} .s18-audio .audio-play-btn {
+      color: #144e57 !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      padding: 4px !important;
+    }
+    ${scope} .s18-audio .audio-cc-btn svg,
+    ${scope} .s18-audio .audio-play-btn svg {
+      height: 34px !important;
+      width: auto !important;
+    }
+    ${scope} .s18-nav {
+      order: 2 !important;
+      position: relative !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 10px !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s18-nav .slide-nav-btn {
+      min-width: 104px !important;
+      height: 44px !important;
+      padding: 0 22px !important;
+    }
+    ${scope} .s18-btn {
+      min-height: 44px !important;
+      height: 44px !important;
+      padding: 0 16px !important;
+      font-size: 14px !important;
+    }
+  `;
+  return `
+    ${s18MobileLayout(".s18-root.is-mobile")}
+    @media (max-width: 767px) {
+      ${s18MobileLayout(".s18-root:not(.is-desktop)")}
+      .s18-root:not(.is-desktop) {
+        min-height: min(640px, calc(100dvh - 80px)) !important;
+        max-height: calc(100dvh - 72px) !important;
+      }
+    }
+    @media (max-width: 767px) and (max-height: 520px) {
+      .s18-root:not(.is-desktop) {
+        justify-content: flex-start !important;
+      }
+    }
+  `;
+})()}
 `;
 
 export interface Slide18SummaryScreenProps {
+  variant?: "auto" | "desktop" | "mobile";
   isSpanish?: boolean;
   answers: Record<string, any>;
   activeToken?: string | null;
@@ -536,6 +686,7 @@ export interface Slide18SummaryScreenProps {
 }
 
 export function Slide18SummaryScreen({
+  variant = "auto",
   isSpanish = false,
   answers,
   activeToken,
@@ -654,162 +805,174 @@ export function Slide18SummaryScreen({
     }
   };
 
+  const variantClass =
+    variant === "mobile"
+      ? " is-mobile"
+      : variant === "desktop"
+      ? " is-desktop"
+      : "";
+
   return (
-    <div id="slide-content" className="s18-root" ref={cardRef}>
+    <div id="slide-content" className={`s18-root${variantClass}`} ref={cardRef}>
       <style>{SLIDE18_CSS}</style>
 
-      {/* Main Centered Content */}
-      <div className="s18-content">
-        {/* Printable Clinical Header (Visible ONLY when printing) */}
-        <div className="s18-print-header" aria-hidden="true">
-          <div className="s18-print-brand">
-            <span className="s18-print-logo">PEN-PAL</span>
-            <span className="s18-print-tagline">
-              {isSpanish
-                ? "Estudio Clínico sobre Alergia a la Penicilina en Pediatría"
-                : "Pediatric Penicillin Allergy Evaluation Study"}
-            </span>
+      <div className="s18-main-stage">
+        {/* Main Centered Content */}
+        <div className="s18-content">
+          {/* Printable Clinical Header (Visible ONLY when printing) */}
+          <div className="s18-print-header" aria-hidden="true">
+            <div className="s18-print-brand">
+              <span className="s18-print-logo">PEN-PAL</span>
+              <span className="s18-print-tagline">
+                {isSpanish
+                  ? "Estudio Clínico sobre Alergia a la Penicilina en Pediatría"
+                  : "Pediatric Penicillin Allergy Evaluation Study"}
+              </span>
+            </div>
+            <div className="s18-print-meta">
+              <span className="s18-print-doc-type">
+                {isSpanish ? "Guía de Discusión Médica y Resumen" : "Doctor Discussion Guide & Summary"}
+              </span>
+              <span className="s18-print-date">
+                {new Date().toLocaleDateString(isSpanish ? "es-US" : "en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
           </div>
-          <div className="s18-print-meta">
-            <span className="s18-print-doc-type">
-              {isSpanish ? "Guía de Discusión Médica y Resumen" : "Doctor Discussion Guide & Summary"}
-            </span>
-            <span className="s18-print-date">
-              {new Date().toLocaleDateString(isSpanish ? "es-US" : "en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+
+          {/* 1. Yellow Badge */}
+          <div className="s18-badge">
+            <h1
+              ref={summaryTitleRef}
+              tabIndex={-1}
+              id="slide18-title"
+              className="s18-badge-title"
+            >
+              {isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents"}
+            </h1>
           </div>
-        </div>
 
-        {/* 1. Yellow Badge */}
-        <div className="s18-badge">
-          <h1
-            ref={summaryTitleRef}
-            tabIndex={-1}
-            id="slide18-title"
-            className="s18-badge-title"
-          >
-            {isSpanish ? "Pasos a seguir para los padres" : "Action Steps for Parents"}
-          </h1>
-        </div>
-
-        {/* 2. Numbered Steps matching Spec p18_4.png */}
-        <div className="s18-steps-list">
-          <p className="s18-step-line">
-            {isSpanish
-              ? "1. Hable con el médico de su hijo sobre la alergia en su próxima visita."
-              : "1. Talk to your child’s doctor about the allergy at their next visit."}
-          </p>
-          <p className="s18-quote-line">
-            {isSpanish ? "Esto es lo que puede decir: " : "Here’s what you can say: "}
-            <span className="s18-quote-text">
+          {/* 2. Numbered Steps matching Spec p18_4.png */}
+          <div className="s18-steps-list">
+            <p className="s18-step-line">
               {isSpanish
-                ? "«Leí sobre las alergias a la penicilina en niños. ¿Podríamos hablar sobre verificar si mi hijo realmente tiene una alergia?»"
-                : '“I read about penicillin allergies in kids. Could we talk about checking to see if my child really has an allergy?”'}
-            </span>
-          </p>
+                ? "1. Hable con el médico de su hijo sobre la alergia en su próxima visita."
+                : "1. Talk to your child’s doctor about the allergy at their next visit."}
+            </p>
+            <p className="s18-quote-line">
+              {isSpanish ? "Esto es lo que puede decir: " : "Here’s what you can say: "}
+              <span className="s18-quote-text">
+                {isSpanish
+                  ? "«Leí sobre las alergias a la penicilina en niños. ¿Podríamos hablar sobre verificar si mi hijo realmente tiene una alergia?»"
+                  : '“I read about penicillin allergies in kids. Could we talk about checking to see if my child really has an allergy?”'}
+              </span>
+            </p>
 
-          <p className="s18-step-line">
-            {isSpanish
-              ? "2. Comparta fotos de la reacción de su hijo con el médico."
-              : "2. Share pictures of your child’s reaction with the doctor."}
-          </p>
+            <p className="s18-step-line">
+              {isSpanish
+                ? "2. Comparta fotos de la reacción de su hijo con el médico."
+                : "2. Share pictures of your child’s reaction with the doctor."}
+            </p>
 
-          <p className="s18-step-line">
-            {isSpanish
-              ? `3. Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
-              : `3. Give the table below to your child’s doctor. This says what happened when your child took ${effectiveMedName}.`}
-          </p>
-        </div>
+            <p className="s18-step-line">
+              {isSpanish
+                ? `3. Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
+                : `3. Give the table below to your child’s doctor. This says what happened when your child took ${effectiveMedName}.`}
+            </p>
+          </div>
 
-        {/* 3. The 2-Column Summary Table (Spec p18_4.png) */}
-        <div className="s18-table-container">
-          <table className="s18-table" aria-label={isSpanish ? "Resumen de la reacción" : "Reaction Summary"}>
-            <tbody>
-              {tableRows.map((row, idx) => (
-                <tr key={idx}>
-                  <td className="s18-table-label">{row.label}</td>
-                  <td className="s18-table-value">{row.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          {/* 3. The 2-Column Summary Table (Spec p18_4.png) */}
+          <div className="s18-table-container">
+            <table className="s18-table" aria-label={isSpanish ? "Resumen de la reacción" : "Reaction Summary"}>
+              <tbody>
+                {tableRows.map((row, idx) => (
+                  <tr key={idx}>
+                    <td className="s18-table-label">{row.label}</td>
+                    <td className="s18-table-value">{row.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        {/* Printable Footer (Visible ONLY when printing) */}
-        <div className="s18-print-footer" aria-hidden="true">
-          <p className="s18-print-footer-text">
-            {isSpanish
-              ? "Entregue esta hoja a su pediatra o médico para evaluar el historial de alergia a la penicilina."
-              : "Please bring this sheet to your child's pediatrician or doctor to discuss penicillin allergy evaluation."}
-          </p>
-          <span className="s18-print-footer-tag">PEN-PAL Medical Study</span>
+          {/* Printable Footer (Visible ONLY when printing) */}
+          <div className="s18-print-footer" aria-hidden="true">
+            <p className="s18-print-footer-text">
+              {isSpanish
+                ? "Entregue esta hoja a su pediatra o médico para evaluar el historial de alergia a la penicilina."
+                : "Please bring this sheet to your child's pediatrician or doctor to discuss penicillin allergy evaluation."}
+            </p>
+            <span className="s18-print-footer-tag">PEN-PAL Medical Study</span>
+          </div>
         </div>
       </div>
 
-      {/* Audio narration & CC controls (bottom-right like Slide 5) */}
-      <div className="s18-audio">
-        <AudioPlayer
-          audioSrc={audioSrc || (isSpanish ? "/audio/es/step-7.mp3" : "/audio/en/step-7.mp3")}
-          stepId={stepId || "screen7_summary"}
-          locale={locale || (isSpanish ? "es" : "en")}
-          transcriptText={transcriptText || (isSpanish ? "Resumen y pasos a seguir" : "Summary and Action Steps")}
-          size="large"
-        />
-      </div>
+      {/* Bottom Controls Container (audio on top of action buttons on mobile) */}
+      <div className="s18-bottom-bar">
+        {/* Audio narration & CC controls (bottom-right like Slide 5) */}
+        <div className="s18-audio">
+          <AudioPlayer
+            audioSrc={audioSrc || (isSpanish ? "/audio/es/step-7.mp3" : "/audio/en/step-7.mp3")}
+            stepId={stepId || "screen7_summary"}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={transcriptText || (isSpanish ? "Resumen y pasos a seguir" : "Summary and Action Steps")}
+            size="large"
+          />
+        </div>
 
-      {/* 4. Bottom Centered Navigation (Back, Print & Save) + Close ✕ */}
-      <div className="s18-nav no-print">
-        {onBack && (
+        {/* 4. Bottom Centered Navigation (Back, Print & Save) + Close ✕ */}
+        <div className="s18-nav no-print">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="slide-nav-btn slide-nav-btn--back"
+              aria-label={isSpanish ? "Atrás" : "Back"}
+            >
+              {isSpanish ? "Atrás" : "Back"}
+            </button>
+          )}
           <button
             type="button"
-            onClick={onBack}
-            className="slide-nav-btn slide-nav-btn--back"
-            aria-label={isSpanish ? "Atrás" : "Back"}
+            onClick={onPrint || (() => window.print())}
+            className="s18-btn"
+            aria-label={isSpanish ? "Imprimir hoja de resumen" : "Print summary sheet"}
+            title={isSpanish ? "Imprimir" : "Print"}
           >
-            {isSpanish ? "Atrás" : "Back"}
+            <Printer className="s18-btn-icon" aria-hidden="true" />
+            <span>{isSpanish ? "Imprimir" : "Print"}</span>
           </button>
-        )}
-        <button
-          type="button"
-          onClick={onPrint || (() => window.print())}
-          className="s18-btn"
-          aria-label={isSpanish ? "Imprimir hoja de resumen" : "Print summary sheet"}
-          title={isSpanish ? "Imprimir" : "Print"}
-        >
-          <Printer className="s18-btn-icon" aria-hidden="true" />
-          <span>{isSpanish ? "Imprimir" : "Print"}</span>
-        </button>
-        <button
-          type="button"
-          onClick={handleSaveAsPicture}
-          disabled={isSavingPicture}
-          className={`s18-btn${isSavingPicture ? " opacity-80 cursor-wait" : ""}`}
-          aria-label={isSpanish ? "Guardar resumen como imagen PNG" : "Save summary as picture PNG"}
-          title={isSpanish ? "Guardar como imagen" : "Save as Picture"}
-        >
-          {isSavingPicture ? (
-            <Loader2 className="s18-btn-icon animate-spin" aria-hidden="true" />
-          ) : (
-            <Download className="s18-btn-icon" aria-hidden="true" />
-          )}
-          <span>
-            {isSavingPicture
-              ? isSpanish
-                ? "Guardando..."
-                : "Saving..."
-              : saveSuccess
-              ? isSpanish
-                ? "¡Guardado!"
-                : "Saved!"
-              : isSpanish
-              ? "Guardar como imagen"
-              : "Save as Picture"}
-          </span>
-        </button>
+          <button
+            type="button"
+            onClick={handleSaveAsPicture}
+            disabled={isSavingPicture}
+            className={`s18-btn${isSavingPicture ? " opacity-80 cursor-wait" : ""}`}
+            aria-label={isSpanish ? "Guardar resumen como imagen PNG" : "Save summary as picture PNG"}
+            title={isSpanish ? "Guardar como imagen" : "Save as Picture"}
+          >
+            {isSavingPicture ? (
+              <Loader2 className="s18-btn-icon animate-spin" aria-hidden="true" />
+            ) : (
+              <Download className="s18-btn-icon" aria-hidden="true" />
+            )}
+            <span>
+              {isSavingPicture
+                ? isSpanish
+                  ? "Guardando..."
+                  : "Saving..."
+                : saveSuccess
+                ? isSpanish
+                  ? "¡Guardado!"
+                  : "Saved!"
+                : isSpanish
+                ? "Guardar como imagen"
+                : "Save as Picture"}
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

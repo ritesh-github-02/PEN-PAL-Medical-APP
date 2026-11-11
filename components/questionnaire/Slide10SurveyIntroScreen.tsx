@@ -159,6 +159,11 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   width: 100%;
 }
 
+/* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
+.s10b-bottom-bar {
+  display: contents;
+}
+
 /* ---------- 3. Caption (CC) & Play/Pause Controls (bottom-right like Slide 5) ---------- */
 .s10b-audio {
   position: absolute !important;
@@ -173,155 +178,196 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   z-index: 35 !important;
 }
 
-/* ==========================================================
-   Mobile-First Responsive Layout (< 768px)
-   ========================================================== */
-@media (max-width: 767px) {
-  .s10b-root {
-    overflow: visible !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
-  }
-  .s10b-stage {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 380px !important;
-    height: auto !important;
-    flex: 0 1 auto !important;
-    min-height: 0 !important;
-    transform: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: transparent !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-    gap: 0 !important;
-  }
-  .s10b-bubble {
-    order: 1 !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: clamp(240px, 72vw, 300px) !important;
-    max-width: 300px !important;
-    aspect-ratio: 510 / 315 !important;
-    height: auto !important;
-    margin: 0 auto !important;
-    filter: drop-shadow(2px 3px 0px #1a3532) !important;
-    z-index: 1 !important;
-    pointer-events: none !important;
-  }
-  .s10b-bubble-svg {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-  .s10b-bubble-text-wrap {
-    position: absolute !important;
-    top: 42% !important;
-    left: 54% !important;
-    transform: translate(-50%, -50%) !important;
-    width: 84% !important;
-    max-width: 86% !important;
-    padding: 0 8px !important;
-    margin: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    box-sizing: border-box !important;
-  }
-  .s10b-bubble-text {
-    font-size: clamp(11px, 1.5vh, 12.5px) !important;
-    line-height: 1.34 !important;
-    font-weight: 700 !important;
-    color: #232323 !important;
-    text-align: center !important;
-    letter-spacing: -0.012em !important;
-    word-break: normal !important;
-    overflow-wrap: break-word !important;
-  }
-  .s10b-bubble-line {
-    display: block !important;
-    text-align: center !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-  }
-  .s10b-nurse {
-    order: 2 !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: clamp(75px, 18vw, 105px) !important;
-    height: clamp(100px, 15.5vh, 135px) !important;
-    margin: -18px auto 0 14% !important;
-    z-index: 2 !important;
-    pointer-events: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s10b-nurse-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    transform: none !important;
-    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
-  }
-  @media (max-height: 560px) {
-    .s10b-nurse {
-      height: 85px !important;
-      max-height: 85px !important;
+${(() => {
+  const mobileLayout = (scope: string) => `
+    ${scope} {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 100% !important;
+      flex: 1 1 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 14px 16px 12px 16px !important;
+      gap: 10px !important;
+      box-sizing: border-box !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
     }
-  }
-  .s10b-audio {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    top: auto !important;
-    left: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-  }
-  .s10b-root .slide-nav {
-    margin: 6px auto 0 auto !important;
-  }
-}
-
-/* Tablet Portrait Enhancements (481px to 767px) */
-@media (min-width: 481px) and (max-width: 767px) {
-  .s10b-stage {
-    max-width: 430px !important;
-  }
-  .s10b-bubble {
-    max-width: 390px !important;
-  }
-  .s10b-bubble-text-wrap {
-    max-width: 300px !important;
-  }
-  .s10b-bubble-text {
-    font-size: 16px !important;
-  }
-  .s10b-nurse {
-    width: 140px !important;
-    height: 235px !important;
-  }
-}
+    ${scope} .s10b-stage {
+      position: relative !important;
+      width: 100% !important;
+      max-width: 380px !important;
+      height: auto !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      overflow: visible !important;
+      transform: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background-color: transparent !important;
+      padding: 0 !important;
+      margin: 0 auto !important;
+      gap: 6px !important;
+    }
+    ${scope} .s10b-bubble {
+      order: 1 !important;
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      width: clamp(275px, 84vw, 345px) !important;
+      max-width: 345px !important;
+      aspect-ratio: 510 / 315 !important;
+      height: auto !important;
+      margin: 16px auto 0 auto !important;
+      filter: drop-shadow(2px 3px 0px #1a3532) !important;
+      z-index: 1 !important;
+      pointer-events: none !important;
+    }
+    ${scope} .s10b-bubble-svg {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    ${scope} .s10b-bubble-text-wrap {
+      position: absolute !important;
+      top: 42% !important;
+      left: 54% !important;
+      transform: translate(-50%, -50%) !important;
+      width: 80% !important;
+      max-width: 265px !important;
+      padding: 0 6px !important;
+      margin: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      box-sizing: border-box !important;
+    }
+    ${scope} .s10b-bubble-text {
+      font-size: clamp(14.5px, 2.15vh, 16.5px) !important;
+      line-height: 1.38 !important;
+      font-weight: 700 !important;
+      color: #142724 !important;
+      text-align: center !important;
+      letter-spacing: -0.015em !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+    }
+    ${scope} .s10b-bubble-text:focus:not(:focus-visible) {
+      outline: none !important;
+    }
+    ${scope} .s10b-bubble-line {
+      display: block !important;
+      text-align: center !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+    }
+    ${scope} .s10b-nurse {
+      order: 2 !important;
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      width: clamp(88px, 22vw, 112px) !important;
+      height: clamp(135px, 21vh, 185px) !important;
+      margin: -12px auto 0 10% !important;
+      z-index: 2 !important;
+      pointer-events: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s10b-nurse-img {
+      height: 100% !important;
+      max-height: 100% !important;
+      width: auto !important;
+      object-fit: contain !important;
+      transform: none !important;
+      filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+    }
+    ${scope} .s10b-bottom-bar {
+      width: 100% !important;
+      max-width: 360px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: clamp(10px, 1.8vh, 16px) !important;
+      padding-top: 6px !important;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+      z-index: 25 !important;
+    }
+    ${scope} .s10b-audio {
+      order: 1 !important;
+      position: static !important;
+      right: auto !important;
+      bottom: auto !important;
+      top: auto !important;
+      left: auto !important;
+      width: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      color: #144e57 !important;
+      z-index: 25 !important;
+    }
+    ${scope} .s10b-audio > div {
+      gap: 8px !important;
+    }
+    ${scope} .s10b-audio .audio-cc-btn,
+    ${scope} .s10b-audio .audio-play-btn {
+      color: #144e57 !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      padding: 4px !important;
+    }
+    ${scope} .s10b-audio .audio-cc-btn svg,
+    ${scope} .s10b-audio .audio-play-btn svg {
+      height: 34px !important;
+      width: auto !important;
+    }
+    ${scope} .slide-nav {
+      order: 2 !important;
+      position: relative !important;
+      bottom: auto !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      margin: 0 auto !important;
+      gap: 16px !important;
+    }
+    ${scope} .slide-nav-btn {
+      min-width: 128px !important;
+      padding: 0 32px !important;
+    }
+  `;
+  return `
+    /* ==========================================================
+       Mobile-First Responsive Layout (< 768px & .is-mobile)
+       ========================================================== */
+    @media (max-width: 767px) {
+      ${mobileLayout(".s10b-root:not(.is-desktop)")}
+      .s10b-root:not(.is-desktop) {
+        min-height: min(640px, calc(100dvh - 80px)) !important;
+        max-height: calc(100dvh - 72px) !important;
+      }
+    }
+    ${mobileLayout(".s10b-root.is-mobile")}
+  `;
+})()}
 
 /* ==========================================================
    Mobile & Tablet Landscape Layout (< 520px height)
@@ -407,6 +453,7 @@ export interface Slide10SurveyIntroScreenProps {
   stepId?: string;
   locale?: string;
   transcriptText?: string;
+  variant?: "auto" | "desktop" | "mobile";
 }
 
 export function Slide10SurveyIntroScreen({
@@ -418,6 +465,7 @@ export function Slide10SurveyIntroScreen({
   stepId = "screen6_survey_intro",
   locale,
   transcriptText,
+  variant = "auto",
 }: Slide10SurveyIntroScreenProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
@@ -438,7 +486,7 @@ export function Slide10SurveyIntroScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w && h) {
-        if (typeof window !== "undefined" && window.innerWidth < 768) {
+        if (variant === "mobile" || (variant !== "desktop" && typeof window !== "undefined" && window.innerWidth < 768)) {
           setScale(1);
         } else if (
           typeof window !== "undefined" &&
@@ -461,14 +509,17 @@ export function Slide10SurveyIntroScreen({
       ro.disconnect();
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [variant]);
 
   const spokenText = isSpanish
     ? "El siguiente conjunto de preguntas puede ayudarlo a usted y al médico a decidir qué es lo mejor para su hijo."
     : "The next set of questions can help you and the doctor see what’s best for your child.";
 
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+
   return (
-    <div id="slide-content" className="s10b-root" ref={rootRef}>
+    <div id="slide-content" className={`s10b-root${variantClass}`} ref={rootRef}>
       <style>{SLIDE10_SURVEY_INTRO_CSS}</style>
 
       <div className="s10b-stage" style={{ transform: `scale(${scale})` }}>
@@ -536,24 +587,25 @@ export function Slide10SurveyIntroScreen({
         </div>
       </div>
 
-      {/* 3. Audio narration & CC controls (bottom-right like Slide 5) */}
-      <div className="s10b-audio">
-        <AudioPlayer
-          audioSrc={audioSrc}
-          stepId={stepId}
-          locale={locale || (isSpanish ? "es" : "en")}
-          transcriptText={transcriptText || spokenText}
-          size="large"
+      {/* 3. Bottom Controls (Audio above Back/Next on mobile; independent on desktop) */}
+      <div className="s10b-bottom-bar">
+        <div className="s10b-audio">
+          <AudioPlayer
+            audioSrc={audioSrc}
+            stepId={stepId}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={transcriptText || spokenText}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isSpanish}
+          loading={loading}
         />
       </div>
-
-      {/* 4. Standardized Navigation Buttons (Back & Next) pinned at bottom */}
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isSpanish}
-        loading={loading}
-      />
     </div>
   );
 }

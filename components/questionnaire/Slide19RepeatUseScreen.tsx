@@ -386,6 +386,27 @@ const SLIDE19_CSS = `
 
 
 
+/* Wrapper Containers (transparent to desktop layout, structural on mobile) */
+.s19-main-stage {
+  display: contents;
+}
+.s19-bottom-bar {
+  display: contents;
+}
+
+.s19-audio {
+  position: absolute;
+  right: 22px;
+  bottom: clamp(16px, 3vh, 22px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 30;
+}
+.s19-root .slide-nav {
+  margin: 10px auto 0.25rem auto !important;
+}
+
 /* Responsive Scaling */
 @media (max-height: 700px), (max-width: 860px) {
   .s19-root {
@@ -418,111 +439,195 @@ const SLIDE19_CSS = `
   }
 }
 
-@media (max-width: 767px) {
-  .s19-root {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    overflow: hidden !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    min-height: 0 !important;
-    flex: 1 1 0% !important;
-    padding: 0.45rem 0.65rem !important;
-    gap: 0.25rem !important;
-  }
-  .s19-top-section {
-    grid-column: auto !important;
-    grid-row: auto !important;
-    width: 100% !important;
-    margin: 0 !important;
-  }
-  .s19-heading {
-    font-size: clamp(12px, 1.8vh, 14px) !important;
-    line-height: 1.3 !important;
-  }
-  .s19-middle {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: space-evenly !important;
-    flex: 1 1 0% !important;
-    min-height: 0 !important;
-    gap: 0.35rem !important;
-    width: 100% !important;
-  }
-  .s19-card {
-    grid-column: auto !important;
-    grid-row: auto !important;
-    max-width: 380px !important;
-    width: 100% !important;
-    padding: 0.65rem 0.75rem !important;
-    border-radius: 14px !important;
-  }
-  .s19-options-row {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.35rem !important;
-    width: 100% !important;
-  }
-  .s19-option-btn {
-    width: 100% !important;
-    min-height: clamp(32px, 4.4vh, 38px) !important;
-    font-size: 0.82rem !important;
-    padding: 0.35rem 0.65rem !important;
-  }
-  .s19-nurse-wrap {
-    margin: 0 auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-end !important;
-  }
-  .s19-nurse-img {
-    height: clamp(85px, 13.5vh, 110px) !important;
-    max-height: 110px !important;
-    width: auto !important;
-    object-fit: contain !important;
-    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
-  }
-  @media (max-height: 560px) {
-    .s19-nurse-img {
-      height: 75px !important;
-      max-height: 75px !important;
+${(() => {
+  const s19MobileLayout = (scope: string) => `
+    ${scope} {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 100% !important;
+      flex: 1 1 auto !important;
+      padding: 14px 16px 12px 16px !important;
+      gap: 10px !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      box-sizing: border-box !important;
     }
-  }
-  .s19-modal-row {
-    flex-direction: column !important;
-  }
-  .s19-audio {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-  }
-  .s19-root .slide-nav {
-    margin: 4px auto 0 auto !important;
-  }
-}
-
-.s19-audio {
-  position: absolute;
-  right: 22px;
-  bottom: clamp(16px, 3vh, 22px);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  z-index: 30;
-}
-.s19-root .slide-nav {
-  margin: 10px auto 0.25rem auto !important;
-}
+    ${scope} .s19-main-stage {
+      width: 100% !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-evenly !important;
+      align-items: center !important;
+      gap: clamp(12px, 2.2vh, 20px) !important;
+      margin: auto 0 !important;
+    }
+    ${scope} .s19-top-section {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 8px !important;
+    }
+    ${scope} .s19-heading {
+      font-size: clamp(16px, 2.4vh, 18.5px) !important;
+      line-height: 1.32 !important;
+      text-align: center !important;
+    }
+    ${scope} .s19-heading:focus:not(:focus-visible) {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    ${scope} .s19-middle {
+      display: contents !important;
+    }
+    ${scope} .s19-card {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      max-width: 340px !important;
+      width: 100% !important;
+      padding: 14px 16px !important;
+      border-radius: 16px !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s19-options-row {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+      width: 100% !important;
+    }
+    ${scope} .s19-option-btn {
+      width: 100% !important;
+      min-height: clamp(46px, 5.8vh, 52px) !important;
+      font-size: 0.92rem !important;
+      line-height: 1.25 !important;
+      padding: 10px 14px !important;
+      white-space: normal !important;
+      overflow-wrap: break-word !important;
+    }
+    ${scope} .s19-detail-badge {
+      width: 100% !important;
+      margin-top: 10px !important;
+      padding: 8px 12px !important;
+      font-size: 0.84rem !important;
+      gap: 8px !important;
+    }
+    ${scope} .s19-change-btn {
+      flex-shrink: 0 !important;
+      font-size: 0.82rem !important;
+      min-height: 28px !important;
+    }
+    ${scope} .s19-nurse-wrap {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      margin: 0 auto !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: flex-end !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s19-nurse-img {
+      height: clamp(120px, 19vh, 165px) !important;
+      max-height: 165px !important;
+      width: auto !important;
+      object-fit: contain !important;
+      filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+    }
+    ${scope} .s19-modal-row {
+      flex-direction: column !important;
+    }
+    ${scope} .s19-bottom-bar {
+      width: 100% !important;
+      max-width: 360px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: clamp(10px, 1.8vh, 16px) !important;
+      padding-top: 6px !important;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s19-audio {
+      order: 1 !important;
+      position: static !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      color: #144e57 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s19-audio > div {
+      gap: 8px !important;
+    }
+    ${scope} .s19-audio .audio-cc-btn,
+    ${scope} .s19-audio .audio-play-btn {
+      color: #144e57 !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      padding: 4px !important;
+    }
+    ${scope} .s19-audio .audio-cc-btn svg,
+    ${scope} .s19-audio .audio-play-btn svg {
+      height: 34px !important;
+      width: auto !important;
+    }
+    ${scope} .slide-nav {
+      order: 2 !important;
+      position: relative !important;
+      bottom: auto !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      margin: 0 auto !important;
+      gap: 16px !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .slide-nav-btn {
+      min-width: 128px !important;
+      padding: 0 32px !important;
+    }
+  `;
+  return `
+    ${s19MobileLayout(".s19-root.is-mobile")}
+    @media (max-width: 767px) {
+      ${s19MobileLayout(".s19-root:not(.is-desktop)")}
+      .s19-root:not(.is-desktop) {
+        min-height: min(640px, calc(100dvh - 80px)) !important;
+        max-height: calc(100dvh - 72px) !important;
+      }
+    }
+    @media (max-width: 767px) and (max-height: 620px) {
+      .s19-root:not(.is-desktop) .s19-nurse-img {
+        height: clamp(92px, 14.5vh, 120px) !important;
+        max-height: 120px !important;
+      }
+      .s19-root:not(.is-desktop) .s19-option-btn {
+        min-height: 42px !important;
+      }
+    }
+  `;
+})()}
 `;
 
 export interface Slide19RepeatUseScreenProps {
+  variant?: "auto" | "desktop" | "mobile";
   isSpanish?: boolean;
   selected?: string;
   reactionDetailSelected?: string;
@@ -593,6 +698,7 @@ function isDetailSelected(optValue: string, currentSelected?: string): boolean {
 }
 
 export function Slide19RepeatUseScreen({
+  variant = "auto",
   isSpanish = false,
   selected,
   reactionDetailSelected,
@@ -707,106 +813,118 @@ export function Slide19RepeatUseScreen({
     ? selectedDetailObj?.labelEs || reactionDetailSelected
     : selectedDetailObj?.labelEn || reactionDetailSelected;
 
+  const variantClass =
+    variant === "mobile"
+      ? " is-mobile"
+      : variant === "desktop"
+      ? " is-desktop"
+      : "";
+
   return (
-    <div id="slide-content" className="s19-root">
+    <div id="slide-content" className={`s19-root${variantClass}`}>
       <style>{SLIDE19_CSS}</style>
 
-      {/* 1. Main Heading */}
-      <div className="s19-top-section">
-        <h1
-          ref={headingRef}
-          tabIndex={-1}
-          id="slide19-title"
-          className="s19-heading"
-        >
-          {isSpanish
-            ? "¿Ha recibido su hijo penicilina desde la reacción?"
-            : "Has your child received penicillin since the reaction?"}
-        </h1>
-      </div>
-
-      {/* 2. Middle Content Area: Rounded Teal Card + Nurse Anna */}
-      <div className="s19-middle">
-        {/* Teal Rounded Container Card */}
-        <div className="s19-card">
-          <div
-            role="radiogroup"
-            aria-labelledby="slide19-title"
-            className="s19-options-row"
+      <div className="s19-main-stage">
+        {/* 1. Main Heading */}
+        <div className="s19-top-section">
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            id="slide19-title"
+            className="s19-heading"
           >
-            {REPEAT_OPTIONS.map((opt, index) => {
-              const isChecked = isRepeatSelected(opt.value, selected);
-              const label = isSpanish ? opt.labelEs : opt.labelEn;
-              const sizeClass = opt.variant === "compact" ? " s19-option-btn--compact" : " s19-option-btn--wide";
+            {isSpanish
+              ? "¿Ha recibido su hijo penicilina desde la reacción?"
+              : "Has your child received penicillin since the reaction?"}
+          </h1>
+        </div>
 
-              return (
+        {/* 2. Middle Content Area: Rounded Teal Card + Nurse Anna */}
+        <div className="s19-middle">
+          {/* Teal Rounded Container Card */}
+          <div className="s19-card">
+            <div
+              role="radiogroup"
+              aria-labelledby="slide19-title"
+              className="s19-options-row"
+            >
+              {REPEAT_OPTIONS.map((opt, index) => {
+                const isChecked = isRepeatSelected(opt.value, selected);
+                const label = isSpanish ? opt.labelEs : opt.labelEn;
+                const sizeClass = opt.variant === "compact" ? " s19-option-btn--compact" : " s19-option-btn--wide";
+
+                return (
+                  <button
+                    key={opt.value}
+                    ref={(el) => {
+                      buttonRefs.current[index] = el;
+                    }}
+                    type="button"
+                    role="radio"
+                    aria-checked={isChecked}
+                    tabIndex={isChecked || (!selected && index === 0) ? 0 : -1}
+                    onClick={() => handleMainOption(opt.value)}
+                    onKeyDown={(e) => handleArrowKeyDown(e, index)}
+                    className={`s19-option-btn${sizeClass}${isChecked ? " s19-option-btn--selected" : ""}`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active Detail Badge (when Yes was chosen) */}
+            {selected === "Yes" && reactionDetailSelected && (
+              <div className="s19-detail-badge">
+                <span className="s19-detail-badge-text">
+                  <strong>{isSpanish ? "Detalle: " : "Detail: "}</strong>
+                  {selectedDetailLabel}
+                </span>
                 <button
-                  key={opt.value}
-                  ref={(el) => {
-                    buttonRefs.current[index] = el;
-                  }}
                   type="button"
-                  role="radio"
-                  aria-checked={isChecked}
-                  tabIndex={isChecked || (!selected && index === 0) ? 0 : -1}
-                  onClick={() => handleMainOption(opt.value)}
-                  onKeyDown={(e) => handleArrowKeyDown(e, index)}
-                  className={`s19-option-btn${sizeClass}${isChecked ? " s19-option-btn--selected" : ""}`}
+                  onClick={() => setModalOpen(true)}
+                  className="s19-change-btn"
                 >
-                  {label}
+                  {isSpanish ? "Cambiar" : "Change"}
                 </button>
-              );
-            })}
+              </div>
+            )}
           </div>
 
-          {/* Active Detail Badge (when Yes was chosen) */}
-          {selected === "Yes" && reactionDetailSelected && (
-            <div className="s19-detail-badge">
-              <span className="s19-detail-badge-text">
-                <strong>{isSpanish ? "Detalle: " : "Detail: "}</strong>
-                {selectedDetailLabel}
-              </span>
-              <button
-                type="button"
-                onClick={() => setModalOpen(true)}
-                className="s19-change-btn"
-              >
-                {isSpanish ? "Cambiar" : "Change"}
-              </button>
-            </div>
-          )}
+          {/* Nurse Anna on the right */}
+          <div className="s19-nurse-wrap" aria-hidden="true">
+            <img
+              src="/images/nurse-anna.png"
+              alt=""
+              className="s19-nurse-img"
+            />
+          </div>
         </div>
+      </div>
 
-        {/* Nurse Anna on the right */}
-        <div className="s19-nurse-wrap" aria-hidden="true">
-          <img
-            src="/images/nurse-anna.png"
-            alt=""
-            className="s19-nurse-img"
+      {/* Bottom Controls Container (audio on top of pill navigation on mobile) */}
+      <div className="s19-bottom-bar">
+        {/* Audio narration & CC controls (bottom-right like Slide 5) */}
+        <div className="s19-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId || "screen6_5_yetagain"}
+            locale={isSpanish ? "es" : "en"}
+            transcriptText={effectiveTranscript}
+            size="large"
           />
         </div>
-      </div>
 
-      {/* Audio narration & CC controls (bottom-right like Slide 5) */}
-      <div className="s19-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId || "screen6_5_yetagain"}
-          locale={isSpanish ? "es" : "en"}
-          transcriptText={effectiveTranscript}
-          size="large"
+        {/* 3. Bottom Centered Navigation (Back & Next) */}
+        <SlideNavigationButtons
+          onBack={handleBackClick}
+          onNext={handleNextClick}
+          isSpanish={isSpanish}
+          loading={isLoading}
+          nextDisabled={!isNextEnabled}
+          variant="flow"
         />
       </div>
-
-      {/* 3. Bottom Centered Navigation (Back & Next) */}
-      <SlideNavigationButtons
-        onBack={handleBackClick}
-        onNext={handleNextClick}
-        isSpanish={isSpanish}
-        loading={isLoading}
-        nextDisabled={!isNextEnabled}
-        variant="flow"
-      />
 
       {/* ==========================================================
           MODAL 20: Repeat Exposure Detail (Matches Spec p17_10.png)

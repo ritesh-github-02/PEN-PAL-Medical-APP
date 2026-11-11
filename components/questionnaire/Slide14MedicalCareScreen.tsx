@@ -28,7 +28,7 @@ const SLIDE14_CSS = `
   align-content: center;
   align-items: center;
   column-gap: 2.5rem;
-  row-gap: clamp(1.75rem, 4.5vh, 2.75rem);
+  row-gap: clamp(0.85rem, 2.2vh, 1.5rem);
   background-color: #f4f8ec;
   padding: 1.25rem 2.5rem 4.25rem 2.5rem;
   overflow: hidden;
@@ -43,6 +43,7 @@ const SLIDE14_CSS = `
   flex-shrink: 0;
   grid-column: 1;
   grid-row: 1;
+  align-self: end;
 }
 .s14-heading {
  font-size: clamp(1.05rem, 2vw, 1.25rem);
@@ -79,6 +80,7 @@ const SLIDE14_CSS = `
   transition: all 0.2s ease;
   grid-column: 1;
   grid-row: 2;
+  align-self: start;
 }
 
 /* Options Row */
@@ -175,12 +177,14 @@ const SLIDE14_CSS = `
   justify-content: center;
   flex-shrink: 0;
   grid-column: 2;
-  grid-row: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: center;
   user-select: none;
 }
 
 .s14-nurse-img {
-  height: 270px;
+  height: clamp(210px, 34vh, 270px);
   width: auto;
   object-fit: contain;
   display: block;
@@ -311,18 +315,19 @@ const SLIDE14_CSS = `
   border-color: #a6bbb5;
 }
 
-/* Responsive Scaling */
-@media (max-height: 700px), (max-width: 860px) {
+/* Responsive Scaling (Tablet / Short Desktop) */
+@media (min-width: 768px) and (max-height: 700px), (min-width: 768px) and (max-width: 860px) {
   .s14-root {
-    padding: 1rem 1.75rem 4rem 1.75rem;
+    padding: 1rem 1.75rem 4.25rem 1.75rem;
     column-gap: 1.5rem;
+    row-gap: clamp(0.65rem, 1.8vh, 1.15rem);
     grid-template-columns: minmax(0, 460px) auto;
   }
   .s14-heading {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
   }
   .s14-card {
-    padding: 1.25rem 1.4rem 0.9rem 1.4rem;
+    padding: 1.25rem 1.4rem 1.05rem 1.4rem;
     max-width: 460px;
   }
   .s14-option-btn {
@@ -331,93 +336,16 @@ const SLIDE14_CSS = `
     padding: 0.45rem 0.65rem;
   }
   .s14-nurse-img {
-    height: 220px;
+    height: clamp(175px, 28vh, 220px);
   }
 }
 
-@media (max-width: 767px) {
-  .s14-root {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
-  }
-  .s14-top-section {
-    width: 100% !important;
-    margin: 0 !important;
-  }
-  .s14-heading {
-    font-size: clamp(12px, 1.8vh, 14px) !important;
-    line-height: 1.3 !important;
-  }
-  .s14-middle {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 1 auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    gap: 8px !important;
-    width: 100% !important;
-  }
-  .s14-card {
-    max-width: 380px !important;
-    width: 100% !important;
-    padding: 0.65rem 0.75rem !important;
-    border-radius: 14px !important;
-  }
-  .s14-options-row {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    gap: 0.45rem !important;
-    width: 100% !important;
-  }
-  .s14-option-btn {
-    flex: 1 1 0% !important;
-    min-height: clamp(34px, 4.8vh, 40px) !important;
-    font-size: 0.82rem !important;
-    padding: 0.35rem 0.5rem !important;
-  }
-  .s14-nurse-wrap {
-    margin: 0 auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-end !important;
-  }
-  .s14-nurse-img {
-    height: clamp(85px, 13.5vh, 110px) !important;
-    max-height: 110px !important;
-    width: auto !important;
-    object-fit: contain !important;
-    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
-  }
-  @media (max-height: 560px) {
-    .s14-nurse-img {
-      height: 75px !important;
-      max-height: 75px !important;
-    }
-  }
-  .s14-audio {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-  }
-  .s14-root .slide-nav {
-    margin: 4px auto 0 auto !important;
-  }
+/* Wrapper collapses on desktop so root grid + absolute audio/nav stay identical */
+.s14-main-stage {
+  display: contents;
+}
+.s14-bottom-bar {
+  display: contents;
 }
 
 .s14-audio {
@@ -432,6 +360,223 @@ const SLIDE14_CSS = `
 .s14-root .slide-nav {
   margin: 10px auto 0.25rem auto !important;
 }
+
+${(() => {
+  const mobileLayout = (scope: string) => `
+    ${scope} {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 100% !important;
+      flex: 1 1 auto !important;
+      padding: 14px 16px 12px 16px !important;
+      gap: 10px !important;
+      box-sizing: border-box !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+    }
+    ${scope} .s14-main-stage {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: space-evenly !important;
+      width: 100% !important;
+      max-width: 380px !important;
+      flex: 1 0 auto !important;
+      min-height: 0 !important;
+      margin: auto 0 !important;
+      padding: 4px 0 !important;
+      gap: clamp(16px, 2.8vh, 26px) !important;
+    }
+    ${scope} .s14-top-section {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      align-self: center !important;
+      width: 100% !important;
+      max-width: 345px !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s14-heading {
+      font-size: clamp(16.5px, 2.4vh, 19px) !important;
+      line-height: 1.36 !important;
+      text-align: center !important;
+    }
+    ${scope} .s14-heading:focus:not(:focus-visible) {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    ${scope} .s14-middle {
+      display: contents !important;
+    }
+    ${scope} .s14-card {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      align-self: center !important;
+      max-width: 360px !important;
+      width: 100% !important;
+      padding: 16px 14px !important;
+      border-radius: 18px !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s14-options-row {
+      display: grid !important;
+      grid-template-columns: minmax(68px, 0.9fr) minmax(68px, 0.9fr) minmax(132px, 1.55fr) !important;
+      gap: 8px !important;
+      width: 100% !important;
+    }
+    ${scope} .s14-option-btn {
+      width: 100% !important;
+      min-height: clamp(50px, 6.8vh, 56px) !important;
+      font-size: clamp(12.5px, 1.75vh, 14px) !important;
+      line-height: 1.25 !important;
+      white-space: normal !important;
+      overflow-wrap: break-word !important;
+      padding: 8px 6px !important;
+      border-radius: 11px !important;
+    }
+    ${scope} .s14-location-badge {
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      margin-top: 10px !important;
+      padding: 8px 12px !important;
+      font-size: 13px !important;
+    }
+    ${scope} .s14-location-change-btn {
+      min-height: 28px !important;
+      font-size: 13px !important;
+    }
+    ${scope} .s14-nurse-wrap {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      align-self: center !important;
+      justify-self: center !important;
+      width: 100% !important;
+      height: auto !important;
+      max-height: none !important;
+      margin: 0 auto !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: flex-end !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s14-nurse-img {
+      height: clamp(150px, 23vh, 200px) !important;
+      max-height: 200px !important;
+      width: auto !important;
+      max-width: 100% !important;
+      object-fit: contain !important;
+      display: block !important;
+      filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+    }
+    ${scope} .s14-bottom-bar {
+      width: 100% !important;
+      max-width: 360px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: clamp(10px, 1.8vh, 16px) !important;
+      padding-top: 6px !important;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s14-audio {
+      order: 1 !important;
+      position: static !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      color: #144e57 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s14-audio > div {
+      gap: 8px !important;
+    }
+    ${scope} .s14-audio .audio-cc-btn,
+    ${scope} .s14-audio .audio-play-btn {
+      color: #144e57 !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      padding: 4px !important;
+    }
+    ${scope} .s14-audio .audio-cc-btn svg,
+    ${scope} .s14-audio .audio-play-btn svg {
+      height: 34px !important;
+      width: auto !important;
+    }
+    ${scope} .slide-nav {
+      order: 2 !important;
+      position: relative !important;
+      bottom: auto !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      margin: 0 auto !important;
+      gap: 16px !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .slide-nav-btn {
+      min-width: 128px !important;
+      padding: 0 32px !important;
+    }
+    ${scope} .s14-modal-card {
+      padding: 1.25rem 1rem 1rem 1rem !important;
+      border-radius: 16px !important;
+      max-height: 88dvh !important;
+      overflow-y: auto !important;
+    }
+    ${scope} .s14-modal-grid {
+      gap: 0.55rem !important;
+    }
+    ${scope} .s14-modal-btn {
+      min-height: 46px !important;
+      font-size: 0.84rem !important;
+      padding: 0.5rem 0.5rem !important;
+    }
+  `;
+  return `
+    ${mobileLayout(".s14-root.is-mobile")}
+    @media (max-width: 767px) {
+      ${mobileLayout(".s14-root:not(.is-desktop)")}
+      .s14-root:not(.is-desktop) {
+        min-height: min(640px, calc(100dvh - 80px)) !important;
+        max-height: calc(100dvh - 72px) !important;
+      }
+    }
+    @media (max-width: 767px) and (max-height: 620px) {
+      .s14-root:not(.is-desktop) .s14-nurse-img {
+        height: clamp(105px, 16vh, 135px) !important;
+        max-height: 135px !important;
+      }
+    }
+    @media (max-width: 359px) {
+      .s14-root:not(.is-desktop) .s14-options-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      .s14-root:not(.is-desktop) .s14-option-btn:last-child {
+        grid-column: 1 / -1 !important;
+      }
+      .s14-root:not(.is-desktop) .s14-modal-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  `;
+})()}
 `;
 
 export interface CareOption {
@@ -482,6 +627,7 @@ export interface Slide14MedicalCareScreenProps {
   stepId?: string;
   locale?: string;
   transcriptText?: string;
+  variant?: "auto" | "desktop" | "mobile";
   navProps?: {
     onNext: (explicitAnswer?: any) => void;
     onBack: () => void;
@@ -503,6 +649,7 @@ export function Slide14MedicalCareScreen({
   stepId = "screen6_4_resolution",
   locale,
   transcriptText,
+  variant = "auto",
   navProps,
 }: Slide14MedicalCareScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
@@ -600,26 +747,30 @@ export function Slide14MedicalCareScreen({
     ? LOCATION_OPTIONS.find((l) => isLocationSelected(l.value, locationSelected))?.labelEs || locationSelected
     : LOCATION_OPTIONS.find((l) => isLocationSelected(l.value, locationSelected))?.labelEn?.replace("\n", " ") || locationSelected;
 
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+
   return (
-    <div id="slide-content" className="s14-root">
+    <div id="slide-content" className={`s14-root${variantClass}`}>
       <style>{SLIDE14_CSS}</style>
 
-      {/* 1. Main Heading */}
-      <div className="s14-top-section">
-        <h1
-          ref={headingRef}
-          tabIndex={-1}
-          id="slide14-title"
-          className="s14-heading"
-        >
-          {isSpanish
-            ? "¿Su hijo recibió atención médica por su reacción?"
-            : "Did your child receive medical care for their reaction?"}
-        </h1>
-      </div>
+      <div className="s14-main-stage">
+        {/* 1. Main Heading */}
+        <div className="s14-top-section">
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            id="slide14-title"
+            className="s14-heading"
+          >
+            {isSpanish
+              ? "¿Su hijo recibió atención médica por su reacción?"
+              : "Did your child receive medical care for their reaction?"}
+          </h1>
+        </div>
 
-      {/* 2. Middle Content Area: Rounded Teal Card + Nurse Anna */}
-      <div className="s14-middle">
+        {/* 2. Middle Content Area: Rounded Teal Card + Nurse Anna */}
+        <div className="s14-middle">
         {/* Teal Rounded Container Card */}
         <div className="s14-card">
           <div
@@ -679,27 +830,29 @@ export function Slide14MedicalCareScreen({
           />
         </div>
       </div>
-
-      {/* 3. Audio Player (bottom-right like Slide 5) */}
-      <div className="s14-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId || "screen6_4_resolution"}
-          locale={isEs ? "es" : "en"}
-          transcriptText={effectiveTranscript}
-          size="large"
-        />
       </div>
 
-      {/* 4. Bottom Centered Navigation (shared SlideNavigationButtons) */}
-      <SlideNavigationButtons
-        onBack={handleBackClick}
-        onNext={handleNextClick}
-        isSpanish={isEs}
-        loading={isLoading}
-        nextDisabled={!isNextEnabled}
-        variant="flow"
-      />
+      {/* 3. Bottom Controls: Audio above Back/Next on mobile; independent on desktop */}
+      <div className="s14-bottom-bar">
+        <div className="s14-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId || "screen6_4_resolution"}
+            locale={isEs ? "es" : "en"}
+            transcriptText={effectiveTranscript}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={handleBackClick}
+          onNext={handleNextClick}
+          isSpanish={isEs}
+          loading={isLoading}
+          nextDisabled={!isNextEnabled}
+          variant="flow"
+        />
+      </div>
 
       {/* ==========================================================
           MODAL 15: Where did your child get medical care?

@@ -133,124 +133,12 @@ const SLIDE21_CSS = `
   user-select: none;
 }
 
-/* ---------- Small phones ---------- */
-@media (max-width: 767px) {
-  .s21-root {
-    --s21-nav-space: 0px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
-  }
-  .s21-content {
-    max-width: 440px !important;
-    width: 100% !important;
-    flex: 0 1 auto !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    gap: 8px !important;
-  }
-  .s21-badge {
-    min-width: 120px !important;
-    height: clamp(30px, 4.2vh, 36px) !important;
-    padding: 0 14px !important;
-    margin-bottom: 12px !important;
-    border-radius: 12px !important;
-  }
-  .s21-badge-title {
-    font-size: clamp(12px, 1.8vh, 14px) !important;
-  }
-  .s21-heading,
-  .s21-bullet {
-    font-size: clamp(10.5px, 1.45vh, 12px) !important;
-    line-height: 1.3 !important;
-  }
-  .s21-bullets {
-    padding-left: 18px !important;
-    margin: 2px 0 !important;
-  }
-  .s21-figure {
-    flex: 1 1 0% !important;
-    min-height: 0 !important;
-    height: clamp(80px, 15vh, 115px) !important;
-    max-height: 115px !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .s21-image {
-    position: relative !important;
-    inset: auto !important;
-    max-height: clamp(80px, 15vh, 115px) !important;
-    height: 100% !important;
-    width: auto !important;
-    margin: 0 auto !important;
-    display: block !important;
-    object-fit: contain !important;
-  }
-  .s21-audio {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-  }
-  .s21-root .slide-nav {
-    margin: 4px auto 0 auto !important;
-  }
+/* Wrapper Containers (transparent to desktop layout, structural on mobile) */
+.s21-main-stage {
+  display: contents;
 }
-
-/* ---------- Phone landscape: text left, image right ---------- */
-@media (orientation: landscape) and (max-height: 520px) {
-  .s21-root {
-    --s21-nav-space: 64px;
-    padding-top: 10px;
-  }
-  .s21-content {
-    max-width: 100%;
-    flex-direction: row;
-    align-items: stretch;
-    gap: 16px;
-  }
-  .s21-text {
-    flex: 1 1 50%;
-    justify-content: center;
-  }
-  .s21-badge {
-    min-width: 110px;
-    height: 40px;
-    margin-bottom: 8px;
-  }
-  .s21-badge-title { font-size: 14px; }
-  .s21-heading,
-  .s21-bullet { font-size: 14px; line-height: 1.3; }
-  .s21-bullets { padding-left: 18px; }
-  .s21-figure {
-    flex: 1 1 50%;
-    min-height: 120px;
-    align-self: stretch;
-  }
-  .s21-image { object-position: center center; }
-}
-
-@media (max-width: 640px) {
-  .s21-root {
-    padding-bottom: 1.5rem !important;
-  }
+.s21-bottom-bar {
+  display: contents;
 }
 
 .s21-audio {
@@ -265,9 +153,232 @@ const SLIDE21_CSS = `
 .s21-root .slide-nav {
   margin: 10px auto 0.25rem auto !important;
 }
+
+${(() => {
+  const s21MobileLayout = (scope: string) => `
+    ${scope} {
+      --s21-nav-space: 0px !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 100% !important;
+      flex: 1 1 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 14px 16px 12px 16px !important;
+      gap: 10px !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      box-sizing: border-box !important;
+    }
+    ${scope} .s21-main-stage {
+      width: 100% !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-evenly !important;
+      align-items: center !important;
+      margin: auto 0 !important;
+    }
+    ${scope} .s21-content {
+      max-width: 360px !important;
+      width: 100% !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-evenly !important;
+      align-items: center !important;
+      gap: clamp(10px, 2vh, 18px) !important;
+    }
+    ${scope} .s21-text {
+      width: 100% !important;
+      align-items: center !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s21-badge {
+      min-width: 165px !important;
+      height: auto !important;
+      min-height: 44px !important;
+      padding: 8px 20px !important;
+      margin-bottom: 12px !important;
+      border-radius: 14px !important;
+    }
+    ${scope} .s21-badge-title {
+      font-size: clamp(16px, 2.4vh, 19px) !important;
+      line-height: 1.2 !important;
+    }
+    ${scope} .s21-badge-title:focus:not(:focus-visible) {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    ${scope} .s21-heading {
+      font-size: clamp(14px, 2vh, 16px) !important;
+      line-height: 1.35 !important;
+      font-weight: 600 !important;
+      text-align: left !important;
+      width: 100% !important;
+      padding: 0 4px !important;
+      margin-bottom: 6px !important;
+    }
+    ${scope} .s21-bullets {
+      width: 100% !important;
+      padding-left: 22px !important;
+      margin: 2px 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+    }
+    ${scope} .s21-bullet {
+      font-size: clamp(13px, 1.8vh, 14.5px) !important;
+      line-height: 1.38 !important;
+      text-align: left !important;
+    }
+    ${scope} .s21-figure {
+      flex: 1 1 0% !important;
+      min-height: 110px !important;
+      max-height: clamp(150px, 27vh, 220px) !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    ${scope} .s21-image {
+      position: relative !important;
+      inset: auto !important;
+      max-height: 100% !important;
+      height: 100% !important;
+      width: auto !important;
+      max-width: 100% !important;
+      margin: 0 auto !important;
+      display: block !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+    }
+    ${scope} .s21-bottom-bar {
+      width: 100% !important;
+      max-width: 360px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: clamp(10px, 1.8vh, 16px) !important;
+      padding-top: 6px !important;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s21-audio {
+      order: 1 !important;
+      position: static !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      color: #144e57 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s21-audio > div {
+      gap: 8px !important;
+    }
+    ${scope} .s21-audio .audio-cc-btn,
+    ${scope} .s21-audio .audio-play-btn {
+      color: #144e57 !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      padding: 4px !important;
+    }
+    ${scope} .s21-audio .audio-cc-btn svg,
+    ${scope} .s21-audio .audio-play-btn svg {
+      height: 34px !important;
+      width: auto !important;
+    }
+    ${scope} .slide-nav {
+      order: 2 !important;
+      position: relative !important;
+      bottom: auto !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      margin: 0 auto !important;
+      gap: 16px !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .slide-nav-btn {
+      min-width: 128px !important;
+      padding: 0 32px !important;
+    }
+  `;
+  return `
+    ${s21MobileLayout(".s21-root.is-mobile")}
+    @media (max-width: 767px) {
+      ${s21MobileLayout(".s21-root:not(.is-desktop)")}
+      .s21-root:not(.is-desktop) {
+        min-height: min(640px, calc(100dvh - 80px)) !important;
+        max-height: calc(100dvh - 72px) !important;
+      }
+    }
+    @media (max-width: 767px) and (max-height: 620px) {
+      .s21-root:not(.is-desktop) .s21-figure {
+        min-height: 85px !important;
+        max-height: clamp(105px, 20vh, 145px) !important;
+      }
+    }
+  `;
+})()}
+
+/* ---------- Phone landscape: text left, image right ---------- */
+@media (orientation: landscape) and (max-height: 520px) {
+  .s21-root {
+    --s21-nav-space: 64px;
+    padding-top: 10px !important;
+  }
+  .s21-root:not(.is-desktop) .s21-content {
+    max-width: 100% !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+  .s21-root:not(.is-desktop) .s21-text {
+    flex: 1 1 50% !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+  }
+  .s21-badge {
+    min-width: 110px !important;
+    min-height: 38px !important;
+    height: 40px !important;
+    padding: 0 14px !important;
+    margin-bottom: 8px !important;
+  }
+  .s21-badge-title { font-size: 14px !important; }
+  .s21-heading,
+  .s21-bullet { font-size: 13px !important; line-height: 1.3 !important; }
+  .s21-bullets { padding-left: 18px !important; }
+  .s21-root:not(.is-desktop) .s21-figure {
+    flex: 1 1 50% !important;
+    min-height: 120px !important;
+    max-height: none !important;
+    align-self: stretch !important;
+  }
+  .s21-image { object-position: center center !important; }
+}
 `;
 
 export interface Slide21WhatNowScreenProps {
+  variant?: "auto" | "desktop" | "mobile";
   isSpanish?: boolean;
   medicationName?: string;
   onNext?: () => void;
@@ -297,6 +408,7 @@ const BULLETS = [
 ];
 
 export function Slide21WhatNowScreen({
+  variant = "auto",
   isSpanish = false,
   medicationName,
   onNext,
@@ -337,72 +449,84 @@ export function Slide21WhatNowScreen({
       ? "¿Qué sigue ahora? Hable con el médico de su hijo sobre la prueba de alergia a la medicina."
       : "What Now? Talk to your child’s doctor about allergy testing.");
 
+  const variantClass =
+    variant === "mobile"
+      ? " is-mobile"
+      : variant === "desktop"
+      ? " is-desktop"
+      : "";
+
   return (
-    <div id="slide-content" className="s21-root">
+    <div id="slide-content" className={`s21-root${variantClass}`}>
       <style>{SLIDE21_CSS}</style>
 
-      <main className="s21-content">
-        <div className="s21-text">
-          <div className="s21-badge">
-            <h2
-              ref={headingRef}
-              tabIndex={-1}
-              id="slide21-title"
-              className="s21-badge-title"
-            >
-              {isSpanish ? "¿Qué sigue ahora?" : "What Now?"}
-            </h2>
+      <div className="s21-main-stage">
+        <main className="s21-content">
+          <div className="s21-text">
+            <div className="s21-badge">
+              <h2
+                ref={headingRef}
+                tabIndex={-1}
+                id="slide21-title"
+                className="s21-badge-title"
+              >
+                {isSpanish ? "¿Qué sigue ahora?" : "What Now?"}
+              </h2>
+            </div>
+
+            <h1 className="s21-heading">{titleText}</h1>
+
+            <ul className="s21-bullets" aria-label={titleText}>
+              {BULLETS.map((b) => {
+                const text = resolveMedicineToken(
+                  isSpanish ? b.es : b.en,
+                  medicationName,
+                  isSpanish
+                );
+                return (
+                  <li key={b.en} className="s21-bullet">
+                    {text}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
-          <h1 className="s21-heading">{titleText}</h1>
-
-          <ul className="s21-bullets" aria-label={titleText}>
-            {BULLETS.map((b) => {
-              const text = resolveMedicineToken(
-                isSpanish ? b.es : b.en,
-                medicationName,
+          <figure className="s21-figure" aria-hidden="true">
+            <img
+              src="/images/doctor-consultation.png"
+              alt={
                 isSpanish
-              );
-              return (
-                <li key={b.en} className="s21-bullet">
-                  {text}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        <figure className="s21-figure" aria-hidden="true">
-          <img
-            src="/images/doctor-consultation.png"
-            alt={
-              isSpanish
-                ? "Madre e hija consultando con la pediatra sobre las pruebas de alergia"
-                : "Mother and daughter consulting with pediatrician about allergy testing"
-            }
-            className="s21-image"
-            draggable={false}
-          />
-        </figure>
-      </main>
-
-      {/* Audio narration & CC controls (bottom-right like Slide 5) */}
-      <div className="s21-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId || "slide21_what_now"}
-          locale={locale || (isSpanish ? "es" : "en")}
-          transcriptText={effectiveTranscript}
-          size="large"
-        />
+                  ? "Madre e hija consultando con la pediatra sobre las pruebas de alergia"
+                  : "Mother and daughter consulting with pediatrician about allergy testing"
+              }
+              className="s21-image"
+              draggable={false}
+            />
+          </figure>
+        </main>
       </div>
 
-      <SlideNavigationButtons
-        onBack={handleBack}
-        onNext={handleNext}
-        isSpanish={isSpanish}
-        loading={isLoading}
-      />
+      {/* Bottom Controls Container (audio on top of pill navigation on mobile) */}
+      <div className="s21-bottom-bar">
+        {/* Audio narration & CC controls (bottom-right like Slide 5) */}
+        <div className="s21-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId || "slide21_what_now"}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={effectiveTranscript}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={handleBack}
+          onNext={handleNext}
+          isSpanish={isSpanish}
+          loading={isLoading}
+        />
+      </div>
     </div>
   );
 }

@@ -263,93 +263,12 @@ const SLIDE13_CSS = `
   }
 }
 
-@media (max-width: 767px) {
-  .s13-root {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
-  }
-  .s13-top-section {
-    grid-column: auto !important;
-    grid-row: auto !important;
-    width: 100% !important;
-    margin: 0 !important;
-  }
-  .s13-heading {
-    font-size: clamp(12px, 1.8vh, 14px) !important;
-    line-height: 1.3 !important;
-  }
-  .s13-middle {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 1 auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    gap: 8px !important;
-    width: 100% !important;
-  }
-  .s13-card {
-    grid-column: auto !important;
-    grid-row: auto !important;
-    max-width: 380px !important;
-    width: 100% !important;
-    padding: 0.65rem 0.75rem !important;
-    border-radius: 14px !important;
-  }
-  .s13-options-row {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.45rem !important;
-    width: 100% !important;
-  }
-  .s13-option-btn {
-    width: 100% !important;
-    min-height: clamp(34px, 4.8vh, 40px) !important;
-    font-size: 0.82rem !important;
-    padding: 0.35rem 0.5rem !important;
-  }
-  .s13-nurse-wrap {
-    margin: 0 auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-end !important;
-  }
-  .s13-nurse-img {
-    height: clamp(85px, 13.5vh, 110px) !important;
-    max-height: 110px !important;
-    width: auto !important;
-    object-fit: contain !important;
-    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
-  }
-  @media (max-height: 560px) {
-    .s13-nurse-img {
-      height: 75px !important;
-      max-height: 75px !important;
-    }
-  }
-  .s13-audio {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-  }
-  .s13-root .slide-nav {
-    margin: 4px auto 0 auto !important;
-  }
+/* Wrapper collapses on desktop so root grid + absolute audio/nav stay identical */
+.s13-main-stage {
+  display: contents;
+}
+.s13-bottom-bar {
+  display: contents;
 }
 
 .s13-audio {
@@ -364,6 +283,177 @@ const SLIDE13_CSS = `
 .s13-root .slide-nav {
   margin: 10px auto 0.25rem auto !important;
 }
+
+${(() => {
+  const mobileLayout = (scope: string) => `
+    ${scope} {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 100% !important;
+      flex: 1 1 auto !important;
+      padding: 14px 16px 12px 16px !important;
+      gap: 10px !important;
+      box-sizing: border-box !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+    }
+    ${scope} .s13-main-stage {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 380px !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      margin: 0 auto !important;
+      gap: clamp(16px, 2.8vh, 26px) !important;
+    }
+    ${scope} .s13-top-section {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      width: 100% !important;
+      max-width: 345px !important;
+      margin: 0 auto !important;
+    }
+    ${scope} .s13-heading {
+      font-size: clamp(16px, 2.35vh, 18.5px) !important;
+      line-height: 1.38 !important;
+      text-align: center !important;
+    }
+    ${scope} .s13-heading:focus:not(:focus-visible) {
+      outline: none !important;
+    }
+    ${scope} .s13-middle {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex: 0 1 auto !important;
+      height: auto !important;
+      min-height: 0 !important;
+      gap: clamp(16px, 2.6vh, 24px) !important;
+      width: 100% !important;
+    }
+    ${scope} .s13-card {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      max-width: 380px !important;
+      width: 100% !important;
+      padding: 16px 14px !important;
+      border-radius: 18px !important;
+    }
+    ${scope} .s13-options-row {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+      width: 100% !important;
+    }
+    ${scope} .s13-option-btn {
+      width: 100% !important;
+      min-height: clamp(48px, 6.8vh, 56px) !important;
+      font-size: clamp(13.5px, 1.85vh, 15px) !important;
+      line-height: 1.25 !important;
+      white-space: normal !important;
+      padding: 8px 10px !important;
+      border-radius: 11px !important;
+    }
+    ${scope} .s13-nurse-wrap {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      margin: 0 auto !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: flex-end !important;
+    }
+    ${scope} .s13-nurse-img {
+      height: clamp(130px, 20vh, 185px) !important;
+      max-height: 185px !important;
+      width: auto !important;
+      object-fit: contain !important;
+      filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+    }
+    @media (max-height: 580px) {
+      ${scope} .s13-nurse-img {
+        height: 88px !important;
+        max-height: 88px !important;
+      }
+    }
+    ${scope} .s13-bottom-bar {
+      width: 100% !important;
+      max-width: 360px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: clamp(10px, 1.8vh, 16px) !important;
+      padding-top: 6px !important;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+      z-index: 25 !important;
+    }
+    ${scope} .s13-audio {
+      order: 1 !important;
+      position: static !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      color: #144e57 !important;
+      z-index: 25 !important;
+    }
+    ${scope} .s13-audio > div {
+      gap: 8px !important;
+    }
+    ${scope} .s13-audio .audio-cc-btn,
+    ${scope} .s13-audio .audio-play-btn {
+      color: #144e57 !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      padding: 4px !important;
+    }
+    ${scope} .s13-audio .audio-cc-btn svg,
+    ${scope} .s13-audio .audio-play-btn svg {
+      height: 34px !important;
+      width: auto !important;
+    }
+    ${scope} .slide-nav {
+      order: 2 !important;
+      position: relative !important;
+      bottom: auto !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      margin: 0 auto !important;
+      gap: 16px !important;
+    }
+    ${scope} .slide-nav-btn {
+      min-width: 128px !important;
+      padding: 0 32px !important;
+    }
+  `;
+  return `
+    @media (max-width: 767px) {
+      ${mobileLayout(".s13-root:not(.is-desktop)")}
+      .s13-root:not(.is-desktop) {
+        min-height: min(640px, calc(100dvh - 80px)) !important;
+        max-height: calc(100dvh - 72px) !important;
+      }
+    }
+    ${mobileLayout(".s13-root.is-mobile")}
+  `;
+})()}
 `;
 
 export interface OnsetOption {
@@ -403,6 +493,7 @@ export interface Slide13OnsetScreenProps {
   transcriptText?: string;
   stepId?: string;
   locale?: string;
+  variant?: "auto" | "desktop" | "mobile";
   navProps?: {
     onNext: (explicitAnswer?: any) => void;
     onBack: () => void;
@@ -423,6 +514,7 @@ export function Slide13OnsetScreen({
   transcriptText,
   stepId,
   locale,
+  variant = "auto",
   navProps,
 }: Slide13OnsetScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
@@ -495,24 +587,28 @@ export function Slide13OnsetScreen({
     }
   };
 
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+
   return (
-    <div id="slide-content" className="s13-root">
+    <div id="slide-content" className={`s13-root${variantClass}`}>
       <style>{SLIDE13_CSS}</style>
 
-      {/* 1. Main Heading */}
-      <div className="s13-top-section">
-        <h1
-          ref={headingRef}
-          tabIndex={-1}
-          id="slide13-title"
-          className="s13-heading"
-        >
-          {titleText}
-        </h1>
-      </div>
+      <div className="s13-main-stage">
+        {/* 1. Main Heading */}
+        <div className="s13-top-section">
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            id="slide13-title"
+            className="s13-heading"
+          >
+            {titleText}
+          </h1>
+        </div>
 
-      {/* 2. Middle Content Area: Rounded Teal Card + Nurse Anna */}
-      <div className="s13-middle">
+        {/* 2. Middle Content Area: Rounded Teal Card + Nurse Anna */}
+        <div className="s13-middle">
         {/* Teal Rounded Container Card */}
         <div className="s13-card">
           <div
@@ -554,27 +650,29 @@ export function Slide13OnsetScreen({
           />
         </div>
       </div>
-
-      {/* Audio narration & CC controls (bottom-right like Slide 5) */}
-      <div className="s13-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId || "screen6_3_onset"}
-          locale={isSpanish ? "es" : "en"}
-          transcriptText={effectiveTranscript}
-          size="large"
-        />
       </div>
 
-      {/* 3. Bottom Centered Navigation (Back & Next) */}
-      <SlideNavigationButtons
-        onBack={handleBackClick}
-        onNext={handleNextClick}
-        isSpanish={isSpanish}
-        loading={isLoading}
-        nextDisabled={!isNextEnabled}
-        variant="flow"
-      />
+      {/* Bottom Controls: Audio above Back/Next on mobile; independent on desktop */}
+      <div className="s13-bottom-bar">
+        <div className="s13-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId || "screen6_3_onset"}
+            locale={isSpanish ? "es" : "en"}
+            transcriptText={effectiveTranscript}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={handleBackClick}
+          onNext={handleNextClick}
+          isSpanish={isSpanish}
+          loading={isLoading}
+          nextDisabled={!isNextEnabled}
+          variant="flow"
+        />
+      </div>
     </div>
   );
 }

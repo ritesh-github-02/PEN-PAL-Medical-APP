@@ -179,6 +179,11 @@ const SLIDE8_COMPONENT_CSS = `
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
   }
 
+  /* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
+  .s8-bottom-bar {
+    display: contents;
+  }
+
   /* ------------------------------------------------------------
      Bottom Audio Narration & CC Controls (Bottom-Right like Slide 5)
      ------------------------------------------------------------ */
@@ -217,207 +222,171 @@ const SLIDE8_COMPONENT_CSS = `
     pointer-events: auto !important;
   }
 
-  /* -------------------------------------------------------------
-     EXPLICIT PREVIEW & MOBILE EMBEDDED MODES (.is-mobile & < 768px)
-     ------------------------------------------------------------- */
-  .s8-component-card.is-mobile {
-    aspect-ratio: auto !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    flex: 0 1 auto !important;
-    min-height: 0 !important;
-    border-radius: 20px !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    overflow: visible !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
-  }
-  .s8-component-card.is-mobile .s8-stage-body {
-    flex: 0 1 auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0 !important;
-  }
-  .s8-component-card.is-mobile .s8-bubble-wrap {
-    width: clamp(240px, 72vw, 305px) !important;
-    max-width: 305px !important;
-    aspect-ratio: 510 / 315 !important;
-    height: auto !important;
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    margin: 0 auto !important;
-    filter: drop-shadow(2px 3px 0px #1a3532) !important;
-  }
-  .s8-component-card.is-mobile .s8-bubble-text-wrap {
-    position: absolute !important;
-    top: 44% !important;
-    left: 46% !important;
-    transform: translate(-50%, -50%) !important;
-    width: 84% !important;
-    max-width: 86% !important;
-    padding: 0 8px !important;
-    margin: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    box-sizing: border-box !important;
-  }
-  .s8-component-card.is-mobile .s8-heading {
-    font-size: 12px !important;
-    line-height: 1.35 !important;
-    font-weight: 600 !important;
-    color: #142724 !important;
-    text-align: center !important;
-    letter-spacing: -0.01em !important;
-    word-break: normal !important;
-    overflow-wrap: break-word !important;
-  }
-  .s8-component-card.is-mobile .s8-heading-line {
-    display: block !important;
-    text-align: center !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-  }
-  .s8-component-card.is-mobile .s8-nurse-wrap {
-    width: clamp(65px, 16vw, 85px) !important;
-    height: clamp(85px, 13vh, 115px) !important;
-    margin: -14px 12% 0 auto !important;
-    z-index: 2 !important;
-  }
-  .s8-component-card.is-mobile .s8-audio-wrap {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-  }
-  .s8-component-card.is-mobile .slide-nav {
-    position: static !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    width: 100% !important;
-    margin: 4px auto 0 auto !important;
-    pointer-events: auto !important;
-  }
-
-  /* Responsive Fallback (< 768px) */
-  @media (max-width: 767px) {
-    .s8-component-card {
-      aspect-ratio: auto !important;
-      height: auto !important;
-      max-height: calc(100dvh - 80px) !important;
-      flex: 0 1 auto !important;
-      min-height: 0 !important;
-      border-radius: 20px !important;
-      padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-      overflow: visible !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: center !important;
-      gap: clamp(8px, 1.8vh, 14px) !important;
-    }
-    .s8-stage-body {
-      flex: 0 1 auto !important;
-      height: auto !important;
-      min-height: 0 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 0 !important;
-    }
-    .s8-bubble-wrap {
-      width: clamp(240px, 72vw, 305px) !important;
-      max-width: 305px !important;
-      aspect-ratio: 510 / 315 !important;
-      height: auto !important;
-      position: relative !important;
-      left: auto !important;
-      top: auto !important;
-      margin: 0 auto !important;
-      filter: drop-shadow(2px 3px 0px #1a3532) !important;
-    }
-    .s8-bubble-text-wrap {
-      position: absolute !important;
-      top: 44% !important;
-      left: 46% !important;
-      transform: translate(-50%, -50%) !important;
-      width: 84% !important;
-      max-width: 86% !important;
-      padding: 0 8px !important;
-      margin: 0 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      text-align: center !important;
-      box-sizing: border-box !important;
-    }
-    .s8-heading {
-      font-size: 12px !important;
-      line-height: 1.35 !important;
-      font-weight: 600 !important;
-      color: #142724 !important;
-      text-align: center !important;
-      letter-spacing: -0.01em !important;
-      word-break: normal !important;
-      overflow-wrap: break-word !important;
-    }
-    .s8-heading-line {
-      display: block !important;
-      text-align: center !important;
-      margin: 0 auto !important;
-      width: 100% !important;
-    }
-    .s8-nurse-wrap {
-      width: clamp(65px, 16vw, 85px) !important;
-      height: clamp(85px, 13vh, 115px) !important;
-      margin: -14px 12% 0 auto !important;
-      z-index: 2 !important;
-    }
-    .s8-audio-wrap {
-      position: static !important;
-      right: auto !important;
-      bottom: auto !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100% !important;
-      margin: 4px auto 0 auto !important;
-      z-index: 25 !important;
-    }
-    .s8-component-card .slide-nav {
-      position: static !important;
-      bottom: auto !important;
-      left: auto !important;
-      right: auto !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 10px !important;
-      width: 100% !important;
-      margin: 4px auto 0 auto !important;
-      pointer-events: auto !important;
-    }
-  }
+  ${(() => {
+    const mobileLayout = (scope: string) => `
+      ${scope} {
+        aspect-ratio: auto !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        min-height: 100% !important;
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 14px 16px 12px 16px !important;
+        gap: 10px !important;
+        box-sizing: border-box !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+      ${scope} .s8-stage-body {
+        width: 100% !important;
+        max-width: 380px !important;
+        flex: 1 1 auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 auto !important;
+        gap: 6px !important;
+      }
+      ${scope} .s8-bubble-wrap {
+        width: clamp(275px, 84vw, 345px) !important;
+        max-width: 345px !important;
+        aspect-ratio: 510 / 315 !important;
+        height: auto !important;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        margin: 16px auto 0 auto !important;
+        filter: drop-shadow(2px 3px 0px #1a3532) !important;
+      }
+      ${scope} .s8-bubble-text-wrap {
+        position: absolute !important;
+        top: 44% !important;
+        left: 46% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 82% !important;
+        max-width: 265px !important;
+        padding: 0 6px !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+      }
+      ${scope} .s8-heading {
+        font-size: clamp(14.5px, 2.15vh, 16.5px) !important;
+        line-height: 1.38 !important;
+        font-weight: 700 !important;
+        color: #142724 !important;
+        text-align: center !important;
+        letter-spacing: -0.015em !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+      }
+      ${scope} .s8-heading-line {
+        display: block !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+      }
+      ${scope} .s8-nurse-wrap {
+        width: clamp(88px, 22vw, 112px) !important;
+        height: clamp(135px, 21vh, 185px) !important;
+        margin: -12px 10% 0 auto !important;
+        z-index: 2 !important;
+        flex-shrink: 0 !important;
+      }
+      ${scope} .s8-nurse-img {
+        height: 100% !important;
+        max-height: 100% !important;
+        width: auto !important;
+        object-fit: contain !important;
+      }
+      ${scope} .s8-bottom-bar {
+        width: 100% !important;
+        max-width: 360px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: clamp(10px, 1.8vh, 16px) !important;
+        padding-top: 6px !important;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+        margin: 0 auto !important;
+        flex-shrink: 0 !important;
+        z-index: 25 !important;
+      }
+      ${scope} .s8-audio-wrap {
+        order: 1 !important;
+        position: static !important;
+        right: auto !important;
+        bottom: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        color: #144e57 !important;
+        z-index: 25 !important;
+      }
+      ${scope} .s8-audio-wrap > div {
+        gap: 8px !important;
+      }
+      ${scope} .s8-audio-wrap .audio-cc-btn,
+      ${scope} .s8-audio-wrap .audio-play-btn {
+        color: #144e57 !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 4px !important;
+      }
+      ${scope} .s8-audio-wrap .audio-cc-btn svg,
+      ${scope} .s8-audio-wrap .audio-play-btn svg {
+        height: 34px !important;
+        width: auto !important;
+      }
+      ${scope} .slide-nav {
+        order: 2 !important;
+        position: relative !important;
+        bottom: auto !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 16px !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        pointer-events: auto !important;
+      }
+      ${scope} .slide-nav-btn {
+        min-width: 128px !important;
+        padding: 0 32px !important;
+      }
+    `;
+    return `
+      ${mobileLayout(".s8-component-card.is-mobile")}
+      @media (max-width: 767px) {
+        ${mobileLayout(".s8-component-card:not(.is-desktop)")}
+        .s8-component-card:not(.is-desktop) {
+          min-height: min(640px, calc(100dvh - 80px)) !important;
+          max-height: calc(100dvh - 72px) !important;
+        }
+      }
+    `;
+  })()}
 
   /* Prefers-Reduced-Motion (WCAG 2.3.3 Level AAA) */
   @media (prefers-reduced-motion: reduce) {
@@ -545,24 +514,25 @@ export function Slide8MilestoneScreen({
         </div>
       </div>
 
-      {/* 2. Audio narration & CC controls (bottom-right on desktop/tablet, centered on mobile) */}
-      <div className="s8-audio-wrap">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId}
-          locale={isEs ? "es" : "en"}
-          transcriptText={spokenText}
-          size="large"
+      {/* 2. Bottom Controls (Audio above Back/Next on mobile; independent on desktop) */}
+      <div className="s8-bottom-bar">
+        <div className="s8-audio-wrap">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={isEs ? "es" : "en"}
+            transcriptText={spokenText}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
         />
       </div>
-
-      {/* 3. Centered Back & Next Navigation Buttons (Identical to Slide 5 & other slides) */}
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isEs}
-        loading={loading}
-      />
     </section>
   );
 }

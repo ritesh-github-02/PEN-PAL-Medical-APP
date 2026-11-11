@@ -453,10 +453,10 @@ input.s11-other-input:focus-visible,
   filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
 
-/* Tablet & Smaller Screens Scaling */
-@media (max-height: 650px), (max-width: 820px) {
+/* Tablet & Short-Desktop Scaling (scoped above mobile breakpoint) */
+@media (min-width: 768px) and (max-height: 650px), (min-width: 768px) and (max-width: 820px) {
   .s11-root {
-    padding: 0.85rem 1.25rem 1rem 1.25rem;
+    padding: 0.85rem 1.25rem 4rem 1.25rem;
   }
   .s11-top-section,
   .s11-middle {
@@ -484,214 +484,15 @@ input.s11-other-input:focus-visible,
   }
 }
 
-/* ==========================================================
-   Mobile-First Enhanced Responsive Layout (<= 640px)
-   ========================================================== */
-@media (max-width: 767px) {
-  .s11-root {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    max-height: calc(100dvh - 80px) !important;
-    min-height: 0 !important;
-    flex: 0 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: clamp(14px, 2.4vh, 20px) clamp(12px, 3.5vw, 18px) !important;
-    gap: clamp(8px, 1.8vh, 14px) !important;
-  }
-
-  .s11-top-section {
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .s11-heading {
-    font-size: clamp(12px, 1.8vh, 13.5px) !important;
-    line-height: 1.3 !important;
-    text-align: left !important;
-  }
-
-  .s11-middle {
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 1 auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    gap: 0.5rem !important;
-    width: 100% !important;
-  }
-
-  .s11-card {
-    max-width: 100% !important;
-    width: 100% !important;
-    padding: 0.55rem 0.75rem !important;
-    border-radius: 14px !important;
-    gap: 0.35rem !important;
-  }
-
-  .s11-chip-row {
-    gap: 0.35rem !important;
-  }
-
-  .s11-chip {
-    padding: 0.28rem 0.55rem !important;
-    font-size: clamp(10px, 1.4vh, 11px) !important;
-    line-height: 1.2 !important;
-    border-radius: 7px !important;
-    white-space: normal !important;
-    text-align: left !important;
-    word-break: break-word !important;
-    max-width: 100% !important;
-  }
-
-  /* Row 5: Stack Other describe input and Unsure chip */
-  .s11-row-bottom {
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 0.45rem !important;
-    margin-top: 0.15rem !important;
-    padding-top: 0.15rem !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
-  }
-
-  .s11-other-wrap {
-    flex: 1 1 auto !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.35rem !important;
-  }
-
-  .s11-other-label {
-    font-size: clamp(9.5px, 1.3vh, 10.5px) !important;
-    white-space: nowrap !important;
-  }
-
-  .s11-other-input {
-    width: 100% !important;
-    min-width: 0 !important;
-    font-size: clamp(10px, 1.35vh, 11px) !important;
-    padding: 3px 6px !important;
-    color: #ffffff !important;
-    border: 2px solid #ffd41d !important;
-    border-radius: 6px !important;
-    background-color: rgba(16, 44, 40, 0.28) !important;
-  }
-
-  .s11-row-bottom .s11-chip {
-    align-self: center !important;
-    flex-shrink: 0 !important;
-  }
-
-  /* Nurse Anna sizing on mobile */
-  .s11-right {
-    margin: 0 auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-end !important;
-    flex-shrink: 0 !important;
-  }
-
-  .s11-nurse {
-    width: auto !important;
-    height: clamp(80px, 12.5vh, 105px) !important;
-    max-height: 105px !important;
-    display: flex !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-  }
-
-  .s11-nurse-img {
-    height: 100% !important;
-    max-height: clamp(80px, 12.5vh, 105px) !important;
-    width: auto !important;
-    object-fit: contain !important;
-    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
-  }
-
-  @media (max-height: 560px) {
-    .s11-nurse {
-      height: 75px !important;
-      max-height: 75px !important;
-    }
-  }
-
-  .s11-audio {
-    position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 4px auto 0 auto !important;
-    z-index: 25 !important;
-  }
-
-  .s11-root .slide-nav {
-    margin: 4px auto 0 auto !important;
-  }
-
-  /* Modal 11B (Rash) Mobile Overrides */
-  .s11-rash-dialog {
-    padding: 1.25rem 1rem 1rem 1rem;
-    border-radius: 20px;
-    max-width: 92vw;
-    max-height: 88vh;
-    overflow-y: auto;
-    gap: 0.65rem;
-  }
-
-  .s11-rash-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-  }
-
-  .s11-rash-btn {
-    width: 100%;
-    text-align: center;
-    padding: 0.55rem 0.85rem;
-    font-size: 0.88rem;
-    min-height: 40px;
-  }
-
-  /* Modal 11C (Swelling) Mobile Overrides */
-  .s11-swelling-dialog {
-    padding: 1.25rem 1rem 1rem 1rem;
-    border-radius: 20px;
-    max-width: 92vw;
-    max-height: 88vh;
-    overflow-y: auto;
-    gap: 0.75rem;
-  }
-
-  .s11-swelling-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-  }
-
-  .s11-swelling-btn {
-    width: 100%;
-    text-align: center;
-    padding: 0.55rem 0.85rem;
-    font-size: 0.88rem;
-    min-height: 42px;
-  }
-
-  .s11-swelling-other {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.35rem;
-    margin-top: 0.4rem;
-  }
-
-  .s11-swelling-other-input {
-    width: 100%;
-  }
+/* Wrappers collapse on desktop so existing flex rows and absolute audio keep exact layout */
+.s11-main-stage {
+  display: contents;
+}
+.s11-chips-wrap {
+  display: contents;
+}
+.s11-bottom-bar {
+  display: contents;
 }
 
 .s11-audio {
@@ -706,6 +507,301 @@ input.s11-other-input:focus-visible,
 .s11-root .slide-nav {
   margin: 10px auto 0.25rem auto !important;
 }
+
+/* ==========================================================
+   Mobile-First Enhanced Responsive Layout (< 768px & .is-mobile)
+   ========================================================== */
+${(() => {
+  const mobileLayout = (scope: string) => `
+    ${scope} {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      min-height: 100% !important;
+      flex: 1 1 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 14px 16px 12px 16px !important;
+      gap: 10px !important;
+      box-sizing: border-box !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+    }
+    ${scope} .s11-main-stage {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 380px !important;
+      flex: 1 0 auto !important;
+      min-height: 0 !important;
+      margin: auto 0 !important;
+      gap: clamp(10px, 1.8vh, 16px) !important;
+    }
+    ${scope} .s11-top-section {
+      padding: 0 4px !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+      max-width: 350px !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s11-heading {
+      font-size: clamp(15px, 2.15vh, 17px) !important;
+      line-height: 1.34 !important;
+      text-align: center !important;
+    }
+    ${scope} .s11-heading:focus:not(:focus-visible) {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    ${scope} .s11-middle {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      flex: 0 0 auto !important;
+      height: auto !important;
+      min-height: 0 !important;
+      gap: clamp(10px, 1.8vh, 16px) !important;
+      width: 100% !important;
+    }
+    ${scope} .s11-card {
+      max-width: 100% !important;
+      width: 100% !important;
+      padding: 12px 12px !important;
+      border-radius: 16px !important;
+      gap: 8px !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s11-chips-wrap {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      gap: 6px !important;
+      width: 100% !important;
+    }
+    ${scope} .s11-chip-row {
+      display: contents !important;
+    }
+    ${scope} .s11-chip {
+      padding: 6px 10px !important;
+      font-size: clamp(11.5px, 1.55vh, 12.5px) !important;
+      line-height: 1.25 !important;
+      border-radius: 9px !important;
+      white-space: normal !important;
+      text-align: left !important;
+      word-break: break-word !important;
+      max-width: 100% !important;
+    }
+    ${scope} .s11-row-bottom {
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 8px !important;
+      margin-top: 2px !important;
+      padding-top: 8px !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+    }
+    ${scope} .s11-other-wrap {
+      flex: 1 1 200px !important;
+      min-width: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+    }
+    ${scope} .s11-other-label {
+      font-size: clamp(11.5px, 1.5vh, 12.5px) !important;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s11-other-input {
+      flex: 1 1 auto !important;
+      width: auto !important;
+      min-width: 96px !important;
+      min-height: 34px !important;
+      font-size: 13px !important;
+      padding: 4px 10px !important;
+      color: #ffffff !important;
+      border: 2px solid #ffd41d !important;
+      border-radius: 7px !important;
+      background-color: rgba(16, 44, 40, 0.28) !important;
+    }
+    ${scope} .s11-row-bottom .s11-chip {
+      align-self: center !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s11-right {
+      width: 100% !important;
+      margin: 0 auto !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: flex-end !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s11-nurse {
+      width: auto !important;
+      height: clamp(86px, 13.5vh, 120px) !important;
+      max-height: 120px !important;
+      max-width: 100% !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+      flex-shrink: 0 !important;
+    }
+    ${scope} .s11-nurse > div {
+      height: 100% !important;
+      max-height: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+    }
+    ${scope} .s11-nurse-img {
+      height: clamp(86px, 13.5vh, 120px) !important;
+      max-height: 120px !important;
+      width: auto !important;
+      max-width: 100% !important;
+      object-fit: contain !important;
+      display: block !important;
+      filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
+    }
+    ${scope} .s11-bottom-bar {
+      width: 100% !important;
+      max-width: 360px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: clamp(10px, 1.8vh, 16px) !important;
+      padding-top: 6px !important;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s11-audio {
+      order: 1 !important;
+      position: static !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      color: #144e57 !important;
+      z-index: 25 !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .s11-audio > div {
+      gap: 8px !important;
+    }
+    ${scope} .s11-audio .audio-cc-btn,
+    ${scope} .s11-audio .audio-play-btn {
+      color: #144e57 !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      padding: 4px !important;
+    }
+    ${scope} .s11-audio .audio-cc-btn svg,
+    ${scope} .s11-audio .audio-play-btn svg {
+      height: 34px !important;
+      width: auto !important;
+    }
+    ${scope} .slide-nav {
+      order: 2 !important;
+      position: relative !important;
+      bottom: auto !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      margin: 0 auto !important;
+      gap: 16px !important;
+      pointer-events: auto !important;
+    }
+    ${scope} .slide-nav-btn {
+      min-width: 128px !important;
+      padding: 0 32px !important;
+    }
+    /* Modal 11B (Rash) Mobile Overrides */
+    ${scope} .s11-rash-dialog {
+      padding: 1.25rem 1rem 1rem 1rem;
+      border-radius: 20px;
+      max-width: 92vw;
+      max-height: 88vh;
+      overflow-y: auto;
+      gap: 0.65rem;
+    }
+    ${scope} .s11-rash-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+    ${scope} .s11-rash-btn {
+      width: 100%;
+      text-align: center;
+      padding: 0.55rem 0.85rem;
+      font-size: 0.88rem;
+      min-height: 44px;
+    }
+    /* Modal 11C (Swelling) Mobile Overrides */
+    ${scope} .s11-swelling-dialog {
+      padding: 1.25rem 1rem 1rem 1rem;
+      border-radius: 20px;
+      max-width: 92vw;
+      max-height: 88vh;
+      overflow-y: auto;
+      gap: 0.75rem;
+    }
+    ${scope} .s11-swelling-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+    ${scope} .s11-swelling-btn {
+      width: 100%;
+      text-align: center;
+      padding: 0.55rem 0.85rem;
+      font-size: 0.88rem;
+      min-height: 44px;
+    }
+    ${scope} .s11-swelling-other {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+    }
+    ${scope} .s11-swelling-other-input {
+      width: 100%;
+    }
+  `;
+  return `
+    ${mobileLayout(".s11-root.is-mobile")}
+    @media (max-width: 767px) {
+      ${mobileLayout(".s11-root:not(.is-desktop)")}
+      .s11-root:not(.is-desktop) {
+        min-height: min(640px, calc(100dvh - 80px)) !important;
+        max-height: calc(100dvh - 72px) !important;
+      }
+    }
+    @media (max-width: 767px) and (max-height: 620px) {
+      .s11-root:not(.is-desktop) .s11-nurse,
+      .s11-root:not(.is-desktop) .s11-nurse-img {
+        height: clamp(68px, 11vh, 88px) !important;
+        max-height: 88px !important;
+      }
+    }
+  `;
+})()}
 `;
 
 export interface Slide11SymptomsScreenProps {
@@ -726,6 +822,7 @@ export interface Slide11SymptomsScreenProps {
   transcriptText?: string;
   stepId?: string;
   locale?: string;
+  variant?: "auto" | "desktop" | "mobile";
 }
 
 interface SymptomItem {
@@ -793,6 +890,7 @@ export function Slide11SymptomsScreen({
   transcriptText,
   stepId = "screen6_1_symptoms",
   locale,
+  variant = "auto",
 }: Slide11SymptomsScreenProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const rashFirstBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -1020,43 +1118,49 @@ export function Slide11SymptomsScreen({
     );
   };
 
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+
   return (
-    <div id="slide-content" className="s11-root">
+    <div id="slide-content" className={`s11-root${variantClass}`}>
       <style dangerouslySetInnerHTML={{ __html: SLIDE11_CSS }} />
 
-      {/* 1. Main Heading */}
-      <div className="s11-top-section">
-        <h1
-          ref={headingRef}
-          tabIndex={-1}
-          className="s11-heading"
-        >
-          {titleText}
-        </h1>
-      </div>
+      <div className="s11-main-stage">
+        {/* 1. Main Heading */}
+        <div className="s11-top-section">
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            className="s11-heading"
+          >
+            {titleText}
+          </h1>
+        </div>
 
-      {/* 2. Middle Content: Sage Green Card + Nurse Anna */}
-      <div className="s11-middle">
+        {/* 2. Middle Content: Sage Green Card + Nurse Anna */}
+        <div className="s11-middle">
         {/* Sage Green Card Container */}
         <div className="s11-card" role="group" aria-label={titleText}>
-          {/* Row 1 */}
-          <div className="s11-chip-row">
-            {ROW_1.map(renderChip)}
-          </div>
+          <div className="s11-chips-wrap">
+            {/* Row 1 */}
+            <div className="s11-chip-row">
+              {ROW_1.map(renderChip)}
+            </div>
 
-          {/* Row 2 */}
-          <div className="s11-chip-row">
-            {ROW_2.map(renderChip)}
-          </div>
+            {/* Row 2 */}
+            <div className="s11-chip-row">
+              {ROW_2.map(renderChip)}
+            </div>
 
-          {/* Row 3 */}
-          <div className="s11-chip-row">
-            {ROW_3.map(renderChip)}
-          </div>
+            {/* Row 3 */}
+            <div className="s11-chip-row">
+              {ROW_3.map(renderChip)}
+            </div>
 
-          {/* Row 4 */}
-          <div className="s11-chip-row">
-            {ROW_4.map(renderChip)}
+            {/* Row 4 */}
+            <div className="s11-chip-row">
+              {ROW_4.map(renderChip)}
+            </div>
           </div>
 
           {/* Row 5: Other Input + Unsure Chip */}
@@ -1100,26 +1204,29 @@ export function Slide11SymptomsScreen({
           </div>
         </div>
       </div>
-
-      {/* Audio narration & CC controls (bottom-right like Slide 5) */}
-      <div className="s11-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId || "screen6_1_symptoms"}
-          locale={locale || (isSpanish ? "es" : "en")}
-          transcriptText={effectiveTranscript}
-        />
       </div>
 
-      {/* 3. Bottom Centered Navigation Buttons (Back & Next) */}
-      <SlideNavigationButtons
-        onBack={onBack}
-        onNext={onNext}
-        isSpanish={isSpanish}
-        loading={loading}
-        nextDisabled={!isNextEnabled || loading}
-        variant="flow"
-      />
+      {/* Bottom Controls: Audio above Back/Next on mobile; independent on desktop */}
+      <div className="s11-bottom-bar">
+        <div className="s11-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId || "screen6_1_symptoms"}
+            locale={locale || (isSpanish ? "es" : "en")}
+            transcriptText={effectiveTranscript}
+            size="large"
+          />
+        </div>
+
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isSpanish}
+          loading={loading}
+          nextDisabled={!isNextEnabled || loading}
+          variant="flow"
+        />
+      </div>
 
       {/* ========================================================================= */}
       {/* MODAL 11B (Figma 7-1-1): Rash Sub-types Branching Modal */}
