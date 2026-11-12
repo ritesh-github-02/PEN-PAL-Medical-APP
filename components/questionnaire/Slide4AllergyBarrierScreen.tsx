@@ -49,9 +49,9 @@ const mobileLayout = (scope: string) => `
     -webkit-overflow-scrolling: touch !important;
     height: 100% !important;
     max-height: 100% !important;
-    min-height: 100% !important;
+    min-height: clamp(640px, 75dvh, 720px) !important;
     flex: 1 1 auto !important;
-    display: flex !important;
+    display: flex !important;F
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
