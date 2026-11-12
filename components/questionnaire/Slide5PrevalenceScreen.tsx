@@ -22,8 +22,8 @@ const STAGE_W = 750;
 const STAGE_H = 530;
 
 /**
- * Stacked mobile layout (< 768px) matching Slide 3 & Slide 4 exact canvas height
- * and two-tier bottom bar (Audio/CC on top, Back/Next below).
+ * Stacked mobile layout (< 768px) with Badge, Content, and Nurse Anna
+ * vertically center-aligned inside the stage.
  */
 const mobileLayout = (scope: string) => `
   #slide-content${scope},
@@ -58,11 +58,11 @@ const mobileLayout = (scope: string) => `
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     background-color: transparent !important;
-    padding: 8px 4px 4px 4px !important;
+    padding: 8px 4px !important;
     margin: 0 auto !important;
-    gap: clamp(10px, 1.8dvh, 18px) !important;
+    gap: 16px !important;
     box-sizing: border-box !important;
   }
   ${scope} .s5-badge {
@@ -70,61 +70,61 @@ const mobileLayout = (scope: string) => `
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-width: clamp(170px, 46vw, 204px) !important;
-    height: clamp(44px, 5.8dvh, 52px) !important;
-    padding: 0 clamp(16px, 4vw, 22px) !important;
+    min-width: 184px !important;
+    height: 46px !important;
+    padding: 0 24px !important;
     background-color: #feff9f !important;
     border: 1.8px solid #236f7a !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 6px rgba(34, 105, 118, 0.25) !important;
-    margin: 4px auto 0 auto !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 6px rgba(34, 105, 118, 0.22) !important;
+    margin: 0 auto !important;
     text-align: center !important;
     flex-shrink: 0 !important;
     align-self: center !important;
   }
   ${scope} .s5-badge-title {
     margin: 0 !important;
-    font-size: clamp(16px, 2.1dvh, 18.5px) !important;
+    font-size: 16.5px !important;
     line-height: 1.2 !important;
     font-weight: 700 !important;
     letter-spacing: -0.01em !important;
-    color: #232323 !important;
+    color: #142724 !important;
     text-align: center !important;
   }
   ${scope} .s5-text-wrap {
     position: static !important;
     width: 100% !important;
-    max-width: 350px !important;
+    max-width: 340px !important;
     margin: 0 auto !important;
     padding: 0 4px !important;
     text-align: center !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s5-heading {
-    font-size: clamp(15px, 2.15dvh, 17.5px) !important;
-    line-height: 1.36 !important;
-    font-weight: 600 !important;
+    font-size: clamp(15px, 2.05dvh, 17px) !important;
+    line-height: 1.42 !important;
+    font-weight: 500 !important;
     text-align: center !important;
-    text-wrap: pretty !important;
+    text-wrap: balance !important;
     margin: 0 auto !important;
-    color: #142724 !important;
+    color: #232323 !important;
   }
   ${scope} .s5-bold {
     font-size: 1.05em !important;
     font-weight: 800 !important;
+    color: #111827 !important;
   }
   ${scope} .s5-nurse {
     position: static !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(105px, 26vw, 136px) !important;
-    height: clamp(145px, 20.5dvh, 195px) !important;
-    max-height: 195px !important;
-    margin: 0 auto !important;
+    width: clamp(95px, 24vw, 120px) !important;
+    height: clamp(140px, 19dvh, 175px) !important;
+    margin: 4px auto 0 auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    flex-shrink: 1 !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s5-nurse-img {
     height: 100% !important;
@@ -294,7 +294,7 @@ const SLIDE5_CSS = `
     color: #111827;
   }
 
-  /* 3. Nurse Anna holding bottle — right side */
+  /* 3. Nurse Anna — right side */
   .s5-nurse {
     position: absolute;
     left: 510px;
@@ -507,11 +507,10 @@ export function Slide5PrevalenceScreen({
           </h1>
         </div>
 
-        {/* 3. Nurse Anna holding bottle */}
+        {/* 3. Nurse Anna */}
         <div className="s5-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-holding-bottle.png"
-            srcSet="/images/nurse-anna-holding-bottle.png 1x, /images/nurse-anna-holding-bottle-hd.png 2x"
+            src="/images/nurse-anna.png"
             alt=""
             className="s5-nurse-img"
             draggable={false}
