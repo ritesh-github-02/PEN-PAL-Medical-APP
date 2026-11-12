@@ -482,13 +482,12 @@ const BUBBLE_BEZIER_PATH =
 // Responsive Styles
 // ============================================================================
 const mobileLayout = (scope: string) => `
+#slide-content${scope},
   ${scope} {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
+    overflow: hidden !important;
     height: 100% !important;
-    max-height: 100% !important;
-    min-height: 100% !important;
+    min-height: clamp(640px, calc(100dvh - 175px), 740px) !important;
+    max-height: calc(100dvh - 165px) !important;
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
@@ -502,13 +501,14 @@ const mobileLayout = (scope: string) => `
     box-shadow: none !important;
     border-radius: 0 !important;
   }
+  #slide-content${scope} .s3-stage,
   ${scope} .s3-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 380px !important;
     height: auto !important;
+    min-height: clamp(495px, calc(100dvh - 305px), 555px) !important;
     flex: 1 1 auto !important;
-    min-height: 0 !important;
     overflow: visible !important;
     transform: none !important;
     display: flex !important;
@@ -518,7 +518,7 @@ const mobileLayout = (scope: string) => `
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
-    gap: 30px !important;
+    gap: 24px !important;
   }
   ${scope} .s3-left-col {
     position: static !important;

@@ -43,11 +43,12 @@ const BUBBLE_PATH_MOBILE =
   "Z";
 
 const mobileLayout = (scope: string) => `
+  #slide-content${scope},
   ${scope} {
     overflow: hidden !important;
-    height: calc(100dvh - 140px) !important;
-    min-height: calc(100dvh - 140px) !important;
-    max-height: calc(100dvh - 140px) !important;
+    height: 100% !important;
+    min-height: clamp(640px, calc(100dvh - 175px), 740px) !important;
+    max-height: calc(100dvh - 165px) !important;
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
@@ -61,13 +62,15 @@ const mobileLayout = (scope: string) => `
     box-shadow: none !important;
     border-radius: 0 !important;
   }
+  #slide-content${scope} .s4-stage,
   ${scope} .s4-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 398px !important;
     height: auto !important;
-    flex: 1 1 0% !important;
-    min-height: 0 !important;
+    /* Forces the inner stage to match Slide 3's exact 3-element height on Android & iOS */
+    min-height: clamp(495px, calc(100dvh - 305px), 555px) !important;
+    flex: 1 1 auto !important;
     overflow: visible !important;
     transform: none !important;
     display: flex !important;
@@ -75,9 +78,9 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     justify-content: center !important;
     background-color: transparent !important;
-    padding: 0 10px !important;
+    padding: 12px 10px 4px 10px !important;
     margin: 0 auto !important;
-    gap: 12px !important;
+    gap: 18px !important;
     box-sizing: border-box !important;
   }
   ${scope} .s4-bubble {
@@ -90,7 +93,7 @@ const mobileLayout = (scope: string) => `
     max-width: 355px !important;
     aspect-ratio: 438 / 312 !important;
     height: auto !important;
-    flex-shrink: 1 !important;
+    flex-shrink: 0 !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
@@ -149,12 +152,12 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(110px, 27vw, 138px) !important;
-    height: clamp(150px, 21vh, 195px) !important;
-    margin-top: -14px !important;
+    width: clamp(112px, 28vw, 142px) !important;
+    height: clamp(160px, 22vh, 202px) !important;
+    margin-top: -12px !important;
     margin-left: auto !important;
     margin-right: 4% !important;
-    flex-shrink: 1 !important;
+    flex-shrink: 0 !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
