@@ -47,15 +47,15 @@ const mobileLayout = (scope: string) => `
   ${scope} {
     overflow: hidden !important;
     height: 100% !important;
-    min-height: clamp(640px, calc(100dvh - 175px), 740px) !important;
-    max-height: calc(100dvh - 165px) !important;
-    flex: 1 1 auto !important;
+    min-height: clamp(580px, calc(100dvh - 150px), 720px) !important;
+    max-height: 100% !important;
+    flex: 1 1 0% !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 14px 16px 12px 16px !important;
-    gap: 10px !important;
+    padding: 14px 16px 18px 16px !important;
+    gap: 8px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
@@ -68,9 +68,8 @@ const mobileLayout = (scope: string) => `
     width: 100% !important;
     max-width: 398px !important;
     height: auto !important;
-    /* Forces the inner stage to match Slide 3's exact 3-element height on Android & iOS */
-    min-height: clamp(495px, calc(100dvh - 305px), 555px) !important;
-    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
     overflow: visible !important;
     transform: none !important;
     display: flex !important;
@@ -78,9 +77,9 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     justify-content: center !important;
     background-color: transparent !important;
-    padding: 12px 10px 4px 10px !important;
+    padding: 4px 10px !important;
     margin: 0 auto !important;
-    gap: 18px !important;
+    gap: 8px !important;
     box-sizing: border-box !important;
   }
   ${scope} .s4-bubble {
@@ -90,10 +89,10 @@ const mobileLayout = (scope: string) => `
     top: auto !important;
     transform: none !important;
     width: 100% !important;
-    max-width: 355px !important;
+    max-width: 345px !important;
     aspect-ratio: 438 / 312 !important;
     height: auto !important;
-    flex-shrink: 0 !important;
+    flex-shrink: 1 !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
@@ -117,7 +116,7 @@ const mobileLayout = (scope: string) => `
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     width: 80% !important;
-    max-width: 285px !important;
+    max-width: 280px !important;
     padding: 0 6px !important;
     margin: 0 !important;
     display: flex !important;
@@ -128,7 +127,7 @@ const mobileLayout = (scope: string) => `
     box-sizing: border-box !important;
   }
   ${scope} .s4-bubble-text {
-    font-size: clamp(14px, 1.95vh, 16px) !important;
+    font-size: clamp(14px, 1.95dvh, 16px) !important;
     line-height: 1.34 !important;
     font-weight: 700 !important;
     color: #142724 !important;
@@ -152,12 +151,12 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(112px, 28vw, 142px) !important;
-    height: clamp(160px, 22vh, 202px) !important;
-    margin-top: -12px !important;
+    width: clamp(105px, 26vw, 136px) !important;
+    height: clamp(140px, 19.5dvh, 188px) !important;
+    margin-top: -14px !important;
     margin-left: auto !important;
     margin-right: 4% !important;
-    flex-shrink: 0 !important;
+    flex-shrink: 1 !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -170,6 +169,7 @@ const mobileLayout = (scope: string) => `
     object-fit: contain !important;
     transform: none !important;
   }
+  /* Bottom Controls Bar: Guaranteed clearance at bottom so Back/Next never clip */
   ${scope} .s4-bottom-bar-mobile {
     width: 100% !important;
     max-width: 360px !important;
@@ -177,31 +177,70 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: clamp(10px, 1.8vh, 16px) !important;
-    padding-top: 6px !important;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 12px !important;
+    padding-top: 4px !important;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
   }
   ${scope} .s4-audio {
+    order: 1 !important;
     position: static !important;
     right: auto !important;
     bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     margin: 0 auto !important;
     z-index: 25 !important;
+    color: #144e57 !important;
   }
-  ${scope} .slide-nav-container {
-    margin: 0 auto !important;
+  ${scope} .s4-audio button {
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #144e57 !important;
+    display: flex !important;
+    align-items: center !important;
     justify-content: center !important;
+    padding: 4px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 8px !important;
+    transition: transform 0.12s ease, opacity 0.15s ease !important;
+  }
+  ${scope} .s4-audio button:hover {
+    transform: scale(1.08) !important;
+    opacity: 0.85 !important;
+  }
+  ${scope} .s4-audio button svg {
+    height: 34px !important;
+    width: auto !important;
+    transition: transform 0.12s ease !important;
+  }
+  ${scope} .s4-audio button:hover svg,
+  ${scope} .s4-audio button:active svg {
+    transform: scale(0.96) !important;
+  }
+  ${scope} .slide-nav,
+  ${scope} .slide-nav-container {
+    order: 2 !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
     width: 100% !important;
     gap: 16px !important;
+    padding-bottom: 2px !important;
   }
   ${scope} .slide-nav-btn {
     min-width: 128px !important;
+    min-height: 48px !important;
+    height: 48px !important;
     padding: 0 32px !important;
     white-space: nowrap !important;
     flex: 0 1 auto !important;
@@ -330,19 +369,38 @@ const SLIDE4_CSS = `
 }
 .s4-audio-desktop {
   position: absolute;
-  right: clamp(14px, 3.5vw, 22px);
-  bottom: clamp(14px, 2.5vh, 22px);
+  right: 22px;
+  bottom: clamp(16px, 3vh, 22px);
   display: flex;
   align-items: center;
   justify-content: flex-end;
   z-index: 35;
+  color: #144e57;
+}
+.s4-audio-desktop button {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: #144e57 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-radius: 8px !important;
+  transition: transform 0.12s ease, opacity 0.15s ease !important;
+}
+.s4-audio-desktop button svg {
+  height: 34px !important;
+  width: auto !important;
 }
 .s4-nav-desktop {
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom: clamp(14px, 2.5vh, 22px);
+  bottom: clamp(16px, 3vh, 22px);
   left: 0;
   right: 0;
   margin: 0 auto;

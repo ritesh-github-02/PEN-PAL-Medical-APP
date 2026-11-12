@@ -114,12 +114,12 @@ const mobileLayout = (scope: string) => `
     font-weight: 800 !important;
     color: #111827 !important;
   }
-  ${scope} .s5-nurse {
+${scope} .s5-nurse {
     position: static !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(95px, 24vw, 120px) !important;
-    height: clamp(140px, 19dvh, 175px) !important;
+    width: clamp(112px, 28vw, 142px) !important;
+    height: clamp(160px, 22vh, 202px) !important;
     margin: 4px auto 0 auto !important;
     display: flex !important;
     align-items: center !important;
@@ -127,11 +127,10 @@ const mobileLayout = (scope: string) => `
     flex-shrink: 0 !important;
   }
   ${scope} .s5-nurse-img {
+    width: 100% !important;
     height: 100% !important;
-    max-height: 100% !important;
-    width: auto !important;
     object-fit: contain !important;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08)) !important;
+    transform: none !important;
   }
   /* Two-tier bottom bar matching Slide 3 & Slide 4 (Audio on top, Nav below) */
   ${scope} .s5-bottom-bar-mobile {
@@ -148,7 +147,7 @@ const mobileLayout = (scope: string) => `
     flex-shrink: 0 !important;
     z-index: 25 !important;
   }
-  ${scope} .s5-audio {
+${scope} .s5-audio {
     order: 1 !important;
     position: static !important;
     right: auto !important;
@@ -162,6 +161,34 @@ const mobileLayout = (scope: string) => `
     margin: 0 auto !important;
     z-index: 25 !important;
     flex-shrink: 0 !important;
+    color: #144e57 !important;
+  }
+  ${scope} .s5-audio button {
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #144e57 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 8px !important;
+    transition: transform 0.12s ease, opacity 0.15s ease !important;
+  }
+  ${scope} .s5-audio button:hover {
+    transform: scale(1.08) !important;
+    opacity: 0.85 !important;
+  }
+  ${scope} .s5-audio button svg {
+    height: 34px !important;
+    width: auto !important;
+    transition: transform 0.12s ease !important;
+  }
+  ${scope} .s5-audio button:hover svg,
+  ${scope} .s5-audio button:active svg {
+    transform: scale(0.96) !important;
   }
   ${scope} .slide-nav,
   ${scope} .slide-nav-container {
@@ -294,13 +321,14 @@ const SLIDE5_CSS = `
     color: #111827;
   }
 
-  /* 3. Nurse Anna — right side */
+
+/* 3. Nurse Anna — right side (exact Slide 4 desktop dimensions) */
   .s5-nurse {
     position: absolute;
-    left: 510px;
-    top: 32px;
-    width: 200px;
-    height: 410px;
+    left: 525px;
+    top: 82px;
+    width: 165px;
+    height: 310px;
     pointer-events: none;
     z-index: 4;
     display: flex;
@@ -322,7 +350,7 @@ const SLIDE5_CSS = `
   .s5-bottom-bar-mobile {
     display: none;
   }
-  .s5-audio-desktop {
+.s5-audio-desktop {
     position: absolute;
     right: 22px;
     bottom: clamp(16px, 3vh, 22px);
@@ -330,6 +358,25 @@ const SLIDE5_CSS = `
     align-items: center;
     justify-content: flex-end;
     z-index: 30;
+    color: #144e57;
+  }
+  .s5-audio-desktop button {
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #144e57 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 8px !important;
+    transition: transform 0.12s ease, opacity 0.15s ease !important;
+  }
+  .s5-audio-desktop button svg {
+    height: 34px !important;
+    width: auto !important;
   }
   .s5-nav-desktop {
     position: absolute;
