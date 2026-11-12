@@ -19,45 +19,50 @@ export interface Slide5PrevalenceScreenProps {
 }
 
 const STAGE_W = 750;
-const STAGE_H = 427;
+const STAGE_H = 530;
 
 /**
- * Stacked mobile layout (< 768px). Declared once, reused for both
- * the media query and explicit `variant="mobile"` mode.
+ * Stacked mobile layout (< 768px) matching Slide 3 & Slide 4 exact canvas height
+ * and two-tier bottom bar (Audio/CC on top, Back/Next below).
  */
 const mobileLayout = (scope: string) => `
+  #slide-content${scope},
   ${scope} {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
+    overflow: hidden !important;
     height: 100% !important;
-    max-height: 100% !important;
-    min-height: 100% !important;
-    flex: 1 1 auto !important;
+    min-height: clamp(610px, calc(100dvh - 185px), 730px) !important;
+    max-height: calc(100dvh - 175px) !important;
+    flex: 1 1 0% !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 14px clamp(12px, 3.5vw, 18px) calc(12px + env(safe-area-inset-bottom, 0px)) clamp(12px, 3.5vw, 18px) !important;
-    gap: 0 !important;
+    padding: 10px 16px 10px 16px !important;
+    gap: 6px !important;
     box-sizing: border-box !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
+  #slide-content${scope} .s5-stage,
   ${scope} .s5-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 398px !important;
     height: auto !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
+    min-height: clamp(460px, calc(100dvh - 320px), 540px) !important;
+    flex: 1 1 0% !important;
+    overflow: visible !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
     background-color: transparent !important;
-    padding: 0 4px !important;
-    margin: auto auto !important;
-    gap: 10px !important;
+    padding: 8px 4px 4px 4px !important;
+    margin: 0 auto !important;
+    gap: clamp(10px, 1.8dvh, 18px) !important;
     box-sizing: border-box !important;
   }
   ${scope} .s5-badge {
@@ -66,20 +71,20 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     justify-content: center !important;
     min-width: clamp(170px, 46vw, 204px) !important;
-    height: clamp(46px, 6.2vh, 54px) !important;
+    height: clamp(44px, 5.8dvh, 52px) !important;
     padding: 0 clamp(16px, 4vw, 22px) !important;
     background-color: #feff9f !important;
     border: 1.8px solid #236f7a !important;
     border-radius: 16px !important;
     box-shadow: 0 4px 6px rgba(34, 105, 118, 0.25) !important;
-    margin: 0 auto 6px auto !important;
+    margin: 4px auto 0 auto !important;
     text-align: center !important;
     flex-shrink: 0 !important;
     align-self: center !important;
   }
   ${scope} .s5-badge-title {
     margin: 0 !important;
-    font-size: clamp(16px, 1.3vh + 9px, 19px) !important;
+    font-size: clamp(16px, 2.1dvh, 18.5px) !important;
     line-height: 1.2 !important;
     font-weight: 700 !important;
     letter-spacing: -0.01em !important;
@@ -89,63 +94,82 @@ const mobileLayout = (scope: string) => `
   ${scope} .s5-text-wrap {
     position: static !important;
     width: 100% !important;
+    max-width: 350px !important;
     margin: 0 auto !important;
-    padding: 0 !important;
+    padding: 0 4px !important;
     text-align: center !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s5-heading {
-    font-size: clamp(15px, 1.4vh + 9px, 19px) !important;
-    line-height: 1.4 !important;
+    font-size: clamp(15px, 2.15dvh, 17.5px) !important;
+    line-height: 1.36 !important;
+    font-weight: 600 !important;
     text-align: center !important;
-    text-wrap: balance !important;
+    text-wrap: pretty !important;
     margin: 0 auto !important;
+    color: #142724 !important;
   }
   ${scope} .s5-bold {
     font-size: 1.05em !important;
+    font-weight: 800 !important;
   }
   ${scope} .s5-nurse {
     position: static !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(112px, 28vw, 142px) !important;
-    height: clamp(150px, 22dvh, 202px) !important;
-    max-height: 202px !important;
-    margin: 10px auto 0 auto !important;
+    width: clamp(105px, 26vw, 136px) !important;
+    height: clamp(145px, 20.5dvh, 195px) !important;
+    max-height: 195px !important;
+    margin: 0 auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    flex-shrink: 0 !important;
+    flex-shrink: 1 !important;
   }
   ${scope} .s5-nurse-img {
     height: 100% !important;
-    max-height: clamp(150px, 22dvh, 202px) !important;
+    max-height: 100% !important;
     width: auto !important;
     object-fit: contain !important;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08)) !important;
   }
+  /* Two-tier bottom bar matching Slide 3 & Slide 4 (Audio on top, Nav below) */
+  ${scope} .s5-bottom-bar-mobile {
+    width: 100% !important;
+    max-width: 360px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(8px, 1.4dvh, 14px) !important;
+    padding-top: 2px !important;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+    z-index: 25 !important;
+  }
   ${scope} .s5-audio {
+    order: 1 !important;
     position: static !important;
     right: auto !important;
     bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    margin: 0 auto 24px auto !important;
+    margin: 0 auto !important;
     z-index: 25 !important;
     flex-shrink: 0 !important;
   }
-  ${scope} .s5-nav {
-    position: static !important;
+  ${scope} .slide-nav,
+  ${scope} .slide-nav-container {
+    order: 2 !important;
+    margin: 0 auto !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-    flex-shrink: 0 !important;
-  }
-  ${scope} .slide-nav-container {
-    margin: 0 auto !important;
-    justify-content: center !important;
     width: 100% !important;
     gap: 16px !important;
   }
@@ -158,10 +182,6 @@ const mobileLayout = (scope: string) => `
 `;
 
 const SLIDE5_CSS = `
-  /* ------------------------------------------------------------
-     Slide 5: WCAG 2.1/2.2 Level AAA — Prevalence Screen
-     Transparent stage scaled within frame (no double borders)
-     ------------------------------------------------------------ */
   .s5-root,
   .s5-root *,
   .s5-root *::before,
@@ -184,7 +204,6 @@ const SLIDE5_CSS = `
     color: #232323;
   }
 
-  /* Screen Reader Only Utility (WCAG 1.3.1, 4.1.2) */
   .s5-sr-only {
     position: absolute !important;
     width: 1px !important;
@@ -197,14 +216,12 @@ const SLIDE5_CSS = `
     border: 0 !important;
   }
 
-  /* Universal High Contrast Focus Indicator */
   .s5-root button:focus-visible,
   .s5-root [tabindex="0"]:focus-visible {
     outline: 3px solid #143833 !important;
     outline-offset: 3px !important;
   }
 
-  /* Transparent stage that scales as one composition */
   .s5-stage {
     position: relative;
     width: ${STAGE_W}px;
@@ -218,7 +235,7 @@ const SLIDE5_CSS = `
   .s5-badge {
     position: absolute;
     left: 40px;
-    top: 28px;
+    top: 42px;
     min-width: 200px;
     height: 58px;
     display: inline-flex;
@@ -246,7 +263,7 @@ const SLIDE5_CSS = `
   .s5-text-wrap {
     position: absolute;
     left: 40px;
-    top: 118px;
+    top: 132px;
     width: 430px;
     margin: 0;
     padding: 0;
@@ -281,7 +298,7 @@ const SLIDE5_CSS = `
   .s5-nurse {
     position: absolute;
     left: 510px;
-    top: 12px;
+    top: 32px;
     width: 200px;
     height: 410px;
     pointer-events: none;
@@ -301,8 +318,11 @@ const SLIDE5_CSS = `
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
   }
 
-  /* Audio narration & CC controls: bottom-right on desktop, centered on mobile */
-  .s5-audio {
+  /* Desktop Bottom Controls */
+  .s5-bottom-bar-mobile {
+    display: none;
+  }
+  .s5-audio-desktop {
     position: absolute;
     right: 22px;
     bottom: clamp(16px, 3vh, 22px);
@@ -311,11 +331,9 @@ const SLIDE5_CSS = `
     justify-content: flex-end;
     z-index: 30;
   }
-
-  /* Centered bottom navigation on desktop */
-  .s5-nav {
+  .s5-nav-desktop {
     position: absolute;
-    bottom: clamp(16px, 3vh, 24px);
+    bottom: clamp(16px, 3vh, 22px);
     left: 0;
     right: 0;
     margin: 0 auto;
@@ -328,9 +346,27 @@ const SLIDE5_CSS = `
 
   @media (max-width: 767px) {
     ${mobileLayout(".s5-root:not(.is-desktop)")}
+    .s5-audio-desktop {
+      display: none !important;
+    }
+    .s5-nav-desktop {
+      display: none !important;
+    }
+    .s5-bottom-bar-mobile {
+      display: flex !important;
+    }
   }
 
   ${mobileLayout(".s5-root.is-mobile")}
+  .s5-root.is-mobile .s5-audio-desktop {
+    display: none !important;
+  }
+  .s5-root.is-mobile .s5-nav-desktop {
+    display: none !important;
+  }
+  .s5-root.is-mobile .s5-bottom-bar-mobile {
+    display: flex !important;
+  }
 
   /* Prefers-Reduced-Motion (WCAG 2.3.3 Level AAA) */
   @media (prefers-reduced-motion: reduce) {
@@ -395,9 +431,12 @@ export function Slide5PrevalenceScreen({
     };
   }, [variant]);
 
-  const rawMed = medicationName && medicationName.trim()
-    ? medicationName.trim()
-    : isEs ? "la amoxicilina" : "amoxicillin";
+  const rawMed =
+    medicationName && medicationName.trim()
+      ? medicationName.trim()
+      : isEs
+        ? "la amoxicilina"
+        : "amoxicillin";
   const medName = resolveMedicineToken(rawMed, rawMed, isEs);
   const article = /^[aeiou]/i.test(medName) ? "an" : "a";
 
@@ -417,9 +456,11 @@ export function Slide5PrevalenceScreen({
     </>
   );
 
-  const captionText = transcriptText || (isEs
-    ? `¿Sabías que...? La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con una alergia a ${medName}, 95 pueden tomar ${medName} sin tener una reacción.`
-    : `Did You Know? Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with ${article} ${medName} allergy, 95 can take ${medName} without having a reaction.`);
+  const captionText =
+    transcriptText ||
+    (isEs
+      ? `¿Sabías que...? La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con una alergia a ${medName}, 95 pueden tomar ${medName} sin tener una reacción.`
+      : `Did You Know? Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with ${article} ${medName} allergy, 95 can take ${medName} without having a reaction.`);
 
   const effectiveAudioSrc =
     audioSrc ||
@@ -427,7 +468,8 @@ export function Slide5PrevalenceScreen({
       ? "/audio/exported/screen2_statistics_es.mp3"
       : "/audio/exported/screen2_statistics_en.mp3");
 
-  const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
     <div
@@ -477,8 +519,8 @@ export function Slide5PrevalenceScreen({
         </div>
       </div>
 
-      {/* 4. Audio narration & CC controls (bottom-right on desktop, centered above nav on mobile) */}
-      <div className="s5-audio">
+      {/* 4. Desktop Audio narration & CC controls */}
+      <div className="s5-audio-desktop">
         <AudioPlayer
           audioSrc={effectiveAudioSrc}
           stepId={stepId}
@@ -488,8 +530,28 @@ export function Slide5PrevalenceScreen({
         />
       </div>
 
-      {/* 5. Fixed Centered Bottom Navigation (Back & Next) */}
-      <div className="s5-nav">
+      {/* 5. Desktop Centered Navigation */}
+      <div className="s5-nav-desktop">
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
+        />
+      </div>
+
+      {/* 6. Mobile Centered Stacked Bottom Bar (Audio on top, Back/Next below) */}
+      <div className="s5-bottom-bar-mobile">
+        <div className="s5-audio">
+          <AudioPlayer
+            audioSrc={effectiveAudioSrc}
+            stepId={stepId}
+            locale={isEs ? "es" : "en"}
+            transcriptText={captionText}
+            size="large"
+          />
+        </div>
+
         <SlideNavigationButtons
           onBack={onBack}
           onNext={onNext}
@@ -502,4 +564,3 @@ export function Slide5PrevalenceScreen({
 }
 
 export default Slide5PrevalenceScreen;
-
