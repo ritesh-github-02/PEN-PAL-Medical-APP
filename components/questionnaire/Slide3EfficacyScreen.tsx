@@ -482,19 +482,19 @@ const BUBBLE_BEZIER_PATH =
 // Responsive Styles
 // ============================================================================
 const mobileLayout = (scope: string) => `
-#slide-content${scope},
+  #slide-content${scope},
   ${scope} {
     overflow: hidden !important;
     height: 100% !important;
-    min-height: clamp(640px, calc(100dvh - 175px), 740px) !important;
-    max-height: calc(100dvh - 165px) !important;
-    flex: 1 1 auto !important;
+    min-height: clamp(610px, calc(100dvh - 185px), 730px) !important;
+    max-height: calc(100dvh - 175px) !important;
+    flex: 1 1 0% !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 14px 16px 12px 16px !important;
-    gap: 10px !important;
+    padding: 10px 16px 10px 16px !important;
+    gap: 6px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
@@ -507,24 +507,24 @@ const mobileLayout = (scope: string) => `
     width: 100% !important;
     max-width: 380px !important;
     height: auto !important;
-    min-height: clamp(495px, calc(100dvh - 305px), 555px) !important;
-    flex: 1 1 auto !important;
+    min-height: clamp(460px, calc(100dvh - 320px), 540px) !important;
+    flex: 1 1 0% !important;
     overflow: visible !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
     background-color: transparent !important;
-    padding: 0 !important;
+    padding: 2px 0 !important;
     margin: 0 auto !important;
-    gap: 24px !important;
+    gap: clamp(8px, 1.5dvh, 16px) !important;
   }
   ${scope} .s3-left-col {
     position: static !important;
     width: 100% !important;
-    max-width: 340px !important;
-    margin: 18px auto 0 auto !important;
+    max-width: 345px !important;
+    margin: 4px auto 0 auto !important;
     padding: 0 !important;
     display: flex !important;
     justify-content: center !important;
@@ -534,8 +534,8 @@ const mobileLayout = (scope: string) => `
   ${scope} .s3-heading {
     position: static !important;
     width: 100% !important;
-    font-size: clamp(16px, 2.4vh, 18.5px) !important;
-    line-height: 1.38 !important;
+    font-size: clamp(15px, 2.15dvh, 17.5px) !important;
+    line-height: 1.32 !important;
     font-weight: 700 !important;
     letter-spacing: -0.015em !important;
     text-align: center !important;
@@ -552,9 +552,10 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(255px, 76vw, 305px) !important;
+    width: clamp(240px, 72vw, 290px) !important;
     aspect-ratio: 380 / 250 !important;
     height: auto !important;
+    flex-shrink: 1 !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
   }
@@ -562,13 +563,13 @@ const mobileLayout = (scope: string) => `
     top: 42% !important;
     left: 48% !important;
     width: 82% !important;
-    max-width: 255px !important;
+    max-width: 245px !important;
     padding: 0 4px !important;
     box-sizing: border-box !important;
   }
   ${scope} .s3-bubble-text {
-    font-size: clamp(13px, 1.85vh, 14.5px) !important;
-    line-height: 1.38 !important;
+    font-size: clamp(12.5px, 1.75dvh, 14px) !important;
+    line-height: 1.34 !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
     text-align: center !important;
@@ -577,18 +578,19 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(80px, 20vw, 105px) !important;
-    height: clamp(125px, 17vh, 160px) !important;
-    margin-top: -20px !important;
+    width: clamp(75px, 19vw, 98px) !important;
+    height: clamp(110px, 15.5dvh, 145px) !important;
+    margin-top: -18px !important;
     margin-left: auto !important;
     margin-right: 10% !important;
+    flex-shrink: 1 !important;
   }
   ${scope} .s3-nurse-img {
     height: 100% !important;
     max-height: 100% !important;
     object-fit: contain !important;
   }
-  /* Two-tier bottom bar with generous separation */
+  /* Two-tier bottom bar */
   ${scope} .s3-bottom-bar-mobile {
     width: 100% !important;
     max-width: 360px !important;
@@ -596,9 +598,9 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: clamp(10px, 1.8vh, 16px) !important;
-    padding-top: 6px !important;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: clamp(8px, 1.4dvh, 14px) !important;
+    padding-top: 2px !important;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
