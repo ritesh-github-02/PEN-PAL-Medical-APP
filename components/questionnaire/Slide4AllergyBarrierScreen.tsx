@@ -44,32 +44,31 @@ const BUBBLE_PATH_MOBILE =
 
 const mobileLayout = (scope: string) => `
   ${scope} {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
+    overflow: hidden !important;
     height: 100% !important;
     max-height: 100% !important;
-    min-height: clamp(675px, 78.5dvh, 735px) !important;
-    flex: 1 1 auto !important;
-    display: flex !important;F
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 14px 16px 12px 16px !important;
-    gap: 10px !important;
+    padding: 12px 16px 10px 16px !important;
+    gap: 6px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
   }
-  ${scope} .s4-stage {
+
+${scope} .s4-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 398px !important;
-    height: auto !important;
-    flex: 1 1 auto !important;
-    min-height: 495px !important;
+    height: 100% !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
     overflow: visible !important;
     transform: none !important;
     display: flex !important;
@@ -77,12 +76,12 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     justify-content: center !important;
     background-color: transparent !important;
-    padding: 0 14px !important;
+    padding: 4px 10px !important;
     margin: 0 auto !important;
     gap: 0 !important;
     box-sizing: border-box !important;
   }
-  ${scope} .s4-bubble {
+${scope} .s4-bubble {
     order: 1 !important;
     position: relative !important;
     left: auto !important;
@@ -92,13 +91,14 @@ const mobileLayout = (scope: string) => `
     max-width: 355px !important;
     aspect-ratio: 438 / 312 !important;
     height: auto !important;
+    flex-shrink: 1 !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
     pointer-events: none !important;
     overflow: visible !important;
   }
-  ${scope} .s4-bubble-desktop-svg {
+${scope} .s4-bubble-desktop-svg {
     display: none !important;
   }
   ${scope} .s4-bubble-mobile-svg {
@@ -109,14 +109,14 @@ const mobileLayout = (scope: string) => `
     height: 100% !important;
     overflow: visible !important;
   }
-  ${scope} .s4-bubble-text-wrap {
+${scope} .s4-bubble-text-wrap {
     position: absolute !important;
-    top: 40% !important;
-    left: 49.5% !important;
+    top: 42.5% !important;
+    left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 66% !important;
-    max-width: 235px !important;
-    padding: 0 4px !important;
+    width: 80% !important;
+    max-width: 285px !important;
+    padding: 0 6px !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -125,13 +125,13 @@ const mobileLayout = (scope: string) => `
     text-align: center !important;
     box-sizing: border-box !important;
   }
-  ${scope} .s4-bubble-text {
-    font-size: clamp(16px, 2.25vh, 18px) !important;
-    line-height: 1.4 !important;
+${scope} .s4-bubble-text {
+    font-size: clamp(14px, 1.95vh, 16px) !important;
+    line-height: 1.34 !important;
     font-weight: 700 !important;
     color: #142724 !important;
     text-align: center !important;
-    text-wrap: balance !important;
+    text-wrap: pretty !important;
     letter-spacing: -0.015em !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
@@ -140,34 +140,34 @@ const mobileLayout = (scope: string) => `
     width: 100% !important;
     display: block !important;
   }
-  ${scope} .s4-bubble-text:focus,
+${scope} .s4-bubble-text:focus,
   ${scope} .s4-bubble-text:focus-visible {
     outline: none !important;
     box-shadow: none !important;
   }
-  ${scope} .s4-nurse {
+${scope} .s4-nurse {
     order: 2 !important;
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(112px, 28vw, 142px) !important;
-    height: clamp(160px, 22vh, 202px) !important;
-    margin-top: -12px !important;
+    width: clamp(100px, 25vw, 130px) !important;
+    height: clamp(135px, 19vh, 180px) !important;
+    margin-top: -14px !important;
     margin-left: auto !important;
-    margin-right: 3% !important;
+    margin-right: 4% !important;
+    flex-shrink: 1 !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
   }
-  ${scope} .s4-nurse-img {
+${scope} .s4-nurse-img {
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
     transform: none !important;
   }
-  /* Bottom Controls Bar: Two-tier stack matching Slide 2 & 3 */
   ${scope} .s4-bottom-bar-mobile {
     width: 100% !important;
     max-width: 360px !important;
@@ -175,14 +175,14 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 26px !important;
-    padding-top: 8px !important;
+    gap: clamp(10px, 1.8vh, 16px) !important;
+    padding-top: 6px !important;
     padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
   }
-  ${scope} .s4-audio {
+${scope} .s4-audio {
     position: static !important;
     right: auto !important;
     bottom: auto !important;
@@ -198,7 +198,7 @@ const mobileLayout = (scope: string) => `
     width: 100% !important;
     gap: 16px !important;
   }
-  ${scope} .slide-nav-btn {
+${scope} .slide-nav-btn {
     min-width: 128px !important;
     padding: 0 32px !important;
     white-space: nowrap !important;
