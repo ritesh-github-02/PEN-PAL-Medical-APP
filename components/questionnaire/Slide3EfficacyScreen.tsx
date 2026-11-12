@@ -514,17 +514,17 @@ const mobileLayout = (scope: string) => `
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     background-color: transparent !important;
-    padding: 2px 0 !important;
+    padding: 4px 0 !important;
     margin: 0 auto !important;
-    gap: clamp(8px, 1.5dvh, 16px) !important;
+    gap: clamp(14px, 2.2dvh, 22px) !important;
   }
   ${scope} .s3-left-col {
     position: static !important;
     width: 100% !important;
     max-width: 345px !important;
-    margin: 4px auto 0 auto !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     display: flex !important;
     justify-content: center !important;
@@ -535,7 +535,7 @@ const mobileLayout = (scope: string) => `
     position: static !important;
     width: 100% !important;
     font-size: clamp(15px, 2.15dvh, 17.5px) !important;
-    line-height: 1.32 !important;
+    line-height: 1.34 !important;
     font-weight: 700 !important;
     letter-spacing: -0.015em !important;
     text-align: center !important;
@@ -552,10 +552,10 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(240px, 72vw, 290px) !important;
+    width: clamp(245px, 74vw, 295px) !important;
     aspect-ratio: 380 / 250 !important;
     height: auto !important;
-    flex-shrink: 1 !important;
+    flex-shrink: 0 !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
   }
@@ -578,12 +578,12 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(75px, 19vw, 98px) !important;
-    height: clamp(110px, 15.5dvh, 145px) !important;
+    width: clamp(78px, 19vw, 100px) !important;
+    height: clamp(115px, 16dvh, 150px) !important;
     margin-top: -18px !important;
     margin-left: auto !important;
     margin-right: 10% !important;
-    flex-shrink: 1 !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s3-nurse-img {
     height: 100% !important;
@@ -660,6 +660,8 @@ const mobileLayout = (scope: string) => `
   ${scope} .slide-nav-btn {
     min-width: 128px !important;
     padding: 0 32px !important;
+    white-space: nowrap !important;
+    flex: 0 1 auto !important;
   }
 `;
 
