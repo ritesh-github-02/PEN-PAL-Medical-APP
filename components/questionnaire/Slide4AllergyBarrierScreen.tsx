@@ -7,16 +7,17 @@ import SlideNavigationButtons from "./SlideNavigationButtons";
 
 /* ==========================================================
    Slide4AllergyBarrierScreen – Improved Speech Bubble & Responsive Layout
-   - Nurse Anna standing on left gesturing toward bubble on desktop
+   - Nurse Anna standing on left gesturing toward bubble on desktop/tablet
    - Improved smooth Bezier speech bubble with crisp tail & paper dot grid
-   - Mobile portrait: bubble on top, Nurse Anna below, audio controls,
-     and navigation buttons matching Slide 2 & 3 canvas hierarchy
+   - Desktop and Tablet: 2D seamless stage, proportionally scaled, intact layout
+   - Mobile portrait: bubble on top, enlarged Nurse Anna below, two-tier bottom bar
+     (audio controls on top, navigation buttons below) matching Slide 2 & 3
    ========================================================== */
 
 const STAGE_W = 750;
 const STAGE_H = 530;
 
-/* Smooth Bezier Silhouette for Desktop (Tail pointing left toward Anna) */
+/* Smooth Bezier Silhouette for Desktop & Tablet (Tail pointing left toward Anna) */
 const BUBBLE_PATH_LEFT =
   "M 125 242 " +
   "C 95 255, 40 270, 18 276 " +
@@ -28,16 +29,16 @@ const BUBBLE_PATH_LEFT =
   "C 230 278, 160 262, 125 242 Z";
 
 /* Dedicated Smooth Curved Silhouette for Mobile Portrait (Tail pointing downward toward Nurse Anna)
-   Tail tip at (312, 230), cleanly reaching toward Nurse Anna without penetrating her head */
+   Tail tip at (316, 238), cleanly reaching toward Nurse Anna without penetrating her head */
 const BUBBLE_PATH_MOBILE =
-  "M 190 12 " +
-  "C 285 12, 362 52, 362 101 " +
-  "C 362 138, 330 168, 278 180 " +
-  "C 292 195, 306 214, 312 230 " +
-  "C 292 216, 264 200, 230 188 " +
-  "C 217 189.5, 203 190, 190 190 " +
-  "C 95 190, 18 150, 18 101 " +
-  "C 18 52, 95 12, 190 12 " +
+  "M 190 8 " +
+  "C 292 8, 372 48, 372 101 " +
+  "C 372 142, 335 174, 280 188 " +
+  "C 295 204, 310 222, 316 238 " +
+  "C 295 222, 266 205, 230 193 " +
+  "C 217 194.5, 203 195, 190 195 " +
+  "C 88 195, 8 153, 8 101 " +
+  "C 8 48, 88 8, 190 8 " +
   "Z";
 
 const mobileLayout = (scope: string) => `
@@ -51,10 +52,10 @@ const mobileLayout = (scope: string) => `
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    padding: 30px 16px 30px 16px !important;
-    gap: 25px !important;
+    padding: 14px 16px 12px 16px !important;
+    gap: 10px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
@@ -64,7 +65,7 @@ const mobileLayout = (scope: string) => `
   ${scope} .s4-stage {
     position: relative !important;
     width: 100% !important;
-    max-width: 380px !important;
+    max-width: 410px !important;
     height: auto !important;
     flex: 1 1 auto !important;
     min-height: 0 !important;
@@ -73,11 +74,11 @@ const mobileLayout = (scope: string) => `
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: center !important;
     background-color: transparent !important;
     padding: 0 !important;
     margin: 0 auto !important;
-    gap: 6px !important;
+    gap: 0 !important;
   }
   ${scope} .s4-bubble {
     order: 1 !important;
@@ -85,11 +86,11 @@ const mobileLayout = (scope: string) => `
     left: auto !important;
     top: auto !important;
     transform: none !important;
-    width: clamp(285px, 88vw, 360px) !important;
-    max-width: 360px !important;
+    width: clamp(335px, 94vw, 395px) !important;
+    max-width: 395px !important;
     aspect-ratio: 380 / 250 !important;
     height: auto !important;
-    margin: 20px auto 0 auto !important;
+    margin: 4px auto 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
     pointer-events: none !important;
@@ -106,12 +107,12 @@ const mobileLayout = (scope: string) => `
   }
   ${scope} .s4-bubble-text-wrap {
     position: absolute !important;
-    top: 41% !important;
-    left: 49% !important;
+    top: 40.5% !important;
+    left: 49.5% !important;
     transform: translate(-50%, -50%) !important;
-    width: 82% !important;
-    max-width: 275px !important;
-    padding: 0 4px !important;
+    width: 71% !important;
+    max-width: 265px !important;
+    padding: 0 8px !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -121,11 +122,12 @@ const mobileLayout = (scope: string) => `
     box-sizing: border-box !important;
   }
   ${scope} .s4-bubble-text {
-    font-size: clamp(13px, 1.85vh, 15px) !important;
-    line-height: 1.38 !important;
+    font-size: clamp(15.5px, 2.25vh, 18px) !important;
+    line-height: 1.4 !important;
     font-weight: 700 !important;
     color: #142724 !important;
     text-align: center !important;
+    text-wrap: balance !important;
     letter-spacing: -0.015em !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
@@ -144,17 +146,16 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(90px, 23vw, 120px) !important;
-    height: clamp(140px, 22vh, 200px) !important;
-    margin-top: 4px !important;
+    width: clamp(105px, 27vw, 135px) !important;
+    height: clamp(155px, 21vh, 195px) !important;
+    margin-top: -6px !important;
     margin-left: auto !important;
-    margin-right: 6% !important;
+    margin-right: 4% !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    flex-shrink: 0 !important;
   }
   ${scope} .s4-nurse-img {
     width: 100% !important;
@@ -170,10 +171,10 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 16px !important;
+    gap: 26px !important;
     padding-top: 8px !important;
     padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-    margin: auto auto 0 auto !important;
+    margin: 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
   }
@@ -259,9 +260,9 @@ const SLIDE4_CSS = `
 /* ---------- 2. Speech Bubble on Right (Tail pointing left toward Anna) ---------- */
 .s4-bubble {
   position: absolute;
-  left: 188px;
-  top: -14px;
-  width: 458px;
+  left: 175px;
+  top: -20px;
+  width: 485px;
   aspect-ratio: 510 / 315;
   pointer-events: none;
   z-index: 1;
@@ -279,43 +280,42 @@ const SLIDE4_CSS = `
 }
 .s4-bubble-text-wrap {
   position: absolute;
-  top: 48%;
-  left: 54%;
+  top: 50%;
+  left: 56%;
   transform: translate(-50%, -50%);
-  width: 78%;
+  width: 72%;
+  max-width: 340px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0;
+  padding: 0 10px;
   margin: 0;
   box-sizing: border-box;
   pointer-events: none;
 }
 .s4-bubble-text {
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
   width: 100%;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
-  font-size: 18.5px;
-  line-height: 1.42;
+  font-size: 21.5px;
+  line-height: 1.44;
   font-weight: 700;
-  color: #232323;
-  text-align: center;
-  letter-spacing: -0.012em;
+  color: #142724;
+  text-align: center !important;
+  text-wrap: balance !important;
+  letter-spacing: -0.015em;
   outline: none;
-  word-break: break-word;
+  word-break: normal;
   overflow-wrap: break-word;
-}
-.s4-bubble-text:focus-visible {
-  box-shadow: 0 0 0 2px #236f7a;
-}
-.s4-bubble-line {
   display: block;
-  text-align: center;
-  margin: 0 auto;
-  width: 100%;
+}
+.s4-bubble-text:focus,
+.s4-bubble-text:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Desktop Bottom Controls */
@@ -330,16 +330,6 @@ const SLIDE4_CSS = `
   align-items: center;
   justify-content: flex-end;
   z-index: 35;
-}
-.s4-audio-desktop .audio-cc-btn svg,
-.s4-audio .audio-cc-btn svg {
-  height: 38px !important;
-  width: auto !important;
-}
-.s4-audio-desktop .audio-play-btn svg,
-.s4-audio .audio-play-btn svg {
-  height: 38px !important;
-  width: auto !important;
 }
 .s4-nav-desktop {
   display: flex;
@@ -363,11 +353,6 @@ const SLIDE4_CSS = `
   }
   .s4-bottom-bar-mobile {
     display: flex !important;
-  }
-  .s4-audio .audio-cc-btn svg,
-  .s4-audio .audio-play-btn svg {
-    height: 34px !important;
-    width: auto !important;
   }
 }
 
@@ -419,7 +404,7 @@ export function Slide4AllergyBarrierScreen({
     return () => clearTimeout(timer);
   }, []);
 
-  // Responsive stage scaling that fits container with zero distortion across all viewports
+  // Responsive stage scaling that fits container with zero distortion across all viewports (Desktop & Tablet)
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -482,7 +467,7 @@ export function Slide4AllergyBarrierScreen({
 
         {/* 2. Speech Bubble on Right with smooth Bezier curve & drop shadow */}
         <div className="s4-bubble">
-          {/* Desktop Bezier SVG (Pointing left toward Anna) */}
+          {/* Desktop & Tablet Bezier SVG (Pointing left toward Anna) */}
           <svg
             className="s4-bubble-desktop-svg"
             viewBox="-20 -10 540 330"
@@ -549,7 +534,7 @@ export function Slide4AllergyBarrierScreen({
         </div>
       </div>
 
-      {/* 3. Desktop Audio narration & CC controls */}
+      {/* 3. Desktop / Tablet Audio narration & CC controls */}
       <div className="s4-audio-desktop">
         <AudioPlayer
           audioSrc={effectiveAudioSrc}
@@ -560,7 +545,7 @@ export function Slide4AllergyBarrierScreen({
         />
       </div>
 
-      {/* 4. Desktop Centered Navigation Buttons (Back & Next) */}
+      {/* 4. Desktop / Tablet Centered Navigation Buttons (Back & Next) */}
       <div className="s4-nav-desktop">
         <SlideNavigationButtons
           onBack={onBack}
@@ -594,5 +579,4 @@ export function Slide4AllergyBarrierScreen({
 }
 
 export default Slide4AllergyBarrierScreen;
-
 
