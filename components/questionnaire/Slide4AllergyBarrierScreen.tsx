@@ -45,28 +45,27 @@ const BUBBLE_PATH_MOBILE =
 const mobileLayout = (scope: string) => `
   ${scope} {
     overflow: hidden !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    min-height: 0 !important;
-    flex: 1 1 0% !important;
+    height: calc(100dvh - 140px) !important;
+    min-height: calc(100dvh - 140px) !important;
+    max-height: calc(100dvh - 140px) !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 12px 16px 10px 16px !important;
-    gap: 6px !important;
+    padding: 14px 16px 12px 16px !important;
+    gap: 10px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
   }
-
-${scope} .s4-stage {
+  ${scope} .s4-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 398px !important;
-    height: 100% !important;
+    height: auto !important;
     flex: 1 1 0% !important;
     min-height: 0 !important;
     overflow: visible !important;
@@ -76,12 +75,12 @@ ${scope} .s4-stage {
     align-items: center !important;
     justify-content: center !important;
     background-color: transparent !important;
-    padding: 4px 10px !important;
+    padding: 0 10px !important;
     margin: 0 auto !important;
-    gap: 0 !important;
+    gap: 12px !important;
     box-sizing: border-box !important;
   }
-${scope} .s4-bubble {
+  ${scope} .s4-bubble {
     order: 1 !important;
     position: relative !important;
     left: auto !important;
@@ -98,7 +97,7 @@ ${scope} .s4-bubble {
     pointer-events: none !important;
     overflow: visible !important;
   }
-${scope} .s4-bubble-desktop-svg {
+  ${scope} .s4-bubble-desktop-svg {
     display: none !important;
   }
   ${scope} .s4-bubble-mobile-svg {
@@ -109,7 +108,7 @@ ${scope} .s4-bubble-desktop-svg {
     height: 100% !important;
     overflow: visible !important;
   }
-${scope} .s4-bubble-text-wrap {
+  ${scope} .s4-bubble-text-wrap {
     position: absolute !important;
     top: 42.5% !important;
     left: 50% !important;
@@ -125,7 +124,7 @@ ${scope} .s4-bubble-text-wrap {
     text-align: center !important;
     box-sizing: border-box !important;
   }
-${scope} .s4-bubble-text {
+  ${scope} .s4-bubble-text {
     font-size: clamp(14px, 1.95vh, 16px) !important;
     line-height: 1.34 !important;
     font-weight: 700 !important;
@@ -140,18 +139,18 @@ ${scope} .s4-bubble-text {
     width: 100% !important;
     display: block !important;
   }
-${scope} .s4-bubble-text:focus,
+  ${scope} .s4-bubble-text:focus,
   ${scope} .s4-bubble-text:focus-visible {
     outline: none !important;
     box-shadow: none !important;
   }
-${scope} .s4-nurse {
+  ${scope} .s4-nurse {
     order: 2 !important;
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(100px, 25vw, 130px) !important;
-    height: clamp(135px, 19vh, 180px) !important;
+    width: clamp(110px, 27vw, 138px) !important;
+    height: clamp(150px, 21vh, 195px) !important;
     margin-top: -14px !important;
     margin-left: auto !important;
     margin-right: 4% !important;
@@ -162,7 +161,7 @@ ${scope} .s4-nurse {
     align-items: center !important;
     justify-content: center !important;
   }
-${scope} .s4-nurse-img {
+  ${scope} .s4-nurse-img {
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
@@ -182,7 +181,7 @@ ${scope} .s4-nurse-img {
     flex-shrink: 0 !important;
     z-index: 25 !important;
   }
-${scope} .s4-audio {
+  ${scope} .s4-audio {
     position: static !important;
     right: auto !important;
     bottom: auto !important;
@@ -198,7 +197,7 @@ ${scope} .s4-audio {
     width: 100% !important;
     gap: 16px !important;
   }
-${scope} .slide-nav-btn {
+  ${scope} .slide-nav-btn {
     min-width: 128px !important;
     padding: 0 32px !important;
     white-space: nowrap !important;
