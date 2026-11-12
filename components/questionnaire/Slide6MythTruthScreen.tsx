@@ -20,7 +20,7 @@ export interface Slide6MythTruthScreenProps {
   transcriptText?: string;
 }
 
-/** Fixed design stage, scaled to fit the tablet frame (same convention as the other slides). */
+/** Fixed design stage, scaled to fit the frame (same convention as Slides 3, 4 & 5). */
 const STAGE_W = 750;
 const STAGE_H = 530;
 
@@ -81,103 +81,104 @@ const stripPrefix = (text: string) =>
     .replace(/^(truth|verdad)\s*[-–—:]\s*/i, "");
 
 /**
- * Stacked phone layout. Declared once and reused for both the media query and
- * the explicit `variant="mobile"` mode instead of duplicating the rules.
+ * Stacked mobile layout matching Slides 3, 4 & 5:
+ * - Same locked card height & stage behavior
+ * - Heading + 4 myth cards vertically center-aligned inside stage
+ * - Two-tier bottom bar (Play/CC on top with 34px SVG size, Back/Next below without clipping)
  */
 const mobileLayout = (scope: string) => `
+  #slide-content${scope},
   ${scope} {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    min-height: clamp(580px, calc(100dvh - 150px), 720px) !important;
     max-height: 100% !important;
-    min-height: 0 !important;
-    flex: 1 1 auto !important;
+    flex: 1 1 0% !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 10px 14px 10px 14px !important;
-    gap: clamp(6px, 1.2vh, 10px) !important;
+    padding: 12px 16px 16px 16px !important;
+    gap: 6px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
   }
+  #slide-content${scope} .s6-stage,
   ${scope} .s6-stage {
+    position: relative !important;
     width: 100% !important;
-    max-width: 380px !important;
+    max-width: 410px !important;
     height: auto !important;
-    flex: 1 1 auto !important;
     min-height: 0 !important;
-    overflow: visible !important;
-    padding: 0 !important;
+    flex: 1 1 0% !important;
+    padding: 4px 0 !important;
     margin: 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
     justify-content: center !important;
+    align-items: center !important;
     transform: none !important;
-    gap: clamp(8px, 1.5vh, 14px) !important;
+    gap: clamp(8px, 1.4dvh, 14px) !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
   }
   ${scope} .s6-heading {
     width: 100% !important;
-    max-width: 100% !important;
-    font-size: clamp(13.5px, 1.95vh, 15.5px) !important;
+    font-size: clamp(14.5px, 2dvh, 17px) !important;
     line-height: 1.32 !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.015em !important;
+    margin: 0 auto 2px auto !important;
     text-align: center !important;
-    margin: 2px auto 0 auto !important;
-    padding: 0 2px !important;
+    text-wrap: balance !important;
     flex-shrink: 0 !important;
-  }
-  ${scope} .s6-heading:focus:not(:focus-visible) {
-    outline: none !important;
   }
   ${scope} .s6-cards {
-    width: 100% !important;
-    gap: clamp(6px, 1.1vh, 9px) !important;
+    gap: clamp(6px, 1.1dvh, 10px) !important;
     flex: 0 1 auto !important;
     min-height: 0 !important;
-    overflow: visible !important;
-    padding: 0 !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    justify-content: center !important;
+    width: 100% !important;
+    padding: 2px 0 !important;
   }
   ${scope} .s6-card {
-    min-height: clamp(44px, 6.2vh, 54px) !important;
-    padding: 7px 10px !important;
+    min-height: clamp(44px, 6.2dvh, 52px) !important;
+    padding: clamp(6px, 1dvh, 10px) 10px !important;
     gap: 8px !important;
-    border-radius: 13px !important;
-    flex-shrink: 0 !important;
+    border-radius: 10px !important;
+  }
+  ${scope} .s6-card:hover {
+    transform: none !important;
+  }
+  ${scope} .s6-card:active {
+    transform: translateY(0) !important;
   }
   ${scope} .s6-card-tag {
-    min-width: 58px !important;
-    text-align: center !important;
-    font-size: 10px !important;
-    letter-spacing: 0.03em !important;
-    padding: 3px 7px !important;
+    font-size: 10.5px !important;
+    padding: 3px 8px !important;
   }
   ${scope} .s6-card-text {
-    font-size: clamp(11.5px, 1.6vh, 12.2px) !important;
+    font-size: clamp(12px, 1.65dvh, 14px) !important;
     line-height: 1.3 !important;
+    overflow-wrap: break-word !important;
   }
-  ${scope} .s6-card-icon svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-  ${scope} .s6-bottom-bar {
+  /* Two-tier bottom bar matching Slides 3, 4 & 5 */
+  ${scope} .s6-bottom-bar-mobile {
     width: 100% !important;
     max-width: 360px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: clamp(6px, 1.2vh, 12px) !important;
-    padding-top: 2px !important;
-    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 12px !important;
+    padding-top: 4px !important;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
@@ -187,41 +188,62 @@ const mobileLayout = (scope: string) => `
     position: static !important;
     right: auto !important;
     bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
     width: 100% !important;
     display: flex !important;
     justify-content: center !important;
+    align-items: center !important;
     margin: 0 auto !important;
-    color: #144e57 !important;
     z-index: 25 !important;
-  }
-  ${scope} .s6-audio > div {
-    gap: 8px !important;
-  }
-  ${scope} .s6-audio .audio-cc-btn,
-  ${scope} .s6-audio .audio-play-btn {
+    flex-shrink: 0 !important;
     color: #144e57 !important;
+  }
+  ${scope} .s6-audio button {
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #144e57 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
     min-width: 44px !important;
     min-height: 44px !important;
-    padding: 4px !important;
+    border-radius: 8px !important;
+    transition: transform 0.12s ease, opacity 0.15s ease !important;
   }
-  ${scope} .s6-audio .audio-cc-btn svg,
-  ${scope} .s6-audio .audio-play-btn svg {
+  ${scope} .s6-audio button:hover {
+    transform: scale(1.08) !important;
+    opacity: 0.85 !important;
+  }
+  ${scope} .s6-audio button svg {
     height: 34px !important;
     width: auto !important;
+    transition: transform 0.12s ease !important;
   }
-  ${scope} .slide-nav {
+  ${scope} .s6-audio button:hover svg,
+  ${scope} .s6-audio button:active svg {
+    transform: scale(0.96) !important;
+  }
+  ${scope} .slide-nav,
+  ${scope} .slide-nav-container {
     order: 2 !important;
-    position: relative !important;
-    bottom: auto !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
     margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
     gap: 16px !important;
+    padding-bottom: 2px !important;
   }
   ${scope} .slide-nav-btn {
     min-width: 128px !important;
+    min-height: 48px !important;
+    height: 48px !important;
     padding: 0 32px !important;
+    white-space: nowrap !important;
+    flex: 0 1 auto !important;
   }
 `;
 
@@ -243,6 +265,7 @@ const SLIDE6_CSS = `
   height: 100%;
   min-height: 0;
   overflow: hidden;
+  background-color: #fafdf3;
   color: #232323;
   font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
@@ -259,6 +282,13 @@ const SLIDE6_CSS = `
   border: 0 !important;
 }
 
+/* Universal Focus Indicator (WCAG 2.4.7) */
+.s6-root button:focus-visible,
+.s6-root [tabindex="0"]:focus-visible {
+  outline: 3px solid #143833 !important;
+  outline-offset: 3px !important;
+}
+
 /* Bottom padding keeps the slide content clear of the shared navigation row. */
 .s6-stage {
   position: relative;
@@ -269,6 +299,7 @@ const SLIDE6_CSS = `
   height: ${STAGE_H}px;
   padding: 30px 36px 60px;
   overflow: hidden;
+  background-color: transparent;
 }
 
 /* 1. Question heading (AAA contrast: #232323 on #fafdf3 ≈ 15.8:1) */
@@ -348,7 +379,6 @@ const SLIDE6_CSS = `
 
 .s6-card-tag {
   flex-shrink: 0;
-  min-width: 68px;
   padding: 4px 9px;
   border-radius: 9999px;
   background-color: #7a4526;
@@ -357,7 +387,6 @@ const SLIDE6_CSS = `
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: 0.04em;
-  text-align: center;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -373,7 +402,7 @@ const SLIDE6_CSS = `
   font-weight: 600;
   line-height: 1.38;
   letter-spacing: -0.01em;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 .s6-card-icon {
@@ -385,13 +414,12 @@ const SLIDE6_CSS = `
   opacity: 0.75;
 }
 
-/* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
-.s6-bottom-bar {
-  display: contents;
+/* Desktop Bottom Controls */
+.s6-bottom-bar-mobile {
+  display: none;
 }
 
-/* 3. Audio controls — bottom-right on desktop, centered above nav on mobile */
-.s6-audio {
+.s6-audio-desktop {
   position: absolute;
   right: 22px;
   bottom: clamp(16px, 3vh, 22px);
@@ -399,17 +427,65 @@ const SLIDE6_CSS = `
   align-items: center;
   justify-content: flex-end;
   z-index: 30;
+  color: #144e57;
+}
+
+.s6-audio-desktop button {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: #144e57 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-radius: 8px !important;
+  transition: transform 0.12s ease, opacity 0.15s ease !important;
+}
+
+.s6-audio-desktop button svg {
+  height: 34px !important;
+  width: auto !important;
+}
+
+.s6-nav-desktop {
+  position: absolute;
+  bottom: clamp(16px, 3vh, 22px);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 25;
+  pointer-events: auto;
 }
 
 @media (max-width: 767px) {
-${mobileLayout(".s6-root:not(.is-desktop)")}
-  .s6-root:not(.is-desktop) {
-    min-height: min(560px, calc(100dvh - 80px)) !important;
-    max-height: calc(100dvh - 72px) !important;
+  ${mobileLayout(".s6-root:not(.is-desktop)")}
+  .s6-audio-desktop {
+    display: none !important;
+  }
+  .s6-nav-desktop {
+    display: none !important;
+  }
+  .s6-bottom-bar-mobile {
+    display: flex !important;
   }
 }
 
 ${mobileLayout(".s6-root.is-mobile")}
+.s6-root.is-mobile .s6-audio-desktop {
+  display: none !important;
+}
+.s6-root.is-mobile .s6-nav-desktop {
+  display: none !important;
+}
+.s6-root.is-mobile .s6-bottom-bar-mobile {
+  display: flex !important;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .s6-root *,
@@ -451,13 +527,22 @@ export function Slide6MythTruthScreen({
   const revealed = revealedCards ?? ownRevealed;
 
   const text = useCallback(
-    (value: string) => stripPrefix(resolveMedicineToken(value, medName, isEs)),
+    (value: string) =>
+      stripPrefix(
+        resolveMedicineToken(
+          value,
+          medName || (isEs ? "la amoxicilina" : "amoxicillin"),
+          isEs
+        )
+      ),
     [medName, isEs]
   );
 
   // WCAG 2.4.3 — move reading order to the new heading.
   useEffect(() => {
-    const frame = requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true }));
+    const frame = requestAnimationFrame(() =>
+      headingRef.current?.focus({ preventScroll: true })
+    );
     return () => cancelAnimationFrame(frame);
   }, []);
 
@@ -467,7 +552,10 @@ export function Slide6MythTruthScreen({
     if (!el || typeof ResizeObserver === "undefined") return;
 
     const update = () => {
-      if (variant === "mobile" || window.innerWidth < 768) {
+      if (
+        variant === "mobile" ||
+        (variant !== "desktop" && window.innerWidth < 768)
+      ) {
         setScale(1);
         return;
       }
@@ -479,7 +567,11 @@ export function Slide6MythTruthScreen({
     update();
     const observer = new ResizeObserver(update);
     observer.observe(el);
-    return () => observer.disconnect();
+    window.addEventListener("resize", update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, [variant]);
 
   const toggleCard = useCallback(
@@ -521,8 +613,9 @@ export function Slide6MythTruthScreen({
 
   const plainTranscript =
     transcriptText ||
-    `${title} ${MYTHS.map((item) =>
-      `${text(isEs ? item.mythEs : item.mythEn)} ${text(isEs ? item.truthEs : item.truthEn)}`
+    `${title} ${MYTHS.map(
+      (item) =>
+        `${text(isEs ? item.mythEs : item.mythEn)} ${text(isEs ? item.truthEs : item.truthEn)}`
     ).join(" ")}`;
 
   const effectiveAudioSrc =
@@ -532,7 +625,11 @@ export function Slide6MythTruthScreen({
       : "/audio/exported/screen3_5_knowledge_test_en.mp3");
 
   const variantClass =
-    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+    variant === "mobile"
+      ? " is-mobile"
+      : variant === "desktop"
+        ? " is-desktop"
+        : "";
 
   return (
     <div
@@ -562,8 +659,22 @@ export function Slide6MythTruthScreen({
         >
           {MYTHS.map((item) => {
             const isOpen = revealed.includes(item.id);
-            const statement = text(isEs ? (isOpen ? item.truthEs : item.mythEs) : isOpen ? item.truthEn : item.mythEn);
-            const typeLabel = isEs ? (isOpen ? "Verdad" : `Mito ${item.id}`) : isOpen ? "Truth" : `Myth ${item.id}`;
+            const statement = text(
+              isEs
+                ? isOpen
+                  ? item.truthEs
+                  : item.mythEs
+                : isOpen
+                  ? item.truthEn
+                  : item.mythEn
+            );
+            const typeLabel = isEs
+              ? isOpen
+                ? "Verdad"
+                : `Mito ${item.id}`
+              : isOpen
+                ? "Truth"
+                : `Myth ${item.id}`;
 
             return (
               <button
@@ -593,11 +704,31 @@ export function Slide6MythTruthScreen({
 
                 <span className="s6-card-icon" aria-hidden="true">
                   {isOpen ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      focusable="false"
+                    >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      focusable="false"
+                    >
                       <circle cx="12" cy="12" r="10" />
                       <line x1="12" y1="8" x2="12" y2="12" />
                       <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="3" />
@@ -610,6 +741,17 @@ export function Slide6MythTruthScreen({
         </div>
       </div>
 
+      {/* Desktop Audio narration & CC controls */}
+      <div className="s6-audio-desktop">
+        <AudioPlayer
+          audioSrc={effectiveAudioSrc}
+          stepId={stepId}
+          locale={activeLocale}
+          transcriptText={plainTranscript}
+          size="large"
+        />
+      </div>
+
       <p className="s6-sr-only">
         {allRevealed
           ? isEs
@@ -620,7 +762,19 @@ export function Slide6MythTruthScreen({
             : "The Next button is enabled once all four myths are revealed."}
       </p>
 
-      <div className="s6-bottom-bar">
+      {/* Desktop Centered Navigation */}
+      <div className="s6-nav-desktop">
+        <SlideNavigationButtons
+          onBack={onBack}
+          onNext={onNext}
+          isSpanish={isEs}
+          loading={loading}
+          nextDisabled={!allRevealed}
+        />
+      </div>
+
+      {/* Mobile Centered Stacked Bottom Bar (Audio/CC on top, Back/Next below) */}
+      <div className="s6-bottom-bar-mobile">
         <div className="s6-audio">
           <AudioPlayer
             audioSrc={effectiveAudioSrc}
