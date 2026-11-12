@@ -49,7 +49,7 @@ const mobileLayout = (scope: string) => `
     -webkit-overflow-scrolling: touch !important;
     height: 100% !important;
     max-height: 100% !important;
-    min-height: clamp(640px, 75dvh, 720px) !important;
+    min-height: clamp(675px, 78.5dvh, 735px) !important;
     flex: 1 1 auto !important;
     display: flex !important;F
     flex-direction: column !important;
@@ -69,7 +69,7 @@ const mobileLayout = (scope: string) => `
     max-width: 398px !important;
     height: auto !important;
     flex: 1 1 auto !important;
-    min-height: 0 !important;
+    min-height: 495px !important;
     overflow: visible !important;
     transform: none !important;
     display: flex !important;
