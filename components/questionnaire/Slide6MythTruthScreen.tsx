@@ -82,9 +82,9 @@ const stripPrefix = (text: string) =>
 
 /**
  * Stacked mobile layout matching Slides 3, 4 & 5:
- * - Same locked card height & stage behavior
+ * - Same locked canvas height preventing outer page scroll
  * - Heading + 4 myth cards vertically center-aligned inside stage
- * - Two-tier bottom bar (Play/CC on top with 34px SVG size, Back/Next below without clipping)
+ * - Two-tier bottom bar (Play/CC on top, Back/Next below without clipping)
  */
 const mobileLayout = (scope: string) => `
   #slide-content${scope},
@@ -149,7 +149,7 @@ const mobileLayout = (scope: string) => `
   }
   ${scope} .s6-card {
     min-height: clamp(44px, 6.2dvh, 52px) !important;
-    padding: clamp(6px, 1dvh, 10px) 10px !important;
+    padding: clamp(6px, 1dvh, 10px) 12px !important;
     gap: 8px !important;
     border-radius: 10px !important;
   }
@@ -160,7 +160,7 @@ const mobileLayout = (scope: string) => `
     transform: translateY(0) !important;
   }
   ${scope} .s6-card-tag {
-    font-size: 10.5px !important;
+    font-size: clamp(11px, 0.4vh + 8.5px, 12px) !important;
     padding: 3px 8px !important;
   }
   ${scope} .s6-card-text {
