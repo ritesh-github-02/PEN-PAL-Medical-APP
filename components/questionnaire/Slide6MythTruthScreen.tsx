@@ -164,7 +164,7 @@ const mobileLayout = (scope: string) => `
     padding: 3px 8px !important;
   }
 ${scope} .s6-card-text {
-    font-size: clamp(15.5px, 1.65dvh, 16px) !important;
+    font-size: clamp(15px, 1.65dvh, 16px) !important;
     line-height: 1.3 !important;
     overflow-wrap: break-word !important;
   }
