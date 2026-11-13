@@ -76,66 +76,85 @@ const BUBBLE_PATH =
  "L 397.9,283.4 " +
  "Z";
 
-
+ 
 const s2MobileLayout = (scope: string) => `
   .tablet-mockup-frame ${scope},
   .tablet-screen-inner ${scope},
   .tablet-slide-content ${scope},
   .intervention-frame-outer ${scope},
+  #slide-content${scope},
   ${scope} {
     aspect-ratio: auto !important;
-    max-height: none !important;
+    width: 100% !important;
     height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    flex: 1 1 0% !important;
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
-    padding: 12px 14px 10px 14px !important;
+    padding: 10px 14px 10px 14px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    align-items: center !important;
     overflow-y: auto !important;
-    gap: 6px !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
   }
+  /* 1. Top Yellow Banner */
   ${scope} .s2-banner-wrap {
+    position: relative !important;
     width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 20px !important;
-    padding: 8px 16px !important;
-    margin: 0 auto 6px auto !important;
+    max-width: 360px !important;
+    border-radius: 18px !important;
+    padding: 8px 14px !important;
+    margin: 0 auto !important;
     box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2) !important;
     flex-shrink: 0 !important;
+    z-index: 5 !important;
   }
   ${scope} .s2-heading {
     font-size: 14.5px !important;
-    line-height: 1.32 !important;
+    line-height: 1.3 !important;
     text-align: center !important;
+    margin: 0 !important;
   }
+  /* 2. Middle Stage: Scrollable independently so options never overlap bottom buttons */
   ${scope} .s2-stage-middle {
+    position: relative !important;
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 6px !important;
+    gap: 8px !important;
     width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 !important;
+    max-width: 360px !important;
+    padding: 2px 2px 6px 2px !important;
+    margin: 0 auto !important;
     min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    z-index: 1 !important;
   }
-  /* 1. Character Area: Nurse Anna + auto-sizing Speech Bubble side-by-side */
+  /* 2A. Character Area: Speech Bubble + Nurse Anna side-by-side */
   ${scope} .s2-character-col {
     order: 1 !important;
     position: relative !important;
     width: 100% !important;
-    max-width: 360px !important;
+    max-width: 350px !important;
     height: auto !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    margin: 2px auto 6px auto !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     flex-shrink: 0 !important;
   }
@@ -146,7 +165,7 @@ const s2MobileLayout = (scope: string) => `
     flex: 1 1 0% !important;
     min-width: 0 !important;
     width: auto !important;
-    max-width: 268px !important;
+    max-width: 260px !important;
     min-height: auto !important;
     aspect-ratio: 520 / 340 !important;
     height: auto !important;
@@ -164,13 +183,13 @@ const s2MobileLayout = (scope: string) => `
     z-index: 1 !important;
     width: 100% !important;
     max-width: none !important;
-    padding: 30px 36px 34px 34px !important;
+    padding: 24px 30px 28px 28px !important;
     box-sizing: border-box !important;
   }
   ${scope} .s2-bubble-text {
     width: 100% !important;
-    font-size: clamp(11.5px, 3.1vw, 12.5px) !important;
-    line-height: 1.38 !important;
+    font-size: clamp(11px, 3vw, 12.5px) !important;
+    line-height: 1.35 !important;
     font-weight: 600 !important;
     color: #143833 !important;
     text-align: center !important;
@@ -181,8 +200,8 @@ const s2MobileLayout = (scope: string) => `
     position: relative !important;
     right: auto !important;
     bottom: auto !important;
-    width: clamp(54px, 16vw, 66px) !important;
-    height: clamp(108px, 31vw, 130px) !important;
+    width: clamp(50px, 15vw, 64px) !important;
+    height: clamp(96px, 28vw, 124px) !important;
     flex-shrink: 0 !important;
     display: flex !important;
     align-items: center !important;
@@ -194,7 +213,7 @@ const s2MobileLayout = (scope: string) => `
     object-fit: contain !important;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)) !important;
   }
-  /* 2. Options Area: Bottle hidden on mobile for horizontal symmetry and centered checklist */
+  /* 2B. Options Area */
   ${scope} .s2-options-col {
     order: 2 !important;
     display: flex !important;
@@ -203,7 +222,7 @@ const s2MobileLayout = (scope: string) => `
     justify-content: center !important;
     width: 100% !important;
     max-width: 340px !important;
-    margin: 0 auto 6px auto !important;
+    margin: 0 auto !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s2-bottle-wrap {
@@ -217,12 +236,12 @@ const s2MobileLayout = (scope: string) => `
   }
   ${scope} .s2-option-row {
     width: 100% !important;
-    min-height: 40px !important;
+    min-height: 38px !important;
     gap: 12px !important;
     padding: 6px 14px !important;
     border-radius: 12px !important;
     border: 1.5px solid rgba(35, 111, 122, 0.2) !important;
-    background-color: rgba(255, 255, 255, 0.75) !important;
+    background-color: rgba(255, 255, 255, 0.85) !important;
     box-shadow: 0 1px 3px rgba(20, 56, 51, 0.06) !important;
     transition: all 0.15s ease !important;
     justify-content: flex-start !important;
@@ -250,25 +269,34 @@ const s2MobileLayout = (scope: string) => `
     font-weight: 600 !important;
     color: #143833 !important;
   }
-  /* 3. Bottom Controls: Two-tier layout with Play/CC ABOVE and Back/Next BELOW */
+  /* 3. Bottom Bar: Solid cream background & static flex position so it never overlaps options */
   ${scope} .s2-bottom-bar {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     width: 100% !important;
     max-width: 340px !important;
+    background-color: #fafdf3 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: clamp(8px, 1.6vh, 14px) !important;
-    padding-top: 4px !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 8px !important;
+    padding-top: 6px !important;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
+    z-index: 25 !important;
   }
   ${scope} .s2-spacer-side {
     display: none !important;
   }
   ${scope} .s2-audio-controls {
     order: 1 !important;
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
     width: auto !important;
     display: flex !important;
     align-items: center !important;
@@ -282,14 +310,14 @@ const s2MobileLayout = (scope: string) => `
   }
   ${scope} .s2-audio-btn {
     min-width: 44px !important;
-    min-height: 44px !important;
-    padding: 4px !important;
+    min-height: 40px !important;
+    padding: 2px 4px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
   }
   ${scope} .s2-audio-btn svg {
-    height: 34px !important;
+    height: 32px !important;
     width: auto !important;
     transition: transform 0.12s ease !important;
   }
@@ -299,6 +327,10 @@ const s2MobileLayout = (scope: string) => `
   }
   ${scope} .s2-nav-center {
     order: 2 !important;
+    position: static !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -308,8 +340,8 @@ const s2MobileLayout = (scope: string) => `
   }
   ${scope} .s2-btn-nav {
     flex: 1 1 0% !important;
-    min-height: 48px !important;
-    height: 48px !important;
+    min-height: 44px !important;
+    height: 44px !important;
     font-size: 16px !important;
     font-weight: 700 !important;
     padding: 0 16px !important;
@@ -318,8 +350,6 @@ const s2MobileLayout = (scope: string) => `
     text-align: center !important;
   }
 `;
-
-
 const SLIDE2_COMPONENT_CSS = `
  /* ------------------------------------------------------------
     Slide 2: WCAG 2.1 / 2.2 Level AAA, WAVE & Karen Accessibility Rules
